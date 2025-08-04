@@ -39,7 +39,7 @@ const TestPrepHero: React.FC = () => {
   const testimonials = [
     { name: 'Sarah Ahmed', score: 'Band 8.5', text: 'Achieved my dream IELTS score!' },
     { name: 'Mohammad Rahman', score: 'Band 7.5', text: 'Excellent preparation materials and guidance.' },
-    { name: 'Fatima Khan', score: 'Band 8.0', text: "The best test prep experience I've had." },
+    { name: 'Fatima Khan', score: 'Band 8.0', text: 'The best test prep experience I have had.' },
   ];
 
   useEffect(() => {
@@ -48,7 +48,7 @@ const TestPrepHero: React.FC = () => {
       setCurrentTestimonial(prev => (prev + 1) % testimonials.length);
     }, 3000);
     return () => clearInterval(interval);
-  }, []);
+  }, [testimonials.length]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 relative overflow-hidden">
@@ -69,7 +69,7 @@ const TestPrepHero: React.FC = () => {
             {/* Top Badge */}
             <div className="inline-flex items-center bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-6 border border-white/20">
               <Star className="w-4 h-4 text-yellow-400 mr-2" />
-              <span className="text-white/90 text-sm">Bangladesh's Top Test Prep Platform</span>
+              <span className="text-white/90 text-sm">Bangladesh&apos;s Top Test Prep Platform</span>
             </div>
 
             <h1 className="text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
@@ -101,7 +101,7 @@ const TestPrepHero: React.FC = () => {
                   <span className="pl-3">{testimonials[currentTestimonial].score}</span>
                 </div>
                 <div>
-                  <p className="text-white/90 font-medium">"{testimonials[currentTestimonial].text}"</p>
+                  <p className="text-white/90 font-medium">{testimonials[currentTestimonial].text}</p>
                   <p className="text-white/60 text-sm">- {testimonials[currentTestimonial].name}</p>
                 </div>
               </div>
