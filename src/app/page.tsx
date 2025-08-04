@@ -1,3 +1,3 @@
 export default function Home() {
-  return <div>Project 1.2</div>;
+  return <div>Project Edit v - 1.0.7</div>;
 }
