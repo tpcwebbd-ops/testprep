@@ -4,9 +4,9 @@
  * 
 // ! 1. public/manifest.json
 {
-  "name": "_common_1_Name",
+  "name": "Testprep",
   "short_name": "_common_1_SortName",
-  "description": "_common_2_Description",
+  "description": "Achieve your desired IELTS band score",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -128,8 +128,8 @@ self.addEventListener('push', function (event) {
 
   // ! 5. Update src/app/layout.tsx
   export const metadata: Metadata = {
-  title: '_common_1_Name',
-  description: '_common_2_Description',
+  title: 'Testprep',
+  description: 'Achieve your desired IELTS band score',
   manifest: '/manifest.json',
   icons: {
     apple: '/icons/icon-192x192.png',
@@ -137,4 +137,4 @@ self.addEventListener('push', function (event) {
 };
 
  * 
- * */ 
+ * */

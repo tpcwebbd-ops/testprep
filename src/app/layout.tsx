@@ -18,8 +18,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: '_common_1_Name',
-  description: '_common_2_Description',
+  title: 'Testprep',
+  description: 'Achieve your desired IELTS band score',
   manifest: '/manifest.json',
   icons: {
     apple: '/icons/icon-192x192.png',

@@ -7,31 +7,32 @@
 */
 const navData = {
   baseInfo: {
-    firstName: 'B',
-    lastName: 'Varse',
+    firstName: 'Test',
+    lastName: 'prep',
   },
   about: {
     groupTitle: 'About',
-    fullName: 'Beta Varse',
-    description: ' The best service provider for your business growth.',
+    fullName: 'TestPrep Center',
+    description:
+      'Achieve your desired IELTS band score and master the English language with guidance from Sharif Russel, a senior and highly regarded instructor.',
     links: [
       {
         id: 1,
-        title: 'Introduction',
+        title: 'Course Details',
         url: '/',
-        description: 'We are a group of people to solve your problems',
+        description: 'Strategies to find the best course and university that match your academic profile.',
       },
       {
         id: 2,
-        title: 'Installation',
+        title: 'Funding Options',
         url: '/',
-        description: 'We have more then three plan for your business',
+        description: 'Learn about scholarships, fellowships, and self-funding options.',
       },
       {
         id: 3,
-        title: 'Installation',
+        title: 'IELTS Preparation',
         url: '/',
-        description: 'We have more then three plan for your business',
+        description: 'Effective tips and tricks for all four IELTS modules: Reading, Writing, Listening, and Speaking.',
       },
     ],
   },
@@ -39,39 +40,39 @@ const navData = {
     groupTitle: 'Services',
     data: [
       {
-        title: 'Supports',
+        title: 'Application Process',
         href: '/',
-        description: 'A modal dialog that interrupts the user with important content and expects a response.',
+        description: 'Guidance on writing a strong Statement of Purpose (SOP) and Letter of Recommendation (LOR).',
       },
       {
-        title: 'Preview',
+        title: 'Visa Support',
         href: '/',
-        description: 'For sighted users to preview content available behind a link.',
+        description: 'Comprehensive guidance on preparing for visa interviews and all necessary documentation.',
       },
       {
-        title: 'Indicator',
+        title: 'Free Seminars',
         href: '/',
-        description: 'Displays an indicator showing the completion progress of a task, typically displayed as a progress bar.',
+        description: 'Join our free seminars for a complete guide to studying abroad and acing the IELTS exam.',
       },
       {
-        title: 'Content',
+        title: 'Academic Requirements',
         href: '/',
-        description: 'Visually or semantically separates content.',
+        description: 'Understand how to apply to the best universities based on your academic results and IELTS score.',
       },
       {
-        title: 'Tabs',
+        title: 'Advanced Opportunities',
         href: '/',
-        description: 'A set of layered sections of content—known as tab panels—that are displayed one at a time.',
+        description: 'Information on Graduate, Teaching, and Research Assistantships (GA, TA, RA) and fellowships to fully fund your studies.',
       },
       {
-        title: 'Information',
+        title: 'Expert Instruction',
         href: '/',
-        description: 'A popup that displays information related to an element when the element receives keyboard focus or the mouse hovers over it.',
+        description: 'Receive the best instruction and guidance from our experienced instructors to ensure your success.',
       },
     ],
   },
   othersLink: [
-    { id: 2, title: 'Top Sells', url: '/top-sells' },
+    { id: 2, title: 'Seminars', url: '/seminars' },
     { id: 3, title: 'Contact', url: '/contact' },
   ],
 };
