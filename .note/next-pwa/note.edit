@@ -1,0 +1,5 @@
+1. npx create-next-app@latest
+2. upload to github and share invitation by email.
+3. create account in varcel and push the code and add ci/cd
+4. update layout
+5. update pwa

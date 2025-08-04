@@ -1,0 +1,15 @@
+# Redux
+ 1. add [tagTypes] in [src\redux\api\apiSlice.ts]
+
+
+ # you have to update those path
+ 1. [change the folder name] -->> dashboard/a__1_1001_users__/api/route.ts
+ 2. [change the folder name] -->> dashboard/a__1_1001_users__/ssr-view
+ 3. [change the folder name] -->> dashboard/a__1_1001_users__/client-view
+
+
+ 1. 
+ 2. 
+ 3. 
+ 4. 
+ 5. 

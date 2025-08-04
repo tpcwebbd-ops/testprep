@@ -1,0 +1,24 @@
+
+-------------------------------------------------------------
+Documentation for global change
+-------------------------------------------------------------
+-------------------------------------------------------------
+1.Users   /  _1_     / 000     /    _ _ _     /
+-------------------------------------------------------------
+unique-name/unique-id/global-id/global-check/
+-------------------------------------------------------------
+unique-name -> unique name to identify database
+unique-id   -> unique id to change secure
+global-id   -> global id to change secure
+global-check-> checking is all data editing finish or not
+-------------------------------------------------------------
+you have to change
+1. Users_1_000___ -->> Posts
+2. users_2_000___ -->> posts
+3. User_3_000___ -->> Post
+4. user_4_000___ -->> post
+5. ISelect_6_000___ -->> ISelect
+6. select_5_000___ -->> select
+
+7. a__1_1001_users__ [file and variable name] -->>  -->> posts
+8. tagTypeUsers_1_000___ -->> redux-tag-type -->> posts

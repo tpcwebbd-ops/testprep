@@ -1,0 +1,66 @@
+a -->> Backend api [5]
+    1. api/v1/Model.ts
+       - remove key and interface
+       - add key and interface
+    2. api/v1/Controller.ts
+       - [searchFilter]
+
+b -->> Store [10]
+    1. store/storeConstants.ts
+       - remove key for defaultGAuthUsersData[]
+       - update [defaultGAuthUsersData]
+    
+b -->> Table View []
+    1. components/ViewTable.tsx
+       - Update Table header  [TableHead]
+       - Update Table cell [TableCell]
+
+c -->> Single View
+    1. components/View.tsx
+       - remove fields
+       - add fields
+
+d -->> Single Edit
+    1. 
+
+e -->> B.Update 1
+
+f -->> B.Update 2
+
+g -->> B. Edit 
+
+
+
+----------------------------------------------
+   Prompt
+----------------------------------------------
+Please Update this NextJs component for this interface and type. make sure to use Typescript. 
+export const defaultGAuthUsersData: IGAuthUsers = {
+  _id: '',
+  name: '',
+  userRole: [],
+  imageUrl: '',
+  isBlocked: false,
+  blockedBy: '',
+  email: '',
+  passCode: '',
+  userUID: '',
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
+export const baseIGAuthUsers: IGAuthUsers = {
+  ...defaultGAuthUsersData,
+};
+export interface IGAuthUsers {
+  name: string;
+  userRole: string[];
+  imageUrl: string;
+  isBlocked: boolean;
+  blockedBy: string;
+  email: string;
+  passCode: string;
+  userUID: string;
+  createdAt: Date;
+  updatedAt: Date;
+  _id?: string;
+}

@@ -1,0 +1,13 @@
+-------------------------------------------------------------------
+1. Install those file and tools
+-------------------------------------------------------------------
+npm i react-icons date-fns framer-motion redis mongoose react-redux jsonwebtoken @types/jsonwebtoken @reduxjs/toolkit @tiptap/react @tiptap/starter-kit @tiptap/extension-highlight @tiptap/extension-text-align 
+
+
+
+
+
+-------------------------------------------------------------------
+2. npx shadcn ui @ latest
+-------------------------------------------------------------------
+npx shadcn@latest add label button badge checkbox table select scroll-area input toggle 
