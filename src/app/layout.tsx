@@ -38,7 +38,7 @@ export default function RootLayout({
           <ReduxProvider>
             <NavLayoutTemplate />
             {children}
-            <MainFooter />
+            {/* <MainFooter /> */}
           </ReduxProvider>
         </NextAuthProvider>
         <ToastContainer />
