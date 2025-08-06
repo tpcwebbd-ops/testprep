@@ -6,6 +6,6 @@
 |-----------------------------------------
 */
 const Page = () => {
-  return <main>Block Users Page</main>;
+  return <main>Unread Page</main>;
 };
 export default Page;

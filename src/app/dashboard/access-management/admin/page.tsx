@@ -6,6 +6,6 @@
 |-----------------------------------------
 */
 const Page = () => {
-  return <main>All role-Admin Page</main>;
+  return <main>User Admin Page</main>;
 };
 export default Page;

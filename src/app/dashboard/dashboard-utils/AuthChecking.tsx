@@ -5,9 +5,9 @@ import { useRouter } from 'next/navigation';
 
 import { useEffect } from 'react';
 
-const NotAuthorized = () => {
-  return <div className="flex items-center justify-center h-[40vh]">You are not authorized to view this page.</div>;
-};
+// const NotAuthorized = () => {
+//   return <div className="flex items-center justify-center h-[40vh]">You are not authorized to view this page.</div>;
+// };
 
 export default function AuthCheckingComponent({ redirectUrl = '/' as string, children = null as React.ReactNode | null }) {
   const sessionData = useSession();

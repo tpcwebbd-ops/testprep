@@ -6,6 +6,6 @@
 |-----------------------------------------
 */
 const Page = () => {
-  return <main>Block Users Page</main>;
+  return <main>Pending Page</main>;
 };
 export default Page;

@@ -32,7 +32,13 @@ import { IoInformationCircleOutline } from 'react-icons/io5';
 import { RiContactsBook3Line } from 'react-icons/ri';
 import { MdOutlinePrivacyTip } from 'react-icons/md';
 import { MdOutlinePolicy } from 'react-icons/md';
+import { FaUserSlash } from 'react-icons/fa';
+import { FaUsers } from 'react-icons/fa';
+import { TbUserStar } from 'react-icons/tb';
 
+const iconTbUserStar = <TbUserStar />;
+const iconFaUsers = <FaUsers />;
+const iconFaUserSlash = <FaUserSlash />;
 const iconBiPieChartAlt = <BiPieChartAlt />;
 const iconRiUserSettingsLine = <RiUserSettingsLine />;
 const iconFiUsers = <FiUsers />;
@@ -63,6 +69,9 @@ const iconRiContactsBook3Line = <RiContactsBook3Line />;
 const iconMdOutlinePrivacyTip = <MdOutlinePrivacyTip />;
 const iconMdOutlinePolicy = <MdOutlinePolicy />;
 export {
+  iconTbUserStar,
+  iconFaUsers,
+  iconFaUserSlash,
   iconMdOutlinePolicy,
   iconMdOutlinePrivacyTip,
   iconRiContactsBook3Line,

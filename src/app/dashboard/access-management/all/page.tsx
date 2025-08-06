@@ -2,10 +2,10 @@
 |-----------------------------------------
 | setting up Page for the App
 | @author: Toufiquer Rahman<toufiquer.0@gmail.com>
-| @copyright: varse-project, May, 2025
+| @copyright: webapp, August, 2025
 |-----------------------------------------
 */
 const Page = () => {
-  return <main>All role-management Page</main>;
+  return <main>All users access management Page</main>;
 };
 export default Page;

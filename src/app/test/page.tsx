@@ -147,8 +147,8 @@ const ComingSoonWithIeltsTest = () => {
                 <h3 className="text-xl font-semibold mb-2">Reading Section</h3>
                 <p className="mb-4 text-gray-300">Read the passage and answer the question below.</p>
                 <p className="italic bg-gray-700 p-4 rounded-md text-gray-300">
-                  "The advancements in artificial intelligence are growing at an exponential rate, leading to significant changes in various industries. While
-                  some view this as a threat to human employment, others see it as an opportunity for unprecedented growth and innovation."
+                  `&quot;`The advancements in artificial intelligence are growing at an exponential rate, leading to significant changes in various industries.
+                  While some view this as a threat to human employment, others see it as an opportunity for unprecedented growth and innovation.`&quot;`
                 </p>
                 <p className="mt-4 font-semibold">What is the main idea of the passage?</p>
                 <div className="mt-2 space-y-2">
@@ -171,7 +171,7 @@ const ComingSoonWithIeltsTest = () => {
               <div className="mb-8">
                 <h3 className="text-xl font-semibold mb-2">Writing Section (Task 2)</h3>
                 <p className="mb-2 text-gray-300">Write a short response (min. 20 characters) to the following question:</p>
-                <p className="font-semibold mb-4">"What are the benefits of international travel?"</p>
+                <p className="font-semibold mb-4">`&quot;`What are the benefits of international travel?`&quot;`</p>
                 <textarea
                   {...register('writingQuestion')}
                   rows={4}
