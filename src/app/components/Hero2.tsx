@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { ArrowRight, FileText, Clock, Target, Users, Star, CheckCircle, PlayCircle, BookOpen, Award, TrendingUp } from 'lucide-react';
+import Link from 'next/link';
 
 interface FeatureCardProps {
   icon: React.ReactNode;
@@ -143,10 +144,13 @@ const TestPrepHero: React.FC = () => {
               <div className="w-32 h-32 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl hover:scale-110 transition-transform duration-300 cursor-pointer group">
                 <PlayCircle className="w-16 h-16 text-white group-hover:scale-110 transition-transform duration-300" />
               </div>
-              <button className="bg-red-500 hover:bg-red-600 text-white px-8 py-4 rounded-2xl font-bold text-lg flex items-center mx-auto group transition-all duration-300 shadow-lg hover:shadow-xl">
+              <Link
+                href="/test"
+                className="bg-red-500 hover:bg-red-600 text-white px-8 py-4 rounded-2xl font-bold text-lg mx-auto group transition-all duration-300 shadow-lg hover:shadow-xl text-center max-w-[250px] flex items-center justify-center"
+              >
                 TAKE A TEST
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-              </button>
+              </Link>
             </div>
 
             {/* Right - Stats */}
