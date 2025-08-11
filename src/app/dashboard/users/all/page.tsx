@@ -55,7 +55,7 @@ const MainNextPage: React.FC = () => {
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold w-full">
-          GAuthUser Management {isSuccess && <sup className="text-xs">(total:{getResponseData?.data?.total || '00'})</sup>}
+          User Management {isSuccess && <sup className="text-xs">(total:{getResponseData?.data?.total || '00'})</sup>}
         </h1>
         <div className="w-full flex gap-2 item-center justify-end"></div>
       </div>
