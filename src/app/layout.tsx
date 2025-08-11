@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Testprep',
+  title: 'TestPrep',
   description: 'Achieve your desired IELTS band score',
   manifest: '/manifest.json',
   icons: {

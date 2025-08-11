@@ -16,7 +16,7 @@ const NavLayoutTemplate = () => {
       <CustomNav1 />
       {isFixedToTop ? (
         <div className="sticky top-0 z-50 w-full bg-opacity-60 md:bg-opacity-40 backdrop-blur bg-slate-100 border-b-1">
-          <div className="mx-auto max-w-7xl flex flex-col px-4 text-slate-700">
+          <div className="mx-auto container flex flex-col px-4 text-slate-700">
             <CustomNav2 />
           </div>
         </div>

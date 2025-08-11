@@ -8,7 +8,7 @@
 const navData = {
   baseInfo: {
     firstName: 'Test',
-    lastName: 'prep',
+    lastName: 'Prep',
   },
   about: {
     groupTitle: 'About',

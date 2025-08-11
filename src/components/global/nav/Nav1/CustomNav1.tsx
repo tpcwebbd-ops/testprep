@@ -7,24 +7,21 @@
 */
 
 import Link from 'next/link';
-import { FaFacebook } from 'react-icons/fa';
+import { FaFacebook, FaYoutube } from 'react-icons/fa';
 
 const CustomNav1 = () => {
-  type links = {
-    name: string;
-    url: string;
-  }[];
-  const links: links = [{ name: '+8801786 558855', url: '/' }];
-
   return (
     <nav className="w-full flex gap-4 items-center justify-end text-center px-4 bg-slate-700 text-slate-50">
-      <div className="mx-auto container flex items-center justify-end gap-4">
-        <div>+880 1786 558855</div>
+      <div className="mx-auto container flex items-center justify-end gap-4 px-4">
+        <a href="tel:+8801786558855">+880 1786 558855</a>
         <Link href="https://www.facebook.com/groups/ielts.sharif.russel" target="_blank" className="flex gap-2 items-center justify-center hover:text-accent">
           <FaFacebook /> Group
         </Link>
         <Link href="https://www.facebook.com/TestPrepCenter.BD/" target="_blank" className="flex gap-2 items-center justify-center hover:text-accent">
-          <FaFacebook /> Pgee
+          <FaFacebook /> Page
+        </Link>
+        <Link href="https://www.youtube.com/@TestPrepCenter" target="_blank" className="flex gap-2 items-center justify-center hover:text-accent">
+          <FaYoutube /> Channel
         </Link>
       </div>
     </nav>

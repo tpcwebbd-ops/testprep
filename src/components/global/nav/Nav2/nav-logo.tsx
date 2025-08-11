@@ -5,9 +5,9 @@
 | @copyright: Toufiquer, May, 2024
 |-----------------------------------------
 */
-import Link from "next/link";
-import navData from "./nav-data";
-import NavImage from "./nav-image";
+import Link from 'next/link';
+import navData from './nav-data';
+import NavImage from './nav-image';
 
 const { baseInfo } = navData || {};
 
@@ -22,7 +22,7 @@ const NavLogo = () => {
           {baseInfo.firstName}
         </span>
       </span>
-      {baseInfo.lastName}
+      {baseInfo.lastName} Center (TPC)
     </Link>
   );
 };

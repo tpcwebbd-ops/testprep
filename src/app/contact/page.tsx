@@ -95,7 +95,7 @@ const Contact = () => {
             Contact Us
           </h1>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed animate-fade-in-up">
-            Ready to start something amazing together? We `&apos;`d love to hear from you and bring your ideas to life.
+            Ready to start something amazing together? We&apos;d love to hear from you and bring your ideas to life.
           </p>
         </div>
 

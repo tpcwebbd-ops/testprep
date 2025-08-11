@@ -12,7 +12,7 @@ import MobileNav from './mobile-nav';
 const Nav = () => {
   return (
     <div className="w-full bg-opacity-60 md:bg-opacity-40 backdrop-blur">
-      <div className="mx-auto max-w-7xl flex flex-col">
+      <div className="mx-auto flex flex-col">
         <TabletNav />
         <MobileNav />
       </div>
