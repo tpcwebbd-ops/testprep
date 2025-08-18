@@ -19,8 +19,8 @@ import {
 } from '@/components/ui/dialog'
 
 import { IPosts } from '../api/v1/model'
-import { usePostsStore } from '../store/Store'
-import { useBulkUpdatePostsMutation } from '../redux/rtk-Api'
+import { usePostsStore } from '../store/store'
+import { useBulkUpdatePostsMutation } from '../redux/rtk-api'
 import { handleSuccess, handleError } from './utils'
 
 const BulkEditNextComponents: React.FC = () => {
