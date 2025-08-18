@@ -3,22 +3,21 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
-import { IPosts } from '../api/v1/model';
+import { IPosts, defaultPosts } from '../api/v1/model';
 import { usePostsStore } from '../store/store';
-import { baseIPosts } from '../store/store-constant';
 import { useDeletePostsMutation } from '../redux/rtk-api';
 import { handleSuccess, handleError } from './utils';
 
 const DeleteNextComponents: React.FC = () => {
-  const { toggleDeleteModal, isDeleteModalOpen, selectedPost, setSelectedPost } = usePostsStore();
+  const { toggleDeleteModal, isDeleteModalOpen, selectedPosts, setSelectedPosts } = usePostsStore();
 
   const [deletePost, { isLoading }] = useDeletePostsMutation();
 
   const handleDelete = async () => {
-    if (selectedPost) {
+    if (selectedPosts) {
       try {
         await deletePost({
-          id: selectedPost._id,
+          id: selectedPosts._id,
         }).unwrap();
         toggleDeleteModal(false);
         handleSuccess('Delete Successful');
@@ -31,10 +30,10 @@ const DeleteNextComponents: React.FC = () => {
 
   const handleCancel = () => {
     toggleDeleteModal(false);
-    setSelectedPost({ ...baseIPosts } as IPosts);
+    setSelectedPosts({ ...defaultPosts } as IPosts);
   };
 
-  const displayName = (selectedPost as any)?.['title'] || '';
+  const displayName = (selectedPosts as any)?.['title'] || '';
 
   return (
     <Dialog open={isDeleteModalOpen} onOpenChange={toggleDeleteModal}>
@@ -42,7 +41,7 @@ const DeleteNextComponents: React.FC = () => {
         <DialogHeader>
           <DialogTitle>Confirm Deletion</DialogTitle>
         </DialogHeader>
-        {selectedPost && (
+        {selectedPosts && (
           <div className="py-4">
             <p>
               You are about to delete this post: <span className="font-semibold">{displayName}</span>
