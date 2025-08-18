@@ -1,0 +1,81 @@
+-------------------------------------------------------------
+Base data
+-------------------------------------------------------------
+01 -> useCoursesStore
+02 -> useGetCoursesQuery
+03 -> ViewCoursesTable
+04 -> BulkUpdateCourses
+05 -> BulkDynamicUpdateCourses
+06 -> Course
+07 -> courses
+08 -> Courses
+09 -> courses
+10 -> course
+11 -> courses
+12 -> select_5_000___
+13 -> useAddCoursesMutation
+14 -> defaultCoursesData
+15 -> ISelect_6_000___
+16 -> newCourses
+17 -> addCourses
+18 -> Courses
+19 -> addedCourses
+20 -> Courses
+21 -> coursesrtk_tag
+22 -> select_5_000___
+23 -> courses
+24 -> Course
+
+-------------------------------------------------------------
+Updated data 
+-------------------------------------------------------------
+out put ----------------------------------
+01 -> useCoursesStore                 | useCoursesStore
+02 -> useGetCoursesQuery             | useGetCoursesQuery
+03 -> ViewCoursesTable               | ViewCoursesTable
+04 -> BulkUpdateCourses               | BulkUpdateCourses
+05 -> BulkDynamicUpdateCourses        | BulkDynamicUpdateCourses
+06 -> Course                         | Course
+07 -> courses                     | courses
+08 -> Courses                        | Courses
+09 -> courses                        | courses
+10 -> course                         | course
+11 -> courses                       | courses
+12 -> select_5_000___                  | select_5_000___
+13 -> useAddCoursesMutation           | useAddCoursesMutation
+14 -> defaultCoursesData              | defaultCoursesData
+15 -> ISelect_6_000___            | ISelect_6_000___
+16 -> newCourses                      | newCourses
+17 -> addCourses                      | addCourses
+18 -> Courses                         | Courses
+19 -> addedCourses                    | addedCourses
+20 -> Courses                         | Courses
+21 -> coursesrtk_tag                        | coursesrtk_tag
+22 -> select_5_000___                             | select_5_000___
+23 -> courses                | courses
+24 -> Course                            | Course
+
+
+
+2500*25
+
+-------------------------------------------------------------
+Documentation  
+-------------------------------------------------------------
+-------------------------------------------------------------
+unique-name/unique-id/global-id/global-check/
+-------------------------------------------------------------
+1.Users   /  _1_     / 000     /    ___     /
+-------------------------------------------------------------
+unique-name -> unique name to identify database
+unique-id   -> unique id to change secure
+global-id   -> global id to change secure
+global-check-> checking is all data editing finish or not
+-------------------------------------------------------------
+you have to change
+1. Courses
+2. courses
+3. Course
+4. course
+6. ISelect_6_000___
+5. select_5_000___
