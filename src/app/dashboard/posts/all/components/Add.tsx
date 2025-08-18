@@ -21,9 +21,9 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog'
 
-import { usePostsStore } from '../store/Store'
-import { useAddPostsMutation } from '../redux/rtk-Api'
-import { IPosts, defaultPosts } from '@/app/dashboard/posts/api/v1/model'
+import { usePostsStore } from '../store/store'
+import { useAddPostsMutation } from '../redux/rtk-api'
+import { IPosts, defaultPosts } from '@/app/dashboard/posts/all/api/v1/model'
 import { formatDuplicateKeyError, handleError, handleSuccess, isApiErrorResponse } from './utils'
 
 const InputField: React.FC<{
