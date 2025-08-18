@@ -147,4 +147,10 @@ export const sidebarDataHome: SIDEBARTYPE[] = [
       { id: 1000707, name: 'Terms and Condition', link: '/dashboard/site-setting/terms-and-condition', icon: iconMdOutlinePolicy },
     ],
   },
+  {
+    id: 10008,
+    name: 'Web tec testing',
+    icon: iconVscSettingsGear,
+    content: [{ id: 1000701, name: 'Posts', link: '/dashboard/posts/all', icon: iconTbAlignBoxLeftMiddle }],
+  },
 ];

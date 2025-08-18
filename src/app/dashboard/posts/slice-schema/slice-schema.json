@@ -1,0 +1,16 @@
+{
+  "uid": "001",
+  "templateName": "Test template 1",
+  "schema": {
+    "title": "STRING",
+    "books": "STRING"
+  },
+  "namingConvention": {
+    "Users_1_000___": "Posts",
+    "users_2_000___": "posts",
+    "User_3_000___": "Post",
+    "user_4_000___": "post",
+    "ISelect_6_000___": "ISelect",
+    "select_5_000___": "select"
+  }
+}
