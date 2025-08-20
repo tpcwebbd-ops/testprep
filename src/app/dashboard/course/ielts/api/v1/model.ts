@@ -8,25 +8,40 @@
 
 import mongoose, { Schema } from 'mongoose';
 
-const courseSchema = new Schema(
+const IELTScourseSchema = new Schema(
   {
-    name: { type: String, required: true },
+    courseName: { type: String },
     pdf: { type: String },
     wordFile: { type: String },
     videoLink: { type: String },
     description: { type: String },
+    details: { type: String },
+    enrollmentStatus: { type: Boolean },
+    enrollmentStateDate: { type: Date },
+    enrollmentEndDate: { type: Date },
+    price: { type: Number },
+    numberOfClass: { type: Number },
+    classDuration: { type: String },
   },
   { timestamps: true },
 );
 
-export default mongoose.models.Course || mongoose.model('Course', courseSchema);
+export default mongoose.models.IELTScourse || mongoose.model('IELTScourse', IELTScourseSchema);
 
-export interface ICourses {
-  name: string;
+export interface IELTScourse {
+  courseName: string;
   pdf: string;
   wordFile: string;
   videoLink: string;
   description: string;
+  details: string;
+  enrollmentStatus: boolean;
+  enrollmentStateDate: Date;
+  enrollmentEndDate: Date;
+  price: number;
+  numberOfClass: number;
+  classDuration: string;
+
   createdAt: Date;
   updatedAt: Date;
   _id: string;
