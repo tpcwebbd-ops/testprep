@@ -64,7 +64,14 @@ const CoursesPage = () => {
         {data?.data?.courses?.length === 0 && <p className="text-center text-gray-500 text-4xl">No courses available</p>}
         {data?.data?.courses?.map((course: IAllCourse) => (
           <div key={course._id as string} className="bg-white rounded-lg shadow-lg overflow-hidden relative group">
-            <img src={course.courseBannerPicture || '/placeholder.jpg'} alt={course.courseName} className="w-full h-40 object-cover" />
+            <img
+              onClick={() => openViewModal(course)}
+              loading="lazy"
+              src={course.courseBannerPicture || '/placeholder.jpg'}
+              alt={course.courseName}
+              className="w-full h-40 object-cover cursor-pointer"
+            />
+
             <div className="p-4">
               <h3 className="text-lg font-semibold text-gray-800 truncate">{course.courseName}</h3>
               <p className="text-sm text-gray-500 mt-1">Code: {course.courseCode || 'N/A'}</p>
@@ -107,7 +114,7 @@ const CoursesPage = () => {
       </div>
 
       {isAddModalOpen && <AddCourseModal onClose={closeAddModal} />}
-      {isEditModalOpen && selectedCourse && <EditCourseModal course={selectedCourse} onClose={closeEditModal} />}
+      {isEditModalOpen && selectedCourse && <EditCourseModal isOpen={isEditModalOpen} onClose={closeEditModal} course={selectedCourse} />}
       {isDeleteModalOpen && selectedCourse && <DeleteCourseModal courseId={selectedCourse._id as string} onClose={closeDeleteModal} />}
       {isViewModalOpen && selectedCourse && <ViewCourseModal course={selectedCourse} onClose={closeViewModal} />}
     </div>

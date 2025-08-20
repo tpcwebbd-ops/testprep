@@ -2,9 +2,19 @@ import { useState, FormEvent, useEffect } from 'react';
 import { useUpdateCoursesMutation } from '@/app/dashboard/course/all/store-api/rtk-Api';
 import { IAllCourse } from '@/app/dashboard/course/all/api/v1/model';
 
+// Import shadcn/ui components
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
+import { ScrollArea } from '@/components/ui/scroll-area';
+
 interface EditCourseModalProps {
-  course: IAllCourse;
+  isOpen: boolean;
   onClose: () => void;
+  course: IAllCourse;
 }
 
 // Helper function to format date for input[type="date"]
@@ -14,7 +24,7 @@ const formatDateForInput = (date?: Date | string): string => {
   return new Date(date).toISOString().split('T')[0];
 };
 
-const EditCourseModal = ({ course, onClose }: EditCourseModalProps) => {
+const EditCourseModal = ({ isOpen, onClose, course }: EditCourseModalProps) => {
   const [updateCourse, { isLoading }] = useUpdateCoursesMutation();
   const [formData, setFormData] = useState<Partial<IAllCourse>>({});
 
@@ -28,16 +38,8 @@ const EditCourseModal = ({ course, onClose }: EditCourseModalProps) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
 
-    // Handle checkboxes
-    if (type === 'checkbox') {
-      const { checked } = e.target as HTMLInputElement;
-      setFormData(prev => ({ ...prev, [name]: checked }));
-      return;
-    }
-
     // Handle number inputs
     if (type === 'number') {
-      // Allow clearing the number field
       const numValue = value === '' ? undefined : Number(value);
       setFormData(prev => ({ ...prev, [name]: numValue }));
       return;
@@ -47,110 +49,136 @@ const EditCourseModal = ({ course, onClose }: EditCourseModalProps) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleCheckboxChange = (checked: boolean) => {
+    setFormData(prev => ({ ...prev, enrolmentStatus: checked }));
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     try {
-      const updateData = { ...formData, id: formData._id };
-      updateData.id = course._id;
-      console.log('updateData : ', updateData);
+      // Ensure the ID is correctly passed for the update
+      const updateData = { ...formData, id: course._id };
       await updateCourse(updateData).unwrap();
-
       onClose(); // Close modal on success
     } catch (error) {
       console.error('Failed to update course:', error);
     }
   };
 
-  // Helper function to render input fields and reduce repetition
-  const renderInput = (name: keyof IAllCourse, label: string, type: string = 'text', required: boolean = false) => (
-    <div>
-      <label htmlFor={name} className="block text-sm font-medium text-gray-700">
-        {label}
-      </label>
-      <input
-        type={type}
-        name={name}
-        id={name}
-        value={type === 'date' ? formatDateForInput(formData[name] as Date | string) : (formData[name] as any) || ''}
-        onChange={handleChange}
-        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-        required={required}
-      />
-    </div>
-  );
-
-  const renderTextArea = (name: keyof IAllCourse, label: string, rows: number = 3) => (
-    <div>
-      <label htmlFor={name} className="block text-sm font-medium text-gray-700">
-        {label}
-      </label>
-      <textarea
-        name={name}
-        id={name}
-        value={(formData[name] as string) || ''}
-        onChange={handleChange}
-        rows={rows}
-        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-      ></textarea>
-    </div>
-  );
-
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-        <h2 className="text-2xl font-bold mb-4">Edit Course</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {renderInput('courseName', 'Course Name', 'text', true)}
-            {renderInput('courseCode', 'Course Code', 'number')}
-            {renderInput('coursePrice', 'Price', 'number')}
-            {renderInput('courseDuration', 'Course Duration')}
-            {renderInput('totalLecture', 'Total Lectures', 'number')}
-            {renderInput('totalPdf', 'Total PDFs', 'number')}
-            {renderInput('totalWord', 'Total Word Files', 'number')}
-            {renderInput('totalLiveClass', 'Total Live Classes', 'number')}
-            {renderInput('enrollStudents', 'Enrolled Students', 'number')}
-            {renderInput('runningStudent', 'Running Students', 'number')}
-            {renderInput('enrolmentStart', 'Enrollment Start', 'date')}
-            {renderInput('enrolmentEnd', 'Enrollment End', 'date')}
-          </div>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-3xl">
+        <DialogHeader>
+          <DialogTitle>Edit Course</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit}>
+          <ScrollArea className="h-[65vh] p-4">
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="courseName">Course Name</Label>
+                  <Input id="courseName" name="courseName" value={formData.courseName || ''} onChange={handleChange} required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="courseCode">Course Code</Label>
+                  <Input id="courseCode" name="courseCode" type="number" value={formData.courseCode || ''} onChange={handleChange} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="coursePrice">Price</Label>
+                  <Input id="coursePrice" name="coursePrice" type="number" value={formData.coursePrice || ''} onChange={handleChange} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="courseDuration">Course Duration</Label>
+                  <Input id="courseDuration" name="courseDuration" value={formData.courseDuration || ''} onChange={handleChange} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="totalLecture">Total Lectures</Label>
+                  <Input id="totalLecture" name="totalLecture" type="number" value={formData.totalLecture || ''} onChange={handleChange} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="totalPdf">Total PDFs</Label>
+                  <Input id="totalPdf" name="totalPdf" type="number" value={formData.totalPdf || ''} onChange={handleChange} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="totalWord">Total Word Files</Label>
+                  <Input id="totalWord" name="totalWord" type="number" value={formData.totalWord || ''} onChange={handleChange} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="totalLiveClass">Total Live Classes</Label>
+                  <Input id="totalLiveClass" name="totalLiveClass" type="number" value={formData.totalLiveClass || ''} onChange={handleChange} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="enrollStudents">Enrolled Students</Label>
+                  <Input id="enrollStudents" name="enrollStudents" type="number" value={formData.enrollStudents || ''} onChange={handleChange} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="runningStudent">Running Students</Label>
+                  <Input id="runningStudent" name="runningStudent" type="number" value={formData.runningStudent || ''} onChange={handleChange} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="enrolmentStart">Enrollment Start</Label>
+                  <Input id="enrolmentStart" name="enrolmentStart" type="date" value={formatDateForInput(formData.enrolmentStart)} onChange={handleChange} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="enrolmentEnd">Enrollment End</Label>
+                  <Input id="enrolmentEnd" name="enrolmentEnd" type="date" value={formatDateForInput(formData.enrolmentEnd)} onChange={handleChange} />
+                </div>
+              </div>
 
-          <div className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              name="enrolmentStatus"
-              id="enrolmentStatus"
-              checked={formData.enrolmentStatus || false}
-              onChange={handleChange}
-              className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-            />
-            <label htmlFor="enrolmentStatus" className="text-sm font-medium text-gray-700">
-              Enrollment Active
-            </label>
-          </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox id="enrolmentStatus" checked={formData.enrolmentStatus || false} onCheckedChange={handleCheckboxChange} />
+                <Label htmlFor="enrolmentStatus" className="text-sm font-medium">
+                  Enrollment Active
+                </Label>
+              </div>
 
-          <div className="space-y-4">
-            {renderTextArea('courseShortDescription', 'Short Description')}
-            {renderTextArea('courseDetails', 'Course Details', 5)}
-            {renderTextArea('courseNote', 'Notes')}
-            {renderTextArea('certifications', 'Certifications')}
-            {renderInput('courseBannerPicture', 'Banner Picture URL')}
-            {renderInput('courseIntroVideo', 'Intro Video URL')}
-            {renderInput('howCourseIsRunningView', 'Course Running View Info')}
-            {renderTextArea('review', 'Reviews (comma-separated)')}
-          </div>
-
-          <div className="flex justify-end space-x-2 pt-4">
-            <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="courseShortDescription">Short Description</Label>
+                  <Textarea id="courseShortDescription" name="courseShortDescription" value={formData.courseShortDescription || ''} onChange={handleChange} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="courseDetails">Course Details</Label>
+                  <Textarea id="courseDetails" name="courseDetails" value={formData.courseDetails || ''} onChange={handleChange} rows={5} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="courseNote">Notes</Label>
+                  <Textarea id="courseNote" name="courseNote" value={formData.courseNote || ''} onChange={handleChange} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="certifications">Certifications</Label>
+                  <Textarea id="certifications" name="certifications" value={formData.certifications || ''} onChange={handleChange} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="review">Reviews (comma-separated)</Label>
+                  <Textarea id="review" name="review" value={Array.isArray(formData.review) ? formData.review.join(', ') : ''} onChange={handleChange} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="courseBannerPicture">Banner Picture URL</Label>
+                  <Input id="courseBannerPicture" name="courseBannerPicture" value={formData.courseBannerPicture || ''} onChange={handleChange} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="courseIntroVideo">Intro Video URL</Label>
+                  <Input id="courseIntroVideo" name="courseIntroVideo" value={formData.courseIntroVideo || ''} onChange={handleChange} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="howCourseIsRunningView">Course Running View Info</Label>
+                  <Input id="howCourseIsRunningView" name="howCourseIsRunningView" value={formData.howCourseIsRunningView || ''} onChange={handleChange} />
+                </div>
+              </div>
+            </div>
+          </ScrollArea>
+          <DialogFooter className="pt-4">
+            <Button type="button" variant="outline" onClick={onClose}>
               Cancel
-            </button>
-            <button type="submit" disabled={isLoading} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-300">
+            </Button>
+            <Button type="submit" disabled={isLoading}>
               {isLoading ? 'Updating...' : 'Update Course'}
-            </button>
-          </div>
+            </Button>
+          </DialogFooter>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 
