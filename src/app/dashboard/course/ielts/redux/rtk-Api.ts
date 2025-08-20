@@ -13,7 +13,7 @@ export const coursesApi = apiSlice.injectEndpoints({
   endpoints: builder => ({
     getCourses: builder.query({
       query: ({ page, limit, q }) => {
-        let url = `/dashboard/course/all/api/v1?page=${page || 1}&limit=${limit || 10}`;
+        let url = `/dashboard/course/ielts/api/v1?page=${page || 1}&limit=${limit || 10}`;
         if (q) {
           url += `&q=${encodeURIComponent(q)}`;
         }
@@ -22,11 +22,11 @@ export const coursesApi = apiSlice.injectEndpoints({
       providesTags: [{ type: 'tagTypeCourses', id: 'LIST' }],
     }),
     getCoursesById: builder.query({
-      query: id => `/dashboard/course/all/api/v1?id=${id}`,
+      query: id => `/dashboard/course/ielts/api/v1?id=${id}`,
     }),
     addCourses: builder.mutation({
       query: newCourses => ({
-        url: '/dashboard/course/all/api/v1',
+        url: '/dashboard/course/ielts/api/v1',
         method: 'POST',
         body: newCourses,
       }),
@@ -34,7 +34,7 @@ export const coursesApi = apiSlice.injectEndpoints({
     }),
     updateCourses: builder.mutation({
       query: ({ id, ...data }) => ({
-        url: `/dashboard/course/all/api/v1`,
+        url: `/dashboard/course/ielts/api/v1`,
         method: 'PUT',
         body: { id: id, ...data },
       }),
@@ -42,7 +42,7 @@ export const coursesApi = apiSlice.injectEndpoints({
     }),
     deleteCourses: builder.mutation({
       query: ({ id }) => ({
-        url: `/dashboard/course/all/api/v1`,
+        url: `/dashboard/course/ielts/api/v1`,
         method: 'DELETE',
         body: { id },
       }),
@@ -50,7 +50,7 @@ export const coursesApi = apiSlice.injectEndpoints({
     }),
     bulkUpdateCourses: builder.mutation({
       query: bulkData => ({
-        url: `/dashboard/course/all/api/v1?bulk=true`,
+        url: `/dashboard/course/ielts/api/v1?bulk=true`,
         method: 'PUT',
         body: bulkData,
       }),
@@ -58,7 +58,7 @@ export const coursesApi = apiSlice.injectEndpoints({
     }),
     bulkDeleteCourses: builder.mutation({
       query: bulkData => ({
-        url: `/dashboard/course/all/api/v1?bulk=true`,
+        url: `/dashboard/course/ielts/api/v1?bulk=true`,
         method: 'DELETE',
         body: bulkData,
       }),

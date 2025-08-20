@@ -10,7 +10,8 @@ import mongoose, { Schema } from 'mongoose';
 
 const IELTScourseSchema = new Schema(
   {
-    courseName: { type: String },
+    lectureTitle: { type: String },
+    lectureNo: { type: Number },
     pdf: { type: String },
     wordFile: { type: String },
     videoLink: { type: String },
@@ -29,7 +30,8 @@ const IELTScourseSchema = new Schema(
 export default mongoose.models.IELTScourse || mongoose.model('IELTScourse', IELTScourseSchema);
 
 export interface IELTScourse {
-  courseName: string;
+  lectureTitle: string;
+  lectureNo: number;
   pdf: string;
   wordFile: string;
   videoLink: string;
