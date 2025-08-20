@@ -9,6 +9,7 @@ import EditCourseModal from './Edit';
 import DeleteCourseModal from './Delete';
 import ViewCourseModal from './View';
 import { FiMoreVertical, FiPlus, FiEdit, FiTrash2, FiEye } from 'react-icons/fi';
+import Image from 'next/image';
 
 const CoursesPage = () => {
   const { data, error, isLoading } = useGetCoursesQuery({ page: 1, limit: 10, q: '' });
@@ -67,7 +68,7 @@ const CoursesPage = () => {
         {data?.data?.courses?.length === 0 && <p className="text-center text-gray-500 text-4xl">No courses available</p>}
         {data?.data?.courses?.map((course: IAllCourse) => (
           <div key={course._id as string} className="bg-white rounded-lg shadow-lg overflow-hidden relative group">
-            <img
+            <Image
               onClick={() => openViewModal(course)}
               loading="lazy"
               src={course.courseBannerPicture || '/placeholder.jpg'}

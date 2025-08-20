@@ -19,7 +19,7 @@ export const coursesApi = apiSlice.injectEndpoints({
         }
         return url;
       },
-      providesTags: [{ type: 'tagTypeCourses', id: 'LIST' }],
+      providesTags: [{ type: 'tagTypeSpoken', id: 'LIST' }],
     }),
     getCoursesById: builder.query({
       query: id => `/dashboard/course/spoken/api/v1?id=${id}`,
@@ -30,7 +30,7 @@ export const coursesApi = apiSlice.injectEndpoints({
         method: 'POST',
         body: newCourses,
       }),
-      invalidatesTags: [{ type: 'tagTypeCourses' }],
+      invalidatesTags: [{ type: 'tagTypeSpoken' }],
     }),
     updateCourses: builder.mutation({
       query: ({ id, ...data }) => ({
@@ -38,7 +38,7 @@ export const coursesApi = apiSlice.injectEndpoints({
         method: 'PUT',
         body: { id: id, ...data },
       }),
-      invalidatesTags: [{ type: 'tagTypeCourses' }],
+      invalidatesTags: [{ type: 'tagTypeSpoken' }],
     }),
     deleteCourses: builder.mutation({
       query: ({ id }) => ({
@@ -46,7 +46,7 @@ export const coursesApi = apiSlice.injectEndpoints({
         method: 'DELETE',
         body: { id },
       }),
-      invalidatesTags: [{ type: 'tagTypeCourses' }],
+      invalidatesTags: [{ type: 'tagTypeSpoken' }],
     }),
     bulkUpdateCourses: builder.mutation({
       query: bulkData => ({
@@ -54,7 +54,7 @@ export const coursesApi = apiSlice.injectEndpoints({
         method: 'PUT',
         body: bulkData,
       }),
-      invalidatesTags: [{ type: 'tagTypeCourses' }],
+      invalidatesTags: [{ type: 'tagTypeSpoken' }],
     }),
     bulkDeleteCourses: builder.mutation({
       query: bulkData => ({
@@ -62,7 +62,7 @@ export const coursesApi = apiSlice.injectEndpoints({
         method: 'DELETE',
         body: bulkData,
       }),
-      invalidatesTags: [{ type: 'tagTypeCourses' }],
+      invalidatesTags: [{ type: 'tagTypeSpoken' }],
     }),
   }),
 });

@@ -7,7 +7,7 @@
 */
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -40,7 +40,7 @@ const ComingSoonWithIeltsTest = () => {
     resolver: zodResolver(ieltsTestSchema),
   });
 
-  const launchDate = new Date('2025-12-31T00:00:00');
+  const launchDate = useMemo(() => new Date('2025-12-31T00:00:00'), []);
 
   useEffect(() => {
     const timer = setInterval(() => {

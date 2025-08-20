@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
+import Image from 'next/image';
 
 interface ViewCourseModalProps {
   isOpen: boolean;
@@ -40,7 +41,7 @@ const ViewCourseModal = ({ isOpen, course, onClose }: ViewCourseModalProps) => {
         <ScrollArea className="h-[70vh] p-4">
           <div className="space-y-6">
             <div className="relative w-full h-56 rounded-lg overflow-hidden">
-              <img src={course.courseBannerPicture || '/placeholder.jpg'} alt={course.courseName} className="w-full h-full object-cover" />
+              <Image src={course.courseBannerPicture || '/placeholder.jpg'} alt={course.courseName} className="w-full h-full object-cover" />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
               <DetailItem label="Course Code" value={course.courseCode || 'N/A'} />
