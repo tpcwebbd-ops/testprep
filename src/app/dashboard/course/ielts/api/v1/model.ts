@@ -15,13 +15,10 @@ const IELTScourseSchema = new Schema(
     pdf: { type: String },
     wordFile: { type: String },
     videoLink: { type: String },
-    description: { type: String },
+    shortDescription: { type: String },
+    summery: { type: String },
     details: { type: String },
-    enrollmentStatus: { type: Boolean },
-    enrollmentStateDate: { type: Date },
-    enrollmentEndDate: { type: Date },
-    price: { type: Number },
-    numberOfClass: { type: Number },
+    note: { type: String },
     classDuration: { type: String },
   },
   { timestamps: true },
@@ -35,13 +32,10 @@ export interface IELTScourse {
   pdf: string;
   wordFile: string;
   videoLink: string;
-  description: string;
+  shortDescription: string;
+  summery: string;
   details: string;
-  enrollmentStatus: boolean;
-  enrollmentStateDate: Date;
-  enrollmentEndDate: Date;
-  price: number;
-  numberOfClass: number;
+  note: string;
   classDuration: string;
 
   createdAt: Date;
