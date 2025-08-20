@@ -14,7 +14,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 
-import { IELTScourse } from '../api/v1/model';
+import { SpokenCourse } from '../api/v1/model';
 
 import { useCoursesStore } from '../store/Store';
 import { useGetCoursesByIdQuery } from '../redux/rtk-Api';
@@ -74,7 +74,7 @@ const ViewCourse: React.FC = () => {
 
   const handleClose = () => {
     toggleViewModal(false);
-    setSelectedCourses(null as unknown as IELTScourse);
+    setSelectedCourses(null as unknown as SpokenCourse);
   };
 
   return (

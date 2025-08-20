@@ -38,10 +38,8 @@ const ViewCoursesTable: React.FC = () => {
   const {
     setSelectedCourses,
     toggleBulkEditModal,
-    toggleBulkUpdateModal,
     toggleViewModal,
     queryPramsLimit,
-    toggleBulkDynamicUpdateModal,
     queryPramsPage,
     queryPramsQ,
     toggleEditModal,

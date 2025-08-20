@@ -60,7 +60,7 @@ const ComingSoonWithIeltsTest = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [launchDate]);
 
   const onTestSubmit: SubmitHandler<IeltsTestFormInputs> = data => {
     let score = 0;

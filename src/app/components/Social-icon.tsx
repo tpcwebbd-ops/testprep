@@ -8,8 +8,6 @@
 
 'use client';
 
-import { FaFacebook, FaYoutube } from 'react-icons/fa';
-
 import Link from 'next/link';
 import { Facebook, Youtube } from 'lucide-react';
 

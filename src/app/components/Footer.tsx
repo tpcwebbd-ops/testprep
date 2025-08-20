@@ -1,5 +1,5 @@
 import React from 'react';
-import { Facebook, Instagram, Youtube, Mail, Phone, MapPin, Clock, Award, Users, BookOpen } from 'lucide-react';
+import { Mail, Phone, MapPin, Clock, Award, Users, BookOpen } from 'lucide-react';
 import SocialIcon from './Social-icon';
 
 interface FooterLink {

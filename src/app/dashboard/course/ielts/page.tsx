@@ -10,8 +10,6 @@
 
 import React, { useState } from 'react';
 import { PlusIcon } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { BiRightArrowAlt } from 'react-icons/bi';
 
 import { Button } from '@/components/ui/button';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
@@ -59,7 +57,6 @@ const CoursePage: React.FC = () => {
   };
 
   const modals = [AddCourse, ViewCourse, BulkDeleteCourse, BulkEditCourse, EditCourse, DeleteCourse, BulkUpdateCourses, BulkDynamicUpdateCourses];
-  const router = useRouter();
 
   let renderUI = (
     <div className="container mx-auto p-4">

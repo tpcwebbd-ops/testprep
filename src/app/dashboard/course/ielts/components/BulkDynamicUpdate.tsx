@@ -58,7 +58,7 @@ const BulkDynamicUpdateNextComponents: React.FC = () => {
               <div key={(Courses._id as string) || idx} className="flex items-start mb-2 justify-between flex-col">
                 <div className="flex flex-col">
                   <span>
-                    {idx + 1}. {(Courses.name as string) || ''}
+                    {idx + 1}. {(Courses.lectureTitle as string) || ''}
                   </span>
                   {/* <span className="text-xs mt-0">{Array.isArray(Courses.dataArr) ? courses.dataArr.join(', ') : ''}</span> */}
                   <span className="text-xs mt-0">{newItemTags.join(', ') || ''}</span>

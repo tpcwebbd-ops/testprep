@@ -61,11 +61,11 @@ const BulkEditNextComponents: React.FC = () => {
             {bulkData.map((Courses, idx) => (
               <div key={(Courses._id as string) || idx} className="flex items-center justify-between">
                 <span>
-                  {idx + 1}. {(Courses.name as string) || ''}
+                  {idx + 1}. {(Courses.lectureTitle as string) || ''}
                 </span>
                 <div className="flex items-center gap-4 min-w-[180px]">
                   <Label htmlFor="edit-role">Public Status</Label>
-                  <Select onValueChange={role => handleRoleChange(Courses._id as string, role)} defaultValue={(Courses.name as string) || ''}>
+                  <Select onValueChange={role => handleRoleChange(Courses._id as string, role)} defaultValue={(Courses.lectureTitle as string) || ''}>
                     <SelectTrigger className="bg-slate-50">
                       <SelectValue placeholder="Select a status" />
                     </SelectTrigger>

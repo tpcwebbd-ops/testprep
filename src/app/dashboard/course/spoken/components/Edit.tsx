@@ -19,7 +19,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { useCoursesStore } from '../store/Store';
 import { useUpdateCoursesMutation } from '../redux/rtk-Api';
 import { formatDuplicateKeyError, handleError, handleSuccess, isApiErrorResponse } from './utils';
-import { IELTScourse } from '../api/v1/model';
+import { SpokenCourse } from '../api/v1/model';
 
 const EditCourse: React.FC = () => {
   const { toggleEditModal, isEditModalOpen, selectedCourses, setSelectedCourses } = useCoursesStore();
@@ -88,7 +88,7 @@ const EditCourse: React.FC = () => {
 
   const handleCancel = () => {
     toggleEditModal(false);
-    setSelectedCourses(null as unknown as IELTScourse);
+    setSelectedCourses(null as unknown as SpokenCourse);
   };
 
   return (

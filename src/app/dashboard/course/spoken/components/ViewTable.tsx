@@ -21,7 +21,7 @@ import ErrorMessageComponent from '@/components/common/Error';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-import { IELTScourse } from '../api/v1/model';
+import { SpokenCourse } from '../api/v1/model';
 import { pageLimitArr } from '../store/StoreConstants';
 import { useCoursesStore } from '../store/Store';
 import { useGetCoursesQuery } from '../redux/rtk-Api';
@@ -31,17 +31,15 @@ import { handleSuccess } from './utils';
 
 const ViewCoursesTable: React.FC = () => {
   const [sortConfig, setSortConfig] = useState<{
-    key: keyof IELTScourse;
+    key: keyof SpokenCourse;
     direction: 'asc' | 'desc';
   } | null>(null);
 
   const {
     setSelectedCourses,
     toggleBulkEditModal,
-    toggleBulkUpdateModal,
     toggleViewModal,
     queryPramsLimit,
-    toggleBulkDynamicUpdateModal,
     queryPramsPage,
     queryPramsQ,
     toggleEditModal,
@@ -75,7 +73,7 @@ const ViewCoursesTable: React.FC = () => {
 
   const formatDate = (date?: Date) => (date ? format(new Date(date), 'MMM dd, yyyy') : 'N/A');
 
-  const handleSort = (key: keyof IELTScourse) => {
+  const handleSort = (key: keyof SpokenCourse) => {
     setSortConfig(prev => (prev?.key === key ? { key, direction: prev.direction === 'asc' ? 'desc' : 'asc' } : { key, direction: 'asc' }));
   };
 
@@ -92,7 +90,7 @@ const ViewCoursesTable: React.FC = () => {
 
   const handleSelectAll = (isChecked: boolean) => setBulkData(isChecked ? allCoursesData : []);
 
-  const handleSelectRow = (isChecked: boolean, course: IELTScourse) =>
+  const handleSelectRow = (isChecked: boolean, course: SpokenCourse) =>
     setBulkData(isChecked ? [...bulkData, course] : bulkData.filter(item => item._id !== course._id));
 
   const handleReload = () => {
@@ -100,7 +98,7 @@ const ViewCoursesTable: React.FC = () => {
     handleSuccess('Reload Successful');
   };
 
-  const renderActions = (course: IELTScourse) => (
+  const renderActions = (course: SpokenCourse) => (
     <div className="flex gap-2 justify-end">
       <Button
         variant="outlineDefault"
@@ -136,7 +134,7 @@ const ViewCoursesTable: React.FC = () => {
   );
 
   const renderTableRows = () =>
-    sortedCoursesData.map((course: IELTScourse) => (
+    sortedCoursesData.map((course: SpokenCourse) => (
       <TableRow key={course._id}>
         <TableCell>
           <Checkbox onCheckedChange={checked => handleSelectRow(!!checked, course)} checked={bulkData.some(item => item._id === course._id)} />
@@ -163,7 +161,7 @@ const ViewCoursesTable: React.FC = () => {
       </TableRow>
     ));
 
-  const tableHeaders: { key: keyof IELTScourse; label: string }[] = [
+  const tableHeaders: { key: keyof SpokenCourse; label: string }[] = [
     { key: 'lectureNo', label: 'Lecture No' },
     { key: 'lectureTitle', label: 'Lecture Title' },
     { key: 'status', label: 'Status' },

@@ -14,7 +14,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
-import { IELTScourse } from '../api/v1/model';
+import { SpokenCourse } from '../api/v1/model';
 import { useCoursesStore } from '../store/Store';
 import { coursesSelectorArr } from '../store/StoreConstants';
 import { useBulkUpdateCoursesMutation } from '../redux/rtk-Api';
@@ -42,7 +42,7 @@ const BulkEditNextComponents: React.FC = () => {
   };
 
   const handleRoleChange = (CoursesId: string, status: string) => {
-    setBulkData(bulkData.map(Courses => (Courses._id === CoursesId ? { ...Courses, status } : Courses)) as IELTScourse[]);
+    setBulkData(bulkData.map(Courses => (Courses._id === CoursesId ? { ...Courses, status } : Courses)) as SpokenCourse[]);
   };
 
   return (
@@ -61,11 +61,11 @@ const BulkEditNextComponents: React.FC = () => {
             {bulkData.map((Courses, idx) => (
               <div key={(Courses._id as string) || idx} className="flex items-center justify-between">
                 <span>
-                  {idx + 1}. {(Courses.name as string) || ''}
+                  {idx + 1}. {(Courses.lectureTitle as string) || ''}
                 </span>
                 <div className="flex items-center gap-4 min-w-[180px]">
                   <Label htmlFor="edit-role">Public Status</Label>
-                  <Select onValueChange={role => handleRoleChange(Courses._id as string, role)} defaultValue={(Courses.name as string) || ''}>
+                  <Select onValueChange={role => handleRoleChange(Courses._id as string, role)} defaultValue={(Courses.lectureTitle as string) || ''}>
                     <SelectTrigger className="bg-slate-50">
                       <SelectValue placeholder="Select a status" />
                     </SelectTrigger>

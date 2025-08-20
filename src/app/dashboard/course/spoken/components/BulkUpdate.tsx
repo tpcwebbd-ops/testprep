@@ -13,7 +13,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
-import { ICourses } from '../api/v1/model';
+import { SpokenCourse } from '../api/v1/model';
 import { useCoursesStore } from '../store/Store';
 import { coursesSelectorArr } from '../store/StoreConstants';
 import { useBulkUpdateCoursesMutation } from '../redux/rtk-Api';
@@ -45,7 +45,7 @@ const BulkUpdateNextComponents: React.FC = () => {
       bulkData.map(Courses => ({
         ...Courses,
         role,
-      })) as ICourses[],
+      })) as SpokenCourse[],
     );
   };
 
@@ -82,9 +82,9 @@ const BulkUpdateNextComponents: React.FC = () => {
             {bulkData.map((Courses, idx) => (
               <div key={(Courses._id as string) || idx} className="flex items-center justify-between">
                 <span>
-                  {idx + 1}. {(Courses.name as string) || ''}
+                  {idx + 1}. {(Courses.lectureTitle as string) || ''}
                 </span>
-                <span>{Courses.name as string}</span>
+                <span>{Courses.lectureTitle as string}</span>
               </div>
             ))}
           </div>

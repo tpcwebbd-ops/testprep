@@ -19,7 +19,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { useCoursesStore } from '../store/Store';
 import { useAddCoursesMutation } from '../redux/rtk-Api';
 import { formatDuplicateKeyError, handleError, handleSuccess, isApiErrorResponse } from './utils';
-import { IELTScourse } from '../api/v1/model';
+import { SpokenCourse } from '../api/v1/model';
 
 const AddCourse: React.FC = () => {
   const { toggleAddModal, isAddModalOpen, setCourses, courses } = useCoursesStore();
@@ -67,7 +67,7 @@ const AddCourse: React.FC = () => {
     };
 
     try {
-      const newCourse = (await addCourse(courseData).unwrap()) as IELTScourse;
+      const newCourse = (await addCourse(courseData).unwrap()) as SpokenCourse;
       setCourses([newCourse, ...courses]);
       toggleAddModal(false);
       resetForm();

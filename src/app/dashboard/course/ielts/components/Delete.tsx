@@ -11,7 +11,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
-import { ICourses } from '../api/v1/model';
+import { IELTScourse } from '../api/v1/model';
 import { useCoursesStore } from '../store/Store';
 import { baseICourses } from '../store/StoreConstants';
 import { useDeleteCoursesMutation } from '../redux/rtk-Api';
@@ -38,10 +38,10 @@ const DeleteNextComponents: React.FC = () => {
 
   const handleCancel = () => {
     toggleDeleteModal(false);
-    setSelectedCourses({ ...baseICourses } as ICourses);
+    setSelectedCourses({ ...baseICourses } as IELTScourse);
   };
 
-  const { name = '' } = selectedCourses || {};
+  const { lectureTitle = '' } = selectedCourses || {};
 
   return (
     <Dialog open={isDeleteModalOpen} onOpenChange={toggleDeleteModal}>
@@ -52,7 +52,7 @@ const DeleteNextComponents: React.FC = () => {
         {selectedCourses && (
           <div className="py-4">
             <p>
-              You are about to delete Courses: <span className="font-semibold">{(name as string) || ''}</span>
+              You are about to delete Courses: <span className="font-semibold">{(lectureTitle as string) || ''}</span>
             </p>
           </div>
         )}

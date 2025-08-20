@@ -12,8 +12,6 @@ import {
   iconFaUserSecret,
   iconFiUsers,
   iconRiUserSettingsLine,
-  iconTbUserShare,
-  iconTbUserSquareRounded,
   iconBiCategory,
   iconRiUserSettingsFill,
   iconLucideBaggageClaim,

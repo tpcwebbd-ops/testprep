@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { ICourses } from '../api/v1/model';
+import { IELTScourse } from '../api/v1/model';
 import { CoursesStore } from './StoreTypes';
 import { baseICourses, queryParams } from './StoreConstants';
 
@@ -22,8 +22,8 @@ export const useCoursesStore = create<CoursesStore>(set => ({
   setQueryPramsLimit: (payload: number) => set({ queryPramsLimit: payload }),
   setQueryPramsPage: (payload: number) => set({ queryPramsPage: payload }),
   setQueryPramsQ: (payload: string) => set({ queryPramsQ: payload }),
-  setBulkData: (bulkData: ICourses[]) => set({ bulkData }),
-  setCourses: (courses: ICourses[]) => set({ courses }),
+  setBulkData: (bulkData: IELTScourse[]) => set({ bulkData }),
+  setCourses: (courses: IELTScourse[]) => set({ courses }),
   setSelectedCourses: Courses => set({ selectedCourses: Courses }),
   setNewCourses: Courses =>
     set(state => ({
