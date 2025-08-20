@@ -33,10 +33,10 @@ export const coursesApi = apiSlice.injectEndpoints({
       invalidatesTags: [{ type: 'tagTypeCourses' }],
     }),
     updateCourses: builder.mutation({
-      query: ({ id, ...data }) => ({
+      query: ({ ...data }) => ({
         url: `/dashboard/course/all/api/v1`,
         method: 'PUT',
-        body: { id: id, ...data },
+        body: { ...data },
       }),
       invalidatesTags: [{ type: 'tagTypeCourses' }],
     }),

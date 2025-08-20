@@ -77,25 +77,25 @@ const CoursesPage = () => {
             </div>
             <div className="absolute top-2 right-2">
               <div className="relative">
-                <button className="p-2 rounded-full bg-gray-200 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button className="p-2 rounded-full bg-gray-200 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
                   <FiMoreVertical />
                 </button>
                 <div className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10 hidden group-focus-within:block">
                   <button
                     onClick={() => openViewModal(course)}
-                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 flex items-center cursor-pointer"
                   >
                     <FiEye className="mr-2" /> View
                   </button>
                   <button
                     onClick={() => openEditModal(course)}
-                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 flex items-center cursor-pointer"
                   >
                     <FiEdit className="mr-2" /> Edit
                   </button>
                   <button
                     onClick={() => openDeleteModal(course)}
-                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center"
+                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-200 flex items-center cursor-pointer"
                   >
                     <FiTrash2 className="mr-2" /> Delete
                   </button>
