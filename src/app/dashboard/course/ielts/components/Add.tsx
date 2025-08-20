@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 import { useCoursesStore } from '../store/Store';
@@ -24,7 +25,6 @@ const AddCourse: React.FC = () => {
   const { toggleAddModal, isAddModalOpen, setCourses, courses } = useCoursesStore();
   const [addCourse, { isLoading }] = useAddCoursesMutation();
 
-  // State updated to match the new IELTScourse model
   const [lectureTitle, setLectureTitle] = useState('');
   const [lectureNo, setLectureNo] = useState<number | ''>('');
   const [pdf, setPdf] = useState('');
@@ -35,6 +35,7 @@ const AddCourse: React.FC = () => {
   const [details, setDetails] = useState('');
   const [note, setNote] = useState('');
   const [classDuration, setClassDuration] = useState('');
+  const [status, setStatus] = useState<'Pending' | 'Private' | 'Public'>('Pending');
 
   const resetForm = () => {
     setLectureTitle('');
@@ -47,6 +48,7 @@ const AddCourse: React.FC = () => {
     setDetails('');
     setNote('');
     setClassDuration('');
+    setStatus('Pending');
   };
 
   const handleAddCourse = async () => {
@@ -61,6 +63,7 @@ const AddCourse: React.FC = () => {
       details,
       note,
       classDuration,
+      status,
     };
 
     try {
@@ -90,6 +93,7 @@ const AddCourse: React.FC = () => {
 
         <ScrollArea className="h-[500px] w-full rounded-md border p-4">
           <div className="grid gap-4 py-4">
+            {/* Form Fields */}
             <div className="grid grid-cols-4 items-center gap-4 pr-1">
               <Label htmlFor="lectureTitle" className="text-right">
                 Lecture Title
@@ -113,6 +117,21 @@ const AddCourse: React.FC = () => {
                 Class Duration
               </Label>
               <Input id="classDuration" value={classDuration} onChange={e => setClassDuration(e.target.value)} className="col-span-3" />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4 pr-1">
+              <Label htmlFor="status" className="text-right">
+                Status
+              </Label>
+              <Select onValueChange={(value: 'Pending' | 'Private' | 'Public') => setStatus(value)} defaultValue={status}>
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Select Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Pending">Pending</SelectItem>
+                  <SelectItem value="Private">Private</SelectItem>
+                  <SelectItem value="Public">Public</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="grid grid-cols-4 items-center gap-4 pr-1">
               <Label htmlFor="pdf" className="text-right">

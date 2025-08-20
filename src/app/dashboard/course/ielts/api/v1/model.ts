@@ -20,6 +20,7 @@ const IELTScourseSchema = new Schema(
     details: { type: String },
     note: { type: String },
     classDuration: { type: String },
+    status: { type: String, default: 'Pending' },
   },
   { timestamps: true },
 );
@@ -37,6 +38,7 @@ export interface IELTScourse {
   details: string;
   note: string;
   classDuration: string;
+  status: 'Pending' | 'Private' | 'Public';
 
   createdAt: Date;
   updatedAt: Date;

@@ -12,6 +12,7 @@ import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
 
 import { IELTScourse } from '../api/v1/model';
 
@@ -58,6 +59,19 @@ const ViewCourse: React.FC = () => {
     </div>
   );
 
+  const getStatusVariant = (status?: 'Pending' | 'Private' | 'Public') => {
+    switch (status) {
+      case 'Public':
+        return 'default';
+      case 'Private':
+        return 'destructive';
+      case 'Pending':
+        return 'secondary';
+      default:
+        return 'outline';
+    }
+  };
+
   const handleClose = () => {
     toggleViewModal(false);
     setSelectedCourses(null as unknown as IELTScourse);
@@ -75,6 +89,7 @@ const ViewCourse: React.FC = () => {
               <DetailRow label="Lecture Title" value={selectedCourses.lectureTitle} />
               <DetailRow label="Lecture No" value={selectedCourses.lectureNo} />
               <DetailRow label="Class Duration" value={selectedCourses.classDuration} />
+              <DetailRow label="Status" value={<Badge variant={getStatusVariant(selectedCourses.status)}>{selectedCourses.status}</Badge>} />
               <LinkRow label="PDF" href={selectedCourses.pdf} />
               <LinkRow label="Word File" href={selectedCourses.wordFile} />
               <LinkRow label="Video Link" href={selectedCourses.videoLink} />

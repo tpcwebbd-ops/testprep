@@ -51,7 +51,7 @@ const BulkDeleteNextComponents: React.FC = () => {
           <div className="flex flex-col">
             {bulkData.map((Courses, idx) => (
               <span key={(Courses._id as string) + idx} className="text-xs">
-                {idx + 1}. {(Courses.name as string) || ''}
+                {idx + 1}. {(Courses.lectureTitle as string) || ''}
               </span>
             ))}
           </div>

@@ -21,7 +21,7 @@ import ErrorMessageComponent from '@/components/common/Error';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-import { ICourses } from '../api/v1/model';
+import { IELTScourse } from '../api/v1/model';
 import { pageLimitArr } from '../store/StoreConstants';
 import { useCoursesStore } from '../store/Store';
 import { useGetCoursesQuery } from '../redux/rtk-Api';
@@ -31,7 +31,7 @@ import { handleSuccess } from './utils';
 
 const ViewCoursesTable: React.FC = () => {
   const [sortConfig, setSortConfig] = useState<{
-    key: keyof ICourses;
+    key: keyof IELTScourse;
     direction: 'asc' | 'desc';
   } | null>(null);
 
@@ -75,7 +75,7 @@ const ViewCoursesTable: React.FC = () => {
 
   const formatDate = (date?: Date) => (date ? format(new Date(date), 'MMM dd, yyyy') : 'N/A');
 
-  const handleSort = (key: keyof ICourses) => {
+  const handleSort = (key: keyof IELTScourse) => {
     setSortConfig(prev => (prev?.key === key ? { key, direction: prev.direction === 'asc' ? 'desc' : 'asc' } : { key, direction: 'asc' }));
   };
 
@@ -92,7 +92,7 @@ const ViewCoursesTable: React.FC = () => {
 
   const handleSelectAll = (isChecked: boolean) => setBulkData(isChecked ? allCoursesData : []);
 
-  const handleSelectRow = (isChecked: boolean, course: ICourses) =>
+  const handleSelectRow = (isChecked: boolean, course: IELTScourse) =>
     setBulkData(isChecked ? [...bulkData, course] : bulkData.filter(item => item._id !== course._id));
 
   const handleReload = () => {
@@ -100,7 +100,7 @@ const ViewCoursesTable: React.FC = () => {
     handleSuccess('Reload Successful');
   };
 
-  const renderActions = (course: ICourses) => (
+  const renderActions = (course: IELTScourse) => (
     <div className="flex gap-2 justify-end">
       <Button
         variant="outlineDefault"
@@ -110,7 +110,7 @@ const ViewCoursesTable: React.FC = () => {
           toggleViewModal(true);
         }}
       >
-        <EyeIcon className="w-4 h-4" />
+        <EyeIcon className="w-4 h-4" /> View
       </Button>
       <Button
         variant="outlineDefault"
@@ -120,28 +120,30 @@ const ViewCoursesTable: React.FC = () => {
           toggleEditModal(true);
         }}
       >
-        <PencilIcon className="w-4 h-4" />
+        <PencilIcon className="w-4 h-4" /> Edit
       </Button>
       <Button
-        variant="outlineGarden"
+        variant="outlineFire"
         size="sm"
         onClick={() => {
           setSelectedCourses(course);
           toggleDeleteModal(true);
         }}
       >
-        <TrashIcon className="w-4 h-4" />
+        <TrashIcon className="w-4 h-4" /> Delete
       </Button>
     </div>
   );
 
   const renderTableRows = () =>
-    sortedCoursesData.map((course: ICourses) => (
+    sortedCoursesData.map((course: IELTScourse) => (
       <TableRow key={course._id}>
         <TableCell>
           <Checkbox onCheckedChange={checked => handleSelectRow(!!checked, course)} checked={bulkData.some(item => item._id === course._id)} />
         </TableCell>
-        <TableCell className="font-medium">{course.name}</TableCell>
+        <TableCell className="font-medium">{course.lectureNo}</TableCell>
+        <TableCell className="font-medium">{course.lectureTitle}</TableCell>
+        <TableCell className="font-medium">{course.status}</TableCell>
         <TableCell>
           {course.pdf && (
             <a href={course.pdf} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
@@ -161,8 +163,10 @@ const ViewCoursesTable: React.FC = () => {
       </TableRow>
     ));
 
-  const tableHeaders: { key: keyof ICourses; label: string }[] = [
-    { key: 'name', label: 'Name' },
+  const tableHeaders: { key: keyof IELTScourse; label: string }[] = [
+    { key: 'lectureNo', label: 'Lecture No' },
+    { key: 'lectureTitle', label: 'Lecture Title' },
+    { key: 'status', label: 'Status' },
     { key: 'pdf', label: 'PDF' },
     { key: 'videoLink', label: 'Video Link' },
     { key: 'createdAt', label: 'Created At' },
@@ -180,12 +184,12 @@ const ViewCoursesTable: React.FC = () => {
             Total Selected <span className="text-xs text-slate-500">({bulkData.length})</span>
           </div>
           <div className="px-2 gap-2 flex items-center justify-end w-full">
-            <Button variant="outlineDefault" size="sm" onClick={() => toggleBulkDynamicUpdateModal(true)} disabled={bulkData.length === 0}>
+            {/* <Button variant="outlineDefault" size="sm" onClick={() => toggleBulkDynamicUpdateModal(true)} disabled={bulkData.length === 0}>
               <PencilIcon className="w-4 h-4 mr-1" /> B. Dynamic Update
             </Button>
             <Button variant="outlineDefault" size="sm" onClick={() => toggleBulkUpdateModal(true)} disabled={bulkData.length === 0}>
               <PencilIcon className="w-4 h-4 mr-1" /> B. Update
-            </Button>
+            </Button> */}
             <Button variant="outlineDefault" size="sm" onClick={() => toggleBulkEditModal(true)} disabled={bulkData.length === 0}>
               <PencilIcon className="w-4 h-4 mr-1" /> Edit
             </Button>

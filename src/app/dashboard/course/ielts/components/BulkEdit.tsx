@@ -14,7 +14,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
-import { ICourses } from '../api/v1/model';
+import { IELTScourse } from '../api/v1/model';
 import { useCoursesStore } from '../store/Store';
 import { coursesSelectorArr } from '../store/StoreConstants';
 import { useBulkUpdateCoursesMutation } from '../redux/rtk-Api';
@@ -41,8 +41,8 @@ const BulkEditNextComponents: React.FC = () => {
     }
   };
 
-  const handleRoleChange = (CoursesId: string, role: string) => {
-    setBulkData(bulkData.map(Courses => (Courses._id === CoursesId ? { ...Courses, role } : Courses)) as ICourses[]);
+  const handleRoleChange = (CoursesId: string, status: string) => {
+    setBulkData(bulkData.map(Courses => (Courses._id === CoursesId ? { ...Courses, status } : Courses)) as IELTScourse[]);
   };
 
   return (
@@ -64,10 +64,10 @@ const BulkEditNextComponents: React.FC = () => {
                   {idx + 1}. {(Courses.name as string) || ''}
                 </span>
                 <div className="flex items-center gap-4 min-w-[180px]">
-                  <Label htmlFor="edit-role">Role</Label>
+                  <Label htmlFor="edit-role">Public Status</Label>
                   <Select onValueChange={role => handleRoleChange(Courses._id as string, role)} defaultValue={(Courses.name as string) || ''}>
                     <SelectTrigger className="bg-slate-50">
-                      <SelectValue placeholder="Select a role" />
+                      <SelectValue placeholder="Select a status" />
                     </SelectTrigger>
                     <SelectContent className="bg-slate-50">
                       {coursesSelectorArr?.map((role, index) => (

@@ -82,9 +82,11 @@ export async function getCourses(req: Request) {
       if (searchQuery) {
         searchFilter = {
           $or: [
-            { name: { $regex: searchQuery, $options: 'i' } },
-            { email: { $regex: searchQuery, $options: 'i' } },
-            { alias: { $regex: searchQuery, $options: 'i' } },
+            { lectureTitle: { $regex: searchQuery, $options: 'i' } },
+            { classDuration: { $regex: searchQuery, $options: 'i' } },
+            { note: { $regex: searchQuery, $options: 'i' } },
+            { details: { $regex: searchQuery, $options: 'i' } },
+            { summery: { $regex: searchQuery, $options: 'i' } },
           ],
         };
       }
