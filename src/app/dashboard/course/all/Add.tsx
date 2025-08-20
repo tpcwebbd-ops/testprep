@@ -1,5 +1,5 @@
 import { useState, FormEvent } from 'react';
-import { useAddCoursesMutation } from '@/app/dashboard/course/all/store-api/rtk-Api';
+import { useAddAllCoursesMutation } from '@/app/dashboard/course/all/store-api/rtk-Api';
 import { IAllCourse } from '@/app/dashboard/course/all/api/v1/model';
 
 // Import shadcn/ui components
@@ -23,7 +23,7 @@ const formatDateForInput = (date?: Date | string): string => {
 };
 
 const AddCourseModal = ({ isOpen, onClose }: AddCourseModalProps) => {
-  const [addCourse, { isLoading }] = useAddCoursesMutation();
+  const [addCourse, { isLoading }] = useAddAllCoursesMutation();
   // Initialize state with defaults for all course properties
   const [formData, setFormData] = useState<Partial<IAllCourse>>({
     courseName: '',

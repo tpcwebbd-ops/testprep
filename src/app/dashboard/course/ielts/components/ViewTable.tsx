@@ -24,7 +24,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { IELTScourse } from '../api/v1/model';
 import { pageLimitArr } from '../store/StoreConstants';
 import { useCoursesStore } from '../store/Store';
-import { useGetCoursesQuery } from '../redux/rtk-Api';
+import { useGetIELTSLecturesQuery } from '../redux/rtk-Api';
 
 import Pagination from './Pagination';
 import { handleSuccess } from './utils';
@@ -57,7 +57,7 @@ const ViewCoursesTable: React.FC = () => {
     refetch,
     isError,
     error,
-  } = useGetCoursesQuery(
+  } = useGetIELTSLecturesQuery(
     { q: queryPramsQ, limit: queryPramsLimit, page: queryPramsPage },
     {
       selectFromResult: ({ data, isError, error, isLoading }) => ({

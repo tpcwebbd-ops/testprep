@@ -11,7 +11,7 @@ import { apiSlice } from '@/redux/api/apiSlice';
 // Use absolute paths with leading slash to ensure consistent behavior
 export const coursesApi = apiSlice.injectEndpoints({
   endpoints: builder => ({
-    getCourses: builder.query({
+    getIELTSLectures: builder.query({
       query: ({ page, limit, q }) => {
         let url = `/dashboard/course/ielts/api/v1?page=${page || 1}&limit=${limit || 10}`;
         if (q) {
@@ -21,10 +21,10 @@ export const coursesApi = apiSlice.injectEndpoints({
       },
       providesTags: [{ type: 'tagTypeIELTS', id: 'LIST' }],
     }),
-    getCoursesById: builder.query({
+    getIELTSLecturesById: builder.query({
       query: id => `/dashboard/course/ielts/api/v1?id=${id}`,
     }),
-    addCourses: builder.mutation({
+    addIELTSLectures: builder.mutation({
       query: newCourses => ({
         url: '/dashboard/course/ielts/api/v1',
         method: 'POST',
@@ -32,7 +32,7 @@ export const coursesApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: [{ type: 'tagTypeIELTS' }],
     }),
-    updateCourses: builder.mutation({
+    updateIELTSLectures: builder.mutation({
       query: ({ id, ...data }) => ({
         url: `/dashboard/course/ielts/api/v1`,
         method: 'PUT',
@@ -40,7 +40,7 @@ export const coursesApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: [{ type: 'tagTypeIELTS' }],
     }),
-    deleteCourses: builder.mutation({
+    deleteIELTSLectures: builder.mutation({
       query: ({ id }) => ({
         url: `/dashboard/course/ielts/api/v1`,
         method: 'DELETE',
@@ -48,7 +48,7 @@ export const coursesApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: [{ type: 'tagTypeIELTS' }],
     }),
-    bulkUpdateCourses: builder.mutation({
+    bulkUpdateIELTSLectures: builder.mutation({
       query: bulkData => ({
         url: `/dashboard/course/ielts/api/v1?bulk=true`,
         method: 'PUT',
@@ -56,7 +56,7 @@ export const coursesApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: [{ type: 'tagTypeIELTS' }],
     }),
-    bulkDeleteCourses: builder.mutation({
+    bulkDeleteIELTSLectures: builder.mutation({
       query: bulkData => ({
         url: `/dashboard/course/ielts/api/v1?bulk=true`,
         method: 'DELETE',
@@ -68,11 +68,11 @@ export const coursesApi = apiSlice.injectEndpoints({
 });
 
 export const {
-  useGetCoursesQuery,
-  useAddCoursesMutation,
-  useUpdateCoursesMutation,
-  useDeleteCoursesMutation,
-  useBulkUpdateCoursesMutation,
-  useBulkDeleteCoursesMutation,
-  useGetCoursesByIdQuery,
+  useGetIELTSLecturesQuery,
+  useAddIELTSLecturesMutation,
+  useUpdateIELTSLecturesMutation,
+  useDeleteIELTSLecturesMutation,
+  useBulkUpdateIELTSLecturesMutation,
+  useBulkDeleteIELTSLecturesMutation,
+  useGetIELTSLecturesByIdQuery,
 } = coursesApi;

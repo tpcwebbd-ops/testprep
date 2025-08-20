@@ -1,11 +1,11 @@
-import { useDeleteCoursesMutation } from '@/app/dashboard/course/all/store-api/rtk-Api';
+import { useDeleteAllCoursesMutation } from '@/app/dashboard/course/all/store-api/rtk-Api';
 interface DeleteCourseModalProps {
   courseId: string;
   onClose: () => void;
 }
 
 const DeleteCourseModal = ({ courseId, onClose }: DeleteCourseModalProps) => {
-  const [deleteCourse, { isLoading }] = useDeleteCoursesMutation();
+  const [deleteCourse, { isLoading }] = useDeleteAllCoursesMutation();
 
   const handleDelete = async () => {
     try {

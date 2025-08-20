@@ -1,5 +1,5 @@
 import { useState, FormEvent, useEffect } from 'react';
-import { useUpdateCoursesMutation } from '@/app/dashboard/course/all/store-api/rtk-Api';
+import { useUpdateAllCoursesMutation } from '@/app/dashboard/course/all/store-api/rtk-Api';
 import { IAllCourse } from '@/app/dashboard/course/all/api/v1/model';
 
 // Import shadcn/ui components
@@ -24,7 +24,7 @@ const formatDateForInput = (date?: Date | string): string => {
 };
 
 const EditCourseModal = ({ isOpen, onClose, course }: EditCourseModalProps) => {
-  const [updateCourse, { isLoading }] = useUpdateCoursesMutation();
+  const [updateCourse, { isLoading }] = useUpdateAllCoursesMutation();
   const [formData, setFormData] = useState<Partial<IAllCourse>>({});
 
   useEffect(() => {

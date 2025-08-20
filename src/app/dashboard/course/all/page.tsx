@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useGetCoursesQuery } from '@/app/dashboard/course/all/store-api/rtk-Api';
+import { useGetAllCoursesQuery } from '@/app/dashboard/course/all/store-api/rtk-Api';
 
 import { IAllCourse } from '@/app/dashboard/course/all/api/v1/model';
 import AddCourseModal from './Add';
@@ -12,7 +12,7 @@ import { FiMoreVertical, FiPlus, FiEdit, FiTrash2, FiEye } from 'react-icons/fi'
 import Image from 'next/image';
 
 const CoursesPage = () => {
-  const { data, error, isLoading } = useGetCoursesQuery({ page: 1, limit: 10, q: '' });
+  const { data, error, isLoading } = useGetAllCoursesQuery({ page: 1, limit: 10, q: '' });
   const [isAddModalOpen, setAddModalOpen] = useState(false);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);

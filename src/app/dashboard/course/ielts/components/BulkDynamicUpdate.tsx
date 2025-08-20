@@ -12,7 +12,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 import { useCoursesStore } from '../store/Store';
-import { useBulkUpdateCoursesMutation } from '../redux/rtk-Api';
+import { useBulkUpdateIELTSLecturesMutation } from '../redux/rtk-Api';
 
 import { handleSuccess } from './utils';
 import DynamicDataSelect from './DynamicDataSelect';
@@ -20,7 +20,7 @@ import DynamicDataSelect from './DynamicDataSelect';
 const BulkDynamicUpdateNextComponents: React.FC = () => {
   const [newItemTags, setNewItemTags] = useState<string[]>([]);
   const { toggleBulkDynamicUpdateModal, isBulkDynamicUpdateModal, bulkData, setBulkData } = useCoursesStore();
-  const [bulkUpdateCourses, { isLoading }] = useBulkUpdateCoursesMutation();
+  const [bulkUpdateCourses, { isLoading }] = useBulkUpdateIELTSLecturesMutation();
 
   const handleBulkEditCourses = async () => {
     if (!bulkData.length) return;

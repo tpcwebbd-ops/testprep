@@ -16,13 +16,13 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { IELTScourse } from '../api/v1/model';
 import { useCoursesStore } from '../store/Store';
 import { coursesSelectorArr } from '../store/StoreConstants';
-import { useBulkUpdateCoursesMutation } from '../redux/rtk-Api';
+import { useBulkUpdateIELTSLecturesMutation } from '../redux/rtk-Api';
 
 import { handleSuccess } from './utils';
 
 const BulkUpdateNextComponents: React.FC = () => {
   const { toggleBulkUpdateModal, isBulkUpdateModalOpen, bulkData, setBulkData } = useCoursesStore();
-  const [bulkUpdateCourses, { isLoading }] = useBulkUpdateCoursesMutation();
+  const [bulkUpdateCourses, { isLoading }] = useBulkUpdateIELTSLecturesMutation();
 
   const handleBulkEditCourses = async () => {
     if (!bulkData.length) return;
