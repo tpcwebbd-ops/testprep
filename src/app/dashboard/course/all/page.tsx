@@ -55,7 +55,10 @@ const CoursesPage = () => {
     <div className="container mx-auto p-4 md:p-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-800">Courses</h1>
-        <button onClick={openAddModal} className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition-colors flex items-center">
+        <button
+          onClick={openAddModal}
+          className="bg-blue-600 text-white cursor-pointer px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition-colors flex items-center"
+        >
           <FiPlus className="mr-2" /> Add Course
         </button>
       </div>
@@ -113,10 +116,10 @@ const CoursesPage = () => {
         ))}
       </div>
 
-      {isAddModalOpen && <AddCourseModal onClose={closeAddModal} />}
+      {isAddModalOpen && <AddCourseModal onClose={closeAddModal} isOpen={isAddModalOpen} />}
       {isEditModalOpen && selectedCourse && <EditCourseModal isOpen={isEditModalOpen} onClose={closeEditModal} course={selectedCourse} />}
       {isDeleteModalOpen && selectedCourse && <DeleteCourseModal courseId={selectedCourse._id as string} onClose={closeDeleteModal} />}
-      {isViewModalOpen && selectedCourse && <ViewCourseModal course={selectedCourse} onClose={closeViewModal} />}
+      {isViewModalOpen && selectedCourse && <ViewCourseModal isOpen={isViewModalOpen} course={selectedCourse} onClose={closeViewModal} />}
     </div>
   );
 };

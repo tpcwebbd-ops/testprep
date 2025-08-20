@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
-
+import { Switch } from '@/components/ui/switch';
 interface EditCourseModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -74,6 +74,17 @@ const EditCourseModal = ({ isOpen, onClose, course }: EditCourseModalProps) => {
         <form onSubmit={handleSubmit}>
           <ScrollArea className="h-[65vh] p-4">
             <div className="space-y-4">
+              <div className="flex items-center justify-between w-full">
+                <Label htmlFor="enrolmentStatus" className="text-sm font-medium">
+                  Enrollment Active
+                </Label>
+                <Switch
+                  id="enrolmentStatus"
+                  checked={formData.enrolmentStatus || false}
+                  onCheckedChange={handleCheckboxChange}
+                  className="ring-1 ring-gray-300"
+                />
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="courseName">Course Name</Label>
@@ -123,13 +134,6 @@ const EditCourseModal = ({ isOpen, onClose, course }: EditCourseModalProps) => {
                   <Label htmlFor="enrolmentEnd">Enrollment End</Label>
                   <Input id="enrolmentEnd" name="enrolmentEnd" type="date" value={formatDateForInput(formData.enrolmentEnd)} onChange={handleChange} />
                 </div>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox id="enrolmentStatus" checked={formData.enrolmentStatus || false} onCheckedChange={handleCheckboxChange} />
-                <Label htmlFor="enrolmentStatus" className="text-sm font-medium">
-                  Enrollment Active
-                </Label>
               </div>
 
               <div className="space-y-4">
