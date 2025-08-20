@@ -14,13 +14,13 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { SpokenCourse } from '../api/v1/model';
 import { useCoursesStore } from '../store/Store';
 import { baseICourses } from '../store/StoreConstants';
-import { useDeleteCoursesMutation } from '../redux/rtk-Api';
+import { useDeleteSpokenLecturesMutation } from '../redux/rtk-Api';
 
 import { handleSuccess } from './utils';
 
 const DeleteNextComponents: React.FC = () => {
   const { toggleDeleteModal, isDeleteModalOpen, selectedCourses, setSelectedCourses } = useCoursesStore();
-  const [deleteCourses] = useDeleteCoursesMutation();
+  const [deleteCourses] = useDeleteSpokenLecturesMutation();
 
   const handleDeleteCourses = async () => {
     if (selectedCourses) {

@@ -17,11 +17,11 @@ import { Badge } from '@/components/ui/badge';
 import { SpokenCourse } from '../api/v1/model';
 
 import { useCoursesStore } from '../store/Store';
-import { useGetCoursesByIdQuery } from '../redux/rtk-Api';
+import { useGetSpokenLecturesByIdQuery } from '../redux/rtk-Api';
 
 const ViewCourse: React.FC = () => {
   const { isViewModalOpen, selectedCourses, toggleViewModal, setSelectedCourses } = useCoursesStore();
-  const { data: courseData, refetch } = useGetCoursesByIdQuery(selectedCourses?._id, { skip: !selectedCourses?._id });
+  const { data: courseData, refetch } = useGetSpokenLecturesByIdQuery(selectedCourses?._id, { skip: !selectedCourses?._id });
 
   useEffect(() => {
     if (selectedCourses?._id) {

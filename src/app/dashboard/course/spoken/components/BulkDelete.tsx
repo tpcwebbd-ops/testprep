@@ -13,13 +13,13 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 import { useCoursesStore } from '../store/Store';
-import { useBulkDeleteCoursesMutation } from '../redux/rtk-Api';
+import { useBulkDeleteSpokenLecturesMutation } from '../redux/rtk-Api';
 
 import { handleSuccess } from './utils';
 
 const BulkDeleteNextComponents: React.FC = () => {
   const { isBulkDeleteModalOpen, toggleBulkDeleteModal, bulkData, setBulkData } = useCoursesStore();
-  const [bulkDeleteCourses, { isLoading }] = useBulkDeleteCoursesMutation();
+  const [bulkDeleteCourses, { isLoading }] = useBulkDeleteSpokenLecturesMutation();
 
   const handleBulkDeleteNextComponents = async () => {
     if (!bulkData?.length) return;

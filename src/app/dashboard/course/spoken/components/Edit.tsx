@@ -17,13 +17,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 import { useCoursesStore } from '../store/Store';
-import { useUpdateCoursesMutation } from '../redux/rtk-Api';
+import { useUpdateSpokenLecturesMutation } from '../redux/rtk-Api';
 import { formatDuplicateKeyError, handleError, handleSuccess, isApiErrorResponse } from './utils';
 import { SpokenCourse } from '../api/v1/model';
 
 const EditCourse: React.FC = () => {
   const { toggleEditModal, isEditModalOpen, selectedCourses, setSelectedCourses } = useCoursesStore();
-  const [updateCourse, { isLoading }] = useUpdateCoursesMutation();
+  const [updateCourse, { isLoading }] = useUpdateSpokenLecturesMutation();
 
   const [lectureTitle, setLectureTitle] = useState('');
   const [lectureNo, setLectureNo] = useState<number | ''>('');

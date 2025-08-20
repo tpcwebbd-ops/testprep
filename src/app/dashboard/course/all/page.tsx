@@ -74,6 +74,8 @@ const CoursesPage = () => {
               src={course.courseBannerPicture || '/placeholder.jpg'}
               alt={course.courseName}
               className="w-full h-40 object-cover cursor-pointer"
+              width={400}
+              height={200}
             />
 
             <div className="p-4">

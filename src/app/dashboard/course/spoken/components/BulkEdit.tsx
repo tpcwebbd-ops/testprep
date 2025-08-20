@@ -17,13 +17,13 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { SpokenCourse } from '../api/v1/model';
 import { useCoursesStore } from '../store/Store';
 import { coursesSelectorArr } from '../store/StoreConstants';
-import { useBulkUpdateCoursesMutation } from '../redux/rtk-Api';
+import { useBulkUpdateSpokenLecturesMutation } from '../redux/rtk-Api';
 
 import { handleSuccess } from './utils';
 
 const BulkEditNextComponents: React.FC = () => {
   const { isBulkEditModalOpen, toggleBulkEditModal, bulkData, setBulkData } = useCoursesStore();
-  const [bulkUpdateCourses, { isLoading }] = useBulkUpdateCoursesMutation();
+  const [bulkUpdateCourses, { isLoading }] = useBulkUpdateSpokenLecturesMutation();
 
   const handleBulkEditCourses = async () => {
     if (!bulkData.length) return;

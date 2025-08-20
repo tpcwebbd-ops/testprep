@@ -23,7 +23,7 @@ import BulkEditCourse from './components/BulkEdit';
 import { useCoursesStore } from './store/Store';
 import TooManyRequests from './components/TooManyRequest';
 import BulkDeleteCourse from './components/BulkDelete';
-import { useGetCoursesQuery } from './redux/rtk-Api';
+import { useGetSpokenLecturesQuery } from './redux/rtk-Api';
 import ViewCoursesTable from './components/ViewTable';
 import BulkUpdateCourses from './components/BulkUpdate';
 import BulkDynamicUpdateCourses from './components/BulkDynamicUpdate';
@@ -36,7 +36,7 @@ const CoursePage: React.FC = () => {
     data: getResponseData,
     isSuccess,
     status: statusCode,
-  } = useGetCoursesQuery(
+  } = useGetSpokenLecturesQuery(
     { q: queryPramsQ, page: queryPramsPage, limit: queryPramsLimit },
     {
       selectFromResult: ({ data, isSuccess, status, error }) => ({

@@ -11,7 +11,7 @@ import { apiSlice } from '@/redux/api/apiSlice';
 // Use absolute paths with leading slash to ensure consistent behavior
 export const coursesApi = apiSlice.injectEndpoints({
   endpoints: builder => ({
-    getCourses: builder.query({
+    getSpokenLectures: builder.query({
       query: ({ page, limit, q }) => {
         let url = `/dashboard/course/spoken/api/v1?page=${page || 1}&limit=${limit || 10}`;
         if (q) {
@@ -21,10 +21,10 @@ export const coursesApi = apiSlice.injectEndpoints({
       },
       providesTags: [{ type: 'tagTypeSpoken', id: 'LIST' }],
     }),
-    getCoursesById: builder.query({
+    getSpokenLecturesById: builder.query({
       query: id => `/dashboard/course/spoken/api/v1?id=${id}`,
     }),
-    addCourses: builder.mutation({
+    addSpokenLectures: builder.mutation({
       query: newCourses => ({
         url: '/dashboard/course/spoken/api/v1',
         method: 'POST',
@@ -32,7 +32,7 @@ export const coursesApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: [{ type: 'tagTypeSpoken' }],
     }),
-    updateCourses: builder.mutation({
+    updateSpokenLectures: builder.mutation({
       query: ({ id, ...data }) => ({
         url: `/dashboard/course/spoken/api/v1`,
         method: 'PUT',
@@ -40,7 +40,7 @@ export const coursesApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: [{ type: 'tagTypeSpoken' }],
     }),
-    deleteCourses: builder.mutation({
+    deleteSpokenLectures: builder.mutation({
       query: ({ id }) => ({
         url: `/dashboard/course/spoken/api/v1`,
         method: 'DELETE',
@@ -48,7 +48,7 @@ export const coursesApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: [{ type: 'tagTypeSpoken' }],
     }),
-    bulkUpdateCourses: builder.mutation({
+    bulkUpdateSpokenLectures: builder.mutation({
       query: bulkData => ({
         url: `/dashboard/course/spoken/api/v1?bulk=true`,
         method: 'PUT',
@@ -56,7 +56,7 @@ export const coursesApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: [{ type: 'tagTypeSpoken' }],
     }),
-    bulkDeleteCourses: builder.mutation({
+    bulkDeleteSpokenLectures: builder.mutation({
       query: bulkData => ({
         url: `/dashboard/course/spoken/api/v1?bulk=true`,
         method: 'DELETE',
@@ -68,11 +68,11 @@ export const coursesApi = apiSlice.injectEndpoints({
 });
 
 export const {
-  useGetCoursesQuery,
-  useAddCoursesMutation,
-  useUpdateCoursesMutation,
-  useDeleteCoursesMutation,
-  useBulkUpdateCoursesMutation,
-  useBulkDeleteCoursesMutation,
-  useGetCoursesByIdQuery,
+  useGetSpokenLecturesQuery,
+  useAddSpokenLecturesMutation,
+  useUpdateSpokenLecturesMutation,
+  useDeleteSpokenLecturesMutation,
+  useBulkUpdateSpokenLecturesMutation,
+  useBulkDeleteSpokenLecturesMutation,
+  useGetSpokenLecturesByIdQuery,
 } = coursesApi;
