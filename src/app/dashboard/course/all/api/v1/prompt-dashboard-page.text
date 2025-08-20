@@ -1,0 +1,130 @@
+Here is an example of Interface 
+```
+export interface IAllCourse extends Document {
+  courseName: string;
+  courseCode?: number;
+  totalLecture?: number;
+  totalPdf?: number;
+  totalWord?: number; // Corrected from totalWordFile
+  totalLiveClass?: number;
+  enrollStudents?: number;
+  runningStudent?: number;
+  enrolmentStatus?: boolean;
+  enrolmentStart?: Date;
+  enrolmentEnd?: Date;
+  courseDetails?: string;
+  review?: string[]; // Corrected to be an array of strings
+  coursePrice?: number;
+  courseDuration?: string;
+  courseNote?: string;
+  courseShortDescription?: string;
+  courseBannerPicture?: string;
+  courseIntroVideo?: string;
+  howCourseIsRunningView?: string;
+  certifications?: string;
+}
+``````
+
+here is api : ```http://localhost:3000/dashboard/course/all/v1```
+
+here is example of rtk-api.ts
+```
+// This file is use for rest api
+import { apiSlice } from '@/redux/api/apiSlice';
+
+// Use absolute paths with leading slash to ensure consistent behavior
+export const coursesApi = apiSlice.injectEndpoints({
+  endpoints: builder => ({
+    getCourses: builder.query({
+      query: ({ page, limit, q }) => {
+        let url = `/dashboard/course/ielts/api/v1?page=${page || 1}&limit=${limit || 10}`;
+        if (q) {
+          url += `&q=${encodeURIComponent(q)}`;
+        }
+        return url;
+      },
+      providesTags: [{ type: 'tagTypeCourses', id: 'LIST' }],
+    }),
+    getCoursesById: builder.query({
+      query: id => `/dashboard/course/ielts/api/v1?id=${id}`,
+    }),
+    addCourses: builder.mutation({
+      query: newCourses => ({
+        url: '/dashboard/course/ielts/api/v1',
+        method: 'POST',
+        body: newCourses,
+      }),
+      invalidatesTags: [{ type: 'tagTypeCourses' }],
+    }),
+    updateCourses: builder.mutation({
+      query: ({ id, ...data }) => ({
+        url: `/dashboard/course/ielts/api/v1`,
+        method: 'PUT',
+        body: { id: id, ...data },
+      }),
+      invalidatesTags: [{ type: 'tagTypeCourses' }],
+    }),
+    deleteCourses: builder.mutation({
+      query: ({ id }) => ({
+        url: `/dashboard/course/ielts/api/v1`,
+        method: 'DELETE',
+        body: { id },
+      }),
+      invalidatesTags: [{ type: 'tagTypeCourses' }],
+    }),
+    bulkUpdateCourses: builder.mutation({
+      query: bulkData => ({
+        url: `/dashboard/course/ielts/api/v1?bulk=true`,
+        method: 'PUT',
+        body: bulkData,
+      }),
+      invalidatesTags: [{ type: 'tagTypeCourses' }],
+    }),
+    bulkDeleteCourses: builder.mutation({
+      query: bulkData => ({
+        url: `/dashboard/course/ielts/api/v1?bulk=true`,
+        method: 'DELETE',
+        body: bulkData,
+      }),
+      invalidatesTags: [{ type: 'tagTypeCourses' }],
+    }),
+  }),
+});
+
+export const {
+  useGetCoursesQuery,
+  useAddCoursesMutation,
+  useUpdateCoursesMutation,
+  useDeleteCoursesMutation,
+  useBulkUpdateCoursesMutation,
+  useBulkDeleteCoursesMutation,
+  useGetCoursesByIdQuery,
+} = coursesApi;
+```
+
+Now You have to build those NextJs page with Typescript. I will give you path, file name, and tell you what to do.
+
+1. page.tsx
+    a. at the top right corner please add a Add Course button. it will popup Add.tsx component
+    b. this page Show a small brif data from interface.
+    c. each item has a three dot button at the top of right corner. 
+    d. in three dot button there are total three button like edit, delete, and view
+        [edit button will popup Edit.tsx component]
+        [delete button will popup Delete.tsx component]
+        [view button will popup View.tsx component]
+    e. make grid to view each item.
+    f. make the component eyecatching view
+
+2. Add.tsx
+    a. There I can add new Item.
+
+3. Edit.tsx 
+    a. There I can edit selected Item.
+
+4. Delete.tsx 
+    a. There I can delete the selected Item.
+
+5. View.tsx 
+    a. There I can view all data from the selected Data.
+
+Please Note That: Make sure it will make for NextJs with Typescript. Make it eyecatching view and responsive for mobile desktop and laptop. you can use zustand for store management. and rtk for caching. 

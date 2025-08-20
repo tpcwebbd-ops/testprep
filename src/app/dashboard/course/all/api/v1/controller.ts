@@ -8,7 +8,7 @@
 
 import { withDB } from '@/app/api/utils/db';
 
-import Course from './model';
+import AllCourse from './model';
 import { IResponse } from './jwt-verify';
 import { connectRedis, getRedisData } from './redis';
 
@@ -24,7 +24,7 @@ export async function createCourse(req: Request): Promise<IResponse> {
   return withDB(async () => {
     try {
       const courseData = await req.json();
-      const newCourse = await Course.create({
+      const newCourse = await AllCourse.create({
         ...courseData,
       });
       return formatResponse(newCourse, 'Course created successfully', 201);
@@ -44,7 +44,7 @@ export async function getCourseById(req: Request) {
     const id = new URL(req.url).searchParams.get('id');
     if (!id) return formatResponse(null, 'Course ID is required', 400);
 
-    const course = await Course.findById(id);
+    const course = await AllCourse.findById(id);
     if (!course) return formatResponse(null, 'Course not found', 404);
 
     return formatResponse(course, 'Course fetched successfully', 200);
@@ -89,9 +89,9 @@ export async function getCourses(req: Request) {
         };
       }
 
-      const courses = await Course.find(searchFilter).sort({ updatedAt: -1, createdAt: -1 }).skip(skip).limit(limit);
+      const courses = await AllCourse.find(searchFilter).sort({ updatedAt: -1, createdAt: -1 }).skip(skip).limit(limit);
 
-      const totalCourses = await Course.countDocuments(searchFilter);
+      const totalCourses = await AllCourse.countDocuments(searchFilter);
 
       return formatResponse(
         {
@@ -112,7 +112,7 @@ export async function updateCourse(req: Request) {
   return withDB(async () => {
     try {
       const { id, ...updateData } = await req.json();
-      const updatedCourse = await Course.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
+      const updatedCourse = await AllCourse.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
 
       if (!updatedCourse) return formatResponse(null, 'Course not found', 404);
       return formatResponse(updatedCourse, 'Course updated successfully', 200);
@@ -132,14 +132,14 @@ export async function bulkUpdateCourses(req: Request) {
     const updates = await req.json();
     const results = await Promise.allSettled(
       updates.map(({ id, updateData }: { id: string; updateData: Record<string, unknown> }) =>
-        Course.findByIdAndUpdate(id, updateData, {
+        AllCourse.findByIdAndUpdate(id, updateData, {
           new: true,
           runValidators: true,
         }),
       ),
     );
 
-    const successfulUpdates = results.filter(r => r.status === 'fulfilled' && r.value).map(r => (r as PromiseFulfilledResult<typeof Course>).value);
+    const successfulUpdates = results.filter(r => r.status === 'fulfilled' && r.value).map(r => (r as PromiseFulfilledResult<typeof AllCourse>).value);
     const failedUpdates = results.filter(r => r.status === 'rejected' || !r.value).map((_, i) => updates[i].id);
 
     return formatResponse({ updated: successfulUpdates, failed: failedUpdates }, 'Bulk update completed', 200);
@@ -150,7 +150,7 @@ export async function bulkUpdateCourses(req: Request) {
 export async function deleteCourse(req: Request) {
   return withDB(async () => {
     const { id } = await req.json();
-    const deletedCourse = await Course.findByIdAndDelete(id);
+    const deletedCourse = await AllCourse.findByIdAndDelete(id);
     if (!deletedCourse) return formatResponse(deletedCourse, 'Course not found', 404);
     return formatResponse({ deletedCount: 1 }, 'Course deleted successfully', 200);
   });
@@ -165,9 +165,9 @@ export async function bulkDeleteCourses(req: Request) {
 
     for (const id of ids) {
       try {
-        const course = await Course.findById(id);
+        const course = await AllCourse.findById(id);
         if (course) {
-          const deletedCourse = await Course.findByIdAndDelete(id);
+          const deletedCourse = await AllCourse.findByIdAndDelete(id);
           if (deletedCourse) deletedIds.push(id);
         } else {
           invalidIds.push(id);

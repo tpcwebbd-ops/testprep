@@ -1,96 +1,117 @@
-/*
-|-----------------------------------------
-| setting up Controller for the App
-| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
-| @copyright: varse-project, May, 2025
-|-----------------------------------------
-*/
-
 'use client';
 
-import React, { useState } from 'react';
-import { PlusIcon } from 'lucide-react';
+import { useState } from 'react';
+import { useGetCoursesQuery } from '@/app/dashboard/course/all/store-api/rtk-Api';
 
-import { Button } from '@/components/ui/button';
-import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
+import { IAllCourse } from '@/app/dashboard/course/all/api/v1/model';
+import AddCourseModal from './Add';
+import EditCourseModal from './Edit';
+import DeleteCourseModal from './Delete';
+import ViewCourseModal from './View';
+import { FiMoreVertical, FiPlus, FiEdit, FiTrash2, FiEye } from 'react-icons/fi';
 
-import AddFilename8 from './components/Add';
-import EditFilename8 from './components/Edit';
-import ViewFilename8 from './components/View';
-import SearchBox from './components/SearchBox';
-import DeleteFilename8 from './components/Delete';
-import BulkEditFilename8 from './components/BulkEdit';
-import { useCoursesStore } from './store/Store';
-import TooManyRequests from './components/TooManyRequest';
-import BulkDeleteFilename8 from './components/BulkDelete';
-import { useGetCoursesQuery } from './redux/rtk-Api';
-import ViewCoursesTable from './components/ViewTable';
-import BulkUpdateCourses from './components/BulkUpdate';
-import BulkDynamicUpdateCourses from './components/BulkDynamicUpdate';
+const CoursesPage = () => {
+  const { data, error, isLoading } = useGetCoursesQuery({ page: 1, limit: 10, q: '' });
+  const [isAddModalOpen, setAddModalOpen] = useState(false);
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [isViewModalOpen, setViewModalOpen] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState<IAllCourse | null>(null);
 
-const MainNextPage: React.FC = () => {
-  const [hashSearchText, setHashSearchText] = useState('');
-  const { toggleAddModal, queryPramsLimit, queryPramsPage, queryPramsQ, setQueryPramsPage, setQueryPramsQ } = useCoursesStore();
+  const openAddModal = () => setAddModalOpen(true);
+  const closeAddModal = () => setAddModalOpen(false);
 
-  const {
-    data: getResponseData,
-    isSuccess,
-    status: statusCode,
-  } = useGetCoursesQuery(
-    { q: queryPramsQ, page: queryPramsPage, limit: queryPramsLimit },
-    {
-      selectFromResult: ({ data, isSuccess, status, error }) => ({
-        data,
-        isSuccess,
-        status: 'status' in (error || {}) ? (error as FetchBaseQueryError).status : status, // Extract HTTP status code
-        error,
-      }),
-    },
-  );
-
-  const handleSearch = (query: string) => {
-    if (query !== hashSearchText) {
-      setHashSearchText(query);
-      setQueryPramsPage(1);
-      setQueryPramsQ(query);
-    }
+  const openEditModal = (course: IAllCourse) => {
+    setSelectedCourse(course);
+    setEditModalOpen(true);
+  };
+  const closeEditModal = () => {
+    setSelectedCourse(null);
+    setEditModalOpen(false);
   };
 
-  const modals = [
-    AddFilename8,
-    ViewFilename8,
-    BulkDeleteFilename8,
-    BulkEditFilename8,
-    EditFilename8,
-    DeleteFilename8,
-    BulkUpdateCourses,
-    BulkDynamicUpdateCourses,
-  ];
+  const openDeleteModal = (course: IAllCourse) => {
+    setSelectedCourse(course);
+    setDeleteModalOpen(true);
+  };
+  const closeDeleteModal = () => {
+    setSelectedCourse(null);
+    setDeleteModalOpen(false);
+  };
 
-  let renderUI = (
-    <div className="container mx-auto p-4">
-      <div className="flex flex-col md:flex-row gap-2 justify-between items-center mb-6">
-        <h1 className="h2 w-full">Course Management {isSuccess && <sup className="text-xs">(total:{getResponseData?.data?.total || '00'})</sup>}</h1>
-        <div className="w-full flex flex-col md:flex-row gap-2 item-center justify-end">
-          <Button size="sm" variant="outlineGarden" onClick={() => toggleAddModal(true)}>
-            <PlusIcon className="w-4 h-4" />
-            Add Course
-          </Button>
-        </div>
+  const openViewModal = (course: IAllCourse) => {
+    setSelectedCourse(course);
+    setViewModalOpen(true);
+  };
+  const closeViewModal = () => {
+    setSelectedCourse(null);
+    setViewModalOpen(false);
+  };
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading courses</div>;
+  console.log(' Data :', data);
+  return (
+    <div className="container mx-auto p-4 md:p-8">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold text-gray-800">Courses</h1>
+        <button onClick={openAddModal} className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition-colors flex items-center">
+          <FiPlus className="mr-2" /> Add Course
+        </button>
       </div>
-      <SearchBox onSearch={handleSearch} placeholder="Search here ..." autoFocus={false} />
-      <ViewCoursesTable />
-      {modals.map((ModalComponent, index) => (
-        <ModalComponent key={index} />
-      ))}
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {data?.data?.courses?.length === 0 && <p className="text-center text-gray-500 text-4xl">No courses available</p>}
+        {data?.data?.courses?.map((course: IAllCourse) => (
+          <div key={course._id as string} className="bg-white rounded-lg shadow-lg overflow-hidden relative group">
+            <img src={course.courseBannerPicture || '/placeholder.jpg'} alt={course.courseName} className="w-full h-40 object-cover" />
+            <div className="p-4">
+              <h3 className="text-lg font-semibold text-gray-800 truncate">{course.courseName}</h3>
+              <p className="text-sm text-gray-500 mt-1">Code: {course.courseCode || 'N/A'}</p>
+              <div className="flex justify-between items-center mt-4">
+                <span className="text-blue-600 font-bold">${course.coursePrice || 0}</span>
+                <span className={`px-2 py-1 text-xs rounded-full ${course.enrolmentStatus ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'}`}>
+                  {course.enrolmentStatus ? 'Open' : 'Closed'}
+                </span>
+              </div>
+            </div>
+            <div className="absolute top-2 right-2">
+              <div className="relative">
+                <button className="p-2 rounded-full bg-gray-200 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <FiMoreVertical />
+                </button>
+                <div className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10 hidden group-focus-within:block">
+                  <button
+                    onClick={() => openViewModal(course)}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                  >
+                    <FiEye className="mr-2" /> View
+                  </button>
+                  <button
+                    onClick={() => openEditModal(course)}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                  >
+                    <FiEdit className="mr-2" /> Edit
+                  </button>
+                  <button
+                    onClick={() => openDeleteModal(course)}
+                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center"
+                  >
+                    <FiTrash2 className="mr-2" /> Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {isAddModalOpen && <AddCourseModal onClose={closeAddModal} />}
+      {isEditModalOpen && selectedCourse && <EditCourseModal course={selectedCourse} onClose={closeEditModal} />}
+      {isDeleteModalOpen && selectedCourse && <DeleteCourseModal courseId={selectedCourse._id as string} onClose={closeDeleteModal} />}
+      {isViewModalOpen && selectedCourse && <ViewCourseModal course={selectedCourse} onClose={closeViewModal} />}
     </div>
   );
-
-  if (statusCode === 429) {
-    renderUI = <TooManyRequests />;
-  }
-
-  return renderUI;
 };
 
-export default MainNextPage;
+export default CoursesPage;
