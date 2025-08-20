@@ -64,7 +64,7 @@ const CoursePage: React.FC = () => {
   let renderUI = (
     <div className="container mx-auto p-4">
       <div className="flex flex-col md:flex-row gap-2 justify-between items-center mb-6">
-        <h1 className="h2 w-full">Course Management {isSuccess && <sup className="text-xs">(total:{getResponseData?.data?.total || '00'})</sup>}</h1>
+        <h1 className="h2 w-full">IELTS Lecture {isSuccess && <sup className="text-xs">(total:{getResponseData?.data?.total || '00'})</sup>}</h1>
         <div className="w-full flex flex-col md:flex-row gap-2 item-center justify-end">
           <Button size="sm" variant="outlineGarden" onClick={() => toggleAddModal(true)}>
             <PlusIcon className="w-4 h-4" />
