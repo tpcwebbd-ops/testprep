@@ -10,7 +10,7 @@ import mongoose, { Schema } from 'mongoose';
 
 const user_accessSchema = new Schema(
   {
-    role: [{ type: String, required: false }],
+    role: { type: String, required: false },
     name: {
       type: String,
     },
@@ -28,7 +28,7 @@ const user_accessSchema = new Schema(
 export default mongoose.models.User_access || mongoose.model('User_access', user_accessSchema);
 
 export interface IUsers_access {
-  role?: string[];
+  role?: string;
   email: string;
   createdAt: Date;
   updatedAt: Date;

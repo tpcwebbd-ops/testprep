@@ -13,7 +13,7 @@ export const defaultUsersAccessData: IUsers_access = {
   assignBy: '',
 
   email: '',
-  role: [selectUserAccess],
+  role: selectUserAccess,
   createdAt: new Date(),
   updatedAt: new Date(),
 };

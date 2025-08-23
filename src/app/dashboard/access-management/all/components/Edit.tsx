@@ -1,6 +1,6 @@
 /*
 |-----------------------------------------
-| setting up Controller for the App
+| setting up Edit Component for User Access
 | @author: Toufiquer Rahman<toufiquer.0@gmail.com>
 | @copyright: varse-project, May, 2025
 |-----------------------------------------
@@ -11,7 +11,6 @@ import React, { useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -19,124 +18,111 @@ import { IUsers_access } from '../api/v1/model';
 import { useUsersAccessStore } from '../store/Store';
 import { useUpdateUsers_accessMutation } from '../redux/rtk-Api';
 import { ISelectUserAccess, usersAccessSelectorArr, baseIUsers_access } from '../store/StoreConstants';
-
-import DataSelect from './DataSelect';
-import ImagesSelect from './ImagesSelect';
-import RichTextEditor from './rich-text-editor';
 import { formatDuplicateKeyError, handleError, handleSuccess, isApiErrorResponse } from './utils';
 
-const EditNextComponents: React.FC = () => {
-  const [newItemTags, setNewItemTags] = useState<string[]>([]);
-  const [newImages, setNewImages] = useState<string[]>([]);
-  const { toggleEditModal, isEditModalOpen, newUsersAccess, selectedUsersAccess, setNewUsersAccess, setSelectedUsersAccess } = useUsersAccessStore();
-  const [updateUsersAccess] = useUpdateUsers_accessMutation();
-  const [descriptions, setDescriptions] = useState('');
+const EditUserAccess: React.FC = () => {
+  const { isEditModalOpen, toggleEditModal, selectedUsersAccess, setSelectedUsersAccess } = useUsersAccessStore();
+  const [updateUsersAccess, { isLoading }] = useUpdateUsers_accessMutation();
 
-  const onChange = (content: string) => {
-    setDescriptions(content);
-  };
+  // Local state to hold form data, preventing direct mutation of the global store
+  const [formData, setFormData] = useState<Partial<IUsers_access>>({ email: '', role: '' });
+
+  // When a user is selected, populate the local form state
   useEffect(() => {
     if (selectedUsersAccess) {
-      setNewUsersAccess(selectedUsersAccess);
-      setNewItemTags(selectedUsersAccess.role as string[]);
+      setFormData({
+        email: selectedUsersAccess.email,
+        role: selectedUsersAccess.role || '',
+      });
     }
-  }, [selectedUsersAccess, setNewUsersAccess]);
+  }, [selectedUsersAccess]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setNewUsersAccess({ ...newUsersAccess, [name]: value });
-  };
-  const handleRoleChange = (value: string) => {
-    setNewUsersAccess({
-      ...newUsersAccess,
-      role: [value] as ISelectUserAccess[],
-    });
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleEditNextComponents = async () => {
-    if (!selectedUsersAccess) return;
+  const handleRoleChange = (value: string) => {
+    // The model expects an array of strings for the role
+    console.log(' role : ', value);
+    setFormData(prev => ({ ...prev, role: value }));
+  };
+
+  const handleSaveChanges = async () => {
+    if (!selectedUsersAccess) {
+      handleError('No user selected for editing.');
+      return;
+    }
 
     try {
-      const updateData = {
-        ...newUsersAccess,
-        dataArr: newItemTags,
-        images: newImages,
-      };
+      // The RTK mutation expects an object with the ID and the update body
       await updateUsersAccess({
         id: selectedUsersAccess._id,
-        ...updateData,
-      }).unwrap(); // Call RTK mutation
+        email: formData.email,
+        role: formData.role,
+      }).unwrap();
+
+      handleSuccess('User access updated successfully!');
       toggleEditModal(false);
-      handleSuccess('Edit Successful');
     } catch (error: unknown) {
-      let errMessage: string = '';
-      if (isApiErrorResponse(error)) {
-        errMessage = formatDuplicateKeyError(error.data.message);
-      } else if (error instanceof Error) {
-        errMessage = error.message;
-      }
+      console.error('Failed to update user access:', error);
+      const errMessage = isApiErrorResponse(error)
+        ? formatDuplicateKeyError(error.data.message)
+        : error instanceof Error
+        ? error.message
+        : 'An unknown error occurred.';
       handleError(errMessage);
     }
   };
 
+  // When the dialog is closed, clear the selected user from the global store
+  const handleOnOpenChange = (isOpen: boolean) => {
+    if (!isOpen) {
+      setSelectedUsersAccess(null);
+    }
+    toggleEditModal(isOpen);
+  };
+
   return (
-    <Dialog open={isEditModalOpen} onOpenChange={toggleEditModal}>
+    <Dialog open={isEditModalOpen} onOpenChange={handleOnOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit UsersAccess</DialogTitle>
+          <DialogTitle>Edit User Access</DialogTitle>
         </DialogHeader>
-        <ScrollArea className="h-[400px] w-full rounded-md border p-4">
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-name" className="text-right">
-                Name
-              </Label>
-              <Input id="edit-name" name="name" value={(newUsersAccess.name as string) || ''} onChange={handleInputChange} className="col-span-3" />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-email" className="text-right">
-                Email
-              </Label>
-              <Input
-                id="edit-email"
-                name="email"
-                type="email"
-                value={(newUsersAccess.email as string) || ''}
-                onChange={handleInputChange}
-                className="col-span-3"
-              />
-            </div>
 
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-role" className="text-right">
-                Role
-              </Label>
-            </div>
-            <DataSelect newItemTags={newItemTags as string[]} setNewItemTags={setNewItemTags} />
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="edit-email" className="text-right">
+              Email
+            </Label>
+            <Input readOnly id="edit-email" name="email" type="email" value={formData.email || ''} onChange={handleInputChange} className="col-span-3" />
           </div>
-          <ImagesSelect newImages={newImages as string[]} setNewImages={setNewImages} />
-          <div className="w-full mt-2" />
 
-          <RichTextEditor content={descriptions} onChange={onChange} />
-          <div className="mt-12 pt-12" />
-        </ScrollArea>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="edit-role" className="text-right">
+              Role
+            </Label>
+            <Select onValueChange={handleRoleChange} value={formData.role || ''}>
+              <SelectTrigger className="col-span-3">
+                <SelectValue placeholder="Select a role" />
+              </SelectTrigger>
+              <SelectContent>
+                {usersAccessSelectorArr.map(role => (
+                  <SelectItem key={role} value={role}>
+                    {role.charAt(0).toUpperCase() + role.slice(1)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
         <DialogFooter>
-          <Button
-            className="cursor-pointer border-1 border-slate-400 hover:border-slate-500"
-            variant="outline"
-            onClick={() => {
-              toggleEditModal(false);
-              setSelectedUsersAccess({
-                ...baseIUsers_access,
-              } as IUsers_access);
-            }}
-          >
+          <Button variant="outline" onClick={() => toggleEditModal(false)}>
             Cancel
           </Button>
-          <Button
-            onClick={handleEditNextComponents}
-            className="text-green-400 hover:text-green-500 cursor-pointer bg-green-100 hover:bg-green-200 border-1 border-green-300 hover:border-green-400"
-          >
-            Save Changes
+          <Button onClick={handleSaveChanges} disabled={isLoading}>
+            {isLoading ? 'Saving...' : 'Save Changes'}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -144,4 +130,4 @@ const EditNextComponents: React.FC = () => {
   );
 };
 
-export default EditNextComponents;
+export default EditUserAccess;

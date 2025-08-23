@@ -155,11 +155,7 @@ const ViewTableNextComponents: React.FC = () => {
         <TableCell>{(UsersAccess.email as string) || ''}</TableCell>
         <TableCell>
           <div className="flex flex-wrap gap-1">
-            {UsersAccess.role?.map(role => (
-              <span key={role} className={`px-2 py-1 text-xs font-medium rounded-full ${getRoleBadgeStyle(role)}`}>
-                {role}
-              </span>
-            ))}
+            <span className={`px-2 py-1 text-xs font-medium rounded-full ${getRoleBadgeStyle(UsersAccess.role || '')}`}>{UsersAccess.role}</span>
           </div>
         </TableCell>
 
