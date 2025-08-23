@@ -1,79 +1,17 @@
-Here is an example of model.ts ```
-import mongoose, { Schema } from 'mongoose';
-
-const user_accessSchema = new Schema(
-  {
-    role: [{ type: String, required: false }],
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-      match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email'],
-    },
-  },
-  { timestamps: true },
-);
-
-export default mongoose.models.User_access || mongoose.model('User_access', user_accessSchema);
-
-export interface IUsers_access {
-  role?: string[];
-  email: string;
-  createdAt: Date;
-  updatedAt: Date;
-  _id: string;
-}
-
-``` 
-
-here is example of StoreConstants.ts
-```
-import { IUsers_access } from '../api/v1/model';
-
-export const baseIUsers_accessPerPage = 2;
-export const queryParams = { q: '', page: 1, limit: baseIUsers_accessPerPage };
-export const pageLimitArr: number[] = [baseIUsers_accessPerPage, 10, 50, 100, 200];
-export const selectUserAccess: string = 'user';
-export const usersAccessSelectorArr = [selectUserAccess, 'admin', 'moderator', 'student', 'mentor', 'instructor'];
-export type ISelectUserAccess = 'selectUserAccess' | 'admin' | 'moderator' | 'student' | 'mentor' | 'instructor';
-
-export const defaultUsersAccessData: IUsers_access = {
-  _id: '',
-  email: '',
-  role: [selectUserAccess],
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
-export const baseIUsers_access: IUsers_access = {
-  ...defaultUsersAccessData,
-};
-
-```
-Here is example of Add.tsx
-``` /*
-|-----------------------------------------
-| setting up Controller for the App
-| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
-| @copyright: varse-project, May, 2025
-|-----------------------------------------
-*/
-
-import React, { useState } from 'react';
+Here is an example of Add.tsx ```import { useState } from 'react';
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
-import { useUsersAccessStore } from '../store/Store';
-import { useAddUsers_accessMutation } from '../redux/rtk-Api';
-import { defaultUsersAccessData, selectUserAccess, ISelectUserAccess, usersAccessSelectorArr } from '../store/StoreConstants';
-
-import DataSelect from './DataSelect';
-import ImagesSelect from './ImagesSelect';
-import RichTextEditor from './rich-text-editor';
+import { useUsersAccessStore } from '..//storestore';
+import { useAddUsers_accessMutation } from '../redux/rtk-api';
+import { IAccesses, defaultAccesses } from '@/app/dashboard/accessess/all/api/v1/model';
 import { formatDuplicateKeyError, handleError, handleSuccess, isApiErrorResponse } from './utils';
 
 const InputField: React.FC<{
@@ -81,65 +19,85 @@ const InputField: React.FC<{
   name: string;
   label: string;
   type?: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  value: string | number;
+  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 }> = ({ id, name, label, type = 'text', value, onChange }) => (
   <div className="grid grid-cols-4 items-center gap-4 pr-1">
     <Label htmlFor={id} className="text-right">
       {label}
     </Label>
-    <Input id={id} name={name} type={type} value={value} onChange={onChange} className="col-span-3" />
+    {type === 'textarea' ? (
+      <Textarea id={id} name={name} value={value as string} onChange={onChange} className="col-span-3" />
+    ) : (
+      <Input id={id} name={name} type={type} value={value} onChange={onChange} className="col-span-3" />
+    )}
   </div>
 );
 
 const AddNextComponents: React.FC = () => {
-  const { toggleAddModal, isAddModalOpen, newUsersAccess, setNewUsersAccess, setUsersAccess } = useUsersAccessStore();
-  const [addUsersAccess, { isLoading }] = useAddUsers_accessMutation();
+  const { toggleAddModal, isAddModalOpen, setUsersAccess } = useUsersAccessStore();
+  const [addAccesses, { isLoading }] = useAddUsers_accessMutation();
+  const [newAccess, setNewAccess] = useState<IAccesses>(defaultAccesses);
 
-  const [newItemTags, setNewItemTags] = useState<string[]>([]);
-  const [newImages, setNewImages] = useState<string[]>([]);
-
-  const [descriptions, setDescriptions] = useState('');
-
-  const onChange = (content: string) => {
-    setDescriptions(content);
-    console.log(content);
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setNewUsersAccess({ ...newUsersAccess, [name]: value });
+    setNewAccess({ ...newAccess, [name]: value });
   };
 
-  const handleRoleChange = (value: string) => {
-    setNewUsersAccess({ ...newUsersAccess, role: value as ISelectUserAccess });
+  const handleCheckboxChange = (name: string, checked: boolean) => {
+    setNewAccess({ ...newAccess, [name]: checked });
   };
 
-  const handleAddUsersAccess = async () => {
-    const usersAccess = {
-      dataArr: newItemTags || [],
-      name: newUsersAccess.name || '',
-      email: newUsersAccess.email || '',
-      passCode: newUsersAccess.passCode || '',
-      alias: newUsersAccess.alias || '',
-      role: (newUsersAccess.role as ISelectUserAccess) || selectUserAccess,
-      images: newImages || [],
-      descriptions: descriptions || '',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+  const handleSelectChange = (name: string, value: string) => {
+    setNewAccess({ ...newAccess, [name]: value });
+  };
 
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>, field: string, nestedField?: 'start' | 'end') => {
+    const { value } = e.target;
+    if (nestedField) {
+      setNewAccess({
+        ...newAccess,
+        [field]: {
+          ...(newAccess[field as keyof IAccesses] as object),
+          [nestedField]: new Date(value),
+        },
+      });
+    } else {
+      setNewAccess({ ...newAccess, [field]: new Date(value) });
+    }
+  };
+
+  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>, field: string, nestedField?: 'start' | 'end') => {
+    const { value } = e.target;
+    if (nestedField) {
+      setNewAccess({
+        ...newAccess,
+        [field]: {
+          ...(newAccess[field as keyof IAccesses] as object),
+          [nestedField]: value,
+        },
+      });
+    } else {
+      setNewAccess({ ...newAccess, [field]: value });
+    }
+  };
+
+  const handleArrayChange = (name: string, value: string) => {
+    setNewAccess({ ...newAccess, [name]: value.split(',').map(item => item.trim()) });
+  };
+
+  const handleAddAccess = async () => {
     try {
-      const addedUsersAccess = await addUsersAccess(usersAccess).unwrap(); // Get the returned data
-      setUsersAccess([usersAccess, addedUsersAccess]); // Use the returned data instead of the local `UsersAccess` object
+      const addedAccess = await addAccesses(newAccess).unwrap();
+      setAccesses([addedAccess]);
       toggleAddModal(false);
-      setNewUsersAccess(defaultUsersAccessData);
+      setNewAccess(defaultAccesses);
       handleSuccess('Added Successful');
     } catch (error: unknown) {
-      console.log(error);
-      let errMessage: string = '';
+      console.error(error);
+      let errMessage: string = 'An unknown error occurred.';
       if (isApiErrorResponse(error)) {
-        errMessage = formatDuplicateKeyError(error.data.message);
+        errMessage = formatDuplicateKeyError(error.data.message) || 'API error';
       } else if (error instanceof Error) {
         errMessage = error.message;
       }
@@ -149,59 +107,27 @@ const AddNextComponents: React.FC = () => {
 
   return (
     <Dialog open={isAddModalOpen} onOpenChange={toggleAddModal}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[625px]">
         <DialogHeader>
-          <DialogTitle>Add New UsersAccess</DialogTitle>
+          <DialogTitle>Add New Access</DialogTitle>
         </DialogHeader>
 
-        <ScrollArea className="h-[400px] w-full rounded-md border p-4">
+        <ScrollArea className="h-[500px] w-full rounded-md border p-4">
           <div className="grid gap-4 py-4">
-            <InputField id="name" name="name" label="Name" value={(newUsersAccess.name as string) || ''} onChange={handleInputChange} />
-            <InputField id="email" name="email" label="Email" type="email" value={(newUsersAccess.email as string) || ''} onChange={handleInputChange} />
-            <InputField
-              id="passCode"
-              name="passCode"
-              label="Pass Code"
-              type="password"
-              value={(newUsersAccess.passCode as string) || ''}
-              onChange={handleInputChange}
-            />
-            <InputField id="alias" name="alias" label="Alias" value={(newUsersAccess.alias as string) || ''} onChange={handleInputChange} />
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="role" className="text-right">
-                Role
-              </Label>
-              <Select onValueChange={handleRoleChange} defaultValue={(newUsersAccess.role as string) || ''}>
-                <SelectTrigger className="col-span-3">
-                  <SelectValue placeholder="Select a role" />
-                </SelectTrigger>
-                <SelectContent>
-                  {usersAccessSelectorArr?.map((i, index) => (
-                    <SelectItem key={i + index} className="cursor-pointer" value={i}>
-                      {i}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <DataSelect newItemTags={newItemTags as string[]} setNewItemTags={setNewItemTags} />
-            <ImagesSelect newImages={newImages as string[]} setNewImages={setNewImages} />
-
-            <RichTextEditor content={descriptions} onChange={onChange} />
+            <InputField id="student" name="student" label="Student" value={newAccess['student']} onChange={handleInputChange} />
+            <InputField id="admin" name="admin" label="Admin" value={newAccess['admin']} onChange={handleInputChange} />
+            <InputField id="moderator" name="moderator" label="Moderator" value={newAccess['moderator']} onChange={handleInputChange} />
+            <InputField id="mentor" name="mentor" label="Mentor" value={newAccess['mentor']} onChange={handleInputChange} />
+            <InputField id="instructor" name="instructor" label="Instructor" value={newAccess['instructor']} onChange={handleInputChange} />
           </div>
         </ScrollArea>
 
         <DialogFooter>
-          <Button variant="outline" className="border-slate-500 hover:border-slate-600 border-1 cursor-pointer" onClick={() => toggleAddModal(false)}>
+          <Button variant="outline" onClick={() => toggleAddModal(false)}>
             Cancel
           </Button>
-          <Button
-            disabled={isLoading}
-            variant="outline"
-            className="border-slate-500 hover:border-slate-600 border-1 cursor-pointer"
-            onClick={handleAddUsersAccess}
-          >
-            Add UsersAccess
+          <Button disabled={isLoading} onClick={handleAddAccess}>
+            {isLoading ? 'Adding...' : 'Add Access'}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -210,4 +136,82 @@ const AddNextComponents: React.FC = () => {
 };
 
 export default AddNextComponents;
-``` Now update the Add.tsx file for this model 
+``` 
+
+I Want to rewrite this file.
+I want to do the following things in this file.
+
+1. fetch data form "http://localhost:3000/dashboard/users/all/api/v1&q={query}"
+
+2. it return this json file '''
+{
+    "data": {
+        "gAuthUsers": [
+            {
+                "_id": "68a5c9c535e60940afbb5cb4",
+                "name": "Sharif Bhuyan",
+                "userRole": [],
+                "email": "ifu0118@gmail.com",
+                "createdAt": "2025-08-20T13:12:37.905Z",
+                "updatedAt": "2025-08-20T13:12:37.905Z",
+                "__v": 0
+            },
+            {
+                "_id": "68a0b18d73035abb59866610",
+                "name": "Nura Alom Jitu",
+                "userRole": [
+                    "admin"
+                ],
+                "email": "nuraalomjitu143@gmail.com",
+                "createdAt": "2025-08-16T16:27:57.464Z",
+                "updatedAt": "2025-08-18T13:11:44.335Z",
+                "__v": 0,
+                "blockedBy": "",
+                "imageUrl": "",
+                "isBlocked": false,
+                "passCode": "",
+                "userUID": ""
+            },
+            {
+                "_id": "689c6f44602027952db755e9",
+                "name": "Shariful Islam",
+                "userRole": [],
+                "email": "sjuniv32@gmail.com",
+                "createdAt": "2025-08-13T10:56:04.170Z",
+                "updatedAt": "2025-08-13T10:56:04.170Z",
+                "__v": 0
+            },
+            {
+                "_id": "6899ccd2c368180735c61c80",
+                "name": "Sharif Russel",
+                "userRole": [],
+                "email": "tpc.web.bd@gmail.com",
+                "createdAt": "2025-08-11T10:58:26.819Z",
+                "updatedAt": "2025-08-11T10:58:26.819Z",
+                "__v": 0
+            },
+            {
+                "_id": "6899cc51c368180735c61c7b",
+                "name": "Toufiquer Rahman",
+                "userRole": [],
+                "email": "testpreptr@gmail.com",
+                "createdAt": "2025-08-11T10:56:17.535Z",
+                "updatedAt": "2025-08-11T10:56:17.535Z",
+                "__v": 0
+            }
+        ],
+        "total": 5,
+        "page": 1,
+        "limit": 10
+    },
+    "message": "GAuthUsers fetched successfully",
+    "status": 200
+}``` 
+
+3. at the top there is a searchbar. if I write three word as query. then it fetch with query.
+4. after that it show a list of data maxium 10.
+5. each list have a add button.
+6. If I hit Add button then it will fetch data from this url by post method"http://localhost:3000/dashboard/access-management/all/api/v1 " and default role is "user".
+7. there is a cancel button to totggle popup the model. 
+
+
