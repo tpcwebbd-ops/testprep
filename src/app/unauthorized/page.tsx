@@ -80,7 +80,6 @@ const UnauthorizedPage = () => {
           <a href="/support" style={contactLinkStyle}>
             support team
           </a>
-          .
         </p>
       </div>
     </main>
