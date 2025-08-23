@@ -70,7 +70,8 @@ const ViewTableNextComponents: React.FC = () => {
     },
   );
 
-  const getAllUsersAccessData = useMemo(() => getResponseData?.data?.usersAccess || [], [getResponseData]);
+  console.log('getResponseData', getResponseData?.data?.users_access);
+  const getAllUsersAccessData = useMemo(() => getResponseData?.data?.users_access || [], [getResponseData]);
 
   const formatDate = (date?: Date) => (date ? format(date, 'MMM dd, yyyy') : 'N/A');
 
