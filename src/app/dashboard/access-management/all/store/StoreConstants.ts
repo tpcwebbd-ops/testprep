@@ -9,6 +9,9 @@ export type ISelectUserAccess = 'selectUserAccess' | 'admin' | 'moderator' | 'st
 
 export const defaultUsersAccessData: IUsers_access = {
   _id: '',
+  name: '',
+  assignBy: '',
+
   email: '',
   role: [selectUserAccess],
   createdAt: new Date(),
