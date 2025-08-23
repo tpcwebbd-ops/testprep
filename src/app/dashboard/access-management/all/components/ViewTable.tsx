@@ -116,7 +116,7 @@ const ViewTableNextComponents: React.FC = () => {
         <PencilIcon className="w-4 h-4 mr-1" /> Edit
       </Button>
       <Button
-        variant="outlineGarden"
+        variant="outlineFire"
         size="sm"
         onClick={() => {
           setSelectedUsersAccess(UsersAccess);
@@ -188,7 +188,7 @@ const ViewTableNextComponents: React.FC = () => {
             <TableHead>
               <Checkbox onCheckedChange={checked => handleSelectAll(!!checked)} checked={bulkData.length === getAllUsersAccessData.length} />
             </TableHead>
-            {['name', 'email', 'passCode', 'alias', 'role', 'createdAt'].map(key => (
+            {['name', 'email', 'role', 'assignby', 'assignDate', 'lastUpdate'].map(key => (
               <TableHead key={key} className={`font-bold text-slate-50 cursor-pointer`} onClick={() => handleSort(key as keyof IUsers_access)}>
                 {key.charAt(0).toUpperCase() + key.slice(1)} {sortConfig?.key === key && (sortConfig.direction === 'asc' ? '↑' : '↓')}
               </TableHead>
