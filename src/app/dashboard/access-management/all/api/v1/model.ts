@@ -11,12 +11,16 @@ import mongoose, { Schema } from 'mongoose';
 const user_accessSchema = new Schema(
   {
     role: [{ type: String, required: false }],
+    name: {
+      type: String,
+    },
     email: {
       type: String,
       required: true,
       unique: true,
       match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email'],
     },
+    assignBy: { type: String },
   },
   { timestamps: true },
 );
@@ -28,5 +32,7 @@ export interface IUsers_access {
   email: string;
   createdAt: Date;
   updatedAt: Date;
+  name: string;
+  assignBy: string;
   _id: string;
 }

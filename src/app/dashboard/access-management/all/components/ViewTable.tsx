@@ -70,6 +70,24 @@ const ViewTableNextComponents: React.FC = () => {
     },
   );
 
+  // Helper function to get styling for role badges
+  const getRoleBadgeStyle = (role: string) => {
+    switch (role.toLowerCase()) {
+      case 'admin':
+        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
+      case 'moderator':
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
+      case 'mentor':
+        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+      case 'instructor':
+        return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300';
+      case 'student':
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
+      default:
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+    }
+  };
+
   console.log('getResponseData', getResponseData?.data?.users_access);
   const getAllUsersAccessData = useMemo(() => getResponseData?.data?.users_access || [], [getResponseData]);
 
@@ -129,16 +147,26 @@ const ViewTableNextComponents: React.FC = () => {
   );
   const renderTableRows = () =>
     sortedUsersAccessData.map((UsersAccess: IUsers_access, index: number) => (
-      <TableRow key={(UsersAccess.email as string) || index}>
+      <TableRow key={(UsersAccess.name as string) || index}>
         <TableCell>
           <Checkbox onCheckedChange={checked => handleSelectRow(!!checked, UsersAccess)} checked={bulkData.some(item => item.email === UsersAccess.email)} />
         </TableCell>
-        <TableCell className="font-medium">{(UsersAccess.email as string) || ''}</TableCell>
+        <TableCell>{(UsersAccess.name as string) || ''}</TableCell>
         <TableCell>{(UsersAccess.email as string) || ''}</TableCell>
         <TableCell>
-          <span className={`py-1 rounded-full text-xs font-medium bg-green-500 text-green-50 px-3`}>{(UsersAccess.email as string) || ''}</span>
+          <div className="flex flex-wrap gap-1">
+            {UsersAccess.role?.map(role => (
+              <span key={role} className={`px-2 py-1 text-xs font-medium rounded-full ${getRoleBadgeStyle(role)}`}>
+                {role}
+              </span>
+            ))}
+          </div>
         </TableCell>
+
+        <TableCell>{(UsersAccess.assignBy as string) || ''}</TableCell>
+
         <TableCell>{formatDate(UsersAccess.createdAt)}</TableCell>
+        <TableCell>{formatDate(UsersAccess.updatedAt)}</TableCell>
         <TableCell className="justify-end flex">{renderActions(UsersAccess)}</TableCell>
       </TableRow>
     ));

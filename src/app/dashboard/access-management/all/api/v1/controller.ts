@@ -81,11 +81,7 @@ export async function getUsers_access(req: Request) {
       // Apply search filter only if search query is provided
       if (searchQuery) {
         searchFilter = {
-          $or: [
-            { name: { $regex: searchQuery, $options: 'i' } },
-            { email: { $regex: searchQuery, $options: 'i' } },
-            { alias: { $regex: searchQuery, $options: 'i' } },
-          ],
+          $or: [{ name: { $regex: searchQuery, $options: 'i' } }, { email: { $regex: searchQuery, $options: 'i' } }],
         };
       }
 
