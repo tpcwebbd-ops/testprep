@@ -1,59 +1,59 @@
 -------------------------------------------------------------
 Base data
 -------------------------------------------------------------
-01 -> useUsers_1_000___Store
-02 -> useGetUsers_1_000___Query
-03 -> ViewUsers_1_000___Table
-04 -> BulkUpdateUsers_1_000___
-05 -> BulkDynamicUpdateUsers_1_000___
-06 -> User_3_000___
-07 -> users_2_000___
-08 -> Users_1_000___
-09 -> users_2_000___
-10 -> user_4_000___
-11 -> users_2_000___
+01 -> useUsers_accessStore
+02 -> useGetUsers_accessQuery
+03 -> ViewUsers_accessTable
+04 -> BulkUpdateUsers_access
+05 -> BulkDynamicUpdateUsers_access
+06 -> User_access
+07 -> users_access
+08 -> Users_access
+09 -> users_access
+10 -> user_access
+11 -> users_access
 12 -> selectSpokenStatus
-13 -> useAddUsers_1_000___Mutation
-14 -> defaultUsers_1_000___Data
+13 -> useAddUsers_accessMutation
+14 -> defaultUsers_accessData
 15 -> ISelectSpokenStatus
-16 -> newUsers_1_000___
-17 -> addUsers_1_000___
-18 -> Users_1_000___
-19 -> addedUsers_1_000___
-20 -> Users_1_000___
-21 -> users_2_000___rtk_tag
+16 -> newUsers_access
+17 -> addUsers_access
+18 -> Users_access
+19 -> addedUsers_access
+20 -> Users_access
+21 -> users_accessrtk_tag
 22 -> selectSpokenStatus
-23 -> users_2_000___
-24 -> User_3_000___
+23 -> users_access
+24 -> User_access
 
 -------------------------------------------------------------
 Updated data 
 -------------------------------------------------------------
 out put ----------------------------------
-01 -> useUsers_1_000___Store                 | useUsers_1_000___Store
-02 -> useGetUsers_1_000___Query             | useGetUsers_1_000___Query
-03 -> ViewUsers_1_000___Table               | ViewUsers_1_000___Table
-04 -> BulkUpdateUsers_1_000___               | BulkUpdateUsers_1_000___
-05 -> BulkDynamicUpdateUsers_1_000___        | BulkDynamicUpdateUsers_1_000___
-06 -> User_3_000___                         | User_3_000___
-07 -> users_2_000___                     | users_2_000___
-08 -> Users_1_000___                        | Users_1_000___
-09 -> users_2_000___                        | users_2_000___
-10 -> user_4_000___                         | user_4_000___
-11 -> users_2_000___                       | users_2_000___
+01 -> useUsers_accessStore                 | useUsers_accessStore
+02 -> useGetUsers_accessQuery             | useGetUsers_accessQuery
+03 -> ViewUsers_accessTable               | ViewUsers_accessTable
+04 -> BulkUpdateUsers_access               | BulkUpdateUsers_access
+05 -> BulkDynamicUpdateUsers_access        | BulkDynamicUpdateUsers_access
+06 -> User_access                         | User_access
+07 -> users_access                     | users_access
+08 -> Users_access                        | Users_access
+09 -> users_access                        | users_access
+10 -> user_access                         | user_access
+11 -> users_access                       | users_access
 12 -> selectSpokenStatus                  | selectSpokenStatus
-13 -> useAddUsers_1_000___Mutation           | useAddUsers_1_000___Mutation
-14 -> defaultUsers_1_000___Data              | defaultUsers_1_000___Data
+13 -> useAddUsers_accessMutation           | useAddUsers_accessMutation
+14 -> defaultUsers_accessData              | defaultUsers_accessData
 15 -> ISelectSpokenStatus            | ISelectSpokenStatus
-16 -> newUsers_1_000___                      | newUsers_1_000___
-17 -> addUsers_1_000___                      | addUsers_1_000___
-18 -> Users_1_000___                         | Users_1_000___
-19 -> addedUsers_1_000___                    | addedUsers_1_000___
-20 -> Users_1_000___                         | Users_1_000___
-21 -> users_2_000___rtk_tag                        | users_2_000___rtk_tag
+16 -> newUsers_access                      | newUsers_access
+17 -> addUsers_access                      | addUsers_access
+18 -> Users_access                         | Users_access
+19 -> addedUsers_access                    | addedUsers_access
+20 -> Users_access                         | Users_access
+21 -> users_accessrtk_tag                        | users_accessrtk_tag
 22 -> selectSpokenStatus                             | selectSpokenStatus
-23 -> users_2_000___                | users_2_000___
-24 -> User_3_000___                            | User_3_000___
+23 -> users_access                | users_access
+24 -> User_access                            | User_access
 
 
 
@@ -73,9 +73,9 @@ global-id   -> global id to change secure
 global-check-> checking is all data editing finish or not
 -------------------------------------------------------------
 you have to change
-1. Users_1_000___
-2. users_2_000___
-3. User_3_000___
-4. user_4_000___
+1. Users_access
+2. users_access
+3. User_access
+4. user_access
 6. ISelectSpokenStatus
 5. selectSpokenStatus

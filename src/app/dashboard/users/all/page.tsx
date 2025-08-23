@@ -57,6 +57,7 @@ const MainNextPage: React.FC = () => {
         <h1 className="text-2xl font-bold w-full">
           User Management {isSuccess && <sup className="text-xs">(total:{getResponseData?.data?.total || '00'})</sup>}
         </h1>
+
         <div className="w-full flex gap-2 item-center justify-end"></div>
       </div>
       <SearchBox onSearch={handleSearch} placeholder="Search here ..." autoFocus={false} />
