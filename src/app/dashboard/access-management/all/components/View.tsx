@@ -1,142 +1,108 @@
-// /*
-// |-----------------------------------------
-// | setting up Controller for the App
-// | @author: Toufiquer Rahman<toufiquer.0@gmail.com>
-// | @copyright: varse-project, May, 2025
-// |-----------------------------------------
-// */
-
-// import Image from 'next/image';
-// import { format } from 'date-fns';
-// import React, { useEffect } from 'react';
-
-// import { Button } from '@/components/ui/button';
-// import { ScrollArea } from '@/components/ui/scroll-area';
-// import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-
-// import { IUsers_access } from '../api/v1/model';
-// import { useUsersAccessStore } from '../store/Store';
-// import { baseIUsers_access } from '../store/StoreConstants';
-// import { useGetUsers_accessByIdQuery } from '../redux/rtk-Api';
-
-// import { ViewRichText } from './view-rich-text/ViewRichText';
-
-// const ViewNextComponents: React.FC = () => {
-//   const { isViewModalOpen, selectedUsersAccess, toggleViewModal, setSelectedUsersAccess } = useUsersAccessStore();
-//   const { data: UsersAccessData, refetch } = useGetUsers_accessByIdQuery(selectedUsersAccess?._id, { skip: !selectedUsersAccess?._id });
-
-//   useEffect(() => {
-//     if (selectedUsersAccess?._id) {
-//       refetch(); // Fetch the latest UsersAccess data
-//     }
-//   }, [selectedUsersAccess?._id, refetch]);
-
-//   useEffect(() => {
-//     if (UsersAccessData?.data) {
-//       setSelectedUsersAccess(UsersAccessData.data); // Update selectedUsersAccess with the latest data
-//     }
-//   }, [UsersAccessData, setSelectedUsersAccess]);
-
-//   const formatDate = (date?: Date) => (date ? format(date, 'MMM dd, yyyy') : 'N/A');
-
-//   const DetailRow = ({ label, value }: { label: string; value: React.ReactNode }) => (
-//     <div className="grid grid-cols-3 gap-2">
-//       <div className="font-semibold">{label}:</div>
-//       <div className="col-span-2">{value || 'N/A'}</div>
-//     </div>
-//   );
-//   const DetailRowArray = ({ label, values }: { label: string; values: string[] }) => (
-//     <div className="grid grid-cols-3 gap-2">
-//       <div className="font-semibold">{label}:</div>
-//       <div className="col-span-2">{values?.join(', ')}</div>
-//     </div>
-//   );
-
-//   return (
-//     <Dialog open={isViewModalOpen} onOpenChange={toggleViewModal}>
-//       <DialogContent>
-//         <DialogHeader>
-//           <DialogTitle>UsersAccess Details</DialogTitle>
-//         </DialogHeader>
-//         {selectedUsersAccess && (
-//           <ScrollArea className="h-[400px] w-full rounded-md border p-4">
-//             <div className="w-full flex flex-col">
-//               <div className="grid gap-2">
-//                 <DetailRow label="Name" value={selectedUsersAccess.name as string} />
-//                 <DetailRow label="Email" value={selectedUsersAccess.email as string} />
-//                 <DetailRow label="Pass Code" value={selectedUsersAccess.passCode as string} />
-//                 <DetailRow label="Alias" value={selectedUsersAccess.alias as string} />
-//                 <DetailRow
-//                   label="Role"
-//                   value={
-//                     <span
-//                       className={`px-2 py-1 rounded-full text-xs font-medium ${
-//                         selectedUsersAccess.role === 'admin'
-//                           ? 'bg-amber-100 text-amber-700'
-//                           : selectedUsersAccess.role === 'moderator'
-//                           ? 'bg-blue-100 text-blue-700'
-//                           : 'bg-green-100 text-green-700'
-//                       }`}
-//                     >
-//                       {selectedUsersAccess.role as string}
-//                     </span>
-//                   }
-//                 />
-//                 <DetailRowArray label="Data Array" values={selectedUsersAccess.dataArr as string[]} />
-//                 <DetailRow label="Created At" value={formatDate(selectedUsersAccess.createdAt)} />
-//                 <DetailRow label="Updated At" value={formatDate(selectedUsersAccess.updatedAt)} />
-//               </div>
-//               <div className="w-full flex items-center justify-center mt-2 min-h-[10vh]">
-//                 {Array.isArray(selectedUsersAccess.images) && selectedUsersAccess.images?.length > 0 ? (
-//                   <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-1">
-//                     {selectedUsersAccess.images.map((i: string, index: number) => (
-//                       <div
-//                         key={index + i}
-//                         className={`relative w-full h-[150px] border-1 border-slate-300 shadow-xl hover:shadow-2xl cursor-pointer hover:border-slate-600 flex items-center justify-center rounded-lg overflow-hidden`}
-//                       >
-//                         <Image src={i} fill alt="Media" objectFit="cover" />
-//                       </div>
-//                     ))}
-//                   </div>
-//                 ) : (
-//                   <div className="flex flex-col w-full items-center justify-center">
-//                     <p>Ops! there is no Image</p>
-//                   </div>
-//                 )}
-//               </div>
-//               <div className="w-full m-2" />
-//               <ViewRichText data={selectedUsersAccess.descriptions || ''} />
-//             </div>
-//           </ScrollArea>
-//         )}
-//         <DialogFooter>
-//           <Button
-//             className="cursor-pointer border-1 border-slate-400 hover:border-slate-500"
-//             onClick={() => {
-//               toggleViewModal(false);
-//               setSelectedUsersAccess({
-//                 ...baseIUsers_access,
-//               } as IUsers_access);
-//             }}
-//           >
-//             Close
-//           </Button>
-//         </DialogFooter>
-//       </DialogContent>
-//     </Dialog>
-//   );
-// };
-
-// export default ViewNextComponents;
-
 /*
 |-----------------------------------------
-| setting up View for the App
+| setting up View Component for User Access
 | @author: Toufiquer Rahman<toufiquer.0@gmail.com>
-| @copyright: testprep-webapp, August, 2025
+| @copyright: varse-project, May, 2025
 |-----------------------------------------
 */
-const View = () => {
-  return <main>View</main>;
+
+import { format } from 'date-fns';
+import React, { useEffect } from 'react';
+
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+
+import { useUsersAccessStore } from '../store/Store';
+import { useGetUsers_accessByIdQuery } from '../redux/rtk-Api';
+
+// Helper function to get styling for role badges
+const getRoleBadgeStyle = (role: string) => {
+  switch (role.toLowerCase()) {
+    case 'admin':
+      return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
+    case 'moderator':
+      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
+    case 'mentor':
+      return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+    case 'instructor':
+      return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300';
+    case 'student':
+      return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
+    default:
+      return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+  }
 };
-export default View;
+
+const ViewUserAccess: React.FC = () => {
+  const { isViewModalOpen, selectedUsersAccess, toggleViewModal, setSelectedUsersAccess } = useUsersAccessStore();
+  const { data: userAccessData, refetch } = useGetUsers_accessByIdQuery(selectedUsersAccess?._id, { skip: !selectedUsersAccess?._id });
+
+  // Refetch data when a new user is selected
+  useEffect(() => {
+    if (selectedUsersAccess?._id) {
+      refetch();
+    }
+  }, [selectedUsersAccess?._id, refetch]);
+
+  // Update the store's selected user with the fresh data from the API
+  useEffect(() => {
+    if (userAccessData?.data) {
+      setSelectedUsersAccess(userAccessData.data);
+    }
+  }, [userAccessData, setSelectedUsersAccess]);
+
+  const formatDate = (date?: Date | string) => (date ? format(new Date(date), 'MMM dd, yyyy, h:mm a') : 'N/A');
+
+  const DetailRow = ({ label, value }: { label: string; value: React.ReactNode }) => (
+    <div className="flex justify-between border-b py-2">
+      <div className="font-semibold text-slate-600">{label}</div>
+      <div className="text-right">{value || 'N/A'}</div>
+    </div>
+  );
+
+  // When the dialog is closed, clear the selected user from the global store
+  const handleOnOpenChange = (isOpen: boolean) => {
+    if (!isOpen) {
+      setSelectedUsersAccess(null);
+    }
+    toggleViewModal(isOpen);
+  };
+  return (
+    <Dialog open={isViewModalOpen} onOpenChange={handleOnOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>User Access Details</DialogTitle>
+        </DialogHeader>
+        {selectedUsersAccess && (
+          <ScrollArea className="h-auto max-h-[60vh] w-full rounded-md p-4">
+            <div className="grid gap-2">
+              <DetailRow label="Name" value={selectedUsersAccess.name} />
+              <DetailRow label="Email" value={selectedUsersAccess.email} />
+              <DetailRow
+                label="Roles"
+                value={
+                  <div className="flex flex-wrap gap-1 justify-end">
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRoleBadgeStyle(selectedUsersAccess.role || '')}`}>
+                      {selectedUsersAccess.role}
+                    </span>
+                  </div>
+                }
+              />
+              <DetailRow label="Assigned By" value={selectedUsersAccess.assignBy} />
+              <DetailRow label="Created At" value={formatDate(selectedUsersAccess.createdAt)} />
+              <DetailRow label="Last Updated" value={formatDate(selectedUsersAccess.updatedAt)} />
+            </div>
+          </ScrollArea>
+        )}
+        <DialogFooter>
+          <Button variant="outline" onClick={() => toggleViewModal(false)}>
+            Close
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default ViewUserAccess;
