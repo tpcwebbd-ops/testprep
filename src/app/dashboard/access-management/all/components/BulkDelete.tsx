@@ -12,25 +12,25 @@
 // import { ScrollArea } from '@/components/ui/scroll-area';
 // import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
-// import { useUsers_1_000___Store } from '../store/Store';
+// import { useUsersAccessStore } from '../store/Store';
 // import { useBulkDeleteUsers_accessMutation } from '../redux/rtk-Api';
 
 // import { handleSuccess } from './utils';
 
 // const BulkDeleteNextComponents: React.FC = () => {
-//   const { isBulkDeleteModalOpen, toggleBulkDeleteModal, bulkData, setBulkData } = useUsers_1_000___Store();
-//   const [bulkDeleteUsers_1_000___, { isLoading }] = useBulkDeleteUsers_accessMutation();
+//   const { isBulkDeleteModalOpen, toggleBulkDeleteModal, bulkData, setBulkData } = useUsersAccessStore();
+//   const [bulkDeleteUsersAccess, { isLoading }] = useBulkDeleteUsers_accessMutation();
 
 //   const handleBulkDeleteNextComponents = async () => {
 //     if (!bulkData?.length) return;
 //     try {
-//       const ids = bulkData.map(Users_1_000___ => Users_1_000___._id);
-//       await bulkDeleteUsers_1_000___({ ids }).unwrap();
+//       const ids = bulkData.map(UsersAccess => UsersAccess._id);
+//       await bulkDeleteUsersAccess({ ids }).unwrap();
 //       toggleBulkDeleteModal(false);
 //       setBulkData([]);
 //       handleSuccess('Delete Successful');
 //     } catch (error) {
-//       console.error('Failed to delete Users_1_000___:', error);
+//       console.error('Failed to delete UsersAccess:', error);
 //     }
 //   };
 
@@ -43,15 +43,15 @@
 //         {bulkData?.length > 0 && (
 //           <div className="pt-4">
 //             <p>
-//               You are about to delete <span className="font-semibold">({bulkData.length})</span> users_2_000___
+//               You are about to delete <span className="font-semibold">({bulkData.length})</span> usersAccess
 //             </p>
 //           </div>
 //         )}
 //         <ScrollArea className="h-[400px] w-full rounded-md border p-4">
 //           <div className="flex flex-col">
-//             {bulkData.map((Users_1_000___, idx) => (
-//               <span key={(Users_1_000___._id as string) + idx} className="text-xs">
-//                 {idx + 1}. {(Users_1_000___.name as string) || ''}
+//             {bulkData.map((UsersAccess, idx) => (
+//               <span key={(UsersAccess._id as string) + idx} className="text-xs">
+//                 {idx + 1}. {(UsersAccess.name as string) || ''}
 //               </span>
 //             ))}
 //           </div>

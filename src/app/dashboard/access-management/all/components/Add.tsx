@@ -9,7 +9,7 @@
 // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 // import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
-// import { useUsers_1_000___Store } from '..//storestore';
+// import { useUsersAccessStore } from '..//storestore';
 // import { useAddUsers_accessMutation } from '../redux/rtk-api';
 // import { IAccesses, defaultAccesses } from '@/app/dashboard/accessess/all/api/v1/model';
 // import { formatDuplicateKeyError, handleError, handleSuccess, isApiErrorResponse } from './utils';
@@ -35,7 +35,7 @@
 // );
 
 // const AddNextComponents: React.FC = () => {
-//   const { toggleAddModal, isAddModalOpen, setUsers_1_000___ } = useUsers_1_000___Store();
+//   const { toggleAddModal, isAddModalOpen, setUsersAccess } = useUsersAccessStore();
 //   const [addAccesses, { isLoading }] = useAddUsers_accessMutation();
 //   const [newAccess, setNewAccess] = useState<IAccesses>(defaultAccesses);
 

@@ -33,19 +33,19 @@ import { IUsers_access } from '../api/v1/model';
 export const baseIUsers_accessPerPage = 2;
 export const queryParams = { q: '', page: 1, limit: baseIUsers_accessPerPage };
 export const pageLimitArr: number[] = [baseIUsers_accessPerPage, 10, 50, 100, 200];
-export const select_5_000___: string = 'user';
-export const users_2_000___SelectorArr = [select_5_000___, 'admin', 'moderator', 'student', 'mentor', 'instructor'];
-export type ISelect_6_000___ = 'select_5_000___' | 'admin' | 'moderator' | 'student' | 'mentor' | 'instructor';
+export const selectUserAccess: string = 'user';
+export const usersAccessSelectorArr = [selectUserAccess, 'admin', 'moderator', 'student', 'mentor', 'instructor'];
+export type ISelectUserAccess = 'selectUserAccess' | 'admin' | 'moderator' | 'student' | 'mentor' | 'instructor';
 
-export const defaultUsers_1_000___Data: IUsers_access = {
+export const defaultUsersAccessData: IUsers_access = {
   _id: '',
   email: '',
-  role: [select_5_000___],
+  role: [selectUserAccess],
   createdAt: new Date(),
   updatedAt: new Date(),
 };
 export const baseIUsers_access: IUsers_access = {
-  ...defaultUsers_1_000___Data,
+  ...defaultUsersAccessData,
 };
 
 ```
@@ -67,9 +67,9 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
-import { useUsers_1_000___Store } from '../store/Store';
+import { useUsersAccessStore } from '../store/Store';
 import { useAddUsers_accessMutation } from '../redux/rtk-Api';
-import { defaultUsers_1_000___Data, select_5_000___, ISelect_6_000___, users_2_000___SelectorArr } from '../store/StoreConstants';
+import { defaultUsersAccessData, selectUserAccess, ISelectUserAccess, usersAccessSelectorArr } from '../store/StoreConstants';
 
 import DataSelect from './DataSelect';
 import ImagesSelect from './ImagesSelect';
@@ -93,8 +93,8 @@ const InputField: React.FC<{
 );
 
 const AddNextComponents: React.FC = () => {
-  const { toggleAddModal, isAddModalOpen, newUsers_1_000___, setNewUsers_1_000___, setUsers_1_000___ } = useUsers_1_000___Store();
-  const [addUsers_1_000___, { isLoading }] = useAddUsers_accessMutation();
+  const { toggleAddModal, isAddModalOpen, newUsersAccess, setNewUsersAccess, setUsersAccess } = useUsersAccessStore();
+  const [addUsersAccess, { isLoading }] = useAddUsers_accessMutation();
 
   const [newItemTags, setNewItemTags] = useState<string[]>([]);
   const [newImages, setNewImages] = useState<string[]>([]);
@@ -108,21 +108,21 @@ const AddNextComponents: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setNewUsers_1_000___({ ...newUsers_1_000___, [name]: value });
+    setNewUsersAccess({ ...newUsersAccess, [name]: value });
   };
 
   const handleRoleChange = (value: string) => {
-    setNewUsers_1_000___({ ...newUsers_1_000___, role: value as ISelect_6_000___ });
+    setNewUsersAccess({ ...newUsersAccess, role: value as ISelectUserAccess });
   };
 
-  const handleAddUsers_1_000___ = async () => {
-    const Users_2_000___ = {
+  const handleAddUsersAccess = async () => {
+    const usersAccess = {
       dataArr: newItemTags || [],
-      name: newUsers_1_000___.name || '',
-      email: newUsers_1_000___.email || '',
-      passCode: newUsers_1_000___.passCode || '',
-      alias: newUsers_1_000___.alias || '',
-      role: (newUsers_1_000___.role as ISelect_6_000___) || select_5_000___,
+      name: newUsersAccess.name || '',
+      email: newUsersAccess.email || '',
+      passCode: newUsersAccess.passCode || '',
+      alias: newUsersAccess.alias || '',
+      role: (newUsersAccess.role as ISelectUserAccess) || selectUserAccess,
       images: newImages || [],
       descriptions: descriptions || '',
       createdAt: new Date(),
@@ -130,10 +130,10 @@ const AddNextComponents: React.FC = () => {
     };
 
     try {
-      const addedUsers_1_000___ = await addUsers_1_000___(Users_2_000___).unwrap(); // Get the returned data
-      setUsers_1_000___([Users_2_000___, addedUsers_1_000___]); // Use the returned data instead of the local `Users_1_000___` object
+      const addedUsersAccess = await addUsersAccess(usersAccess).unwrap(); // Get the returned data
+      setUsersAccess([usersAccess, addedUsersAccess]); // Use the returned data instead of the local `UsersAccess` object
       toggleAddModal(false);
-      setNewUsers_1_000___(defaultUsers_1_000___Data);
+      setNewUsersAccess(defaultUsersAccessData);
       handleSuccess('Added Successful');
     } catch (error: unknown) {
       console.log(error);
@@ -151,32 +151,32 @@ const AddNextComponents: React.FC = () => {
     <Dialog open={isAddModalOpen} onOpenChange={toggleAddModal}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add New Users_1_000___</DialogTitle>
+          <DialogTitle>Add New UsersAccess</DialogTitle>
         </DialogHeader>
 
         <ScrollArea className="h-[400px] w-full rounded-md border p-4">
           <div className="grid gap-4 py-4">
-            <InputField id="name" name="name" label="Name" value={(newUsers_1_000___.name as string) || ''} onChange={handleInputChange} />
-            <InputField id="email" name="email" label="Email" type="email" value={(newUsers_1_000___.email as string) || ''} onChange={handleInputChange} />
+            <InputField id="name" name="name" label="Name" value={(newUsersAccess.name as string) || ''} onChange={handleInputChange} />
+            <InputField id="email" name="email" label="Email" type="email" value={(newUsersAccess.email as string) || ''} onChange={handleInputChange} />
             <InputField
               id="passCode"
               name="passCode"
               label="Pass Code"
               type="password"
-              value={(newUsers_1_000___.passCode as string) || ''}
+              value={(newUsersAccess.passCode as string) || ''}
               onChange={handleInputChange}
             />
-            <InputField id="alias" name="alias" label="Alias" value={(newUsers_1_000___.alias as string) || ''} onChange={handleInputChange} />
+            <InputField id="alias" name="alias" label="Alias" value={(newUsersAccess.alias as string) || ''} onChange={handleInputChange} />
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="role" className="text-right">
                 Role
               </Label>
-              <Select onValueChange={handleRoleChange} defaultValue={(newUsers_1_000___.role as string) || ''}>
+              <Select onValueChange={handleRoleChange} defaultValue={(newUsersAccess.role as string) || ''}>
                 <SelectTrigger className="col-span-3">
                   <SelectValue placeholder="Select a role" />
                 </SelectTrigger>
                 <SelectContent>
-                  {users_2_000___SelectorArr?.map((i, index) => (
+                  {usersAccessSelectorArr?.map((i, index) => (
                     <SelectItem key={i + index} className="cursor-pointer" value={i}>
                       {i}
                     </SelectItem>
@@ -199,9 +199,9 @@ const AddNextComponents: React.FC = () => {
             disabled={isLoading}
             variant="outline"
             className="border-slate-500 hover:border-slate-600 border-1 cursor-pointer"
-            onClick={handleAddUsers_1_000___}
+            onClick={handleAddUsersAccess}
           >
-            Add Users_1_000___
+            Add UsersAccess
           </Button>
         </DialogFooter>
       </DialogContent>

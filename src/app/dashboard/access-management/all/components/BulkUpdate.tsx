@@ -14,36 +14,36 @@
 // import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 // import { IUsers_access } from '../api/v1/model';
-// import { useUsers_1_000___Store } from '../store/Store';
-// import { users_2_000___SelectorArr } from '../store/StoreConstants';
+// import { useUsersAccessStore } from '../store/Store';
+// import { usersAccessSelectorArr } from '../store/StoreConstants';
 // import { useBulkUpdateUsers_accessMutation } from '../redux/rtk-Api';
 
 // import { handleSuccess } from './utils';
 
 // const BulkUpdateNextComponents: React.FC = () => {
-//   const { toggleBulkUpdateModal, isBulkUpdateModalOpen, bulkData, setBulkData } = useUsers_1_000___Store();
-//   const [bulkUpdateUsers_1_000___, { isLoading }] = useBulkUpdateUsers_accessMutation();
+//   const { toggleBulkUpdateModal, isBulkUpdateModalOpen, bulkData, setBulkData } = useUsersAccessStore();
+//   const [bulkUpdateUsersAccess, { isLoading }] = useBulkUpdateUsers_accessMutation();
 
-//   const handleBulkEditUsers_1_000___ = async () => {
+//   const handleBulkEditUsersAccess = async () => {
 //     if (!bulkData.length) return;
 //     try {
 //       const newBulkData = bulkData.map(({ _id, ...rest }) => ({
 //         id: _id,
 //         updateData: rest,
 //       }));
-//       await bulkUpdateUsers_1_000___(newBulkData).unwrap();
+//       await bulkUpdateUsersAccess(newBulkData).unwrap();
 //       toggleBulkUpdateModal(false);
 //       setBulkData([]);
 //       handleSuccess('Update Successful');
 //     } catch (error) {
-//       console.error('Failed to edit users_2_000___:', error);
+//       console.error('Failed to edit usersAccess:', error);
 //     }
 //   };
 
 //   const handleRoleChangeForAll = (role: string) => {
 //     setBulkData(
-//       bulkData.map(Users_1_000___ => ({
-//         ...Users_1_000___,
+//       bulkData.map(UsersAccess => ({
+//         ...UsersAccess,
 //         role,
 //       })) as IUsers_access[],
 //     );
@@ -58,16 +58,16 @@
 //         {bulkData.length > 0 && (
 //           <div>
 //             <p className="pt-2">
-//               You are about to update <span className="font-semibold">({bulkData.length})</span> users_2_000___
+//               You are about to update <span className="font-semibold">({bulkData.length})</span> usersAccess
 //             </p>
 //             <div className="w-full flex items-center justify-between pt-2">
 //               <p>Update all data as</p>
-//               <Select onValueChange={role => handleRoleChangeForAll(role)} defaultValue={(users_2_000___SelectorArr[0] as string) || ''}>
+//               <Select onValueChange={role => handleRoleChangeForAll(role)} defaultValue={(usersAccessSelectorArr[0] as string) || ''}>
 //                 <SelectTrigger className="bg-slate-50">
 //                   <SelectValue placeholder="Select a role" />
 //                 </SelectTrigger>
 //                 <SelectContent className="bg-slate-50">
-//                   {users_2_000___SelectorArr?.map((role, index) => (
+//                   {usersAccessSelectorArr?.map((role, index) => (
 //                     <SelectItem key={role + index} value={role} className="cursor-pointer hover:bg-slate-200">
 //                       {role}
 //                     </SelectItem>
@@ -79,12 +79,12 @@
 //         )}
 //         <ScrollArea className="h-[400px] w-full rounded-md border p-4">
 //           <div className="flex flex-col gap-2">
-//             {bulkData.map((Users_1_000___, idx) => (
-//               <div key={(Users_1_000___._id as string) || idx} className="flex items-center justify-between">
+//             {bulkData.map((UsersAccess, idx) => (
+//               <div key={(UsersAccess._id as string) || idx} className="flex items-center justify-between">
 //                 <span>
-//                   {idx + 1}. {(Users_1_000___.name as string) || ''}
+//                   {idx + 1}. {(UsersAccess.name as string) || ''}
 //                 </span>
-//                 <span>{Users_1_000___.role as string}</span>
+//                 <span>{UsersAccess.role as string}</span>
 //               </div>
 //             ))}
 //           </div>
@@ -96,7 +96,7 @@
 //           <Button
 //             disabled={isLoading}
 //             variant="outline"
-//             onClick={handleBulkEditUsers_1_000___}
+//             onClick={handleBulkEditUsersAccess}
 //             className="text-green-400 hover:text-green-500 cursor-pointer bg-green-100 hover:bg-green-200 border-1 border-green-300 hover:border-green-400"
 //           >
 //             Update Selected

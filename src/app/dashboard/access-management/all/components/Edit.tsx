@@ -16,9 +16,9 @@
 // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 // import { IUsers_access } from '../api/v1/model';
-// import { useUsers_1_000___Store } from '../store/Store';
+// import { useUsersAccessStore } from '../store/Store';
 // import { useUpdateUsers_accessMutation } from '../redux/rtk-Api';
-// import { ISelect_6_000___, users_2_000___SelectorArr, baseIUsers_access } from '../store/StoreConstants';
+// import { ISelectUserAccess, usersAccessSelectorArr, baseIUsers_access } from '../store/StoreConstants';
 
 // import DataSelect from './DataSelect';
 // import ImagesSelect from './ImagesSelect';
@@ -28,43 +28,43 @@
 // const EditNextComponents: React.FC = () => {
 //   const [newItemTags, setNewItemTags] = useState<string[]>([]);
 //   const [newImages, setNewImages] = useState<string[]>([]);
-//   const { toggleEditModal, isEditModalOpen, newUsers_1_000___, selectedUsers_1_000___, setNewUsers_1_000___, setSelectedUsers_1_000___ } =
-//     useUsers_1_000___Store();
-//   const [updateUsers_1_000___] = useUpdateUsers_accessMutation();
+//   const { toggleEditModal, isEditModalOpen, newUsersAccess, selectedUsersAccess, setNewUsersAccess, setSelectedUsersAccess } =
+//     useUsersAccessStore();
+//   const [updateUsersAccess] = useUpdateUsers_accessMutation();
 //   const [descriptions, setDescriptions] = useState('');
 
 //   const onChange = (content: string) => {
 //     setDescriptions(content);
 //   };
 //   useEffect(() => {
-//     if (selectedUsers_1_000___) {
-//       setNewUsers_1_000___(selectedUsers_1_000___);
-//       setNewItemTags(selectedUsers_1_000___.dataArr as string[]);
-//       setNewImages(selectedUsers_1_000___.images as string[]);
+//     if (selectedUsersAccess) {
+//       setNewUsersAccess(selectedUsersAccess);
+//       setNewItemTags(selectedUsersAccess.dataArr as string[]);
+//       setNewImages(selectedUsersAccess.images as string[]);
 //     }
-//   }, [selectedUsers_1_000___, setNewUsers_1_000___]);
+//   }, [selectedUsersAccess, setNewUsersAccess]);
 //   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 //     const { name, value } = e.target;
-//     setNewUsers_1_000___({ ...newUsers_1_000___, [name]: value });
+//     setNewUsersAccess({ ...newUsersAccess, [name]: value });
 //   };
 //   const handleRoleChange = (value: string) => {
-//     setNewUsers_1_000___({
-//       ...newUsers_1_000___,
-//       role: value as ISelect_6_000___,
+//     setNewUsersAccess({
+//       ...newUsersAccess,
+//       role: value as ISelectUserAccess,
 //     });
 //   };
 
 //   const handleEditNextComponents = async () => {
-//     if (!selectedUsers_1_000___) return;
+//     if (!selectedUsersAccess) return;
 
 //     try {
 //       const updateData = {
-//         ...newUsers_1_000___,
+//         ...newUsersAccess,
 //         dataArr: newItemTags,
 //         images: newImages,
 //       };
-//       await updateUsers_1_000___({
-//         id: selectedUsers_1_000___._id,
+//       await updateUsersAccess({
+//         id: selectedUsersAccess._id,
 //         ...updateData,
 //       }).unwrap(); // Call RTK mutation
 //       toggleEditModal(false);
@@ -84,7 +84,7 @@
 //     <Dialog open={isEditModalOpen} onOpenChange={toggleEditModal}>
 //       <DialogContent>
 //         <DialogHeader>
-//           <DialogTitle>Edit Users_1_000___</DialogTitle>
+//           <DialogTitle>Edit UsersAccess</DialogTitle>
 //         </DialogHeader>
 //         <ScrollArea className="h-[400px] w-full rounded-md border p-4">
 //           <div className="grid gap-4 py-4">
@@ -92,7 +92,7 @@
 //               <Label htmlFor="edit-name" className="text-right">
 //                 Name
 //               </Label>
-//               <Input id="edit-name" name="name" value={(newUsers_1_000___.name as string) || ''} onChange={handleInputChange} className="col-span-3" />
+//               <Input id="edit-name" name="name" value={(newUsersAccess.name as string) || ''} onChange={handleInputChange} className="col-span-3" />
 //             </div>
 //             <div className="grid grid-cols-4 items-center gap-4">
 //               <Label htmlFor="edit-email" className="text-right">
@@ -102,7 +102,7 @@
 //                 id="edit-email"
 //                 name="email"
 //                 type="email"
-//                 value={(newUsers_1_000___.email as string) || ''}
+//                 value={(newUsersAccess.email as string) || ''}
 //                 onChange={handleInputChange}
 //                 className="col-span-3"
 //               />
@@ -115,7 +115,7 @@
 //                 id="edit-passCode"
 //                 name="passCode"
 //                 type="password"
-//                 value={(newUsers_1_000___.passCode as string) || ''}
+//                 value={(newUsersAccess.passCode as string) || ''}
 //                 onChange={handleInputChange}
 //                 className="col-span-3"
 //               />
@@ -124,19 +124,19 @@
 //               <Label htmlFor="edit-alias" className="text-right">
 //                 Alias
 //               </Label>
-//               <Input id="edit-alias" name="alias" value={(newUsers_1_000___.alias as string) || ''} onChange={handleInputChange} className="col-span-3" />
+//               <Input id="edit-alias" name="alias" value={(newUsersAccess.alias as string) || ''} onChange={handleInputChange} className="col-span-3" />
 //             </div>
 //             <div className="grid grid-cols-4 items-center gap-4">
 //               <Label htmlFor="edit-role" className="text-right">
 //                 Role
 //               </Label>
 
-//               <Select onValueChange={handleRoleChange} defaultValue={(newUsers_1_000___.role as string) || ''}>
+//               <Select onValueChange={handleRoleChange} defaultValue={(newUsersAccess.role as string) || ''}>
 //                 <SelectTrigger className="col-span-3">
 //                   <SelectValue placeholder="Select a role" />
 //                 </SelectTrigger>
 //                 <SelectContent className="bg-slate-50">
-//                   {users_2_000___SelectorArr?.map((i, index) => (
+//                   {usersAccessSelectorArr?.map((i, index) => (
 //                     <SelectItem key={i + index} className="cursor-pointer hover:bg-slate-200" value={i}>
 //                       {i}
 //                     </SelectItem>
@@ -158,7 +158,7 @@
 //             variant="outline"
 //             onClick={() => {
 //               toggleEditModal(false);
-//               setSelectedUsers_1_000___({
+//               setSelectedUsersAccess({
 //                 ...baseIUsers_access,
 //               } as IUsers_access);
 //             }}

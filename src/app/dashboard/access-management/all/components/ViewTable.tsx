@@ -23,7 +23,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 import { IUsers_access } from '../api/v1/model';
 import { pageLimitArr } from '../store/StoreConstants';
-import { useUsers_1_000___Store } from '../store/Store';
+import { useUsersAccessStore } from '../store/Store';
 import { useGetUsers_accessQuery } from '../redux/rtk-Api';
 
 import Pagination from './Pagination';
@@ -35,7 +35,7 @@ const ViewTableNextComponents: React.FC = () => {
     direction: 'asc' | 'desc';
   } | null>(null);
   const {
-    setSelectedUsers_1_000___,
+    setSelectedUsersAccess,
     toggleBulkEditModal,
     toggleBulkUpdateModal,
     toggleViewModal,
@@ -50,7 +50,7 @@ const ViewTableNextComponents: React.FC = () => {
     setQueryPramsLimit,
     setQueryPramsPage,
     toggleBulkDeleteModal,
-  } = useUsers_1_000___Store();
+  } = useUsersAccessStore();
 
   const {
     data: getResponseData,
@@ -70,7 +70,7 @@ const ViewTableNextComponents: React.FC = () => {
     },
   );
 
-  const getAllUsers_1_000___Data = useMemo(() => getResponseData?.data?.users_2_000___ || [], [getResponseData]);
+  const getAllUsersAccessData = useMemo(() => getResponseData?.data?.usersAccess || [], [getResponseData]);
 
   const formatDate = (date?: Date) => (date ? format(date, 'MMM dd, yyyy') : 'N/A');
 
@@ -78,27 +78,27 @@ const ViewTableNextComponents: React.FC = () => {
     setSortConfig(prev => (prev?.key === key ? { key, direction: prev.direction === 'asc' ? 'desc' : 'asc' } : { key, direction: 'asc' }));
   };
 
-  const sortedUsers_1_000___Data = useMemo(() => {
-    if (!sortConfig) return getAllUsers_1_000___Data;
-    return [...getAllUsers_1_000___Data].sort((a, b) => {
+  const sortedUsersAccessData = useMemo(() => {
+    if (!sortConfig) return getAllUsersAccessData;
+    return [...getAllUsersAccessData].sort((a, b) => {
       if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === 'asc' ? -1 : 1;
       if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === 'asc' ? 1 : -1;
       return 0;
     });
-  }, [getAllUsers_1_000___Data, sortConfig]);
-  const handleSelectAll = (isChecked: boolean) => setBulkData(isChecked ? getAllUsers_1_000___Data : []);
-  const handleSelectRow = (isChecked: boolean, Users_1_000___: IUsers_access) =>
-    setBulkData(isChecked ? [...bulkData, Users_1_000___] : bulkData.filter(item => item.email !== Users_1_000___.email));
+  }, [getAllUsersAccessData, sortConfig]);
+  const handleSelectAll = (isChecked: boolean) => setBulkData(isChecked ? getAllUsersAccessData : []);
+  const handleSelectRow = (isChecked: boolean, UsersAccess: IUsers_access) =>
+    setBulkData(isChecked ? [...bulkData, UsersAccess] : bulkData.filter(item => item.email !== UsersAccess.email));
   const handlePopUp = () => {
     handleSuccess('Reload Successful');
   };
-  const renderActions = (Users_1_000___: IUsers_access) => (
+  const renderActions = (UsersAccess: IUsers_access) => (
     <div className="flex gap-2">
       <Button
         variant="outlineDefault"
         size="sm"
         onClick={() => {
-          setSelectedUsers_1_000___(Users_1_000___);
+          setSelectedUsersAccess(UsersAccess);
           toggleViewModal(true);
         }}
       >
@@ -108,7 +108,7 @@ const ViewTableNextComponents: React.FC = () => {
         variant="outlineDefault"
         size="sm"
         onClick={() => {
-          setSelectedUsers_1_000___(Users_1_000___);
+          setSelectedUsersAccess(UsersAccess);
           toggleEditModal(true);
         }}
       >
@@ -118,7 +118,7 @@ const ViewTableNextComponents: React.FC = () => {
         variant="outlineGarden"
         size="sm"
         onClick={() => {
-          setSelectedUsers_1_000___(Users_1_000___);
+          setSelectedUsersAccess(UsersAccess);
           toggleDeleteModal(true);
         }}
       >
@@ -127,27 +127,24 @@ const ViewTableNextComponents: React.FC = () => {
     </div>
   );
   const renderTableRows = () =>
-    sortedUsers_1_000___Data.map((Users_1_000___: IUsers_access, index: number) => (
-      <TableRow key={(Users_1_000___.email as string) || index}>
+    sortedUsersAccessData.map((UsersAccess: IUsers_access, index: number) => (
+      <TableRow key={(UsersAccess.email as string) || index}>
         <TableCell>
-          <Checkbox
-            onCheckedChange={checked => handleSelectRow(!!checked, Users_1_000___)}
-            checked={bulkData.some(item => item.email === Users_1_000___.email)}
-          />
+          <Checkbox onCheckedChange={checked => handleSelectRow(!!checked, UsersAccess)} checked={bulkData.some(item => item.email === UsersAccess.email)} />
         </TableCell>
-        <TableCell className="font-medium">{(Users_1_000___.email as string) || ''}</TableCell>
-        <TableCell>{(Users_1_000___.email as string) || ''}</TableCell>
+        <TableCell className="font-medium">{(UsersAccess.email as string) || ''}</TableCell>
+        <TableCell>{(UsersAccess.email as string) || ''}</TableCell>
         <TableCell>
-          <span className={`py-1 rounded-full text-xs font-medium bg-green-500 text-green-50 px-3`}>{(Users_1_000___.email as string) || ''}</span>
+          <span className={`py-1 rounded-full text-xs font-medium bg-green-500 text-green-50 px-3`}>{(UsersAccess.email as string) || ''}</span>
         </TableCell>
-        <TableCell>{formatDate(Users_1_000___.createdAt)}</TableCell>
-        <TableCell className="justify-end flex">{renderActions(Users_1_000___)}</TableCell>
+        <TableCell>{formatDate(UsersAccess.createdAt)}</TableCell>
+        <TableCell className="justify-end flex">{renderActions(UsersAccess)}</TableCell>
       </TableRow>
     ));
 
   if (isLoading) return <LoadingComponent />;
   if (isError) return <ErrorMessageComponent message={error || 'An error occurred'} />;
-  if (getAllUsers_1_000___Data.length === 0) return <div className="py-12 text-2xl text-slate-500">Ops! Nothing was found.</div>;
+  if (getAllUsersAccessData.length === 0) return <div className="py-12 text-2xl text-slate-500">Ops! Nothing was found.</div>;
 
   return (
     <div className="w-full flex flex-col">
@@ -188,7 +185,7 @@ const ViewTableNextComponents: React.FC = () => {
         <TableHeader className="bg-slate-600 text-slate-50 rounded overflow-hidden border-1 border-slate-600">
           <TableRow>
             <TableHead>
-              <Checkbox onCheckedChange={checked => handleSelectAll(!!checked)} checked={bulkData.length === getAllUsers_1_000___Data.length} />
+              <Checkbox onCheckedChange={checked => handleSelectAll(!!checked)} checked={bulkData.length === getAllUsersAccessData.length} />
             </TableHead>
             {['name', 'email', 'passCode', 'alias', 'role', 'createdAt'].map(key => (
               <TableHead key={key} className={`font-bold text-slate-50 cursor-pointer`} onClick={() => handleSort(key as keyof IUsers_access)}>
@@ -208,7 +205,7 @@ const ViewTableNextComponents: React.FC = () => {
       />
       <div className="max-w-[380px] flex items-center justify-between pl-2 gap-4 border-1 border-slate-200 rounded-xl w-full mx-auto mt-8">
         <Label htmlFor="set-limit" className="text-right text-slate-500 font-thin pl-3">
-          Users_1_000___ per page
+          UsersAccess per page
         </Label>
         <Select
           onValueChange={value => {

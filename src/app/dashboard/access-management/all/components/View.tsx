@@ -15,27 +15,27 @@
 // import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 // import { IUsers_access } from '../api/v1/model';
-// import { useUsers_1_000___Store } from '../store/Store';
+// import { useUsersAccessStore } from '../store/Store';
 // import { baseIUsers_access } from '../store/StoreConstants';
 // import { useGetUsers_accessByIdQuery } from '../redux/rtk-Api';
 
 // import { ViewRichText } from './view-rich-text/ViewRichText';
 
 // const ViewNextComponents: React.FC = () => {
-//   const { isViewModalOpen, selectedUsers_1_000___, toggleViewModal, setSelectedUsers_1_000___ } = useUsers_1_000___Store();
-//   const { data: Users_1_000___Data, refetch } = useGetUsers_accessByIdQuery(selectedUsers_1_000___?._id, { skip: !selectedUsers_1_000___?._id });
+//   const { isViewModalOpen, selectedUsersAccess, toggleViewModal, setSelectedUsersAccess } = useUsersAccessStore();
+//   const { data: UsersAccessData, refetch } = useGetUsers_accessByIdQuery(selectedUsersAccess?._id, { skip: !selectedUsersAccess?._id });
 
 //   useEffect(() => {
-//     if (selectedUsers_1_000___?._id) {
-//       refetch(); // Fetch the latest Users_1_000___ data
+//     if (selectedUsersAccess?._id) {
+//       refetch(); // Fetch the latest UsersAccess data
 //     }
-//   }, [selectedUsers_1_000___?._id, refetch]);
+//   }, [selectedUsersAccess?._id, refetch]);
 
 //   useEffect(() => {
-//     if (Users_1_000___Data?.data) {
-//       setSelectedUsers_1_000___(Users_1_000___Data.data); // Update selectedUsers_1_000___ with the latest data
+//     if (UsersAccessData?.data) {
+//       setSelectedUsersAccess(UsersAccessData.data); // Update selectedUsersAccess with the latest data
 //     }
-//   }, [Users_1_000___Data, setSelectedUsers_1_000___]);
+//   }, [UsersAccessData, setSelectedUsersAccess]);
 
 //   const formatDate = (date?: Date) => (date ? format(date, 'MMM dd, yyyy') : 'N/A');
 
@@ -56,40 +56,40 @@
 //     <Dialog open={isViewModalOpen} onOpenChange={toggleViewModal}>
 //       <DialogContent>
 //         <DialogHeader>
-//           <DialogTitle>Users_1_000___ Details</DialogTitle>
+//           <DialogTitle>UsersAccess Details</DialogTitle>
 //         </DialogHeader>
-//         {selectedUsers_1_000___ && (
+//         {selectedUsersAccess && (
 //           <ScrollArea className="h-[400px] w-full rounded-md border p-4">
 //             <div className="w-full flex flex-col">
 //               <div className="grid gap-2">
-//                 <DetailRow label="Name" value={selectedUsers_1_000___.name as string} />
-//                 <DetailRow label="Email" value={selectedUsers_1_000___.email as string} />
-//                 <DetailRow label="Pass Code" value={selectedUsers_1_000___.passCode as string} />
-//                 <DetailRow label="Alias" value={selectedUsers_1_000___.alias as string} />
+//                 <DetailRow label="Name" value={selectedUsersAccess.name as string} />
+//                 <DetailRow label="Email" value={selectedUsersAccess.email as string} />
+//                 <DetailRow label="Pass Code" value={selectedUsersAccess.passCode as string} />
+//                 <DetailRow label="Alias" value={selectedUsersAccess.alias as string} />
 //                 <DetailRow
 //                   label="Role"
 //                   value={
 //                     <span
 //                       className={`px-2 py-1 rounded-full text-xs font-medium ${
-//                         selectedUsers_1_000___.role === 'admin'
+//                         selectedUsersAccess.role === 'admin'
 //                           ? 'bg-amber-100 text-amber-700'
-//                           : selectedUsers_1_000___.role === 'moderator'
+//                           : selectedUsersAccess.role === 'moderator'
 //                           ? 'bg-blue-100 text-blue-700'
 //                           : 'bg-green-100 text-green-700'
 //                       }`}
 //                     >
-//                       {selectedUsers_1_000___.role as string}
+//                       {selectedUsersAccess.role as string}
 //                     </span>
 //                   }
 //                 />
-//                 <DetailRowArray label="Data Array" values={selectedUsers_1_000___.dataArr as string[]} />
-//                 <DetailRow label="Created At" value={formatDate(selectedUsers_1_000___.createdAt)} />
-//                 <DetailRow label="Updated At" value={formatDate(selectedUsers_1_000___.updatedAt)} />
+//                 <DetailRowArray label="Data Array" values={selectedUsersAccess.dataArr as string[]} />
+//                 <DetailRow label="Created At" value={formatDate(selectedUsersAccess.createdAt)} />
+//                 <DetailRow label="Updated At" value={formatDate(selectedUsersAccess.updatedAt)} />
 //               </div>
 //               <div className="w-full flex items-center justify-center mt-2 min-h-[10vh]">
-//                 {Array.isArray(selectedUsers_1_000___.images) && selectedUsers_1_000___.images?.length > 0 ? (
+//                 {Array.isArray(selectedUsersAccess.images) && selectedUsersAccess.images?.length > 0 ? (
 //                   <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-1">
-//                     {selectedUsers_1_000___.images.map((i: string, index: number) => (
+//                     {selectedUsersAccess.images.map((i: string, index: number) => (
 //                       <div
 //                         key={index + i}
 //                         className={`relative w-full h-[150px] border-1 border-slate-300 shadow-xl hover:shadow-2xl cursor-pointer hover:border-slate-600 flex items-center justify-center rounded-lg overflow-hidden`}
@@ -105,7 +105,7 @@
 //                 )}
 //               </div>
 //               <div className="w-full m-2" />
-//               <ViewRichText data={selectedUsers_1_000___.descriptions || ''} />
+//               <ViewRichText data={selectedUsersAccess.descriptions || ''} />
 //             </div>
 //           </ScrollArea>
 //         )}
@@ -114,7 +114,7 @@
 //             className="cursor-pointer border-1 border-slate-400 hover:border-slate-500"
 //             onClick={() => {
 //               toggleViewModal(false);
-//               setSelectedUsers_1_000___({
+//               setSelectedUsersAccess({
 //                 ...baseIUsers_access,
 //               } as IUsers_access);
 //             }}

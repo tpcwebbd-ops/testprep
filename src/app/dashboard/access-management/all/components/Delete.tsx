@@ -12,36 +12,36 @@
 // import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 // import { IUsers_access } from '../api/v1/model';
-// import { useUsers_1_000___Store } from '../store/Store';
+// import { useUsersAccessStore } from '../store/Store';
 // import { baseIUsers_access } from '../store/StoreConstants';
 // import { useDeleteUsers_accessMutation } from '../redux/rtk-Api';
 
 // import { handleSuccess } from './utils';
 
 // const DeleteNextComponents: React.FC = () => {
-//   const { toggleDeleteModal, isDeleteModalOpen, selectedUsers_1_000___, setSelectedUsers_1_000___ } = useUsers_1_000___Store();
-//   const [deleteUsers_1_000___] = useDeleteUsers_accessMutation();
+//   const { toggleDeleteModal, isDeleteModalOpen, selectedUsersAccess, setSelectedUsersAccess } = useUsersAccessStore();
+//   const [deleteUsersAccess] = useDeleteUsers_accessMutation();
 
-//   const handleDeleteUsers_1_000___ = async () => {
-//     if (selectedUsers_1_000___) {
+//   const handleDeleteUsersAccess = async () => {
+//     if (selectedUsersAccess) {
 //       try {
-//         await deleteUsers_1_000___({
-//           id: selectedUsers_1_000___._id,
+//         await deleteUsersAccess({
+//           id: selectedUsersAccess._id,
 //         }).unwrap();
 //         toggleDeleteModal(false);
 //         handleSuccess('Delete Successful');
 //       } catch (error) {
-//         console.error('Failed to delete Users_1_000___:', error);
+//         console.error('Failed to delete UsersAccess:', error);
 //       }
 //     }
 //   };
 
 //   const handleCancel = () => {
 //     toggleDeleteModal(false);
-//     setSelectedUsers_1_000___({ ...baseIUsers_access } as IUsers_access);
+//     setSelectedUsersAccess({ ...baseIUsers_access } as IUsers_access);
 //   };
 
-//   const { name = '' } = selectedUsers_1_000___ || {};
+//   const { name = '' } = selectedUsersAccess || {};
 
 //   return (
 //     <Dialog open={isDeleteModalOpen} onOpenChange={toggleDeleteModal}>
@@ -49,10 +49,10 @@
 //         <DialogHeader>
 //           <DialogTitle>Confirm Deletion</DialogTitle>
 //         </DialogHeader>
-//         {selectedUsers_1_000___ && (
+//         {selectedUsersAccess && (
 //           <div className="py-4">
 //             <p>
-//               You are about to delete Users_1_000___: <span className="font-semibold">{(name as string) || ''}</span>
+//               You are about to delete UsersAccess: <span className="font-semibold">{(name as string) || ''}</span>
 //             </p>
 //           </div>
 //         )}
@@ -63,7 +63,7 @@
 //           <Button
 //             className="text-rose-400 hover:text-rose-500 cursor-pointer bg-rose-100 hover:bg-rose-200 border-1 border-rose-300 hover:border-rose-400 "
 //             variant="outline"
-//             onClick={handleDeleteUsers_1_000___}
+//             onClick={handleDeleteUsersAccess}
 //           >
 //             Delete
 //           </Button>

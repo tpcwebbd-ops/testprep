@@ -22,17 +22,17 @@ import ViewFilename8 from './components/View';
 import SearchBox from './components/SearchBox';
 import DeleteFilename8 from './components/Delete';
 import BulkEditFilename8 from './components/BulkEdit';
-import { useUsers_1_000___Store } from './store/Store';
+import { useUsersAccessStore } from './store/Store';
 import TooManyRequests from './components/TooManyRequest';
 import BulkDeleteFilename8 from './components/BulkDelete';
 import { useGetUsers_accessQuery } from './redux/rtk-Api';
-import ViewUsers_1_000___Table from './components/ViewTable';
-import BulkUpdateUsers_1_000___ from './components/BulkUpdate';
-import BulkDynamicUpdateUsers_1_000___ from './components/BulkDynamicUpdate';
+import ViewUsersAccessTable from './components/ViewTable';
+import BulkUpdateUsersAccess from './components/BulkUpdate';
+import BulkDynamicUpdateUsersAccess from './components/BulkDynamicUpdate';
 
 const MainNextPage: React.FC = () => {
   const [hashSearchText, setHashSearchText] = useState('');
-  const { toggleAddModal, queryPramsLimit, queryPramsPage, queryPramsQ, setQueryPramsPage, setQueryPramsQ } = useUsers_1_000___Store();
+  const { toggleAddModal, queryPramsLimit, queryPramsPage, queryPramsQ, setQueryPramsPage, setQueryPramsQ } = useUsersAccessStore();
 
   const {
     data: getResponseData,
@@ -65,8 +65,8 @@ const MainNextPage: React.FC = () => {
     BulkEditFilename8,
     EditFilename8,
     DeleteFilename8,
-    BulkUpdateUsers_1_000___,
-    BulkDynamicUpdateUsers_1_000___,
+    BulkUpdateUsersAccess,
+    BulkDynamicUpdateUsersAccess,
   ];
 
   let renderUI = (
@@ -81,7 +81,7 @@ const MainNextPage: React.FC = () => {
         </div>
       </div>
       <SearchBox onSearch={handleSearch} placeholder="Search here ..." autoFocus={false} />
-      <ViewUsers_1_000___Table />
+      <ViewUsersAccessTable />
       {modals.map((ModalComponent, index) => (
         <ModalComponent key={index} />
       ))}

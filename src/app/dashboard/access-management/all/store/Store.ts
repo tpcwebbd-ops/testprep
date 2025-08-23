@@ -1,15 +1,15 @@
 import { create } from 'zustand';
 import { IUsers_access } from '../api/v1/model';
-import { Users_1_000___Store } from './StoreTypes';
+import { UsersAccessStore } from './StoreTypes';
 import { baseIUsers_access, queryParams } from './StoreConstants';
 
-export const useUsers_1_000___Store = create<Users_1_000___Store>(set => ({
+export const useUsersAccessStore = create<UsersAccessStore>(set => ({
   queryPramsLimit: queryParams.limit,
   queryPramsPage: queryParams.page,
   queryPramsQ: queryParams.q,
-  users_2_000___: [],
-  selectedUsers_1_000___: null,
-  newUsers_1_000___: baseIUsers_access,
+  usersAccess: [],
+  selectedUsersAccess: null,
+  newUsersAccess: baseIUsers_access,
   isBulkEditModalOpen: false,
   isBulkDynamicUpdateModal: false,
   isBulkUpdateModalOpen: false,
@@ -23,11 +23,11 @@ export const useUsers_1_000___Store = create<Users_1_000___Store>(set => ({
   setQueryPramsPage: (payload: number) => set({ queryPramsPage: payload }),
   setQueryPramsQ: (payload: string) => set({ queryPramsQ: payload }),
   setBulkData: (bulkData: IUsers_access[]) => set({ bulkData }),
-  setUsers_1_000___: (users_2_000___: IUsers_access[]) => set({ users_2_000___ }),
-  setSelectedUsers_1_000___: Users_1_000___ => set({ selectedUsers_1_000___: Users_1_000___ }),
-  setNewUsers_1_000___: Users_1_000___ =>
+  setUsersAccess: (usersAccess: IUsers_access[]) => set({ usersAccess }),
+  setSelectedUsersAccess: UsersAccess => set({ selectedUsersAccess: UsersAccess }),
+  setNewUsersAccess: UsersAccess =>
     set(state => ({
-      newUsers_1_000___: typeof Users_1_000___ === 'function' ? Users_1_000___(state.newUsers_1_000___) : Users_1_000___,
+      newUsersAccess: typeof UsersAccess === 'function' ? UsersAccess(state.newUsersAccess) : UsersAccess,
     })),
   toggleAddModal: data => set({ isAddModalOpen: data }),
   toggleViewModal: data => set({ isViewModalOpen: data }),
