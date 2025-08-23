@@ -17,7 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { IUsers_access } from '../api/v1/model';
 import { useUsersAccessStore } from '../store/Store';
 import { useUpdateUsers_accessMutation } from '../redux/rtk-Api';
-import { ISelectUserAccess, usersAccessSelectorArr, baseIUsers_access } from '../store/StoreConstants';
+import { usersAccessSelectorArr } from '../store/StoreConstants';
 import { formatDuplicateKeyError, handleError, handleSuccess, isApiErrorResponse } from './utils';
 
 const EditUserAccess: React.FC = () => {

@@ -92,7 +92,7 @@ const AddUserFromSearch: React.FC = () => {
     } catch (err) {
       console.error('Failed to add user access:', err);
       // The error message from RTK might contain useful info (e.g., "email already exists")
-      const errorMessage = (err as any)?.data?.message || `Failed to add ${user.name}.`;
+      const errorMessage = `Failed to add ${user.name}.`;
       handleError(errorMessage);
     }
   };

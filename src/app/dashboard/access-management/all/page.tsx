@@ -10,8 +10,6 @@
 
 import React, { useState } from 'react';
 import { PlusIcon } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { BiRightArrowAlt } from 'react-icons/bi';
 
 import { Button } from '@/components/ui/button';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
