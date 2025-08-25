@@ -32,6 +32,8 @@ const BulkEditNextComponents: React.FC = () => {
         id: _id,
         updateData: rest,
       }));
+      console.log('newBulkData', newBulkData);
+
       await bulkUpdateUsersAccess(newBulkData).unwrap();
       toggleBulkEditModal(false);
       setBulkData([]);

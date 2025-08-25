@@ -9,14 +9,14 @@ import { IUsers_access } from '../api/v1/model';
 import { usersAccessSelectorArr } from '../store/StoreConstants';
 
 import { useUsersAccessStore } from '../store/Store';
-import { useAddUsers_block_users_accessMutation } from '../redux/rtk-Api';
+import { useBulkUpdateUsers_block_users_accessMutation } from '../redux/rtk-Api';
 
 import { handleSuccess, handleError } from './utils';
 
 const BulkUpdateNextComponents: React.FC = () => {
   const { toggleBulkUpdateModal, isBulkUpdateModalOpen, bulkData, setBulkData } = useUsersAccessStore();
 
-  const [bulkUpdateAccesses, { isLoading }] = useAddUsers_block_users_accessMutation();
+  const [bulkUpdateAccesses, { isLoading }] = useBulkUpdateUsers_block_users_accessMutation();
 
   const handleBulkUpdate = async () => {
     if (!bulkData.length) return;
