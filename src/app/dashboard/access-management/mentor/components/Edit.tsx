@@ -18,13 +18,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 import { IUsers_access } from '../api/v1/model';
 import { useUsersAccessStore } from '../store/Store';
-import { useUpdateUsers_admin_accessMutation } from '../redux/rtk-Api';
+import { useUpdateUsers_mentor_accessMutation } from '../redux/rtk-Api';
 import { usersAccessSelectorArr } from '../store/StoreConstants';
 import { formatDuplicateKeyError, handleError, handleSuccess, isApiErrorResponse } from './utils';
 
 const EditUserAccess: React.FC = () => {
   const { isEditModalOpen, toggleEditModal, selectedUsersAccess, setSelectedUsersAccess } = useUsersAccessStore();
-  const [updateUsersAccess, { isLoading }] = useUpdateUsers_admin_accessMutation();
+  const [updateUsersAccess, { isLoading }] = useUpdateUsers_mentor_accessMutation();
 
   // Local state to hold form data, preventing direct mutation of the global store
   const [formData, setFormData] = useState<Partial<IUsers_access>>({ email: '', role: '' });

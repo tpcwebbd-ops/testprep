@@ -24,7 +24,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { IUsers_access } from '../api/v1/model';
 import { pageLimitArr } from '../store/StoreConstants';
 import { useUsersAccessStore } from '../store/Store';
-import { useGetUsers_accessQuery } from '../redux/rtk-Api';
+import { useGetUsers_mentor_accessQuery } from '../redux/rtk-Api';
 
 import Pagination from './Pagination';
 import { handleSuccess } from './utils';
@@ -57,7 +57,7 @@ const ViewTableNextComponents: React.FC = () => {
     refetch,
     isError,
     error,
-  } = useGetUsers_accessQuery(
+  } = useGetUsers_mentor_accessQuery(
     { q: queryPramsQ, limit: queryPramsLimit, page: queryPramsPage },
     {
       selectFromResult: ({ data, isError, error, isLoading }) => ({

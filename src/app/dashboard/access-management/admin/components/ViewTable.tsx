@@ -40,7 +40,6 @@ const ViewTableNextComponents: React.FC = () => {
     toggleBulkUpdateModal,
     toggleViewModal,
     queryPramsLimit,
-    toggleBulkDynamicUpdateModal,
     queryPramsPage,
     queryPramsQ,
     toggleEditModal,
