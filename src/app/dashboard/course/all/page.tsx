@@ -51,7 +51,6 @@ const CoursesPage = () => {
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading courses</div>;
-  console.log(' Data :', data);
   return (
     <div className="container mx-auto p-4 md:p-8">
       <div className="flex justify-between items-center mb-8">

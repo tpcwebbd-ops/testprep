@@ -19,9 +19,6 @@ export default function AuthCheckingComponent({ redirectUrl = '/' as string, chi
     name: sessionData.data?.user.name,
     email: sessionData.data?.user.email,
   };
-  if (data.email) {
-    console.log('session auth : ', data);
-  }
 
   useEffect(() => {
     if (status === 'loading') {

@@ -4,8 +4,6 @@ import GAuthUser from '@/app/dashboard/users/all/api/v1/Model';
 export async function updateUser(session: { user: { email: string; name: string; image: string } }) {
   try {
     await dbConnect();
-    console.log('-----db');
-    console.log('session; ', session);
     try {
       const searchFilter = {
         $or: [{ email: { $regex: session.user.email, $options: 'i' } }],

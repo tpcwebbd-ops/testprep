@@ -46,7 +46,6 @@ const EditUserAccess: React.FC = () => {
 
   const handleRoleChange = (value: string) => {
     // The model expects an array of strings for the role
-    console.log(' role : ', value);
     setFormData(prev => ({ ...prev, role: value }));
   };
   const sessionData = useSession();
@@ -70,7 +69,6 @@ const EditUserAccess: React.FC = () => {
         assignBy: data.name,
         assignByEmail: data.email,
       };
-      console.log(' udateDate : ', updateData);
 
       // The RTK mutation expects an object with the ID and the update body
       await updateUsersAccess(updateData).unwrap();

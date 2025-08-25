@@ -25,7 +25,6 @@ const BulkUpdateNextComponents: React.FC = () => {
         id: _id,
         updateData: rest,
       }));
-      console.log('newBulkData', newBulkData);
       await bulkUpdateAccesses(newBulkData).unwrap();
       toggleBulkUpdateModal(false);
       setBulkData([]);

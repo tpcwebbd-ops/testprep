@@ -101,28 +101,3 @@ export const getRedisData = async (key: string): Promise<string | null> => {
     throw err;
   }
 };
-
-// --- Example Usage (e.g., in your app's main file) ---
-/*
-async function main() {
-  try {
-    await connectRedis(); // Connect once at the start
-
-    const setResult = await setRedisData('myKey', 'myValue', { EX: 60 }); // Set with 60s expiry
-    console.log('Set result:', setResult);
-
-    const getValue = await getRedisData('myKey');
-    console.log('Get result for myKey:', getValue);
-
-    const nonExistent = await getRedisData('doesNotExist');
-    console.log('Get result for doesNotExist:', nonExistent);
-
-  } catch (error) {
-    console.error('Application error:', error);
-  } finally {
-    await disconnectRedis(); // Disconnect on shutdown
-  }
-}
-
-main();
-*/
