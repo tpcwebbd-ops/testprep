@@ -2,6 +2,9 @@
     If someone logs in to the application
     dashboard -> course details 
 
+1.1 user
+    if admin add a user to users-access default role is users.
+
 2. student 
     If payment for any course
     dashboard -> parched and bonus course

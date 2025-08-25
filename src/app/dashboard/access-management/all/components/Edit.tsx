@@ -8,6 +8,9 @@
 
 import React, { useEffect, useState } from 'react';
 
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -47,6 +50,12 @@ const EditUserAccess: React.FC = () => {
     console.log(' role : ', value);
     setFormData(prev => ({ ...prev, role: value }));
   };
+  const sessionData = useSession();
+
+  const data = {
+    name: sessionData.data?.user.name,
+    email: sessionData.data?.user.email,
+  };
 
   const handleSaveChanges = async () => {
     if (!selectedUsersAccess) {
@@ -55,12 +64,17 @@ const EditUserAccess: React.FC = () => {
     }
 
     try {
-      // The RTK mutation expects an object with the ID and the update body
-      await updateUsersAccess({
+      const updateData = {
         id: selectedUsersAccess._id,
         email: formData.email,
         role: formData.role,
-      }).unwrap();
+        assignBy: data.name,
+        assignByEmail: data.email,
+      };
+      console.log(' udateDate : ', updateData);
+
+      // The RTK mutation expects an object with the ID and the update body
+      await updateUsersAccess(updateData).unwrap();
 
       handleSuccess('User access updated successfully!');
       toggleEditModal(false);
@@ -114,6 +128,12 @@ const EditUserAccess: React.FC = () => {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+          <div className="text-slate-700 text-sm font-bold flaex items-center justify-between w-full">
+            Assign by :{' '}
+            <div className="text-sltate-400 font-normal">
+              {data.name} ({data.email})
+            </div>
           </div>
         </div>
 

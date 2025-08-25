@@ -21,6 +21,7 @@ const user_accessSchema = new Schema(
       match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email'],
     },
     assignBy: { type: String },
+    assignByEmail: { type: String },
   },
   { timestamps: true },
 );
@@ -34,5 +35,6 @@ export interface IUsers_access {
   updatedAt: Date;
   name: string;
   assignBy: string;
+  assignByEmail: string;
   _id: string;
 }
