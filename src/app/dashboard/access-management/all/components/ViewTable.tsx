@@ -92,6 +92,7 @@ const ViewTableNextComponents: React.FC = () => {
   const getAllUsersAccessData = useMemo(() => getResponseData?.data?.users_access || [], [getResponseData]);
 
   const formatDate = (date?: Date) => (date ? format(date, 'MMM dd, yyyy') : 'N/A');
+  const formatDateWithSeconds = (date?: Date) => (date ? format(date, 'MMM dd, yyyy, h:mm:ss a') : 'N/A');
 
   const handleSort = (key: keyof IUsers_access) => {
     setSortConfig(prev => (prev?.key === key ? { key, direction: prev.direction === 'asc' ? 'desc' : 'asc' } : { key, direction: 'asc' }));
@@ -162,7 +163,7 @@ const ViewTableNextComponents: React.FC = () => {
         <TableCell>{(UsersAccess.assignBy as string) || ''}</TableCell>
 
         <TableCell>{formatDate(UsersAccess.createdAt)}</TableCell>
-        <TableCell>{formatDate(UsersAccess.updatedAt)}</TableCell>
+        <TableCell>{formatDateWithSeconds(UsersAccess.updatedAt)}</TableCell>
         <TableCell className="justify-end flex">{renderActions(UsersAccess)}</TableCell>
       </TableRow>
     ));
@@ -209,7 +210,7 @@ const ViewTableNextComponents: React.FC = () => {
             <TableHead>
               <Checkbox onCheckedChange={checked => handleSelectAll(!!checked)} checked={bulkData.length === getAllUsersAccessData.length} />
             </TableHead>
-            {['name', 'email', 'role', 'assignby', 'assignDate', 'lastUpdate'].map(key => (
+            {['Name', 'Email', 'Role', 'Assign By', 'First Assign', 'Last Update'].map(key => (
               <TableHead key={key} className={`font-bold text-slate-50 cursor-pointer`} onClick={() => handleSort(key as keyof IUsers_access)}>
                 {key.charAt(0).toUpperCase() + key.slice(1)} {sortConfig?.key === key && (sortConfig.direction === 'asc' ? '↑' : '↓')}
               </TableHead>
