@@ -36,7 +36,7 @@ export default function AuthCheckingComponent({ redirectUrl = '/' as string, chi
     return <p>Loading session...</p>;
   }
   if (status === 'authenticated' && children) {
-    const allEmailsgiveAccess = ['tpc.web.bd@gmail.com', 'toufiquer.0@mgmail.com', 'toufiquerabc@gmail.com', 'reng32@gmail.com', 'russurmi@gmail.com'];
+    const allEmailsgiveAccess = ['tpc.web.bd@gmail.com', 'toufiquer.0@mgmail.com', 'reng32@gmail.com'];
 
     const isAdmin = allEmailsgiveAccess.includes(data.email || '');
     if (!isAdmin) {

@@ -1,0 +1,42 @@
+1. login user
+    If someone logs in to the application
+    dashboard -> course details 
+
+2. student 
+    If payment for any course
+    dashboard -> parched and bonus course
+
+3. admin
+    assignby admin 
+    dashboard -> adminDashboard
+            controls
+                -> users
+                -> course
+                -> web message
+                -> finance
+                -> media
+                -> site section
+
+4. mentor
+    assignby admin
+    dashboard -> students course details
+            a. students' attendance.
+            b. marksheets.
+            c. students' assignment.
+            d. doughet
+
+5. instructor
+    assignby admin  
+    dashboard -> course, website content, and notice.
+        a. course update
+        b. website content update
+        c. notice publish con confirm
+
+6. block-user
+    assigned admin, mentor, or instructor.
+    dashboard -> He saw he is blocked by Name and email. Contact for unblocking.
+
+
+
+
+            

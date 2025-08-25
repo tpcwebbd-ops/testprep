@@ -25,6 +25,7 @@ import TooManyRequests from './components/TooManyRequest';
 import BulkDeleteFilename8 from './components/BulkDelete';
 import { useGetUsers_accessQuery } from './redux/rtk-Api';
 import ViewUsersAccessTable from './components/ViewTable';
+import BulkUpdateUserAccesses from './components/BulkUpdate';
 
 const MainNextPage: React.FC = () => {
   const [hashSearchText, setHashSearchText] = useState('');
@@ -54,7 +55,7 @@ const MainNextPage: React.FC = () => {
     }
   };
 
-  const modals = [AddFilename8, ViewFilename8, BulkDeleteFilename8, BulkEditFilename8, EditFilename8, DeleteFilename8];
+  const modals = [AddFilename8, ViewFilename8, BulkDeleteFilename8, BulkEditFilename8, EditFilename8, DeleteFilename8, BulkUpdateUserAccesses];
 
   let renderUI = (
     <div className="container mx-auto p-4">

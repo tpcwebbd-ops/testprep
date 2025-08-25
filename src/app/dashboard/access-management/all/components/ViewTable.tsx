@@ -179,11 +179,8 @@ const ViewTableNextComponents: React.FC = () => {
             Total Selected <span className="text-xs text-slate-500">({bulkData.length})</span>
           </div>
           <div className="px-2 gap-2 flex items-center justify-end w-full">
-            <Button variant="outlineDefault" size="sm" onClick={() => toggleBulkDynamicUpdateModal(true)} disabled={bulkData.length === 0}>
-              <PencilIcon className="w-4 h-4 mr-1" /> B. Update
-            </Button>
-            <Button variant="outlineDefault" size="sm" onClick={() => toggleBulkUpdateModal(true)} disabled={bulkData.length === 0}>
-              <PencilIcon className="w-4 h-4 mr-1" /> B. Update
+            <Button size="sm" variant="outlineDefault" onClick={() => toggleBulkUpdateModal(true)} disabled={bulkData.length === 0}>
+              <PencilIcon className="w-4 h-4 mr-1" /> Bulk Update
             </Button>
             <Button variant="outlineDefault" size="sm" onClick={() => toggleBulkEditModal(true)} disabled={bulkData.length === 0}>
               <PencilIcon className="w-4 h-4 mr-1" /> Edit
