@@ -79,9 +79,11 @@ const AddUserFromSearch: React.FC = () => {
 
   // 6. Handle the "Add" button click for a user
   const handleAddUser = async (user: GAuthUser) => {
+    console.log(' user ', user);
     try {
       const payload = {
         email: user.email,
+        name: user.name,
         role: 'user', // Default role is 'user'
       };
       await addUserAccess(payload).unwrap();
