@@ -16,10 +16,11 @@ import { useSession } from 'next-auth/react';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 
 const accessDataByUsers = [
-  { role: 'admin', accessSidebarName: ['Users', 'Access Management', 'Course', 'Web Messages', 'Finance', 'Site Setting', 'Media'] },
+  { role: 'admin', accessSidebarName: ['Users', 'Access Management', 'Course', 'Web Messages', 'Finance', 'Site Setting', 'Media', 'My Course'] },
   { role: 'moderator', accessSidebarName: ['Users', 'Course', 'Web Messages', 'Site Setting', 'Media'] },
   { role: 'instructor', accessSidebarName: ['Users', 'Course', 'Web Messages', 'Media'] },
   { role: 'mentor', accessSidebarName: ['Users', 'Course'] },
+  { role: 'student', accessSidebarName: ['My Course'] },
 ];
 
 const isAccessByRole = (curr: SIDEBARTYPE, currRole: string) => {
@@ -33,6 +34,7 @@ const isAccessByRole = (curr: SIDEBARTYPE, currRole: string) => {
       }
     }
   });
+  console.log(' currRole : curr :: ', currRole, curr);
 
   return result;
 };

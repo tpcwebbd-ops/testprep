@@ -38,6 +38,12 @@ import {
   iconFaUserSlash,
   iconFaUsers,
   iconTbUserStar,
+  iconMdOutlineLaptopChromebook,
+  iconDiGhostSmall,
+  iconVscVmActive,
+  iconBsTerminalDash,
+  iconMdOutlineCloudDone,
+  iconRiPassExpiredLine,
 } from '../site-nav-v3/side-nav-react-icons';
 
 export type LINKTYPE = {
@@ -143,6 +149,18 @@ export const sidebarDataHome: SIDEBARTYPE[] = [
       { id: 1000705, name: 'Contact', link: '/dashboard/site-setting/contact', icon: iconRiContactsBook3Line },
       { id: 1000706, name: 'Privacy Policy', link: '/dashboard/site-setting/privacy-policy', icon: iconMdOutlinePrivacyTip },
       { id: 1000707, name: 'Terms and Condition', link: '/dashboard/site-setting/terms-and-condition', icon: iconMdOutlinePolicy },
+    ],
+  },
+  {
+    id: 10008,
+    name: 'My Course',
+    icon: iconMdOutlineLaptopChromebook,
+    content: [
+      { id: 1000801, name: 'All', link: '/dashboard/my-course/all', icon: iconDiGhostSmall },
+      { id: 1000802, name: 'Active', link: '/dashboard/my-course/active', icon: iconVscVmActive },
+      { id: 1000803, name: 'Inactive', link: '/dashboard/my-course/inactive', icon: iconBsTerminalDash },
+      { id: 1000804, name: 'Finished', link: '/dashboard/my-course/finished', icon: iconMdOutlineCloudDone },
+      { id: 1000805, name: 'Expired', link: '/dashboard/my-course/expired', icon: iconRiPassExpiredLine },
     ],
   },
 ];

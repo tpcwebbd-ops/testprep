@@ -35,7 +35,19 @@ import { MdOutlinePolicy } from 'react-icons/md';
 import { FaUserSlash } from 'react-icons/fa';
 import { FaUsers } from 'react-icons/fa';
 import { TbUserStar } from 'react-icons/tb';
+import { MdOutlineLaptopChromebook } from 'react-icons/md';
+import { DiGhostSmall } from 'react-icons/di';
+import { VscVmActive } from 'react-icons/vsc';
+import { BsTerminalDash } from 'react-icons/bs';
+import { MdOutlineCloudDone } from 'react-icons/md';
+import { RiPassExpiredLine } from 'react-icons/ri';
 
+const iconRiPassExpiredLine = <RiPassExpiredLine />;
+const iconMdOutlineCloudDone = <MdOutlineCloudDone />;
+const iconBsTerminalDash = <BsTerminalDash />;
+const iconVscVmActive = <VscVmActive />;
+const iconDiGhostSmall = <DiGhostSmall />;
+const iconMdOutlineLaptopChromebook = <MdOutlineLaptopChromebook />;
 const iconTbUserStar = <TbUserStar />;
 const iconFaUsers = <FaUsers />;
 const iconFaUserSlash = <FaUserSlash />;
@@ -69,6 +81,12 @@ const iconRiContactsBook3Line = <RiContactsBook3Line />;
 const iconMdOutlinePrivacyTip = <MdOutlinePrivacyTip />;
 const iconMdOutlinePolicy = <MdOutlinePolicy />;
 export {
+  iconRiPassExpiredLine,
+  iconMdOutlineCloudDone,
+  iconBsTerminalDash,
+  iconVscVmActive,
+  iconDiGhostSmall,
+  iconMdOutlineLaptopChromebook,
   iconTbUserStar,
   iconFaUsers,
   iconFaUserSlash,

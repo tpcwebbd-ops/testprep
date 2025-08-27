@@ -49,12 +49,17 @@ export default function AuthCheckingComponent({ redirectUrl = '/' as string, chi
     }
 
     if (isSuccess) {
-      const isBlock = getResponseData?.data?.users_access[0]?.role === 'blocked';
+      const userRole = getResponseData?.data?.users_access[0]?.role;
 
-      if (isBlock) {
+      if (userRole === 'blocked') {
         router.replace('/blocked');
       } else {
-        return children;
+        const accessrole = ['admin', 'moderator', 'instructor', 'mentor', 'user', 'student'];
+        if (accessrole.includes(userRole)) {
+          return children;
+        } else {
+          router.replace('/unauthorized');
+        }
       }
     }
     return <LoadingComponent />;
