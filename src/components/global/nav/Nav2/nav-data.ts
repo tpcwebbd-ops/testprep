@@ -5,6 +5,7 @@
 | @copyright: Toufiquer, May, 2024
 |-----------------------------------------
 */
+
 const navData = {
   baseInfo: {
     firstName: 'Test',

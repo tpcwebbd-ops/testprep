@@ -5,7 +5,15 @@
 | @copyright: varse-project, May, 2025
 |-----------------------------------------
 */
+
+import UpdateHeader from './ContentUpdate';
+
 const Page = () => {
-  return <main>Site-Setting Header Page</main>;
+  return (
+    <main>
+      update this component
+      <UpdateHeader />
+    </main>
+  );
 };
 export default Page;

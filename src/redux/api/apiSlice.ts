@@ -9,11 +9,12 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 export const apiSlice = createApi({
   tagTypes: [
-    'tagTypeGAuthUsers',
-    'tagTypeCourses',
+    'Header',
     'tagTypePosts',
     'tagTypeIELTS',
     'tagTypeSpoken',
+    'tagTypeCourses',
+    'tagTypeGAuthUsers',
     'tagTypeUsers_access',
     'tagTypeUsers_admin_access',
     'tagTypeUsers_mentor_access',
