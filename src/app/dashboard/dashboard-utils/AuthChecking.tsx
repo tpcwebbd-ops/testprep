@@ -50,7 +50,6 @@ export default function AuthCheckingComponent({ redirectUrl = '/' as string, chi
 
     if (isSuccess) {
       const isBlock = getResponseData?.data?.users_access[0]?.role === 'blocked';
-      console.log('is block : ', isBlock);
 
       if (isBlock) {
         router.replace('/blocked');

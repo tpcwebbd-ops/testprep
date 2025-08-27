@@ -8,11 +8,53 @@
 
 import { CgArrowLongLeft, CgArrowLongRight } from 'react-icons/cg';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { sidebarDataHome } from './sidebar-data';
+import { sidebarDataHome, SIDEBARTYPE } from './sidebar-data';
 import SidebarAccordion from './sidebar-accordion';
 import SidebarHoverItem from './sidebar-hover-item';
+import { useGetUsers_accessQuery } from '@/app/dashboard/access-management/all/redux/rtk-Api';
+import { useSession } from 'next-auth/react';
+import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
+
+const accessDataByUsers = [
+  { role: 'admin', accessSidebarName: ['Users', 'Access Management', 'Course', 'Web Messages', 'Finance', 'Site Setting', 'Media'] },
+  { role: 'moderator', accessSidebarName: ['Users', 'Course', 'Web Messages', 'Site Setting', 'Media'] },
+  { role: 'instructor', accessSidebarName: ['Users', 'Course', 'Web Messages', 'Media'] },
+  { role: 'mentor', accessSidebarName: ['Users', 'Course'] },
+];
+
+const isAccessByRole = (curr: SIDEBARTYPE, currRole: string) => {
+  let result = false;
+  accessDataByUsers.forEach(item => {
+    if (currRole === item.role) {
+      if (item.accessSidebarName.map(c => c.toLowerCase()).includes(curr.name.toLowerCase())) {
+        result = true;
+      } else {
+        result = false;
+      }
+    }
+  });
+
+  return result;
+};
 
 const SidebarV3 = ({ toggle, handleToggle, toggleButton = false }: { toggleButton?: boolean; toggle: boolean; handleToggle: () => void }) => {
+  const sessionData = useSession();
+
+  const { data: getResponseData } = useGetUsers_accessQuery(
+    { q: sessionData.data?.user?.email, page: 1, limit: 1 },
+    {
+      selectFromResult: ({ data, isSuccess, status, error, isLoading }) => ({
+        data,
+        isSuccess,
+        status: 'status' in (error || {}) ? (error as FetchBaseQueryError).status : status, // Extract HTTP status code
+        error,
+        isLoading,
+      }),
+    },
+  );
+
+  const currRole = getResponseData?.data?.users_access[0]?.role || '';
+
   return (
     <div className=" border-slate-500 md:border-b md:pb-[60px] ">
       <div className="relative text-slate-600">
@@ -41,16 +83,20 @@ const SidebarV3 = ({ toggle, handleToggle, toggleButton = false }: { toggleButto
         <ScrollArea className="md:h-[calc(100vh_-_122px)] md:top-[50px] md:border-t-1 pt-2">
           {toggle ? (
             <div className="ml-3">
-              {sidebarDataHome.map((curr, idx) => (
-                <SidebarAccordion data={curr} key={curr.name + idx} />
-              ))}
+              {sidebarDataHome
+                .filter(item => isAccessByRole(item, currRole))
+                .map((curr, idx) => (
+                  <SidebarAccordion data={curr} key={curr.name + idx} />
+                ))}
             </div>
           ) : (
             <div className="flex flex-col p-2">
               <div className="h-4" />
-              {sidebarDataHome.map((curr, idx) => (
-                <SidebarHoverItem data={curr} key={curr.name + idx} />
-              ))}
+              {sidebarDataHome
+                .filter(item => isAccessByRole(item, currRole))
+                .map((curr, idx) => (
+                  <SidebarHoverItem data={curr} key={curr.name + idx} />
+                ))}
               <div className="h-16" />
             </div>
           )}
