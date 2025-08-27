@@ -14,14 +14,7 @@ import SidebarHoverItem from './sidebar-hover-item';
 import { useGetUsers_accessQuery } from '@/app/dashboard/access-management/all/redux/rtk-Api';
 import { useSession } from 'next-auth/react';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
-
-const accessDataByUsers = [
-  { role: 'admin', accessSidebarName: ['Users', 'Access Management', 'Course', 'Web Messages', 'Finance', 'Site Setting', 'Media', 'My Course'] },
-  { role: 'moderator', accessSidebarName: ['Users', 'Course', 'Web Messages', 'Site Setting', 'Media'] },
-  { role: 'instructor', accessSidebarName: ['Users', 'Course', 'Web Messages', 'Media'] },
-  { role: 'mentor', accessSidebarName: ['Users', 'Course'] },
-  { role: 'student', accessSidebarName: ['My Course'] },
-];
+import { accessDataByUsers } from '@/app/dashboard/access-management/users-access-role';
 
 const isAccessByRole = (curr: SIDEBARTYPE, currRole: string) => {
   let result = false;
@@ -34,7 +27,6 @@ const isAccessByRole = (curr: SIDEBARTYPE, currRole: string) => {
       }
     }
   });
-  console.log(' currRole : curr :: ', currRole, curr);
 
   return result;
 };
