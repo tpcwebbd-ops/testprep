@@ -146,7 +146,7 @@ const ViewTableNextComponents: React.FC = () => {
   );
   const renderTableRows = () =>
     sortedUsersAccessData.map((UsersAccess: IUsers_access, index: number) => (
-      <TableRow key={(UsersAccess.name as string) || index}>
+      <TableRow key={(UsersAccess.name as string) + index}>
         <TableCell>
           <Checkbox onCheckedChange={checked => handleSelectRow(!!checked, UsersAccess)} checked={bulkData.some(item => item.email === UsersAccess.email)} />
         </TableCell>

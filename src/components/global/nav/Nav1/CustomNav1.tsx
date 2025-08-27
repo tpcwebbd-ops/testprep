@@ -6,10 +6,18 @@
 |-----------------------------------------
 */
 
+'use client';
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { FaFacebook, FaYoutube } from 'react-icons/fa';
 
 const CustomNav1 = () => {
+  const path = usePathname();
+  const currentPathName = path.split('/')[1] || path.split('/')[0] || '';
+  console.log('currentPathName : ', currentPathName);
+  if (currentPathName === 'dashboard') return null;
+
   return (
     <nav className="w-full flex gap-4 items-center justify-end text-center px-4 bg-slate-700 text-slate-50">
       <div className="mx-auto container flex items-center justify-end gap-4 px-4">
