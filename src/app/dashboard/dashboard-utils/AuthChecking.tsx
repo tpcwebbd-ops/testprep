@@ -1,13 +1,13 @@
 'use client'; // This directive makes the component a Client Component
 
+import LoadingComponent from '@/components/common/Loading';
+import LoadingSkeleton from '@/components/common/LoadingSkeleton';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
 import { useEffect } from 'react';
-
-// const NotAuthorized = () => {
-//   return <div className="flex items-center justify-center h-[40vh]">You are not authorized to view this page.</div>;
-// };
+import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
+import { useGetUsers_accessQuery } from '../access-management/all/redux/rtk-Api';
 
 export default function AuthCheckingComponent({ redirectUrl = '/' as string, children = null as React.ReactNode | null }) {
   const sessionData = useSession();
@@ -15,11 +15,22 @@ export default function AuthCheckingComponent({ redirectUrl = '/' as string, chi
 
   const router = useRouter();
 
-  const data = {
-    name: sessionData.data?.user.name,
-    email: sessionData.data?.user.email,
-  };
-
+  const {
+    data: getResponseData,
+    isSuccess,
+    isLoading,
+  } = useGetUsers_accessQuery(
+    { q: sessionData.data?.user?.email, page: 1, limit: 1 },
+    {
+      selectFromResult: ({ data, isSuccess, status, error, isLoading }) => ({
+        data,
+        isSuccess,
+        status: 'status' in (error || {}) ? (error as FetchBaseQueryError).status : status, // Extract HTTP status code
+        error,
+        isLoading,
+      }),
+    },
+  );
   useEffect(() => {
     if (status === 'loading') {
       return;
@@ -30,18 +41,25 @@ export default function AuthCheckingComponent({ redirectUrl = '/' as string, chi
   }, [status, router, redirectUrl]);
 
   if (status === 'loading') {
-    return <p>Loading session...</p>;
+    return <LoadingSkeleton />;
   }
   if (status === 'authenticated' && children) {
-    const allEmailsgiveAccess = ['tpc.web.bd@gmail.com', 'toufiquer.0@mgmail.com', 'reng32@gmail.com', 'ctestprep@gmail.com'];
-
-    const isAdmin = allEmailsgiveAccess.includes(data.email || '');
-    if (!isAdmin) {
-      router.replace('/unauthorized');
+    if (isLoading) {
+      return <LoadingSkeleton />;
     }
 
-    return children;
+    if (isSuccess) {
+      const isBlock = getResponseData?.data?.users_access[0]?.role === 'blocked';
+      console.log('is block : ', isBlock);
+
+      if (isBlock) {
+        router.replace('/blocked');
+      } else {
+        return children;
+      }
+    }
+    return <LoadingComponent />;
   }
 
-  return null;
+  return <LoadingComponent />;
 }
