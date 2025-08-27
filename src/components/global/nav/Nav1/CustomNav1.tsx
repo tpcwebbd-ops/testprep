@@ -15,7 +15,6 @@ import { FaFacebook, FaYoutube } from 'react-icons/fa';
 const CustomNav1 = () => {
   const path = usePathname();
   const currentPathName = path.split('/')[1] || path.split('/')[0] || '';
-  console.log('currentPathName : ', currentPathName);
   if (currentPathName === 'dashboard') return null;
 
   return (

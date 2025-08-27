@@ -16,7 +16,6 @@ export default function AuthCheckingComponent({ redirectUrl = '/' as string, chi
 
   const path = usePathname();
   const currentPathName = path.split('/')[2] || path.split('/')[1] || path.split('/')[0] || '';
-  console.log('currentPathName : ', currentPathName);
   const router = useRouter();
 
   const {
@@ -52,7 +51,6 @@ export default function AuthCheckingComponent({ redirectUrl = '/' as string, chi
     accessPathByUsers.forEach(item => {
       if (currRole === item.role) {
         const isExist = item.accessPathName.map(c => c.toLowerCase()).includes(currPath?.toLowerCase() || '');
-        console.log(' is Exist : ', isExist);
         if (isExist) {
           result = true;
         } else {
@@ -60,8 +58,6 @@ export default function AuthCheckingComponent({ redirectUrl = '/' as string, chi
         }
       }
     });
-    console.log(' currRole : ', currRole);
-    console.log(' currPath : ', currPath);
     return result;
   };
   if (status === 'authenticated' && children) {
