@@ -3,7 +3,7 @@ import { create } from 'zustand';
 
 import { FinancesStore } from '@/app/dashboard/finance/all/store/store-type';
 import { queryParams } from '@/app/dashboard/finance/all/store/store-constant';
-import { defaultFinances, IFinances } from '../api/v1/model';
+import { defaultFinances, IFinances } from './data-type';
 
 export const useFinancesStore = create<FinancesStore>(set => ({
   queryPramsLimit: queryParams.limit,

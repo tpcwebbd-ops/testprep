@@ -5,10 +5,10 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
-import { IFinances } from '../api/v1/model';
 import { useFinancesStore } from '../store/store';
 import { useBulkUpdatefinancesMutation } from '../redux/rtk-api';
 import { handleSuccess, handleError } from './utils';
+import { IFinances } from '../store/data-type';
 
 const BulkEditNextComponents: React.FC = () => {
   const { isBulkEditModalOpen, toggleBulkEditModal, bulkData, setBulkData } = useFinancesStore();

@@ -5,11 +5,11 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
-import { IFinances } from '../api/v1/model';
 import { useFinancesStore } from '../store/store';
 import { financesSelectorArr } from '../store/store-constant';
 import { useBulkUpdatefinancesMutation } from '../redux/rtk-api';
 import { handleSuccess, handleError } from './utils';
+import { IFinances } from '../store/data-type';
 
 const BulkUpdateNextComponents: React.FC = () => {
   const { toggleBulkUpdateModal, isBulkUpdateModalOpen, bulkData, setBulkData } = useFinancesStore();

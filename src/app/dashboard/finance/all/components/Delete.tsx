@@ -3,10 +3,10 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
-import { IFinances, defaultFinances } from '../api/v1/model';
 import { useFinancesStore } from '../store/store';
 import { useDeletefinancesMutation } from '../redux/rtk-api';
 import { handleSuccess, handleError } from './utils';
+import { defaultFinances, IFinances } from '../store/data-type';
 
 const DeleteNextComponents: React.FC = () => {
   const { toggleDeleteModal, isDeleteModalOpen, selectedFinances, setSelectedFinances } = useFinancesStore();

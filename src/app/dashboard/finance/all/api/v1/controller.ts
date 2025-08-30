@@ -64,7 +64,7 @@ export async function getFinances(req: Request): Promise<IResponse> {
       searchFilter = {
         $or: [
           { studentName: { $regex: searchQuery, $options: 'i' } },
-          { studentEmail: { $regex: searchQuery, $options: 'i' } },
+          { studentEinfo: { $regex: searchQuery, $options: 'i' } },
           { studentNumber: { $regex: searchQuery, $options: 'i' } },
           { courseName: { $regex: searchQuery, $options: 'i' } },
           { coursePrice: { $regex: searchQuery, $options: 'i' } },
@@ -76,7 +76,7 @@ export async function getFinances(req: Request): Promise<IResponse> {
           { enrollmentDate: { $regex: searchQuery, $options: 'i' } },
           { paymentData: { $regex: searchQuery, $options: 'i' } },
           { verifyWhomName: { $regex: searchQuery, $options: 'i' } },
-          { verifyWhomEmail: { $regex: searchQuery, $options: 'i' } },
+          { verifyWhomEinfo: { $regex: searchQuery, $options: 'i' } },
           { transectionId: { $regex: searchQuery, $options: 'i' } },
           { invoiceNumber: { $regex: searchQuery, $options: 'i' } },
           { refundStatus: { $regex: searchQuery, $options: 'i' } },

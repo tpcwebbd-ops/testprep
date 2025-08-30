@@ -7,7 +7,7 @@ import { useFinancesStore } from '../store/store';
 import { useBulkUpdatefinancesMutation } from '../redux/rtk-api';
 import { handleSuccess, handleError } from './utils';
 import DynamicDataSelect from './DynamicDataSelect';
-import { IFinances } from '../api/v1/model';
+import { IFinances } from '../store/data-type';
 
 const BulkDynamicUpdateNextComponents: React.FC = () => {
   const [newItemTags, setNewItemTags] = useState<string[]>([]);

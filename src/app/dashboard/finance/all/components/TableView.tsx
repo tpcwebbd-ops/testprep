@@ -13,12 +13,12 @@ import ErrorMessageComponent from '@/components/common/Error';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-import { IFinances } from '../api/v1/model';
 import { pageLimitArr } from '../store/store-constant';
 import { useFinancesStore } from '../store/store';
 import { useGetfinancesQuery } from '../redux/rtk-api';
 import Pagination from './Pagination';
 import { handleSuccess } from './utils';
+import { IFinances } from '../store/data-type';
 
 const ViewTableNextComponents: React.FC = () => {
   const [sortConfig, setSortConfig] = useState<{

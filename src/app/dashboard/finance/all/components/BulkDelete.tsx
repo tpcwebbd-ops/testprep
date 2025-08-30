@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { useFinancesStore } from '../store/store';
 import { useBulkDeletefinancesMutation } from '../redux/rtk-api';
 import { handleSuccess, handleError } from './utils';
-import { IFinances } from '../api/v1/model';
+import { IFinances } from '../store/data-type';
 
 const BulkDeleteNextComponents: React.FC = () => {
   const { isBulkDeleteModalOpen, toggleBulkDeleteModal, bulkData, setBulkData } = useFinancesStore();

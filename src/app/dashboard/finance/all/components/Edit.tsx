@@ -8,10 +8,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
-import { IFinances, defaultFinances } from '../api/v1/model';
 import { useFinancesStore } from '../store/store';
 import { useUpdatefinancesMutation } from '../redux/rtk-api';
 import { formatDuplicateKeyError, handleError, handleSuccess, isApiErrorResponse } from './utils';
+import { defaultFinances, IFinances } from '../store/data-type';
 
 const InputField: React.FC<{
   id: string;

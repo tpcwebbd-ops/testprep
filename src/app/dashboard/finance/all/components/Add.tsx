@@ -10,8 +10,8 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 
 import { useFinancesStore } from '../store/store';
 import { useAddfinancesMutation } from '../redux/rtk-api';
-import { IFinances, defaultFinances } from '@/app/dashboard/finance/all/api/v1/model';
 import { formatDuplicateKeyError, handleError, handleSuccess, isApiErrorResponse } from './utils';
+import { defaultFinances, IFinances } from '../store/data-type';
 
 const InputField: FC<{
   id: string;
