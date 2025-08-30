@@ -141,7 +141,8 @@ const CourseCatalogPage = async () => {
                 {/* Course Banner */}
                 <div className="relative overflow-hidden h-48">
                   <Image
-                    src={course.courseBannerPicture || 'https://i.ibb.co/PGXYXwTq/img.jpg'}
+                    fill
+                    src={course.courseBannerPicture || '/icons/icon-1280x720-1.png'}
                     alt={course.courseName}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />
