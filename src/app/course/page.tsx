@@ -223,7 +223,7 @@ const CourseCatalogPage = async () => {
                     </Link>
 
                     <Link
-                      href={`/course/payment/${course._id}`}
+                      href={`/course/payment/${course.courseName.replaceAll(' ', '-').toLowerCase()}`}
                       aria-disabled={!course.enrolmentStatus}
                       className={`flex-1 flex items-center justify-center space-x-2 px-4 py-3 rounded-xl font-semibold transition-all duration-300 group/btn ${
                         course.enrolmentStatus

@@ -1,6 +1,7 @@
-'use client'
+'use client';
 import React, { useState, useEffect } from 'react';
 import { Check, Clock, Users, BookOpen, Award, Calendar, MapPin, Star, ArrowRight, PlayCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface CourseCardProps {
   title: string;
@@ -15,27 +16,29 @@ interface CourseCardProps {
   schedule?: string[];
 }
 
-const CourseCard: React.FC<CourseCardProps> = ({ 
-  title, 
-  level, 
-  levelColor, 
-  description, 
-  features, 
-  duration, 
-  classes, 
+const CourseCard: React.FC<CourseCardProps> = ({
+  title,
+  level,
+  levelColor,
+  description,
+  features,
+  duration,
+  classes,
   price,
   popular = false,
-  schedule = []
+  schedule = [],
 }) => (
-  <div className={`relative bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border ${popular ? 'border-red-200 ring-2 ring-red-100' : 'border-gray-100'}`}>
+  <div
+    className={`relative bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border ${
+      popular ? 'border-red-200 ring-2 ring-red-100' : 'border-gray-100'
+    }`}
+  >
     {popular && (
       <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-        <div className="bg-gradient-to-r from-red-500 to-orange-500 text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg">
-          🔥 Most Popular
-        </div>
+        <div className="bg-gradient-to-r from-red-500 to-orange-500 text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg">🔥 Most Popular</div>
       </div>
     )}
-    
+
     {/* Header */}
     <div className="flex items-center justify-between mb-6">
       <div className="flex items-center space-x-3">
@@ -44,9 +47,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
         </div>
         <div>
           <h3 className="text-2xl font-bold text-gray-900">{title}</h3>
-          <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${levelColor}`}>
-            {level}
-          </span>
+          <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${levelColor}`}>{level}</span>
         </div>
       </div>
       {price && (
@@ -103,14 +104,16 @@ const CourseCard: React.FC<CourseCardProps> = ({
     </div>
 
     {/* CTA Button */}
-    <button className={`w-full py-4 rounded-2xl font-bold text-lg transition-all duration-300 flex items-center justify-center group ${
-      popular 
-        ? 'bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white shadow-lg hover:shadow-xl' 
-        : 'bg-red-500 hover:bg-red-600 text-white shadow-lg hover:shadow-xl'
-    }`}>
+    <Button
+      className={`w-full py-4 rounded-2xl font-bold text-lg transition-all duration-300 flex items-center justify-center group ${
+        popular
+          ? 'bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white shadow-lg hover:shadow-xl'
+          : 'bg-red-500 hover:bg-red-600 text-white shadow-lg hover:shadow-xl'
+      }`}
+    >
       + Enroll Now
       <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-    </button>
+    </Button>
   </div>
 );
 
@@ -124,58 +127,55 @@ const TestPrepClasses: React.FC = () => {
 
   const courses = [
     {
-      title: "IELTS Comprehensive",
-      level: "Beginner Level",
-      levelColor: "bg-blue-100 text-blue-700",
-      description: "Perfect for beginners who want to build strong English fundamentals before taking IELTS. Comprehensive coverage of all four skills.",
+      title: 'IELTS Comprehensive',
+      level: 'Beginner Level',
+      levelColor: 'bg-blue-100 text-blue-700',
+      description: 'Perfect for beginners who want to build strong English fundamentals before taking IELTS. Comprehensive coverage of all four skills.',
       features: [
-        "Language Club & Student Lounge",
-        "3 Mock Tests with Teacher Feedback",
-        "No Extra Charge for Course Materials",
-        "Small Batch Size (Max 12 Students)",
-        "Weekend Practice Sessions"
+        'Language Club & Student Lounge',
+        '3 Mock Tests with Teacher Feedback',
+        'No Extra Charge for Course Materials',
+        'Small Batch Size (Max 12 Students)',
+        'Weekend Practice Sessions',
       ],
-      duration: "4.5 Months",
-      classes: "50+ Classes",
-      price: "৳15,000"
+      duration: '4.5 Months',
+      classes: '50+ Classes',
+      price: '৳15,000',
     },
     {
-      title: "IELTS Focus",
-      level: "Intermediate Level",
-      levelColor: "bg-green-100 text-green-700",
-      description: "Designed for students with basic English knowledge. Focus on developing IELTS-specific skills and achieving band 6.0-7.0.",
+      title: 'IELTS Focus',
+      level: 'Intermediate Level',
+      levelColor: 'bg-green-100 text-green-700',
+      description: 'Designed for students with basic English knowledge. Focus on developing IELTS-specific skills and achieving band 6.0-7.0.',
       features: [
-        "Language Club & Student Lounge",
-        "3 Mock Tests with Teacher Feedback",
-        "No Extra Charge for Course Materials",
-        "Speaking Practice Sessions",
-        "Writing Task Correction"
+        'Language Club & Student Lounge',
+        '3 Mock Tests with Teacher Feedback',
+        'No Extra Charge for Course Materials',
+        'Speaking Practice Sessions',
+        'Writing Task Correction',
       ],
-      duration: "3 Months",
-      classes: "30+ Classes",
-      price: "৳12,000",
-      popular: true
+      duration: '3 Months',
+      classes: '30+ Classes',
+      price: '৳12,000',
+      popular: true,
     },
     {
-      title: "IELTS Crash",
-      level: "Intensive",
-      levelColor: "bg-red-100 text-red-700",
-      description: "Fast-track intensive course for students who need to prepare quickly. Focused exam strategies and daily practice sessions.",
+      title: 'IELTS Crash',
+      level: 'Intensive',
+      levelColor: 'bg-red-100 text-red-700',
+      description: 'Fast-track intensive course for students who need to prepare quickly. Focused exam strategies and daily practice sessions.',
       features: [
-        "3 Mock Tests with Personalized Teacher",
-        "No Extra Charge for Course Materials",
-        "Daily Practice Sessions",
-        "One-on-One Speaking Practice",
-        "Express Score Improvement"
+        '3 Mock Tests with Personalized Teacher',
+        'No Extra Charge for Course Materials',
+        'Daily Practice Sessions',
+        'One-on-One Speaking Practice',
+        'Express Score Improvement',
       ],
-      duration: "1.5 Months",
-      classes: "30+ Classes",
-      price: "৳18,000",
-      schedule: [
-        "Morning Batch: 10:00 AM - 1:30 PM",
-        "Evening Batch: 5:00 PM - 8:30 PM"
-      ]
-    }
+      duration: '1.5 Months',
+      classes: '30+ Classes',
+      price: '৳18,000',
+      schedule: ['Morning Batch: 10:00 AM - 1:30 PM', 'Evening Batch: 5:00 PM - 8:30 PM'],
+    },
   ];
 
   return (
@@ -193,10 +193,8 @@ const TestPrepClasses: React.FC = () => {
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
             Join Our <span className="text-red-500">Offline IELTS</span> Classes
           </h1>
-          
-          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-            For Personalized Learning Experience
-          </p>
+
+          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">For Personalized Learning Experience</p>
 
           {/* Tab Navigation */}
           <div className="flex justify-center mb-12">
@@ -204,9 +202,7 @@ const TestPrepClasses: React.FC = () => {
               <button
                 onClick={() => setActiveTab('offline')}
                 className={`px-8 py-3 rounded-xl font-semibold transition-all duration-300 ${
-                  activeTab === 'offline'
-                    ? 'bg-red-500 text-white shadow-lg'
-                    : 'text-gray-600 hover:text-red-500'
+                  activeTab === 'offline' ? 'bg-red-500 text-white shadow-lg' : 'text-gray-600 hover:text-red-500'
                 }`}
               >
                 Offline Classes
@@ -214,9 +210,7 @@ const TestPrepClasses: React.FC = () => {
               <button
                 onClick={() => setActiveTab('online')}
                 className={`px-8 py-3 rounded-xl font-semibold transition-all duration-300 ${
-                  activeTab === 'online'
-                    ? 'bg-red-500 text-white shadow-lg'
-                    : 'text-gray-600 hover:text-red-500'
+                  activeTab === 'online' ? 'bg-red-500 text-white shadow-lg' : 'text-gray-600 hover:text-red-500'
                 }`}
               >
                 Online Classes
@@ -230,9 +224,7 @@ const TestPrepClasses: React.FC = () => {
           {courses.map((course, index) => (
             <div
               key={course.title}
-              className={`transform transition-all duration-1000 ${
-                isVisible ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'
-              }`}
+              className={`transform transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}
               style={{ transitionDelay: `${index * 200}ms` }}
             >
               <CourseCard {...course} />
@@ -286,7 +278,7 @@ const TestPrepClasses: React.FC = () => {
         <div className="bg-gradient-to-r from-red-500 to-orange-500 rounded-3xl p-12 text-center text-white">
           <h2 className="text-4xl font-bold mb-4">Ready to Start Your IELTS Journey?</h2>
           <p className="text-xl mb-8 opacity-90">Join thousands of successful students who achieved their target band scores</p>
-          
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <button className="bg-white text-red-500 hover:bg-gray-50 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-xl flex items-center group">
               Book Free Consultation

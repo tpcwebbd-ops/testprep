@@ -10,15 +10,16 @@
 
 import { ShoppingCart } from 'lucide-react';
 import { Course } from './page';
+import { Button } from '@/components/ui/button';
 
 const PurchaseButton = ({ course }: { course: Course }) => {
   const handlePurchase = (): void => {
-    window.location.href = `/course/payment/${course.courseName.replace(/\s+/g, '-').toLowerCase()}`;
+    window.location.href = `/course/payment/${course.courseName}`;
   };
 
   return (
     <main>
-      <button
+      <Button
         onClick={handlePurchase}
         disabled={!course.enrolmentStatus}
         className={`w-full flex items-center justify-center space-x-3 px-6 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 ${
@@ -30,7 +31,7 @@ const PurchaseButton = ({ course }: { course: Course }) => {
       >
         <ShoppingCart className="w-6 h-6" />
         <span>{course.enrolmentStatus ? 'Enroll Now' : 'Enrollment Closed'}</span>
-      </button>
+      </Button>
     </main>
   );
 };
