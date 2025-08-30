@@ -139,36 +139,35 @@ const CourseCatalogPage = async () => {
                 className="group bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100 hover:border-blue-200 transform hover:-translate-y-2"
               >
                 {/* Course Banner */}
-                <div className="relative overflow-hidden h-48">
-                  <Image
-                    fill
-                    src={course.courseBannerPicture || '/icons/icon-1280x720-1.png'}
-                    alt={course.courseName}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-
-                  {/* Enrollment Status Badge */}
-                  <div className="absolute top-4 right-4">
-                    {course.enrolmentStatus ? (
-                      <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">Open</span>
-                    ) : (
-                      <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">Closed</span>
-                    )}
-                  </div>
-
-                  {/* Course Code */}
-                  {course.courseCode && (
-                    <div className="absolute top-4 left-4">
-                      <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">#{course.courseCode}</span>
+                <Link href={`/course/${courseSlug}`} className="cursor-pointer">
+                  <div className="relative overflow-hidden h-48">
+                    <Image
+                      fill
+                      src={course.courseBannerPicture || '/icons/icon-1280x720-1.png'}
+                      alt={course.courseName}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                    {/* Enrollment Status Badge */}
+                    <div className="absolute top-4 right-4">
+                      {course.enrolmentStatus ? (
+                        <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">Open</span>
+                      ) : (
+                        <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">Closed</span>
+                      )}
                     </div>
-                  )}
-
-                  {/* Course Title Overlay */}
-                  <div className="absolute bottom-4 left-4 right-4">
-                    <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-blue-200 transition-colors">{course.courseName}</h3>
+                    {/* Course Code */}
+                    {course.courseCode && (
+                      <div className="absolute top-4 left-4">
+                        <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">#{course.courseCode}</span>
+                      </div>
+                    )}
+                    {/* Course Title Overlay */}
+                    <div className="absolute bottom-4 left-4 right-4">
+                      <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-blue-200 transition-colors">{course.courseName}</h3>
+                    </div>
                   </div>
-                </div>
+                </Link>
 
                 {/* Course Content */}
                 <div className="p-6">
