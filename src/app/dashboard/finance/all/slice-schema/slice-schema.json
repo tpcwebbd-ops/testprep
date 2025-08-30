@@ -1,0 +1,32 @@
+{
+  "uid": "001",
+  "templateName": "Finance Template",
+  "schema": {
+    "studentName": "STRING",
+    "studentEmail": "EMAIL",
+    "studentNumber": "STRING",
+    "courseName": "STRING",
+    "coursePrice": "NUMBER",
+    "coureCode": "STRING",
+    "batchNo": "STRING",
+    "paymentStatus": "BOOLEAN",
+    "discount": "STRING",
+    "totalPayment": "STRING",
+    "enrollmentDate": "DATE",
+    "paymentData": "DATE",
+    "verifyWhomName": "STRING",
+    "verifyWhomEmail": "EMAIL",
+    "transectionId": "STRING",
+    "invoiceNumber": "STRING",
+    "refundStatus": "BOOLEAN",
+    "refundAmount": "STRING"
+  },
+  "namingConvention": {
+    "Users_1_000___": "Finances",
+    "users_2_000___": "finances",
+    "User_3_000___": "Finance",
+    "user_4_000___": "finance",
+    "ISelect_6_000___": "ISelect",
+    "select_5_000___": "select"
+  }
+}

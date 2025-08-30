@@ -11,8 +11,7 @@
 import { useState } from 'react';
 import { Course } from './page';
 import TransactionForm from './TransectionForm';
-import { CreditCard, Shield, CheckCircle, Lock, Star, Users, Clock, Award } from 'lucide-react';
-import Image from 'next/image';
+import { CreditCard, Shield, CheckCircle, Lock, Star, Users, Award } from 'lucide-react';
 
 // Main Payment Component
 const PaymentGateway: React.FC<{ course: Course }> = ({ course }) => {

@@ -14,7 +14,7 @@ const formatResponse = (data: unknown, message: string, status: number) => ({
 });
 
 // GET Header Data
-export async function getHeaderData(req: Request): Promise<IResponse> {
+export async function getHeaderData(): Promise<IResponse> {
   await connectRedis();
   const cachedData = await getRedisData('headerData');
   if (cachedData) {

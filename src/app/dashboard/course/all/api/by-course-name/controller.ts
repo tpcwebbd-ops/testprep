@@ -9,7 +9,6 @@
 import { withDB } from '@/app/api/utils/db';
 
 import AllCourse from '../v1/model';
-import { IResponse } from '../v1/jwt-verify';
 import { connectRedis, getRedisData } from '../v1/redis';
 
 // Helper to format responses

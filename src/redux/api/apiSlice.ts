@@ -21,6 +21,7 @@ export const apiSlice = createApi({
     'tagTypeUsers_student_access',
     'tagTypeUsers_instructor_access',
     'tagTypeUsers_block_users_access',
+    'tagTypeFinance',
   ],
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({

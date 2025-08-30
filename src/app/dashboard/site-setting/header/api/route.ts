@@ -14,7 +14,7 @@ export async function GET(req: Request) {
   // const tokenResponse = handleTokenVerify(req);
   // if (tokenResponse) return tokenResponse;
 
-  const result: IResponse = await getHeaderData(req);
+  const result: IResponse = await getHeaderData();
   return formatResponse(result.data, result.message, result.status);
 }
 
