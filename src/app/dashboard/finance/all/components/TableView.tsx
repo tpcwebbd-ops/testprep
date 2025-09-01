@@ -93,6 +93,7 @@ const ViewTableNextComponents: React.FC = () => {
     { key: 'courseName', label: 'Course Name' },
     { key: 'coureCode', label: 'Coure Code' },
     { key: 'batchNo', label: 'Batch No' },
+    { key: 'totalPayment', label: 'Total Payment' },
     { key: 'paymentStatus', label: 'Payment Status' },
     { key: 'createdAt', label: 'Created At' },
   ];
@@ -144,6 +145,7 @@ const ViewTableNextComponents: React.FC = () => {
         <TableCell>{(item as IFinances)['courseName']}</TableCell>
         <TableCell>{(item as IFinances)['coureCode']}</TableCell>
         <TableCell>{(item as IFinances)['batchNo']}</TableCell>
+        <TableCell>{(item as IFinances)['totalPayment']}</TableCell>
         <TableCell>
           <span
             className={`px-2 py-1 rounded-full text-xs font-medium ${
