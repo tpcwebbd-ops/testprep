@@ -73,9 +73,10 @@ const navData = {
     ],
   },
   othersLink: [
-    { id: 2, title: 'Course', url: '/course' },
-    { id: 3, title: 'Seminars', url: '/seminars' },
-    { id: 4, title: 'Contact', url: '/contact' },
+    { id: 2, title: 'My Class', url: '/my-class' },
+    { id: 3, title: 'Course', url: '/course' },
+    { id: 4, title: 'Seminars', url: '/seminars' },
+    { id: 5, title: 'Contact', url: '/contact' },
   ],
 };
 export default navData;
