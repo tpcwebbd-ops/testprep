@@ -28,8 +28,6 @@ const ViewTableNextComponents: React.FC = () => {
 
   const {
     setSelectedFinances,
-    toggleBulkEditModal,
-    toggleBulkUpdateModal,
     toggleViewModal,
     queryPramsLimit,
     queryPramsPage,

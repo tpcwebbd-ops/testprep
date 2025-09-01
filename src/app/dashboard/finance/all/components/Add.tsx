@@ -63,15 +63,16 @@ const AddNextComponents: FC = () => {
   };
 
   const handleAddFinance = async () => {
+    const { _id, ...updateNewFinance } = newFinance;
     try {
-      const addedFinance = await addFinances(newFinance).unwrap();
+      const addedFinance = await addFinances(updateNewFinance).unwrap();
       setFinances([addedFinance]);
       toggleAddModal(false);
       setNewFinance(defaultFinances);
       handleSuccess('Added Successful');
     } catch (error: unknown) {
       console.error(error);
-      let errMessage: string = 'An unknown error occurred.';
+      let errMessage: string = `An unknown error occurred. ${_id}`;
       if (isApiErrorResponse(error)) {
         errMessage = formatDuplicateKeyError(error.data.message) || 'API error';
       } else if (error instanceof Error) {

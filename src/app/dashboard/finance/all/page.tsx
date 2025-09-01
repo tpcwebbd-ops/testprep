@@ -2,8 +2,6 @@
 
 import React, { useState } from 'react';
 import { PlusIcon } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { BiRightArrowAlt } from 'react-icons/bi';
 
 import { Button } from '@/components/ui/button';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
@@ -15,9 +13,9 @@ import { useGetfinancesQuery } from './redux/rtk-api';
 import ViewFinancesTable from './components/TableView';
 
 // import BulkEditFile from './components/BulkEdit';
-// import AddFile from './components/Add';
+import AddFile from './components/Add';
 // import EditFile from './components/Edit';
-// import ViewFile from './components/View';
+import ViewFile from './components/View';
 // import DeleteFile from './components/Delete';
 // import BulkDeleteFile from './components/BulkDelete';
 // import BulkUpdateFinances from './components/BulkUpdate';
@@ -51,8 +49,8 @@ const MainNextPage: React.FC = () => {
     }
   };
 
-  // const modals = [AddFile, ViewFile, BulkDeleteFile, BulkEditFile, EditFile, DeleteFile, BulkUpdateFinances, BulkDynamicUpdateFinances];
-  const router = useRouter();
+  // const modals = [AddFile,  BulkDeleteFile, BulkEditFile, EditFile, DeleteFile, BulkUpdateFinances, BulkDynamicUpdateFinances];
+  const modals = [ViewFile, AddFile];
 
   let renderUI = (
     <div className="container mx-auto p-4">
@@ -67,9 +65,9 @@ const MainNextPage: React.FC = () => {
       </div>
       <SearchBox onSearch={handleSearch} placeholder="Search here ..." autoFocus={false} />
       <ViewFinancesTable />
-      {/* {modals.map((ModalComponent, index) => (
+      {modals.map((ModalComponent, index) => (
         <ModalComponent key={index} />
-      ))} */}
+      ))}
     </div>
   );
 

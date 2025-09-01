@@ -19,7 +19,7 @@ export interface IFinances {
   refundAmount: string;
   createdAt: Date;
   updatedAt: Date;
-  _id: string;
+  _id?: string;
 }
 
 export const defaultFinances = {

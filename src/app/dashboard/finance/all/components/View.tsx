@@ -48,8 +48,16 @@ const ViewNextComponents: React.FC = () => {
     </div>
   );
 
+  const handleOnOpenChange = (isOpen: boolean) => {
+    console.log('isOpen : ', isOpen);
+    if (!isOpen) {
+      setSelectedFinances(null);
+    }
+    toggleViewModal(isOpen);
+  };
+
   return (
-    <Dialog open={isViewModalOpen} onOpenChange={toggleViewModal}>
+    <Dialog open={isViewModalOpen} onOpenChange={handleOnOpenChange}>
       <DialogContent className="sm:max-w-[625px]">
         <DialogHeader>
           <DialogTitle>Finances Details</DialogTitle>
