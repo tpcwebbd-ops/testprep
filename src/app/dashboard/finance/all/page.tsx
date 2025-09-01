@@ -16,7 +16,7 @@ import ViewFinancesTable from './components/TableView';
 import AddFile from './components/Add';
 import EditFile from './components/Edit';
 import ViewFile from './components/View';
-// import DeleteFile from './components/Delete';
+import DeleteFile from './components/Delete';
 import BulkDeleteFile from './components/BulkDelete';
 // import BulkUpdateFinances from './components/BulkUpdate';
 // import BulkDynamicUpdateFinances from './components/BulkDynamicUpdate';
@@ -49,8 +49,8 @@ const MainNextPage: React.FC = () => {
     }
   };
 
-  // const modals = [  BulkEditFile, , DeleteFile, BulkUpdateFinances, BulkDynamicUpdateFinances];
-  const modals = [ViewFile, AddFile, BulkDeleteFile, EditFile];
+  // const modals = [  BulkEditFile, , , BulkUpdateFinances, BulkDynamicUpdateFinances];
+  const modals = [ViewFile, AddFile, BulkDeleteFile, EditFile, DeleteFile];
 
   let renderUI = (
     <div className="container mx-auto p-4">
