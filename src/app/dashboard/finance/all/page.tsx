@@ -17,7 +17,7 @@ import AddFile from './components/Add';
 // import EditFile from './components/Edit';
 import ViewFile from './components/View';
 // import DeleteFile from './components/Delete';
-// import BulkDeleteFile from './components/BulkDelete';
+import BulkDeleteFile from './components/BulkDelete';
 // import BulkUpdateFinances from './components/BulkUpdate';
 // import BulkDynamicUpdateFinances from './components/BulkDynamicUpdate';
 
@@ -49,8 +49,8 @@ const MainNextPage: React.FC = () => {
     }
   };
 
-  // const modals = [AddFile,  BulkDeleteFile, BulkEditFile, EditFile, DeleteFile, BulkUpdateFinances, BulkDynamicUpdateFinances];
-  const modals = [ViewFile, AddFile];
+  // const modals = [  BulkEditFile, EditFile, DeleteFile, BulkUpdateFinances, BulkDynamicUpdateFinances];
+  const modals = [ViewFile, AddFile, BulkDeleteFile];
 
   let renderUI = (
     <div className="container mx-auto p-4">
