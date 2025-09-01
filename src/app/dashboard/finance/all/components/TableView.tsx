@@ -162,7 +162,6 @@ const ViewTableNextComponents: React.FC = () => {
 
   if (isLoading) return <LoadingComponent />;
   if (isError) return <ErrorMessageComponent message={error?.toString() || 'An error occurred'} />;
-
   return (
     <div className="w-full flex flex-col">
       <div className="w-full my-4">
@@ -172,12 +171,6 @@ const ViewTableNextComponents: React.FC = () => {
             <span className="text-sm text-slate-500">({bulkData.length})</span>
           </div>
           <div className="flex items-center justify-end w-full gap-2">
-            <Button size="sm" variant="outline" onClick={() => toggleBulkUpdateModal(true)} disabled={bulkData.length === 0}>
-              <PencilIcon className="w-4 h-4 mr-1" /> B.Update
-            </Button>
-            <Button size="sm" variant="outline" onClick={() => toggleBulkEditModal(true)} disabled={bulkData.length === 0}>
-              <PencilIcon className="w-4 h-4 mr-1" /> B.Edit
-            </Button>
             <Button size="sm" variant="destructive" onClick={() => toggleBulkDeleteModal(true)} disabled={bulkData.length === 0}>
               <TrashIcon className="w-4 h-4 mr-1" /> B.Delete
             </Button>
@@ -221,12 +214,12 @@ const ViewTableNextComponents: React.FC = () => {
         currentPage={queryPramsPage}
         itemsPerPage={queryPramsLimit}
         onPageChange={page => setQueryPramsPage(page)}
-        totalItems={getResponseData?.data?.total || 0}
+        totalItems={getResponseData?.data?.total || 1}
       />
 
       <div className="max-w-xs flex items-center self-center justify-between pl-2 gap-4 border rounded-lg w-full mx-auto mt-8">
         <Label htmlFor="set-limit" className="text-right text-slate-500 font-normal pl-3">
-          Finances per page
+          Payment per page
         </Label>
         <Select
           onValueChange={value => {

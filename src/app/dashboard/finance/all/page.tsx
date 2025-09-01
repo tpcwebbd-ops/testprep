@@ -59,17 +59,9 @@ const MainNextPage: React.FC = () => {
       <div className="flex flex-col md:flex-row gap-2 justify-between items-center mb-6">
         <h1 className="h2 w-full">Finance Management {isSuccess && <sup className="text-xs">(total:{getResponseData?.data?.total || '00'})</sup>}</h1>
         <div className="w-full flex flex-col md:flex-row gap-2 item-center justify-end">
-          <Button size="sm" variant="outlineGarden" onClick={() => router.push('/dashboard/finance/ssr-view')}>
-            <BiRightArrowAlt className="w-4 h-4" />
-            SSR View
-          </Button>
-          <Button size="sm" variant="outlineGarden" onClick={() => router.push('/dashboard/finance/client-view')}>
-            <BiRightArrowAlt className="w-4 h-4" />
-            Client View
-          </Button>
           <Button size="sm" variant="outlineGarden" onClick={() => toggleAddModal(true)}>
             <PlusIcon className="w-4 h-4" />
-            Add Finance
+            Add New Payment
           </Button>
         </div>
       </div>
