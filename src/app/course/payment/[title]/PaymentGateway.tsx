@@ -88,10 +88,10 @@ const PaymentGateway: React.FC<{ course: Course }> = ({ course }) => {
         </div>
 
         <button
-          onClick={() => (window.location.href = '/dashboard')}
+          onClick={() => (window.location.href = '/my-class')}
           className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
         >
-          Go to Dashboard
+          Go to My Class
         </button>
       </div>
     );
