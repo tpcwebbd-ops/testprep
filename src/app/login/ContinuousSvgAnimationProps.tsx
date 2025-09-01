@@ -1,5 +1,12 @@
+/*
+|-----------------------------------------
+| Corrected ContinuousSvgAnimation Component
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: testprep-webapp, September, 2025
+|-----------------------------------------
+*/
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 
 interface ContinuousSvgAnimationProps {
   width?: number | string;
@@ -13,23 +20,22 @@ interface ContinuousSvgAnimationProps {
 const ContinuousSvgAnimation: React.FC<ContinuousSvgAnimationProps> = ({
   width = '100%',
   height = '100%',
-  primaryColor = 'rgba(59, 130, 246, 0.7)', // Semi-transparent blue
-  secondaryColor = 'rgba(16, 185, 129, 0.7)', // Semi-transparent green
-  backgroundColor = 'rgba(243, 244, 246, 0.2)', // Very light gray with transparency
-  duration = 8, // Animation duration in seconds
+  primaryColor = 'rgba(59, 130, 246, 0.7)',
+  secondaryColor = 'rgba(16, 185, 129, 0.7)',
+  backgroundColor = 'rgba(243, 244, 246, 0.2)',
+  duration = 8,
 }) => {
-  // Define radial gradient for glass effect
   const glassGradientId = 'glassGradient';
   const highlightGradientId = 'highlightGradient';
 
   // Animation variants for the circular elements
-  const circleVariants = {
+  const circleVariants: Variants = {
     animate: {
       scale: [1, 1.2, 0.9, 1.1, 1],
       opacity: [0.7, 1, 0.8, 0.9, 0.7],
       transition: {
         duration: duration,
-        ease: 'easeInOut',
+        ease: 'easeInOut' as const, // FIX: Added 'as const'
         times: [0, 0.25, 0.5, 0.75, 1],
         repeat: Infinity,
       },
@@ -37,7 +43,7 @@ const ContinuousSvgAnimation: React.FC<ContinuousSvgAnimationProps> = ({
   };
 
   // Animation variants for the waves
-  const waveVariants = {
+  const waveVariants: Variants = {
     animate: (custom: number) => ({
       d: [
         'M0,64 C20,40 40,30 60,40 C80,50 100,70 120,60 C140,50 160,20 180,30 C200,40 220,60 240,50 C260,40 280,30 300,40 C320,50 340,70 360,60 C380,50 400,30 420,40 C440,50 460,70 480,60 C500,50 520,30 540,40 C560,50 580,70 600,60',
@@ -48,46 +54,46 @@ const ContinuousSvgAnimation: React.FC<ContinuousSvgAnimationProps> = ({
       ],
       transition: {
         duration: duration,
-        ease: 'easeInOut',
+        ease: 'easeInOut' as const, // FIX: Added 'as const'
         times: [0, 0.25, 0.5, 0.75, 1],
-        delay: custom * 0.5, // Staggered delay
+        delay: custom * 0.5,
         repeat: Infinity,
       },
     }),
   };
 
   // Animation for rotating elements
-  const rotateVariants = {
+  const rotateVariants: Variants = {
     animate: (custom: number) => ({
       rotate: [0, 360],
       transition: {
-        duration: duration * (custom === 1 ? 2 : 1), // Different durations
-        ease: 'linear',
+        duration: duration * (custom === 1 ? 2 : 1),
+        ease: 'linear' as const, // FIX: Added 'as const'
         repeat: Infinity,
       },
     }),
   };
 
   // Color transition animations with glass effect
-  const colorVariants = {
+  const colorVariants: Variants = {
     animate: {
       fill: [primaryColor, secondaryColor, primaryColor],
       filter: ['url(#glassFilter)', 'url(#glassFilter)', 'url(#glassFilter)'],
       transition: {
         duration: duration * 1.5,
-        ease: 'easeInOut',
+        ease: 'easeInOut' as const, // FIX: Added 'as const'
         repeat: Infinity,
       },
     },
   };
 
   // Shimmer effect for glass highlights
-  const shimmerVariants = {
+  const shimmerVariants: Variants = {
     animate: {
       x: ['-100%', '100%'],
       transition: {
         duration: duration * 0.75,
-        ease: 'easeInOut',
+        ease: 'easeInOut' as const, // FIX: Added 'as const'
         repeat: Infinity,
         repeatType: 'mirror' as const,
       },
@@ -95,7 +101,13 @@ const ContinuousSvgAnimation: React.FC<ContinuousSvgAnimationProps> = ({
   };
 
   return (
-    <div style={{ width, height, background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)' }}>
+    <div
+      style={{
+        width,
+        height,
+        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+      }}
+    >
       <motion.svg
         viewBox="0 0 400 400"
         width="100%"
@@ -111,7 +123,7 @@ const ContinuousSvgAnimation: React.FC<ContinuousSvgAnimationProps> = ({
         initial="initial"
         animate="animate"
       >
-        {/* Define filters and gradients for glass effect */}
+        {/* ... rest of your SVG code remains the same ... */}
         <defs>
           <filter id="glassFilter" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur" />
@@ -286,9 +298,9 @@ const ContinuousSvgAnimation: React.FC<ContinuousSvgAnimationProps> = ({
             strokeWidth="0.5"
           />
         </motion.g>
+        {/* The SVG part of your component is perfectly fine. */}
       </motion.svg>
     </div>
   );
 };
-
 export default ContinuousSvgAnimation;

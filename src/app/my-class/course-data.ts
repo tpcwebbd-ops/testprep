@@ -1,0 +1,98 @@
+/*
+|-----------------------------------------
+| Course Data for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: testprep-webapp, September, 2025
+|-----------------------------------------
+*/
+
+// --- 1. Define the Types for our Data ---
+// This makes our data structure predictable and safe to use anywhere in the app.
+
+export interface Question {
+  id: number;
+  question: string;
+  options: string[];
+  answer: string;
+}
+
+export interface ClassItem {
+  id: number;
+  title: string;
+  duration: string;
+  type: 'modal' | 'video' | 'Questions';
+  modelCentent?: string; // Optional property
+  videoUrl?: string; // Optional property
+  questionsData?: Question[]; // Optional property
+}
+
+export interface Course {
+  id: number;
+  title: string;
+  totalClass: number;
+  duration: string;
+  classList: ClassItem[]; // Renamed for clarity
+}
+
+// --- 2. Define the list of classes first ---
+// This is the actual "playlist" of lessons for the course.
+const classList: ClassItem[] = [
+  {
+    id: 1,
+    title: '1-1 Introduction',
+    duration: '02:30',
+    // Corrected the unclosed <strong> tag
+    modelCentent: '<strong>Carefull</strong> <h2>Todays Topic: Spoken</h2> <p>some text</p>',
+    type: 'modal',
+  },
+  { id: 2, title: '1-2 Basic Spoken', duration: '10:00', videoUrl: 'https://www.youtube.com/embed/1S3jlxzDycs?si=1qNTrJByHxRCUyWl', type: 'video' },
+  { id: 3, title: '1-3 Pronunciation', duration: '12:15', videoUrl: 'https://www.youtube.com/embed/1S3jlxzDycs?si=1qNTrJByHxRCUyWl', type: 'video' },
+  { id: 4, title: '1-4 Common Phrases', duration: '08:45', videoUrl: 'https://www.youtube.com/embed/1S3jlxzDycs?si=1qNTrJByHxRCUyWl', type: 'video' },
+  { id: 5, title: '1-5 Intonation', duration: '11:05', videoUrl: 'https://www.youtube.com/embed/1S3jlxzDycs?si=1qNTrJByHxRCUyWl', type: 'video' },
+  { id: 6, title: '1-6 Linking Sounds', duration: '09:30', videoUrl: 'https://www.youtube.com/embed/1S3jlxzDycs?si=1qNTrJByHxRCUyWl', type: 'video' },
+  { id: 7, title: '1-7 Active Listening', duration: '07:00', videoUrl: 'https://www.youtube.com/embed/1S3jlxzDycs?si=1qNTrJByHxRCUyWl', type: 'video' },
+  { id: 8, title: '1-8 Vocabulary Building', duration: '14:20', videoUrl: 'https://www.youtube.com/embed/1S3jlxzDycs?si=1qNTrJByHxRCUyWl', type: 'video' },
+  { id: 9, title: '1-9 Review', duration: '05:00', videoUrl: 'https://www.youtube.com/embed/1S3jlxzDycs?si=1qNTrJByHxRCUyWl', type: 'video' },
+  {
+    id: 10,
+    title: '1-10 Knowledge Check',
+    duration: '15:00',
+    type: 'Questions',
+    questionsData: [
+      { id: 1, question: 'What is the capital of Bangladesh?', options: ['Dhaka', 'Chittagong', 'Sylhet', 'Barisal'], answer: 'Dhaka' },
+      { id: 2, question: 'What is the currency of Bangladesh?', options: ['BDT', 'USD', 'EUR', 'GBP'], answer: 'BDT' },
+      { id: 3, question: 'What is the largest city in Bangladesh?', options: ['Dhaka', 'Chittagong', 'Sylhet', 'Barisal'], answer: 'Dhaka' },
+      { id: 4, question: 'What is the smallest city in Bangladesh?', options: ['Dhaka', 'Chittagong', 'Sylhet', 'Barisal'], answer: 'Chittagong' },
+      { id: 5, question: 'What is the population of Bangladesh?', options: ['16 million', '18 million', '20 million', '22 million'], answer: '16 million' },
+      { id: 6, question: 'What is the largest state in Bangladesh?', options: ['Dhaka', 'Chittagong', 'Sylhet', 'Barisal'], answer: 'Sylhet' },
+      { id: 7, question: 'What is the smallest state in Bangladesh?', options: ['Dhaka', 'Chittagong', 'Sylhet', 'Barisal'], answer: 'Chittagong' },
+      { id: 8, question: 'What is the capital of Bangladesh?', options: ['Dhaka', 'Chittagong', 'Sylhet', 'Barisal'], answer: 'Dhaka' },
+      { id: 9, question: 'What is the currency of Bangladesh?', options: ['BDT', 'USD', 'EUR', 'GBP'], answer: 'BDT' },
+      {
+        id: 10,
+        question: 'What is the independent day of Bangladesh?',
+        options: ['25 January', '26 January', '27 January', '28 January'],
+        answer: '25 January',
+      },
+    ],
+  },
+];
+
+// --- 3. Calculate dynamic values from the data ---
+// Now that classList is defined, we can safely use it.
+const totalClasses = classList.length;
+const totalDuration = 'N/A'; // You can implement a function to calculate this later
+
+// --- 4. Export the final, correctly structured course data ---
+// This is the main object you will import into your components.
+export const courseData: Course[] = [
+  {
+    id: 1,
+    title: 'Lecture 1 Basic Spoken',
+    totalClass: totalClasses,
+    duration: totalDuration,
+    classList: classList, // The list is now correctly placed here
+  },
+  // You could add more courses here in the future
+  // { id: 2, title: "Lecture 2 Advanced Grammar", ... }
+];

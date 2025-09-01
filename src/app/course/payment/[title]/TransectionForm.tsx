@@ -7,9 +7,9 @@
 */
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation'; // Import useRouter for redirection
 import { Course } from './page';
 import { CheckCircle, CreditCard, Shield, Banknote, Smartphone, Loader2 } from 'lucide-react';
+import Image from 'next/image';
 
 // An array of payment methods for easier management
 const paymentMethods = [
@@ -22,9 +22,7 @@ const paymentMethods = [
 ];
 
 const TransactionForm: React.FC<{ course: Course; setPaymentStep: (step: 'payment' | 'success') => void }> = ({ course, setPaymentStep }) => {
-  const router = useRouter(); // Initialize the router
   const [transactionId, setTransactionId] = useState<string>(''); // Default to empty
-  const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [isPaying, setIsPaying] = useState<boolean>(false); // State for the "Pay Now" loading
   const [selectedPayment, setSelectedPayment] = useState<string>('visa'); // Default selection
 
@@ -83,7 +81,13 @@ const TransactionForm: React.FC<{ course: Course; setPaymentStep: (step: 'paymen
                   selectedPayment === method.id ? 'border-blue-500 bg-blue-50/50' : 'border-gray-200 bg-white/50'
                 }`}
               >
-                <img src={method.icon} alt={method.name} className="h-8 mx-auto grayscale group-hover:grayscale-0 transition-all duration-300" />
+                <Image
+                  width={24}
+                  height={24}
+                  src={method.icon}
+                  alt={method.name}
+                  className="h-8 mx-auto grayscale group-hover:grayscale-0 transition-all duration-300"
+                />
                 {selectedPayment === method.id && (
                   <div className="absolute -top-2 -right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center border-2 border-white shadow-md">
                     <CheckCircle className="w-4 h-4 text-white" />
