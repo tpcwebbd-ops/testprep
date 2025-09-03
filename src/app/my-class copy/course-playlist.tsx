@@ -1,19 +1,32 @@
-'use client';
-
 import { motion } from 'framer-motion';
 import { PlayCircle, CheckCircle } from 'lucide-react';
-import { useStore, AttendanceRecord } from './store';
 
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { allCourseData } from './course-data';
+import { ClassItem, allCourseData } from './course-data';
 
-const CoursePlaylist = () => {
-  const { todaysLecture, handleSelectContent, selectedContent, phase, attendance, handleNextLecture } = useStore();
-  const selectedContentId = selectedContent?.id || 0;
-  const allCourseLectures = allCourseData.slice(0, 4); // Keep the logic to show only 4 courses
+export interface AttendanceRecord {
+  id: number;
+  date: string;
+  lectureId: number;
+  lectureTitle: string;
+}
 
+interface CoursePlaylistProps {
+  todaysLecture: ClassItem | null;
+  onSelectContent: (content: ClassItem) => void;
+  selectedContentId: number;
+  phase: 'ATTENDANCE_PENDING' | 'LECTURE_IN_PROGRESS' | 'LECTURE_COMPLETED';
+  attendance: AttendanceRecord[];
+  onNextLecture: () => void;
+}
+
+const CoursePlaylist = ({ todaysLecture, onSelectContent, selectedContentId, phase, attendance, onNextLecture }: CoursePlaylistProps) => {
+  const course = allCourseData[0];
+  console.log('course : ', course);
+  const allCourseLectures = allCourseData;
+  allCourseLectures.length = 4;
   return (
     <div className="w-full rounded-lg bg-white p-2 shadow-md md:p-4">
       {todaysLecture && (
@@ -26,16 +39,16 @@ const CoursePlaylist = () => {
       )}
 
       <ScrollArea className="h-[500px] w-full rounded-md border p-4">
-        <h2 className="mb-4 text-xl font-bold text-gray-800">Course Content</h2>
-        {allCourseLectures.map(currentCourse => (
+        <h2 className="mb-4 text-lg font-bold text-gray-800">Course Content</h2>
+        {allCourseData.map(currentCourse => (
           <div className="py-2" key={currentCourse.id}>
             <Accordion type="single" collapsible defaultValue="item-1" className="w-full">
               <AccordionItem value="item-1" className="mb-2 rounded-lg border bg-slate-50 px-4 last:mb-0">
                 <AccordionTrigger className="text-lg font-semibold text-gray-800 hover:no-underline">{currentCourse.title}</AccordionTrigger>
                 <AccordionContent>
                   <div className="mb-4 flex justify-between border-b pb-2 text-sm text-gray-500">
-                    <span>Task: {currentCourse.totalClass}</span>
-                    <span>Duration: {currentCourse.duration}</span>
+                    <span>Task: 5</span>
+                    <span>Duration: 1 Hours 5 minutes</span>
                   </div>
                   <ul className="space-y-2">
                     {currentCourse.classList.map((item, index) => (
@@ -44,7 +57,7 @@ const CoursePlaylist = () => {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.3, delay: index * 0.05 }}
-                        onClick={() => handleSelectContent(item)}
+                        onClick={() => onSelectContent(item)}
                         className={`flex cursor-pointer items-center justify-between rounded-md p-3 transition-all duration-200 ${
                           selectedContentId === item.id ? 'bg-blue-500 text-white' : 'bg-gray-100 hover:bg-blue-100'
                         }`}
@@ -70,8 +83,8 @@ const CoursePlaylist = () => {
 
       <div className="mt-4 flex flex-col items-center gap-4">
         {phase === 'LECTURE_COMPLETED' && (
-          <button onClick={handleNextLecture} className="w-full rounded-lg bg-green-500 px-4 py-2 text-white transition-all hover:bg-green-600">
-            Go to Next Lecture
+          <button onClick={onNextLecture} className="w-full rounded-lg bg-green-500 px-4 py-2 text-white transition-all hover:bg-green-600">
+            Next Lecture
           </button>
         )}
         <Dialog>
@@ -80,20 +93,16 @@ const CoursePlaylist = () => {
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>My Attendance History</DialogTitle>
+              <DialogTitle>My Attendance</DialogTitle>
             </DialogHeader>
             <div className="py-4">
               <ul className="space-y-2">
-                {attendance.length > 0 ? (
-                  attendance.map(record => (
-                    <li key={record.id} className="rounded-md border p-3">
-                      <p className="font-semibold">{record.lectureTitle}</p>
-                      <p className="text-sm text-gray-500">{new Date(record.date).toLocaleDateString()}</p>
-                    </li>
-                  ))
-                ) : (
-                  <p>No attendance records yet.</p>
-                )}
+                {attendance.map(record => (
+                  <li key={record.id} className="rounded-md border p-3">
+                    <p className="font-semibold">{record.lectureTitle}</p>
+                    <p className="text-sm text-gray-500">{new Date(record.date).toLocaleDateString()}</p>
+                  </li>
+                ))}
               </ul>
             </div>
           </DialogContent>

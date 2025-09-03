@@ -1,0 +1,75 @@
+here is example of attendance-component.ts
+```
+```
+
+here is example of course-data.ts
+```
+```
+and course-header.tsx
+```
+```
+and course-playlist.tsx
+```
+
+```
+and model-content.tsx
+```
+
+```
+and page.tsx
+```
+
+```
+and quiz.tsx
+```
+
+```
+and video-player.tsx
+```
+
+```
+
+Help me to generate a prompt for our webApplication. 
+I am building a webApplication for our student. 
+I want every student give attendance every day.
+every day they get a new lecture.
+after finish the lecture they get a new button called Next lecture.
+If student click the New Lecture button it load oll lecture and update current lecture.
+also he can view his attendance by shadcn dialog.
+Make sure the component will responsive and make for Typescript also for NextJs with PWA.
+------------
+I want to update my all work-flow as the following senario.
+
+1. When a student go to page.tsx then there is a function it checks the student submit addtendance or not.
+
+    There are total 3 phase 
+        1.  Attendance is Not submitted.
+            - do not view any lecture.
+            - do not view MY attendance.
+            - do not view content.
+            - only view a component that shows
+            ``` Todays date, time. You sumbitted your attendance first```
+
+
+        2.  Attendance sumbitted and lecture is not completed.
+            - view all lectures.
+            - view todays lectures as highlited.
+            - view MY attendance.
+            - view those component as following.
+            ``` in the left side there is playlist. there is loaded old video from my attendance data. after that it highlited todays data. and after that there is a button called "MY Attendance"  and remember before the list of lecture do not view any button.```
+
+
+        3.  Attendance submitted and lecture is completed.
+            - view all lectures.
+            - mark todays lectures as completed.
+            - view MY attendance.
+            - view those component as following.
+            ``` in the left side there is playlist. there is loaded old video from my attendance data. after that it highlited todays completed lecture. and after that there is a button called "Next Lecture" after that there is a button called "MY Attendance"  and remember before the list of lecture do not view any button. ```
+
+
+
+        4. implement Next and preview button functional.
+
+        Summery of content(lecture) view and hide.
+        do not view all data  from course-data.ts
+        there is store some data in localStorage.  you get this data. after that you view course-data by filtering localStorage data. then you can view or update course lecture.

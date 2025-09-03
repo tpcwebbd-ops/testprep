@@ -3,12 +3,17 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, Maximize, Minimize } from 'lucide-react';
-import { useStore } from './store';
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import PreviousButton from './previous-button';
 import NextButton from './next-button';
+
+interface VideoPlayerProps {
+  videoUrl: string;
+  onPrevious: () => void;
+  onNext: () => void;
+}
 
 const WarningContent = () => (
   <>
@@ -36,10 +41,7 @@ const WarningContent = () => (
   </>
 );
 
-const VideoPlayer = () => {
-  const selectedContent = useStore(state => state.selectedContent);
-  const videoUrl = selectedContent?.videoUrl || '';
-
+const VideoPlayer = ({ videoUrl, onPrevious, onNext }: VideoPlayerProps) => {
   const [popup, setPopup] = useState({ visible: false, top: '50%', left: '50%' });
   const [isFullscreen, setIsFullscreen] = useState(false);
   const playerContainerRef = useRef<HTMLDivElement>(null);
@@ -55,13 +57,16 @@ const VideoPlayer = () => {
   }, [videoUrl]);
 
   useEffect(() => {
-    const handleFullscreenChange = () => setIsFullscreen(!!document.fullscreenElement);
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
   const toggleFullScreen = () => {
     if (!playerContainerRef.current) return;
+
     if (!isFullscreen) {
       playerContainerRef.current.requestFullscreen();
     } else {
@@ -70,15 +75,9 @@ const VideoPlayer = () => {
   };
 
   return (
-    <motion.div
-      key={selectedContent?.id} // Add key for re-animation
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="w-full rounded-lg bg-slate-100 p-4"
-    >
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full rounded-lg bg-slate-100 p-4">
       <div ref={playerContainerRef} className="relative aspect-video bg-black">
         <iframe
-          key={videoUrl}
           width="100%"
           height="100%"
           src={videoUrl}

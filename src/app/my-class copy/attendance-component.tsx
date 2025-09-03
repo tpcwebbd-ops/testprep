@@ -1,16 +1,10 @@
-/*
-|-----------------------------------------
-| Attendance Prompt Component
-| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
-| @copyright: testprep-webapp, September, 2025
-|-----------------------------------------
-*/
+
 'use client';
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
 
-const AttendancePrompt = ({ onAttend }: { onAttend: () => void }) => {
+const AttendanceComponent = ({ onAttend }: { onAttend: () => void }) => {
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
@@ -46,4 +40,4 @@ const AttendancePrompt = ({ onAttend }: { onAttend: () => void }) => {
   );
 };
 
-export default AttendancePrompt;
+export default AttendanceComponent;
