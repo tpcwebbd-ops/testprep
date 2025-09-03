@@ -6,10 +6,11 @@
 |-----------------------------------------
 */
 import { motion } from 'framer-motion';
-import { PlayCircle, X } from 'lucide-react';
+import { PlayCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Course, ClassItem } from './course-data';
 
@@ -34,7 +35,6 @@ const CoursePlaylist = ({ courseData, onSelectContent, selectedContentId }: Cour
   const [attendance, setAttendance] = useState<AttendanceRecord[]>([]);
   const [todaysLecture, setTodaysLecture] = useState<ClassItem | null>(null);
   const [taskCompleted, setTaskCompleted] = useState(false);
-  const [showAttendancePopup, setShowAttendancePopup] = useState(false);
 
   // Load attendance and task completion status from localStorage on initial render
   useEffect(() => {
@@ -105,7 +105,7 @@ const CoursePlaylist = ({ courseData, onSelectContent, selectedContentId }: Cour
           {/* Phase 2: Lecture Not Completed */}
           {!taskCompleted && (
             <div className="mb-4 rounded-lg border bg-blue-50 p-4">
-              <h3 className="text-lg font-semibold text-blue-800">Today&apos;s Lecture: {todaysLecture.title}</h3>
+              <h3 className="text-lg font-semibold text-blue-800">Today's Lecture: {todaysLecture.title}</h3>
               <button onClick={handleMarkAsComplete} className="mt-2 rounded bg-green-500 px-3 py-1 text-sm text-white hover:bg-green-600">
                 Mark as Complete
               </button>
@@ -156,30 +156,28 @@ const CoursePlaylist = ({ courseData, onSelectContent, selectedContentId }: Cour
           </ScrollArea>
 
           <div className="mt-4 text-center">
-            <button onClick={() => setShowAttendancePopup(true)} className="rounded-lg bg-gray-700 px-4 py-2 text-white transition-all hover:bg-gray-800">
-              My Attendance
-            </button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <button className="rounded-lg bg-gray-700 px-4 py-2 text-white transition-all hover:bg-gray-800">My Attendance</button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>My Attendance</DialogTitle>
+                </DialogHeader>
+                <div className="py-4">
+                  <ul className="space-y-2">
+                    {attendance.map(record => (
+                      <li key={record.id} className="rounded-md border p-3">
+                        <p className="font-semibold">{record.lecture}</p>
+                        <p className="text-sm text-gray-500">{new Date(record.dateAndTime).toLocaleString()}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </>
-      )}
-
-      {showAttendancePopup && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="relative w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
-            <button onClick={() => setShowAttendancePopup(false)} className="absolute right-4 top-4 text-gray-500 hover:text-gray-800">
-              <X size={24} />
-            </button>
-            <h2 className="mb-4 text-xl font-bold">My Attendance</h2>
-            <ul className="space-y-2">
-              {attendance.map(record => (
-                <li key={record.id} className="rounded-md border p-3">
-                  <p className="font-semibold">{record.lecture}</p>
-                  <p className="text-sm text-gray-500">{new Date(record.dateAndTime).toLocaleString()}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
       )}
     </div>
   );
