@@ -5,12 +5,15 @@
 | @copyright: testprep-webapp, September, 2025
 |-----------------------------------------
 */
+'use client';
+
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ArrowRight, AlertTriangle, Maximize, Minimize } from 'lucide-react';
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Button } from '@/components/ui/button';
 
 interface VideoPlayerProps {
   videoUrl: string;
@@ -38,7 +41,7 @@ const WarningContent = () => (
     <p className="mb-4">
       আমরা অনেকদিন ধরে চিন্তা করছি দুই-একজনকে কোর্স চুরি করে বিক্রি করার জন্য দৃষ্টান্তমূলক শাস্তি দিব। যেন দেশের অন্য সবাই সেটা দেখে সতর্ক হয়ে যায়। সুতরাং,
       তুমি যদি নিজেকে ১৫ বছর জেলের ভিতরে দেখতে না চাও, তাহলে আমাদের কোর্স এর ভিডিও ডাউনলোড করে কারো সাথে অর্থের বিনিময়ে বা বিনামূল্যে দেয়া থেকে বিরত থাকো। তোমার
-      ভাব-মূর্তি এবং তোমার ফ্যামিলি&apos;র কথা চিন্তা করো।
+      ভাব-মূর্তি এবং তোমার ফ্যামিলি&apos;s কথা চিন্তা করো।
     </p>
     <p>একবার ফেঁসে গেলে কিন্তু কেউ তোমাকে বাঁচাতে আসবে না।</p>
   </>
@@ -132,14 +135,14 @@ const VideoPlayer = ({ videoUrl, onPrevious, onNext }: VideoPlayerProps) => {
         </Dialog>
 
         <div className="flex w-auto items-center justify-end gap-2">
-          <button onClick={onPrevious} className="flex items-center gap-2 rounded-lg bg-gray-200 px-4 py-2 text-gray-700 transition-colors hover:bg-gray-300">
+          <Button onClick={onPrevious} className="flex items-center gap-2 rounded-lg bg-gray-200 px-4 py-2 text-gray-700 transition-colors hover:bg-gray-300">
             <ArrowLeft size={16} />
             Previous
-          </button>
-          <button onClick={onNext} className="flex items-center gap-2 rounded-lg bg-blue-500 px-4 py-2 text-white transition-colors hover:bg-blue-600">
+          </Button>
+          <Button onClick={onNext} className="flex items-center gap-2 rounded-lg bg-blue-500 px-4 py-2 text-white transition-colors hover:bg-blue-600">
             Next
             <ArrowRight size={16} />
-          </button>
+          </Button>
         </div>
       </div>
     </motion.div>

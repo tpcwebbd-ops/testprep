@@ -124,7 +124,7 @@ const classList: ClassItem[] = [
 const totalClasses = classList.length;
 const totalDuration = calculateTotalVideoDuration(classList);
 
-export const courseData: Course[] = [
+export const allCourseData: Course[] = [
   {
     id: 1,
     title: 'Lecture 1 Basic Spoken',

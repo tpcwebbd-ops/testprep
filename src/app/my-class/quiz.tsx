@@ -7,9 +7,9 @@
 */
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Question } from './page';
+import { Question } from './course-data'; // Assuming Question type is exported from course-data
 
 type UserAnswer = {
   questionId: number;
@@ -20,13 +20,15 @@ type UserAnswer = {
 
 interface QuizProps {
   questions: Question[];
+  onNext: () => void; // Prop to signal completion
 }
 
-const Quiz = ({ questions }: QuizProps) => {
+const Quiz = ({ questions, onNext }: QuizProps) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [userAnswers, setUserAnswers] = useState<UserAnswer[]>([]);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [quizFinished, setQuizFinished] = useState(false);
 
   const handleNext = () => {
     if (selectedAnswer === null) return;
@@ -77,38 +79,31 @@ const Quiz = ({ questions }: QuizProps) => {
 
       questions.forEach((question, index) => {
         const userAnswer = userAnswers[index];
-
         if (yPosition > 250) {
           doc.addPage();
           yPosition = 20;
         }
-
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(12);
         doc.text(`Question ${index + 1}:`, 20, yPosition);
         yPosition += 8;
-
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(10);
         const questionLines = doc.splitTextToSize(question.question, 170);
         doc.text(questionLines, 20, yPosition);
         yPosition += questionLines.length * 5 + 5;
-
         if (userAnswer.isCorrect) {
           doc.setTextColor(34, 139, 34);
         } else {
           doc.setTextColor(220, 20, 60);
         }
-
         doc.text(`Your Answer: ${userAnswer.selectedOption} ${userAnswer.isCorrect ? '✓' : '✗'}`, 20, yPosition);
         yPosition += 8;
-
         if (!userAnswer.isCorrect) {
           doc.setTextColor(34, 139, 34);
           doc.text(`Correct Answer: ${userAnswer.correctAnswer}`, 20, yPosition);
           yPosition += 8;
         }
-
         doc.setTextColor(34, 34, 34);
         yPosition += 5;
       });
@@ -116,7 +111,6 @@ const Quiz = ({ questions }: QuizProps) => {
       doc.save('quiz-report.pdf');
     } catch (error) {
       console.error('Error generating PDF:', error);
-
       handleDownloadTextReport();
     }
   };
@@ -151,7 +145,15 @@ const Quiz = ({ questions }: QuizProps) => {
     setSelectedAnswer(null);
     setUserAnswers([]);
     setIsCompleted(false);
+    setQuizFinished(false);
   };
+
+  useEffect(() => {
+    if (!quizFinished) {
+      onNext(); // Signal that the lecture (quiz) is complete
+      setQuizFinished(true); // Ensure it only runs once per completion
+    }
+  }, [onNext, quizFinished]);
 
   if (isCompleted) {
     const score = userAnswers.filter(answer => answer.isCorrect).length;
@@ -165,37 +167,37 @@ const Quiz = ({ questions }: QuizProps) => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             className="glass-effect rounded-2xl p-6 sm:p-8 lg:p-10"
           >
-            <div className="text-center mb-8">
+            <div className="mb-8 text-center">
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.3, type: 'spring', stiffness: 200 }}
-                className="mx-auto mb-6 flex h-20 w-20 sm:h-24 sm:w-24 items-center justify-center rounded-full bg-gradient-to-r from-green-400 to-blue-500 text-2xl sm:text-3xl"
+                className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-r from-green-400 to-blue-500 text-2xl sm:h-24 sm:w-24 sm:text-3xl"
               >
                 🎉
               </motion.div>
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent">
+              <h2 className="bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-2xl font-bold text-transparent sm:text-3xl lg:text-4xl">
                 Quiz Completed!
               </h2>
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
-                className="mt-4 inline-block rounded-full bg-gray-800/10 px-6 py-3 backdrop-blur-sm border border-gray-300/30"
+                className="mt-4 inline-block rounded-full border border-gray-300/30 bg-gray-800/10 px-6 py-3 backdrop-blur-sm"
               >
-                <p className="text-lg sm:text-xl text-gray-800">
+                <p className="text-lg text-gray-800 sm:text-xl">
                   Your Score:{' '}
                   <span className="font-bold text-blue-600">
                     {score}/{questions.length}
                   </span>
                 </p>
-                <p className="text-sm sm:text-base text-gray-600">{percentage}% Accuracy</p>
+                <p className="text-sm text-gray-600 sm:text-base">{percentage}% Accuracy</p>
               </motion.div>
             </div>
 
-            <div className="flex justify-center mb-8">
-              <div className="relative w-32 h-32 sm:w-40 sm:h-40">
-                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+            <div className="mb-8 flex justify-center">
+              <div className="relative h-32 w-32 sm:h-40 sm:w-40">
+                <svg className="h-full w-full -rotate-90 transform" viewBox="0 0 100 100">
                   <circle cx="50" cy="50" r="40" stroke="rgba(156,163,175,0.3)" strokeWidth="8" fill="none" />
                   <motion.circle
                     cx="50"
@@ -218,12 +220,12 @@ const Quiz = ({ questions }: QuizProps) => {
                   </defs>
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-2xl sm:text-3xl font-bold text-gray-800">{percentage}%</span>
+                  <span className="text-2xl font-bold text-gray-800 sm:text-3xl">{percentage}%</span>
                 </div>
               </div>
             </div>
 
-            <div className="mb-8 max-h-72 sm:max-h-80 lg:max-h-96 space-y-4 overflow-y-auto pr-2 custom-scrollbar">
+            <div className="custom-scrollbar mb-8 max-h-72 space-y-4 overflow-y-auto pr-2 sm:max-h-80 lg:max-h-96">
               <AnimatePresence>
                 {questions.map((question, index) => {
                   const userAnswer = userAnswers[index];
@@ -233,27 +235,27 @@ const Quiz = ({ questions }: QuizProps) => {
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 }}
-                      className={`glass-card rounded-xl p-4 border-l-4 ${
+                      className={`glass-card rounded-xl border-l-4 p-4 ${
                         userAnswer.isCorrect ? 'border-green-500 bg-green-50/80' : 'border-red-500 bg-red-50/80'
                       }`}
                     >
-                      <p className="font-semibold text-gray-800 text-sm sm:text-base">{question.question}</p>
+                      <p className="text-sm font-semibold text-gray-800 sm:text-base">{question.question}</p>
                       <p className={`mt-2 text-xs sm:text-sm ${userAnswer.isCorrect ? 'text-green-700' : 'text-red-700'}`}>
                         Your answer: {userAnswer.selectedOption}
                       </p>
-                      {!userAnswer.isCorrect && <p className="mt-1 text-xs sm:text-sm text-green-700">Correct answer: {userAnswer.correctAnswer}</p>}
+                      {!userAnswer.isCorrect && <p className="mt-1 text-xs text-green-700 sm:text-sm">Correct answer: {userAnswer.correctAnswer}</p>}
                     </motion.div>
                   );
                 })}
               </AnimatePresence>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col justify-center gap-4 sm:flex-row">
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={handleDownloadReport}
-                className="glass-button bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold py-3 px-6 sm:px-8 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl border-blue-300"
+                className="glass-button rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 py-3 px-6 font-semibold text-white shadow-lg transition-all duration-300 hover:from-blue-600 hover:to-indigo-700 hover:shadow-xl border-blue-300 sm:px-8"
               >
                 📄 Download PDF Report
               </motion.button>
@@ -261,7 +263,7 @@ const Quiz = ({ questions }: QuizProps) => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={resetQuiz}
-                className="glass-button bg-white/60 hover:bg-white/80 text-gray-700 font-semibold py-3 px-6 sm:px-8 rounded-full transition-all duration-300 backdrop-blur-sm border border-gray-300/50 hover:border-gray-400/50"
+                className="glass-button rounded-full border border-gray-300/50 bg-white/60 py-3 px-6 font-semibold text-gray-700 backdrop-blur-sm transition-all duration-300 hover:border-gray-400/50 hover:bg-white/80 sm:px-8"
               >
                 🔄 Retake Quiz
               </motion.button>
@@ -276,32 +278,26 @@ const Quiz = ({ questions }: QuizProps) => {
             border: 1px solid rgba(209, 213, 219, 0.3);
             box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
           }
-
           .glass-card {
             background: rgba(255, 255, 255, 0.6);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(209, 213, 219, 0.2);
           }
-
           .glass-button {
             backdrop-filter: blur(10px);
             border: 1px solid rgba(209, 213, 219, 0.3);
           }
-
           .custom-scrollbar::-webkit-scrollbar {
             width: 6px;
           }
-
           .custom-scrollbar::-webkit-scrollbar-track {
             background: rgba(156, 163, 175, 0.2);
             border-radius: 3px;
           }
-
           .custom-scrollbar::-webkit-scrollbar-thumb {
             background: rgba(156, 163, 175, 0.5);
             border-radius: 3px;
           }
-
           .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: rgba(156, 163, 175, 0.7);
           }
@@ -319,25 +315,25 @@ const Quiz = ({ questions }: QuizProps) => {
       <div className="mx-auto max-w-2xl lg:max-w-4xl">
         <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} className="glass-effect rounded-2xl p-6 sm:p-8 lg:p-10">
           <div className="mb-6 sm:mb-8">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
-              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent">
+            <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+              <h2 className="bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-xl font-bold text-transparent sm:text-2xl lg:text-3xl">
                 Question {currentQuestionIndex + 1}
               </h2>
-              <div className="text-sm sm:text-base text-gray-600 mt-2 sm:mt-0">
+              <div className="mt-2 text-sm text-gray-600 sm:mt-0 sm:text-base">
                 {currentQuestionIndex + 1} of {questions.length}
               </div>
             </div>
 
-            <div className="relative h-3 sm:h-4 w-full rounded-full bg-gray-200/50 backdrop-blur-sm overflow-hidden">
+            <div className="relative h-3 w-full overflow-hidden rounded-full bg-gray-200/50 backdrop-blur-sm sm:h-4">
               <motion.div
                 className="h-full rounded-full bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600 shadow-lg"
                 initial={{ width: '0%' }}
                 animate={{ width: `${progress}%` }}
                 transition={{ duration: 0.8, ease: 'easeInOut' }}
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse" />
+              <div className="animate-pulse absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
             </div>
-            <p className="text-xs sm:text-sm text-gray-500 mt-2 text-right">{Math.round(progress)}% Complete</p>
+            <p className="mt-2 text-right text-xs text-gray-500 sm:text-sm">{Math.round(progress)}% Complete</p>
           </div>
 
           <motion.div
@@ -345,12 +341,12 @@ const Quiz = ({ questions }: QuizProps) => {
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -50 }}
-            className="glass-card rounded-xl p-4 sm:p-6 mb-6 sm:mb-8"
+            className="glass-card mb-6 rounded-xl p-4 sm:mb-8 sm:p-6"
           >
-            <p className="text-base sm:text-lg lg:text-xl text-gray-800 font-medium leading-relaxed">{currentQuestion.question}</p>
+            <p className="text-base font-medium leading-relaxed text-gray-800 sm:text-lg lg:text-xl">{currentQuestion.question}</p>
           </motion.div>
 
-          <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
+          <div className="mb-6 space-y-3 sm:mb-8 sm:space-y-4">
             <AnimatePresence>
               {currentQuestion.options.map((option, index) => (
                 <motion.button
@@ -361,36 +357,36 @@ const Quiz = ({ questions }: QuizProps) => {
                   whileHover={{ scale: 1.02, y: -2 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setSelectedAnswer(option)}
-                  className={`w-full rounded-xl p-4 sm:p-5 text-left transition-all duration-300 transform ${
+                  className={`w-full transform rounded-xl p-4 text-left transition-all duration-300 sm:p-5 ${
                     selectedAnswer === option
-                      ? 'glass-button bg-gradient-to-r from-blue-50 to-indigo-50 text-gray-800 ring-2 ring-blue-500/50 shadow-xl border-blue-200'
-                      : 'glass-card bg-white/60 hover:bg-white/80 text-gray-700 hover:shadow-lg border-gray-200/50'
+                      ? 'glass-button border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50 text-gray-800 ring-2 ring-blue-500/50 shadow-xl'
+                      : 'glass-card border-gray-200/50 bg-white/60 text-gray-700 hover:shadow-lg hover:bg-white/80'
                   }`}
                 >
                   <div className="flex items-center space-x-3">
                     <div
-                      className={`w-3 h-3 sm:w-4 sm:h-4 rounded-full border-2 transition-all duration-300 ${
-                        selectedAnswer === option ? 'bg-blue-500 border-blue-500' : 'border-gray-400'
+                      className={`h-3 w-3 rounded-full border-2 transition-all duration-300 sm:h-4 sm:w-4 ${
+                        selectedAnswer === option ? 'border-blue-500 bg-blue-500' : 'border-gray-400'
                       }`}
                     />
-                    <span className="text-sm sm:text-base lg:text-lg font-medium">{option}</span>
+                    <span className="text-sm font-medium sm:text-base lg:text-lg">{option}</span>
                   </div>
                 </motion.button>
               ))}
             </AnimatePresence>
           </div>
 
-          <div className="flex justify-between items-center">
-            <div className="text-gray-500 text-xs sm:text-sm">{selectedAnswer ? '✓ Answer selected' : 'Select an answer to continue'}</div>
+          <div className="flex items-center justify-between">
+            <div className="text-xs text-gray-500 sm:text-sm">{selectedAnswer ? '✓ Answer selected' : 'Select an answer to continue'}</div>
             <motion.button
               whileHover={{ scale: selectedAnswer ? 1.05 : 1 }}
               whileTap={{ scale: selectedAnswer ? 0.95 : 1 }}
               onClick={handleNext}
               disabled={!selectedAnswer}
-              className={`glass-button font-semibold py-3 px-6 sm:px-8 lg:px-10 rounded-full transition-all duration-300 ${
+              className={`glass-button rounded-full py-3 px-6 font-semibold transition-all duration-300 sm:px-8 lg:px-10 ${
                 selectedAnswer
-                  ? 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl cursor-pointer border-blue-300'
-                  : 'bg-gray-200/50 text-gray-400 cursor-not-allowed border-gray-300'
+                  ? 'cursor-pointer border-blue-300 bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg hover:from-blue-600 hover:to-indigo-700 hover:shadow-xl'
+                  : 'cursor-not-allowed border-gray-300 bg-gray-200/50 text-gray-400'
               }`}
             >
               {isLastQuestion ? '🏁 Finish Quiz' : '➡️ Next Question'}
@@ -406,13 +402,11 @@ const Quiz = ({ questions }: QuizProps) => {
           border: 1px solid rgba(209, 213, 219, 0.3);
           box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
         }
-
         .glass-card {
           background: rgba(255, 255, 255, 0.6);
           backdrop-filter: blur(10px);
           border: 1px solid rgba(209, 213, 219, 0.2);
         }
-
         .glass-button {
           backdrop-filter: blur(10px);
           border: 1px solid rgba(209, 213, 219, 0.3);
