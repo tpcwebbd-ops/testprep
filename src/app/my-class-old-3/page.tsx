@@ -11,7 +11,7 @@ import { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { isSameDay } from 'date-fns';
 
-// import CourseHeader from './course-header';
+import CourseHeader from './course-header';
 import { allCourseData, ClassItem } from './course-data';
 import CoursePlaylist, { AttendanceRecord } from './course-playlist';
 import VideoPlayer from './video-player';
@@ -41,15 +41,15 @@ const Page = () => {
       const savedPhase = (localStorage.getItem('todaysPhase') as typeof phase) || 'LECTURE_IN_PROGRESS';
       setPhase(savedPhase);
 
-      // const lecture = allLectures.find(l => l.id === todaysRecord.lectureId) || null;
-      // setTodaysLecture(lecture);
-      // setSelectedContent(lecture);
+      const lecture = allLectures.find(l => l.id === todaysRecord.lectureId) || null;
+      setTodaysLecture(lecture);
+      setSelectedContent(lecture);
     }
 
     // Update unlocked lectures based on all attendance records
-    // const unlocked = allLectures.filter(lecture => savedAttendance.some(record => record.lectureId === lecture.id));
-    // console.log('allLectures ', allLectures);
-    // setUnlockedLectures(unlocked);
+    const unlocked = allLectures.filter(lecture => savedAttendance.some(record => record.lectureId === lecture.id));
+    console.log('allLectures ', allLectures);
+    setUnlockedLectures(unlocked);
   }, []);
 
   const updateLocalStorage = (newAttendance: AttendanceRecord[], newPhase: typeof phase) => {
@@ -117,7 +117,7 @@ const Page = () => {
   return (
     <main className="min-h-screen bg-gray-100 p-4 sm:p-6 lg:p-8">
       <div className="mx-auto max-w-7xl">
-        {/* <CourseHeader title="IELTS SPOKEN" /> */}
+        <CourseHeader title="IELTS SPOKEN" />
         <div className="mt-8">
           {phase === 'ATTENDANCE_PENDING' ? (
             <AttendancePrompt onAttend={handleAttendanceSubmit} />
@@ -138,6 +138,7 @@ const Page = () => {
               </div>
               <div className="lg:col-span-1">
                 <CoursePlaylist
+                  unlockedLectures={unlockedLectures}
                   todaysLecture={todaysLecture}
                   onSelectContent={handleSelectContent}
                   selectedContentId={selectedContent?.id || 0}

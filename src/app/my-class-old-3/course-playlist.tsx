@@ -21,6 +21,7 @@ export interface AttendanceRecord {
 }
 
 interface CoursePlaylistProps {
+  unlockedLectures: ClassItem[];
   todaysLecture: ClassItem | null;
   onSelectContent: (content: ClassItem) => void;
   selectedContentId: number;
@@ -29,12 +30,12 @@ interface CoursePlaylistProps {
   onNextLecture: () => void;
 }
 
-const CoursePlaylist = ({ todaysLecture, onSelectContent, selectedContentId, phase, attendance, onNextLecture }: CoursePlaylistProps) => {
+const CoursePlaylist = ({ unlockedLectures, todaysLecture, onSelectContent, selectedContentId, phase, attendance, onNextLecture }: CoursePlaylistProps) => {
   // We will assume the course data is structured into one course for this example
   const course = allCourseData[0];
   console.log('course : ', course);
-  const allCourseLectures = allCourseData;
-  allCourseLectures.length = 4;
+  console.log('unlockedLectures : ', unlockedLectures);
+
   return (
     <div className="w-full rounded-lg bg-white p-2 shadow-md md:p-4">
       {todaysLecture && (
@@ -47,46 +48,41 @@ const CoursePlaylist = ({ todaysLecture, onSelectContent, selectedContentId, pha
       )}
 
       <ScrollArea className="h-[500px] w-full rounded-md border p-4">
-        <h2 className="mb-4 text-lg font-bold text-gray-800">Course Content</h2>
-        {allCourseData.map(currentCourse => (
-          <div className="py-2" key={currentCourse.id}>
-            <Accordion type="single" collapsible defaultValue="item-1" className="w-full">
-              <AccordionItem value="item-1" className="mb-2 rounded-lg border bg-slate-50 px-4 last:mb-0">
-                <AccordionTrigger className="text-lg font-semibold text-gray-800 hover:no-underline">{currentCourse.title}</AccordionTrigger>
-                <AccordionContent>
-                  <div className="mb-4 flex justify-between border-b pb-2 text-sm text-gray-500">
-                    <span>Task: 5</span>
-                    <span>Duration: 1 Hours 5 minutes</span>
-                  </div>
-                  <ul className="space-y-2">
-                    {currentCourse.classList.map((item, index) => (
-                      <motion.li
-                        key={item.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.3, delay: index * 0.05 }}
-                        onClick={() => onSelectContent(item)}
-                        className={`flex cursor-pointer items-center justify-between rounded-md p-3 transition-all duration-200 ${
-                          selectedContentId === item.id ? 'bg-blue-500 text-white' : 'bg-gray-100 hover:bg-blue-100'
-                        }`}
-                      >
-                        <div className="flex items-center">
-                          {phase === 'LECTURE_COMPLETED' && todaysLecture?.id === item.id ? (
-                            <CheckCircle className="mr-2 h-5 w-5 text-green-500" />
-                          ) : (
-                            <PlayCircle className="mr-2 h-5 w-5" />
-                          )}
-                          <span className="font-semibold">{item.title}</span>
-                        </div>
-                        <span className="text-xs">{item.duration}</span>
-                      </motion.li>
-                    ))}
-                  </ul>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-          </div>
-        ))}
+        <Accordion type="single" collapsible defaultValue="item-1" className="w-full">
+          <AccordionItem value="item-1" className="mb-2 rounded-lg border bg-slate-50 px-4 last:mb-0">
+            <AccordionTrigger className="text-lg font-semibold text-gray-800 hover:no-underline">{course.title}</AccordionTrigger>
+            <AccordionContent>
+              <div className="mb-4 flex justify-between border-b pb-2 text-sm text-gray-500">
+                <span>{unlockedLectures.length} Unlocked Classes</span>
+                {/* Duration can be calculated based on unlocked lectures if needed */}
+              </div>
+              <ul className="space-y-2">
+                {unlockedLectures.map((item, index) => (
+                  <motion.li
+                    key={item.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.05 }}
+                    onClick={() => onSelectContent(item)}
+                    className={`flex cursor-pointer items-center justify-between rounded-md p-3 transition-all duration-200 ${
+                      selectedContentId === item.id ? 'bg-blue-500 text-white' : 'bg-gray-100 hover:bg-blue-100'
+                    }`}
+                  >
+                    <div className="flex items-center">
+                      {phase === 'LECTURE_COMPLETED' && todaysLecture?.id === item.id ? (
+                        <CheckCircle className="mr-2 h-5 w-5 text-green-500" />
+                      ) : (
+                        <PlayCircle className="mr-2 h-5 w-5" />
+                      )}
+                      <span className="font-semibold">{item.title}</span>
+                    </div>
+                    <span className="text-xs">{item.duration}</span>
+                  </motion.li>
+                ))}
+              </ul>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </ScrollArea>
 
       <div className="mt-4 flex flex-col items-center gap-4">
