@@ -8,12 +8,6 @@
 'use client';
 
 import { useState } from 'react';
-// import CourseHeader from './class/course-header';
-// import VideoPlayer from './class/video-player';
-// import CoursePlaylist from './class/course-playlist';
-// import ModalContent from './class/modal-content';
-// import Quiz from './class/quiz';
-// import { courseData } from './class/course-data';
 import { AnimatePresence } from 'framer-motion';
 import CourseHeader from './course-header';
 import { courseData } from './course-data';
@@ -48,6 +42,8 @@ const Page = () => {
     setSelectedContent(content);
   };
 
+  const onPrevious = () => {};
+  const onNext = () => {};
   return (
     <main className="min-h-screen bg-gray-100 p-4 sm:p-6 lg:p-8">
       <div className="mx-auto max-w-7xl">
@@ -55,7 +51,9 @@ const Page = () => {
         <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <AnimatePresence mode="wait">
-              {selectedContent.type === 'video' && selectedContent.videoUrl && <VideoPlayer videoUrl={selectedContent.videoUrl} />}
+              {selectedContent.type === 'video' && selectedContent.videoUrl && (
+                <VideoPlayer videoUrl={selectedContent.videoUrl} onNext={onNext} onPrevious={onPrevious} />
+              )}
               {selectedContent.type === 'modal' && selectedContent.modelCentent && <ModalContent content={selectedContent.modelCentent} />}
               {selectedContent.type === 'Questions' && selectedContent.questionsData && <Quiz questions={selectedContent.questionsData} />}
             </AnimatePresence>

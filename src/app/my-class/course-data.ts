@@ -113,6 +113,46 @@ export const courseData: Course[] = [
     duration: totalDuration,
     classList: classList, // The list is now correctly placed here
   },
-  // You could add more courses here in the future
-  // { id: 2, title: "Lecture 2 Advanced Grammar", ... }
+  {
+    id: 2,
+    title: 'Lecture 2 Mid Spoken',
+    totalClass: totalClasses,
+    duration: totalDuration,
+    classList: classList, // The list is now correctly placed here
+  },
+  {
+    id: 3,
+    title: 'Lecture 3 Advanced Spoken',
+    totalClass: totalClasses,
+    duration: totalDuration,
+    classList: classList, // The list is now correctly placed here
+  },
+  {
+    id: 4,
+    title: 'Lecture 4 Practice 1 Spoken',
+    totalClass: totalClasses,
+    duration: totalDuration,
+    classList: classList, // The list is now correctly placed here
+  },
+  {
+    id: 5,
+    title: 'Lecture 5 Practice 2 Spoken',
+    totalClass: totalClasses,
+    duration: totalDuration,
+    classList: classList, // The list is now correctly placed here
+  },
+  {
+    id: 6,
+    title: 'Lecture 6 Practice 3 Spoken',
+    totalClass: totalClasses,
+    duration: totalDuration,
+    classList: classList, // The list is now correctly placed here
+  },
+  {
+    id: 7,
+    title: 'Lecture 7 Practice 4 Spoken',
+    totalClass: totalClasses,
+    duration: totalDuration,
+    classList: classList, // The list is now correctly placed here
+  },
 ];
