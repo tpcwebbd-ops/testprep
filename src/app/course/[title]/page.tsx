@@ -376,7 +376,7 @@ const CourseDetailsComponent: React.FC<{ course: Course }> = ({ course }) => {
 // Main API fetch function
 const getCourseByTitle = async (title: string): Promise<ApiResponse> => {
   const updateTitle = title.replaceAll('-', ' ');
-  const backendUrl = `http://localhost:3000/dashboard/course/all/api/by-course-name?coursename=${updateTitle}`;
+  const backendUrl = `https://testprep-bd.vercel.app/dashboard/course/all/api/by-course-name?coursename=${updateTitle}`;
 
   try {
     const res = await fetch(backendUrl, { next: { revalidate: 3600 } });

@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { PlayCircle, CheckCircle } from 'lucide-react';
-import { useStore, AttendanceRecord } from './store';
+import { useStore } from './store';
 
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';

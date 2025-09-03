@@ -10,13 +10,112 @@ const Quiz = () => {
 
   const questions = selectedContent?.questionsData || [];
 
+  // Function to generate and download the PDF report
   const handleDownloadReport = async () => {
-    // This function can now directly use 'userAnswers' and 'questions' from the store
-    // ... (rest of the function remains the same)
+    try {
+      const score = userAnswers.filter(answer => answer.isCorrect).length;
+      const percentage = Math.round((score / questions.length) * 100);
+
+      // Create PDF content using jsPDF
+      const { jsPDF } = await import('jspdf');
+      const doc = new jsPDF();
+
+      // Set fonts and colors
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(20);
+      doc.setTextColor(34, 34, 34);
+
+      // Title
+      doc.text('Quiz Report', 20, 30);
+
+      // Score summary
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Final Score: ${score} out of ${questions.length} (${percentage}%)`, 20, 50);
+      doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 60);
+
+      // Draw a line
+      doc.setDrawColor(200, 200, 200);
+      doc.line(20, 70, 190, 70);
+
+      let yPosition = 85;
+
+      // Questions and answers
+      questions.forEach((question, index) => {
+        const userAnswer = userAnswers[index];
+
+        // Check if we need a new page
+        if (yPosition > 250) {
+          doc.addPage();
+          yPosition = 20;
+        }
+
+        // Question number and text
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(12);
+        doc.text(`Question ${index + 1}:`, 20, yPosition);
+        yPosition += 8;
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        const questionLines = doc.splitTextToSize(question.question, 170);
+        doc.text(questionLines, 20, yPosition);
+        yPosition += questionLines.length * 5 + 5;
+
+        // User's answer
+        if (userAnswer.isCorrect) {
+          doc.setTextColor(34, 139, 34);
+        } else {
+          doc.setTextColor(220, 20, 60);
+        }
+        // doc.setTextColor(userAnswer.isCorrect ? 34, 139, 34 : 220, 20, 60);
+        doc.text(`Your Answer: ${userAnswer.selectedOption} ${userAnswer.isCorrect ? '✓' : '✗'}`, 20, yPosition);
+        yPosition += 8;
+
+        // Correct answer if wrong
+        if (!userAnswer.isCorrect) {
+          doc.setTextColor(34, 139, 34);
+          doc.text(`Correct Answer: ${userAnswer.correctAnswer}`, 20, yPosition);
+          yPosition += 8;
+        }
+
+        doc.setTextColor(34, 34, 34);
+        yPosition += 5;
+      });
+
+      // Save the PDF
+      doc.save('quiz-report.pdf');
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      // Fallback to text download if PDF fails
+      handleDownloadTextReport();
+    }
   };
 
+  // Fallback function for text download
   const handleDownloadTextReport = () => {
-    // ... (rest of the function remains the same)
+    const score = userAnswers.filter(answer => answer.isCorrect).length;
+    let reportContent = `Quiz Report\n`;
+    reportContent += `Final Score: ${score} out of ${questions.length}\n`;
+    reportContent += `Date: ${new Date().toLocaleDateString()}\n`;
+    reportContent += `----------------------------------------\n\n`;
+
+    questions.forEach((question, index) => {
+      const userAnswer = userAnswers[index];
+      reportContent += `Question ${index + 1}: ${question.question}\n`;
+      reportContent += `Your Answer: ${userAnswer.selectedOption} ${userAnswer.isCorrect ? '(Correct)' : '(Incorrect)'}\n`;
+      reportContent += `Correct Answer: ${userAnswer.correctAnswer}\n\n`;
+    });
+
+    const blob = new Blob([reportContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'quiz-report.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   // --- Quiz Completed View ---
