@@ -6,9 +6,6 @@
 |-----------------------------------------
 */
 
-// --- 1. Define the Types for our Data ---
-// This makes our data structure predictable and safe to use anywhere in the app.
-
 export interface Question {
   id: number;
   question: string;
@@ -21,9 +18,9 @@ export interface ClassItem {
   title: string;
   duration: string;
   type: 'modal' | 'video' | 'Questions';
-  modelCentent?: string; // Optional property
-  videoUrl?: string; // Optional property
-  questionsData?: Question[]; // Optional property
+  modelCentent?: string;
+  videoUrl?: string;
+  questionsData?: Question[];
 }
 
 export interface Course {
@@ -31,13 +28,12 @@ export interface Course {
   title: string;
   totalClass: number;
   duration: string;
-  classList: ClassItem[]; // Renamed for clarity
+  classList: ClassItem[];
 }
 
 export const calculateTotalVideoDuration = (classList: ClassItem[]): string => {
-  // Use reduce to sum the total seconds from all video items
   const totalSeconds = classList
-    .filter(item => item.type === 'video' && item.duration) // Filter for video types with a duration
+    .filter(item => item.type === 'video' && item.duration)
     .reduce((accumulator, currentItem) => {
       const timeParts = currentItem.duration.split(':').map(Number);
       const minutes = timeParts[0] || 0;
@@ -49,12 +45,10 @@ export const calculateTotalVideoDuration = (classList: ClassItem[]): string => {
     return '0 minutes';
   }
 
-  // Convert total seconds to hours and minutes
   const totalMinutes = Math.floor(totalSeconds / 60);
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
 
-  // Build the formatted output string
   const parts: string[] = [];
   if (hours > 0) {
     parts.push(`${hours} Hour${hours > 1 ? 's' : ''}`);
@@ -66,14 +60,11 @@ export const calculateTotalVideoDuration = (classList: ClassItem[]): string => {
   return parts.join(' ');
 };
 
-// --- 2. Define the list of classes first ---
-// This is the actual "playlist" of lessons for the course.
 const classList: ClassItem[] = [
   {
     id: 1,
     title: '1-1 Introduction',
     duration: '02:30',
-    // Corrected the unclosed <strong> tag
     modelCentent: '<strong>Carefull</strong> <h2>Todays Topic: Spoken</h2> <p>some text</p>',
     type: 'modal',
   },
@@ -130,61 +121,57 @@ const classList: ClassItem[] = [
   },
 ];
 
-// --- 3. Calculate dynamic values from the data ---
-// Now that classList is defined, we can safely use it.
 const totalClasses = classList.length;
 const totalDuration = calculateTotalVideoDuration(classList);
 
-// --- 4. Export the final, correctly structured course data ---
-// This is the main object you will import into your components.
 export const courseData: Course[] = [
   {
     id: 1,
     title: 'Lecture 1 Basic Spoken',
     totalClass: totalClasses,
     duration: totalDuration,
-    classList: classList, // The list is now correctly placed here
+    classList: classList,
   },
   {
     id: 2,
     title: 'Lecture 2 Mid Spoken',
     totalClass: totalClasses,
     duration: totalDuration,
-    classList: classList, // The list is now correctly placed here
+    classList: classList,
   },
   {
     id: 3,
     title: 'Lecture 3 Advanced Spoken',
     totalClass: totalClasses,
     duration: totalDuration,
-    classList: classList, // The list is now correctly placed here
+    classList: classList,
   },
   {
     id: 4,
     title: 'Lecture 4 Practice 1 Spoken',
     totalClass: totalClasses,
     duration: totalDuration,
-    classList: classList, // The list is now correctly placed here
+    classList: classList,
   },
   {
     id: 5,
     title: 'Lecture 5 Practice 2 Spoken',
     totalClass: totalClasses,
     duration: totalDuration,
-    classList: classList, // The list is now correctly placed here
+    classList: classList,
   },
   {
     id: 6,
     title: 'Lecture 6 Practice 3 Spoken',
     totalClass: totalClasses,
     duration: totalDuration,
-    classList: classList, // The list is now correctly placed here
+    classList: classList,
   },
   {
     id: 7,
     title: 'Lecture 7 Practice 4 Spoken',
     totalClass: totalClasses,
     duration: totalDuration,
-    classList: classList, // The list is now correctly placed here
+    classList: classList,
   },
 ];

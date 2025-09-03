@@ -49,7 +49,6 @@ const VideoPlayer = ({ videoUrl, onPrevious, onNext }: VideoPlayerProps) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const playerContainerRef = useRef<HTMLDivElement>(null);
 
-  // Effect for the email popup
   useEffect(() => {
     const interval = setInterval(() => {
       const top = `${Math.random() * 80 + 10}%`;
@@ -60,7 +59,6 @@ const VideoPlayer = ({ videoUrl, onPrevious, onNext }: VideoPlayerProps) => {
     return () => clearInterval(interval);
   }, [videoUrl]);
 
-  // Effect to handle fullscreen changes
   useEffect(() => {
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement);

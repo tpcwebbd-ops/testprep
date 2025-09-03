@@ -35,7 +35,7 @@ export type Question = {
 
 const Page = () => {
   const [selectedContent, setSelectedContent] = useState<ClassItem>(
-    courseData[0].classList[1], // Default to the first video
+    courseData[0].classList[1],
   );
 
   const handleSelectContent = (content: ClassItem) => {

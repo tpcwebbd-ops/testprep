@@ -9,9 +9,8 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Question } from './page'; // Adjust path if needed
+import { Question } from './page';
 
-// Define a type for storing the user's answers for better type safety
 type UserAnswer = {
   questionId: number;
   selectedOption: string;
@@ -19,7 +18,6 @@ type UserAnswer = {
   isCorrect: boolean;
 };
 
-// Props for the Quiz component
 interface QuizProps {
   questions: Question[];
 }
@@ -30,11 +28,9 @@ const Quiz = ({ questions }: QuizProps) => {
   const [userAnswers, setUserAnswers] = useState<UserAnswer[]>([]);
   const [isCompleted, setIsCompleted] = useState(false);
 
-  // This function now handles moving to the next question or finishing the quiz
   const handleNext = () => {
-    if (selectedAnswer === null) return; // Don't proceed without an answer
+    if (selectedAnswer === null) return;
 
-    // Record the user's answer
     const currentQuestion = questions[currentQuestionIndex];
     setUserAnswers([
       ...userAnswers,
@@ -46,59 +42,47 @@ const Quiz = ({ questions }: QuizProps) => {
       },
     ]);
 
-    // Reset selected answer for the next question
     setSelectedAnswer(null);
 
-    // Check if it's the last question
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
-      // All questions are answered, show the results view
       setIsCompleted(true);
     }
   };
 
-  // Function to generate and download the PDF report
   const handleDownloadReport = async () => {
     try {
       const score = userAnswers.filter(answer => answer.isCorrect).length;
       const percentage = Math.round((score / questions.length) * 100);
 
-      // Create PDF content using jsPDF
       const { jsPDF } = await import('jspdf');
       const doc = new jsPDF();
 
-      // Set fonts and colors
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(20);
       doc.setTextColor(34, 34, 34);
 
-      // Title
       doc.text('Quiz Report', 20, 30);
 
-      // Score summary
       doc.setFontSize(14);
       doc.setFont('helvetica', 'normal');
       doc.text(`Final Score: ${score} out of ${questions.length} (${percentage}%)`, 20, 50);
       doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 60);
 
-      // Draw a line
       doc.setDrawColor(200, 200, 200);
       doc.line(20, 70, 190, 70);
 
       let yPosition = 85;
 
-      // Questions and answers
       questions.forEach((question, index) => {
         const userAnswer = userAnswers[index];
 
-        // Check if we need a new page
         if (yPosition > 250) {
           doc.addPage();
           yPosition = 20;
         }
 
-        // Question number and text
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(12);
         doc.text(`Question ${index + 1}:`, 20, yPosition);
@@ -110,17 +94,15 @@ const Quiz = ({ questions }: QuizProps) => {
         doc.text(questionLines, 20, yPosition);
         yPosition += questionLines.length * 5 + 5;
 
-        // User's answer
         if (userAnswer.isCorrect) {
           doc.setTextColor(34, 139, 34);
         } else {
           doc.setTextColor(220, 20, 60);
         }
-        // doc.setTextColor(userAnswer.isCorrect ? 34, 139, 34 : 220, 20, 60);
+
         doc.text(`Your Answer: ${userAnswer.selectedOption} ${userAnswer.isCorrect ? '✓' : '✗'}`, 20, yPosition);
         yPosition += 8;
 
-        // Correct answer if wrong
         if (!userAnswer.isCorrect) {
           doc.setTextColor(34, 139, 34);
           doc.text(`Correct Answer: ${userAnswer.correctAnswer}`, 20, yPosition);
@@ -131,16 +113,14 @@ const Quiz = ({ questions }: QuizProps) => {
         yPosition += 5;
       });
 
-      // Save the PDF
       doc.save('quiz-report.pdf');
     } catch (error) {
       console.error('Error generating PDF:', error);
-      // Fallback to text download if PDF fails
+
       handleDownloadTextReport();
     }
   };
 
-  // Fallback function for text download
   const handleDownloadTextReport = () => {
     const score = userAnswers.filter(answer => answer.isCorrect).length;
     let reportContent = `Quiz Report\n`;
@@ -173,7 +153,6 @@ const Quiz = ({ questions }: QuizProps) => {
     setIsCompleted(false);
   };
 
-  // Render the Results View when the quiz is completed
   if (isCompleted) {
     const score = userAnswers.filter(answer => answer.isCorrect).length;
     const percentage = Math.round((score / questions.length) * 100);
@@ -186,7 +165,6 @@ const Quiz = ({ questions }: QuizProps) => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             className="glass-effect rounded-2xl p-6 sm:p-8 lg:p-10"
           >
-            {/* Results Header */}
             <div className="text-center mb-8">
               <motion.div
                 initial={{ scale: 0 }}
@@ -215,7 +193,6 @@ const Quiz = ({ questions }: QuizProps) => {
               </motion.div>
             </div>
 
-            {/* Progress Ring */}
             <div className="flex justify-center mb-8">
               <div className="relative w-32 h-32 sm:w-40 sm:h-40">
                 <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
@@ -246,7 +223,6 @@ const Quiz = ({ questions }: QuizProps) => {
               </div>
             </div>
 
-            {/* Detailed Results */}
             <div className="mb-8 max-h-72 sm:max-h-80 lg:max-h-96 space-y-4 overflow-y-auto pr-2 custom-scrollbar">
               <AnimatePresence>
                 {questions.map((question, index) => {
@@ -272,7 +248,6 @@ const Quiz = ({ questions }: QuizProps) => {
               </AnimatePresence>
             </div>
 
-            {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -335,7 +310,6 @@ const Quiz = ({ questions }: QuizProps) => {
     );
   }
 
-  // Render the Question View while the quiz is in progress
   const currentQuestion = questions[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === questions.length - 1;
   const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
@@ -344,7 +318,6 @@ const Quiz = ({ questions }: QuizProps) => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 p-3 sm:p-6 lg:p-8">
       <div className="mx-auto max-w-2xl lg:max-w-4xl">
         <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} className="glass-effect rounded-2xl p-6 sm:p-8 lg:p-10">
-          {/* Progress Header */}
           <div className="mb-6 sm:mb-8">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
               <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent">
@@ -355,7 +328,6 @@ const Quiz = ({ questions }: QuizProps) => {
               </div>
             </div>
 
-            {/* Enhanced Progress Bar */}
             <div className="relative h-3 sm:h-4 w-full rounded-full bg-gray-200/50 backdrop-blur-sm overflow-hidden">
               <motion.div
                 className="h-full rounded-full bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600 shadow-lg"
@@ -368,7 +340,6 @@ const Quiz = ({ questions }: QuizProps) => {
             <p className="text-xs sm:text-sm text-gray-500 mt-2 text-right">{Math.round(progress)}% Complete</p>
           </div>
 
-          {/* Question Card */}
           <motion.div
             key={currentQuestionIndex}
             initial={{ opacity: 0, x: 50 }}
@@ -379,7 +350,6 @@ const Quiz = ({ questions }: QuizProps) => {
             <p className="text-base sm:text-lg lg:text-xl text-gray-800 font-medium leading-relaxed">{currentQuestion.question}</p>
           </motion.div>
 
-          {/* Options */}
           <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
             <AnimatePresence>
               {currentQuestion.options.map((option, index) => (
@@ -410,7 +380,6 @@ const Quiz = ({ questions }: QuizProps) => {
             </AnimatePresence>
           </div>
 
-          {/* Navigation */}
           <div className="flex justify-between items-center">
             <div className="text-gray-500 text-xs sm:text-sm">{selectedAnswer ? '✓ Answer selected' : 'Select an answer to continue'}</div>
             <motion.button

@@ -14,7 +14,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Course, ClassItem } from './course-data';
 
-// Helper to check if two dates are the same day
 const isSameDay = (date1: Date, date2: Date) => {
   return date1.getFullYear() === date2.getFullYear() && date1.getMonth() === date2.getMonth() && date1.getDate() === date2.getDate();
 };
@@ -36,7 +35,6 @@ const CoursePlaylist = ({ courseData, onSelectContent, selectedContentId }: Cour
   const [todaysLecture, setTodaysLecture] = useState<ClassItem | null>(null);
   const [taskCompleted, setTaskCompleted] = useState(false);
 
-  // Load attendance and task completion status from localStorage on initial render
   useEffect(() => {
     const savedAttendance = localStorage.getItem('attendance');
     const today = new Date();
@@ -61,7 +59,6 @@ const CoursePlaylist = ({ courseData, onSelectContent, selectedContentId }: Cour
     }
   }, [courseData, onSelectContent]);
 
-  // Update localStorage when attendance changes
   useEffect(() => {
     localStorage.setItem('attendance', JSON.stringify(attendance));
   }, [attendance]);
@@ -90,7 +87,6 @@ const CoursePlaylist = ({ courseData, onSelectContent, selectedContentId }: Cour
 
   return (
     <div className="w-full rounded-lg bg-white p-2 shadow-md md:p-4">
-      {/* Phase 1: Attendance Not Submitted */}
       {!todaysLecture && (
         <div className="mb-4 text-center">
           <button onClick={handleAttendanceClick} className="rounded-lg bg-blue-500 px-4 py-2 text-white transition-all hover:bg-blue-600">
@@ -99,20 +95,17 @@ const CoursePlaylist = ({ courseData, onSelectContent, selectedContentId }: Cour
         </div>
       )}
 
-      {/* Phases 2 & 3: Attendance Submitted */}
       {todaysLecture && (
         <>
-          {/* Phase 2: Lecture Not Completed */}
           {!taskCompleted && (
             <div className="mb-4 rounded-lg border bg-blue-50 p-4">
-              <h3 className="text-lg font-semibold text-blue-800">Today's Lecture: {todaysLecture.title}</h3>
+              <h3 className="text-lg font-semibold text-blue-800">Today&apos;s Lecture: {todaysLecture.title}</h3>
               <button onClick={handleMarkAsComplete} className="mt-2 rounded bg-green-500 px-3 py-1 text-sm text-white hover:bg-green-600">
                 Mark as Complete
               </button>
             </div>
           )}
 
-          {/* Phase 3: Lecture Completed */}
           {taskCompleted && (
             <div className="mb-4 rounded-lg border bg-green-100 p-4 text-center">
               <p className="font-semibold text-green-800">You have finished all tasks for today.</p>
