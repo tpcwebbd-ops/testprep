@@ -34,6 +34,38 @@ export interface Course {
   classList: ClassItem[]; // Renamed for clarity
 }
 
+export const calculateTotalVideoDuration = (classList: ClassItem[]): string => {
+  // Use reduce to sum the total seconds from all video items
+  const totalSeconds = classList
+    .filter(item => item.type === 'video' && item.duration) // Filter for video types with a duration
+    .reduce((accumulator, currentItem) => {
+      const timeParts = currentItem.duration.split(':').map(Number);
+      const minutes = timeParts[0] || 0;
+      const seconds = timeParts[1] || 0;
+      return accumulator + minutes * 60 + seconds;
+    }, 0);
+
+  if (totalSeconds === 0) {
+    return '0 minutes';
+  }
+
+  // Convert total seconds to hours and minutes
+  const totalMinutes = Math.floor(totalSeconds / 60);
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+
+  // Build the formatted output string
+  const parts: string[] = [];
+  if (hours > 0) {
+    parts.push(`${hours} Hour${hours > 1 ? 's' : ''}`);
+  }
+  if (minutes > 0) {
+    parts.push(`${minutes} minute${minutes > 1 ? 's' : ''}`);
+  }
+
+  return parts.join(' ');
+};
+
 // --- 2. Define the list of classes first ---
 // This is the actual "playlist" of lessons for the course.
 const classList: ClassItem[] = [
@@ -101,7 +133,7 @@ const classList: ClassItem[] = [
 // --- 3. Calculate dynamic values from the data ---
 // Now that classList is defined, we can safely use it.
 const totalClasses = classList.length;
-const totalDuration = 'N/A'; // You can implement a function to calculate this later
+const totalDuration = calculateTotalVideoDuration(classList);
 
 // --- 4. Export the final, correctly structured course data ---
 // This is the main object you will import into your components.

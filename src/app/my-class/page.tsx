@@ -43,7 +43,8 @@ const Page = () => {
   };
 
   const onPrevious = () => {};
-  const onNext = () => {};
+  const onNext = () => { };
+  
   return (
     <main className="min-h-screen bg-gray-100 p-4 sm:p-6 lg:p-8">
       <div className="mx-auto max-w-7xl">
