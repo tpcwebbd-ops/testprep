@@ -179,6 +179,18 @@ export const sidebarDataHome: SIDEBARTYPE[] = [
     ],
   },
   {
+    id: 10008001,
+    name: 'My Students',
+    icon: iconMdOutlineLaptopChromebook,
+    content: [
+      { id: 1000801001, name: 'All', link: '/dashboard/my-students/all', icon: iconDiGhostSmall },
+      { id: 1000802002, name: 'Active', link: '/dashboard/my-students/active', icon: iconVscVmActive },
+      { id: 1000803003, name: 'Inactive', link: '/dashboard/my-students/inactive', icon: iconBsTerminalDash },
+      { id: 1000804004, name: 'Finished', link: '/dashboard/my-students/finished', icon: iconMdOutlineCloudDone },
+      { id: 1000805005, name: 'Expired', link: '/dashboard/my-students/expired', icon: iconRiPassExpiredLine },
+    ],
+  },
+  {
     id: 10009,
     name: 'My Profile',
     icon: iconImProfile,

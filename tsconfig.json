@@ -22,6 +22,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/dashboard/finance/all/api/v1/overview/rr", "src/app/my-class/page-prmpt.text"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/dashboard/finance/all/api/v1/overview/rr", "src/app/my-class/page-prmpt.text", ".note/prompt/base/dashboard/dashboard-prompt.text"],
   "exclude": ["node_modules"]
 }

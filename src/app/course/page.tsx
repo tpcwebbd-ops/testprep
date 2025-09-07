@@ -67,7 +67,7 @@ async function getCourses(): Promise<Course[]> {
   try {
     // In a real application, you would replace 'localhost' with your actual domain.
     // The `cache: 'no-store'` option ensures that the data is fetched fresh for each request (SSR).
-    const res = await fetch('https://testprep-bd.vercel.app/dashboard/course/all/api/v1', {
+    const res = await fetch(`${process.env.projectURL}/dashboard/course/all/api/v1`, {
       cache: 'no-store',
     });
 

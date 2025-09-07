@@ -53,7 +53,7 @@ const AddUserFromSearch: React.FC = () => {
         setIsLoading(true);
         try {
           // 1. Fetch data from the user API
-          const response = await fetch(`https://testprep-bd.vercel.app/dashboard/users/all/api/v1?q=${searchQuery}`);
+          const response = await fetch(`${process.env.projectURL}/dashboard/users/all/api/v1?q=${searchQuery}`);
           if (!response.ok) {
             throw new Error('Network response was not ok');
           }

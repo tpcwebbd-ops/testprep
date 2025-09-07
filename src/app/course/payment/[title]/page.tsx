@@ -51,7 +51,7 @@ interface ApiResponse {
 // Main API fetch function
 const getCourseByTitle = async (title: string): Promise<ApiResponse> => {
   const updateTitle = title?.replaceAll('-', ' ');
-  const backendUrl = `https://testprep-bd.vercel.app/dashboard/course/all/api/by-course-name?coursename=${updateTitle}`;
+  const backendUrl = `${process.env.projectURL}/dashboard/course/all/api/by-course-name?coursename=${updateTitle}`;
 
   try {
     const res = await fetch(backendUrl, { next: { revalidate: 3600 } });
