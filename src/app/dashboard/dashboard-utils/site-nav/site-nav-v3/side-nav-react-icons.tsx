@@ -41,7 +41,9 @@ import { VscVmActive } from 'react-icons/vsc';
 import { BsTerminalDash } from 'react-icons/bs';
 import { MdOutlineCloudDone } from 'react-icons/md';
 import { RiPassExpiredLine } from 'react-icons/ri';
+import { ImProfile } from 'react-icons/im';
 
+const iconImProfile = <ImProfile />;
 const iconRiPassExpiredLine = <RiPassExpiredLine />;
 const iconMdOutlineCloudDone = <MdOutlineCloudDone />;
 const iconBsTerminalDash = <BsTerminalDash />;
@@ -81,6 +83,7 @@ const iconRiContactsBook3Line = <RiContactsBook3Line />;
 const iconMdOutlinePrivacyTip = <MdOutlinePrivacyTip />;
 const iconMdOutlinePolicy = <MdOutlinePolicy />;
 export {
+  iconImProfile,
   iconRiPassExpiredLine,
   iconMdOutlineCloudDone,
   iconBsTerminalDash,

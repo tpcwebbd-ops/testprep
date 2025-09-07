@@ -44,6 +44,7 @@ import {
   iconBsTerminalDash,
   iconMdOutlineCloudDone,
   iconRiPassExpiredLine,
+  iconImProfile,
 } from '../site-nav-v3/side-nav-react-icons';
 
 export type LINKTYPE = {
@@ -163,5 +164,11 @@ export const sidebarDataHome: SIDEBARTYPE[] = [
       { id: 1000804, name: 'Finished', link: '/dashboard/my-course/finished', icon: iconMdOutlineCloudDone },
       { id: 1000805, name: 'Expired', link: '/dashboard/my-course/expired', icon: iconRiPassExpiredLine },
     ],
+  },
+  {
+    id: 10009,
+    name: 'My Profile',
+    icon: iconImProfile,
+    content: [{ id: 1000901, name: 'Profile', link: '/dashboard/my-profile', icon: iconImProfile }],
   },
 ];
