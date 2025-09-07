@@ -6,6 +6,6 @@
 |-----------------------------------------
 */
 const Page = () => {
-  return <main>All Batch Page</main>;
+  return <main>All Page</main>;
 };
 export default Page;
