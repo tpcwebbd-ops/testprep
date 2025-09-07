@@ -45,6 +45,7 @@ import {
   iconMdOutlineCloudDone,
   iconRiPassExpiredLine,
   iconImProfile,
+  iconVscSymbolClass,
 } from '../site-nav-v3/side-nav-react-icons';
 
 export type LINKTYPE = {
@@ -100,6 +101,18 @@ export const sidebarDataHome: SIDEBARTYPE[] = [
       { id: 1000301, name: 'All', link: '/dashboard/course/all', icon: iconBiCategory },
       { id: 1000302, name: 'IELTS', link: '/dashboard/course/ielts', icon: iconBiCategory },
       { id: 1000303, name: 'Spoken', link: '/dashboard/course/spoken', icon: iconBiCategory },
+    ],
+  },
+  {
+    id: 10003001,
+    name: 'Batch',
+    icon: iconVscSymbolClass,
+    content: [
+      { id: 1000300101, name: 'All', link: '/dashboard/batch/all', icon: iconVscSymbolClass },
+      { id: 1000300102, name: 'Running', link: '/dashboard/batch/running', icon: iconVscSymbolClass },
+      { id: 1000300103, name: 'Up Comming', link: '/dashboard/batch/up-comming', icon: iconVscSymbolClass },
+      { id: 1000300104, name: 'Finished', link: '/dashboard/batch/finished', icon: iconVscSymbolClass },
+      { id: 1000300105, name: 'Cancelled', link: '/dashboard/batch/cancelled', icon: iconVscSymbolClass },
     ],
   },
   {

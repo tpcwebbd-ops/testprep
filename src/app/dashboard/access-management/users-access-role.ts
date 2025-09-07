@@ -4,7 +4,10 @@ export type accessPathByUsersType = {
 }[];
 
 export const accessDataByUsers = [
-  { role: 'admin', accessSidebarName: ['Users', 'Access Management', 'Course', 'Web Messages', 'Finance', 'Site Setting', 'Media', 'My Course', 'My Profile'] },
+  {
+    role: 'admin',
+    accessSidebarName: ['Users', 'Access Management', 'Course', 'Web Messages', 'Finance', 'Site Setting', 'Media', 'My Course', 'My Profile', 'Batch'],
+  },
   { role: 'moderator', accessSidebarName: ['Users', 'Course', 'Web Messages', 'Site Setting', 'Media', 'My Profile'] },
   { role: 'instructor', accessSidebarName: ['Users', 'Course', 'Web Messages', 'Media', 'My Profile'] },
   { role: 'mentor', accessSidebarName: ['Users', 'Course', 'My Profile'] },
@@ -21,6 +24,7 @@ const siteSettingPath = 'site-setting';
 const mediaPath = 'media';
 const myCoursePath = 'my-course';
 const myProfilePath = 'my-profile';
+const batchPath = 'batch';
 
 export const accessPathByUsers: accessPathByUsersType = [
   {
@@ -36,10 +40,11 @@ export const accessPathByUsers: accessPathByUsersType = [
       mediaPath,
       myCoursePath,
       myProfilePath,
+      batchPath,
     ],
   },
-  { role: 'moderator', accessPathName: [dashboard, usersPath, coursePath, webMessagesPath, siteSettingPath, mediaPath, myProfilePath] },
-  { role: 'instructor', accessPathName: [dashboard, usersPath, coursePath, webMessagesPath, mediaPath, myProfilePath] },
-  { role: 'mentor', accessPathName: [dashboard, usersPath, coursePath, myProfilePath] },
+  { role: 'moderator', accessPathName: [batchPath, dashboard, usersPath, coursePath, webMessagesPath, siteSettingPath, mediaPath, myProfilePath] },
+  { role: 'instructor', accessPathName: [batchPath, dashboard, usersPath, coursePath, webMessagesPath, mediaPath, myProfilePath] },
+  { role: 'mentor', accessPathName: [batchPath, dashboard, usersPath, coursePath, myProfilePath] },
   { role: 'student', accessPathName: [dashboard, myCoursePath, myProfilePath] },
 ];
