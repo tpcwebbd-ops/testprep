@@ -12,7 +12,7 @@ import { motion } from 'framer-motion';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { FiUser, FiMail, FiCalendar, FiLogOut, FiEdit3, FiSettings, FiShield, FiUserCheck, FiClock, FiActivity } from 'react-icons/fi';
+import { FiUser, FiMail, FiCalendar, FiLogOut, FiEdit3, FiSettings, FiShield, FiUserCheck, FiActivity } from 'react-icons/fi';
 import Image from 'next/image';
 
 interface ApiUserData {

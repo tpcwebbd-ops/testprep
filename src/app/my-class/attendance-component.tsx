@@ -1,7 +1,6 @@
 'use client';
 
 import { format } from 'date-fns';
-import { motion, Variants } from 'framer-motion';
 import { useStore } from './store';
 import { useState, useEffect } from 'react';
 
@@ -53,245 +52,74 @@ const AttendanceComponent: React.FC = () => {
   const formattedDate = format(time, 'eeee, MMMM do, yyyy');
   const formattedTime = format(time, 'h:mm:ss a');
 
-  // Floating animation variants
-  const floatingVariants: Variants = {
-    animate: {
-      y: [-10, 10, -10],
-      transition: {
-        duration: 4,
-        ease: 'easeInOut',
-        repeat: Infinity,
-      },
-    },
-  };
-
-  const pulseVariants: Variants = {
-    animate: {
-      scale: [1, 1.05, 1],
-      transition: {
-        duration: 2,
-        ease: 'easeInOut',
-        repeat: Infinity,
-      },
-    },
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4 sm:p-6 lg:p-8">
-      {/* Animated background elements */}
+      {/* Background elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          animate={{
-            x: [-100, 100, -100],
-            y: [-50, 50, -50],
-          }}
-          transition={{
-            duration: 20,
-            ease: 'linear',
-            repeat: Infinity,
-          }}
-          className="absolute top-20 left-10 w-32 h-32 bg-blue-200/20 rounded-full blur-xl"
-        />
-        <motion.div
-          animate={{
-            x: [100, -100, 100],
-            y: [50, -50, 50],
-          }}
-          transition={{
-            duration: 25,
-            ease: 'linear',
-            repeat: Infinity,
-          }}
-          className="absolute bottom-20 right-10 w-40 h-40 bg-indigo-200/20 rounded-full blur-xl"
-        />
-        <motion.div
-          animate={{
-            x: [-50, 150, -50],
-            y: [100, -100, 100],
-          }}
-          transition={{
-            duration: 30,
-            ease: 'linear',
-            repeat: Infinity,
-          }}
-          className="absolute top-1/2 left-1/4 w-24 h-24 bg-purple-200/20 rounded-full blur-xl"
-        />
+        <div className="absolute top-20 left-10 w-32 h-32 bg-blue-200/20 rounded-full blur-xl" />
+        <div className="absolute bottom-20 right-10 w-40 h-40 bg-indigo-200/20 rounded-full blur-xl" />
+        <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-purple-200/20 rounded-full blur-xl" />
       </div>
 
       <div className="relative flex items-center justify-center min-h-screen">
-        <motion.div
-          initial={{ opacity: 0, y: 50, scale: 0.9 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{
-            duration: 0.8,
-            ease: 'easeOut',
-            type: 'spring',
-            bounce: 0.4,
-          }}
-          className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl"
-        >
+        <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl">
           {/* Main glass card */}
-          <motion.div
-            variants={floatingVariants}
-            animate="animate"
-            className="relative overflow-hidden rounded-3xl bg-white/80 backdrop-blur-xl border border-white/30 shadow-2xl shadow-blue-500/10"
-          >
+          <div className="relative overflow-hidden rounded-3xl bg-white/80 backdrop-blur-xl border border-white/30 shadow-2xl shadow-blue-500/10">
             {/* Glass effect overlay */}
             <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-white/20 to-transparent" />
 
             {/* Content */}
             <div className="relative p-6 sm:p-8 md:p-10 lg:p-12 text-center">
-              {/* Animated welcome section */}
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.6 }} className="mb-6 sm:mb-8">
-                <motion.h1
-                  variants={pulseVariants}
-                  animate="animate"
-                  className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2"
-                >
+              {/* Welcome section */}
+              <div className="mb-6 sm:mb-8">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2">
                   Welcome Back!
-                </motion.h1>
+                </h1>
 
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.6, duration: 0.6 }}
-                  className="text-sm sm:text-base md:text-lg lg:text-xl text-slate-600 font-medium px-2"
-                >
-                  {motivationalTitle}
-                </motion.p>
-              </motion.div>
+                <p className="text-sm sm:text-base md:text-lg lg:text-xl text-slate-600 font-medium px-2">{motivationalTitle}</p>
+              </div>
 
               {/* Course badges */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.9, duration: 0.5 }}
-                className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-6 sm:mb-8"
-              >
-                {['IELTS', 'Spoken English', 'PTE', 'GRE'].map((course, index) => (
-                  <motion.span
+              <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-6 sm:mb-8">
+                {['IELTS', 'Spoken English', 'PTE', 'GRE'].map(course => (
+                  <span
                     key={course}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 1.1 + index * 0.1, duration: 0.4 }}
-                    whileHover={{ scale: 1.1, y: -2 }}
-                    className="px-3 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full shadow-lg backdrop-blur-sm"
+                    className="px-3 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full shadow-lg backdrop-blur-sm hover:scale-110 hover:-translate-y-0.5 transition-transform duration-200"
                   >
                     {course}
-                  </motion.span>
+                  </span>
                 ))}
-              </motion.div>
+              </div>
 
               {/* Date and time display */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.2, duration: 0.6 }}
-                className="mb-8 sm:mb-10 p-4 sm:p-6 rounded-2xl bg-gradient-to-br from-slate-50/50 to-blue-50/50 backdrop-blur-sm border border-white/40"
-              >
-                <motion.p
-                  className="text-base sm:text-lg md:text-xl font-medium text-slate-700 mb-2"
-                  animate={{
-                    color: ['#334155', '#1e40af', '#334155'],
-                  }}
-                  transition={{
-                    duration: 3,
-                    ease: 'easeInOut',
-                    repeat: Infinity,
-                  }}
-                >
-                  {formattedDate}
-                </motion.p>
-                <motion.p
-                  className="text-lg sm:text-xl md:text-2xl font-bold text-blue-600"
-                  animate={{
-                    scale: [1, 1.05, 1],
-                  }}
-                  transition={{
-                    duration: 2,
-                    ease: 'easeInOut',
-                    repeat: Infinity,
-                  }}
-                >
-                  {formattedTime}
-                </motion.p>
+              <div className="mb-8 sm:mb-10 p-4 sm:p-6 rounded-2xl bg-gradient-to-br from-slate-50/50 to-blue-50/50 backdrop-blur-sm border border-white/40">
+                <p className="text-base sm:text-lg md:text-xl font-medium text-slate-700 mb-2">{formattedDate}</p>
+                <p className="text-lg sm:text-xl md:text-2xl font-bold text-blue-600">{formattedTime}</p>
                 <p className="text-xs sm:text-sm text-slate-500 mt-1">Bangladesh Standard Time</p>
-              </motion.div>
+              </div>
 
               {/* Attendance button */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 1.5, duration: 0.6, type: 'spring', bounce: 0.6 }}
-                className="flex justify-center"
-              >
-                <motion.button
-                  whileHover={{
-                    scale: 1.05,
-                    y: -2,
-                    boxShadow: '0 20px 40px rgba(59, 130, 246, 0.3)',
-                  }}
-                  whileTap={{ scale: 0.95 }}
+              <div className="flex justify-center">
+                <button
                   onClick={handleAttendanceSubmit}
-                  className="relative group px-8 sm:px-10 py-4 sm:py-5 text-base sm:text-lg md:text-xl font-bold text-white bg-gradient-to-r from-blue-500 via-indigo-600 to-purple-600 rounded-2xl shadow-xl overflow-hidden transition-all duration-300"
+                  className="relative group px-8 sm:px-10 py-4 sm:py-5 text-base sm:text-lg md:text-xl font-bold text-white bg-gradient-to-r from-blue-500 via-indigo-600 to-purple-600 rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:scale-105 hover:-translate-y-0.5 hover:shadow-2xl"
                 >
-                  {/* Button background animation */}
+                  {/* Button background hover effect */}
                   <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-indigo-700 to-purple-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-                  {/* Button shimmer effect */}
-                  <motion.div
-                    animate={{
-                      x: [-100, 100],
-                    }}
-                    transition={{
-                      duration: 2,
-                      ease: 'linear',
-                      repeat: Infinity,
-                      repeatDelay: 1,
-                    }}
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"
-                  />
-
                   <span className="relative flex items-center gap-2">📚 Submit Attendance →</span>
-                </motion.button>
-              </motion.div>
+                </button>
+              </div>
 
               {/* Motivational footer */}
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 2, duration: 0.8 }}
-                className="mt-6 sm:mt-8 text-xs sm:text-sm text-slate-500 italic"
-              >
-                &quot;Your English journey starts with today&quot;s commitment!&quot;
-              </motion.p>
+              <p className="mt-6 sm:mt-8 text-xs sm:text-sm text-slate-500 italic">&quot;Your English journey starts with today&quot;s commitment!&quot;</p>
             </div>
 
             {/* Decorative elements */}
-            <motion.div
-              animate={{
-                rotate: [0, 360],
-              }}
-              transition={{
-                duration: 20,
-                ease: 'linear' as const,
-                repeat: Infinity,
-              }}
-              className="absolute -top-10 -right-10 w-20 h-20 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-xl"
-            />
-            <motion.div
-              animate={{
-                rotate: [360, 0],
-              }}
-              transition={{
-                duration: 25,
-                ease: 'linear' as const,
-                repeat: Infinity,
-              }}
-              className="absolute -bottom-10 -left-10 w-16 h-16 bg-gradient-to-br from-indigo-400/20 to-blue-400/20 rounded-full blur-xl"
-            />
-          </motion.div>
-        </motion.div>
+            <div className="absolute -top-10 -right-10 w-20 h-20 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-xl" />
+            <div className="absolute -bottom-10 -left-10 w-16 h-16 bg-gradient-to-br from-indigo-400/20 to-blue-400/20 rounded-full blur-xl" />
+          </div>
+        </div>
       </div>
     </div>
   );
