@@ -1,0 +1,86 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "https://excalidraw.com",
+  "elements": [
+    {
+      "id": "lh9MJZ8-fo8erKULUFSkb",
+      "type": "rectangle",
+      "x": 499,
+      "y": 274,
+      "width": 694,
+      "height": 299,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [
+        "yk6uT4Dqgr2ju5SlIXU5R"
+      ],
+      "frameId": null,
+      "index": "a0",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 341174633,
+      "version": 35,
+      "versionNonce": 1625000999,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1758008859440,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "DTBm1LmjEkD5MOB-O3kzp",
+      "type": "text",
+      "x": 722,
+      "y": 401,
+      "width": 237.887939453125,
+      "height": 45,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [
+        "yk6uT4Dqgr2ju5SlIXU5R"
+      ],
+      "frameId": null,
+      "index": "a1",
+      "roundness": null,
+      "seed": 287963881,
+      "version": 47,
+      "versionNonce": 1435495881,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1758008859440,
+      "link": null,
+      "locked": false,
+      "text": "System design",
+      "fontSize": 36,
+      "fontFamily": 6,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "System design",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": 20,
+    "gridStep": 5,
+    "gridModeEnabled": false,
+    "viewBackgroundColor": "#ffffff",
+    "lockedMultiSelections": {}
+  },
+  "files": {}
+}
