@@ -29,11 +29,12 @@ A. Core User and Access Management
         -  description
         -  assign_access ({view:[], Create:[], Update: [], delete:[]})
 
-4. User_Roles
+4. Roles_Management
     Description: A many-to-many join table that assigns one or more roles to a user, enabling flexible permission management.
-    Fields:
+    Fields: 
         -  user_id (Foreign Key to Users)
         -  role_id (Foreign Key to Roles)
+        -  role_name (Foreign Key to Roles)
 
 
 B. Course and Enrollment Management
@@ -139,7 +140,7 @@ These tables organize the actual learning materials and student assessments.
         -  id (Primary Key)
         -  user_id (Foreign Key to Users)
         -  date
-        -  status ('Present', 'Parmet_Absent')
+        -  status ('Present', 'Parmit_Absent')
         -  notes
 
 
@@ -233,7 +234,9 @@ Tables for managing payments, employee tasks, and company-wide goals.
        Fields:
            -  id (Primary Key)
            -  user_id (Foreign Key to Users, recipient)
+           -  user_name (Foreign Key to Users, recipient)
            -  given_by_id (Foreign Key to Users)
+           -  given_by_name (Foreign Key to Users)
            -  reward_date
            -  reason
 
