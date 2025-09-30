@@ -2463,8 +2463,8 @@
       "type": "text",
       "x": -6240,
       "y": -2800,
-      "width": 252.60097539992555,
-      "height": 259.99999999999994,
+      "width": 233.6095733642578,
+      "height": 371.42857142857144,
       "angle": 0,
       "strokeColor": "#1971c2",
       "backgroundColor": "transparent",
@@ -2480,20 +2480,20 @@
       "index": "b1C",
       "roundness": null,
       "seed": 1667713092,
-      "version": 563,
-      "versionNonce": 655001164,
+      "version": 594,
+      "versionNonce": 670502094,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1758441584190,
+      "updated": 1759212335473,
       "link": null,
       "locked": false,
-      "text": "1. id\n2. user_id [Users]\n3. date\n4. status \n    - Present,\n    - Parmit_Absent\n5. notes",
+      "text": "1. id\n2. user_id [Users]\n3. date\n4. status \n    - Present,\n    - Parmit_Leave\n    - Absent\n5. notes\n\n",
       "fontSize": 29.714285714285715,
       "fontFamily": 6,
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "1. id\n2. user_id [Users]\n3. date\n4. status \n    - Present,\n    - Parmit_Absent\n5. notes",
+      "originalText": "1. id\n2. user_id [Users]\n3. date\n4. status \n    - Present,\n    - Parmit_Leave\n    - Absent\n5. notes\n\n",
       "autoResize": true,
       "lineHeight": 1.25
     },
@@ -2740,7 +2740,7 @@
       "id": "RKxvEuXvFB6Qw_blP14l2",
       "type": "rectangle",
       "x": -7000,
-      "y": -1680,
+      "y": -1600,
       "width": 360,
       "height": 660.0000000000001,
       "angle": 0,
@@ -2760,11 +2760,11 @@
         "type": 3
       },
       "seed": 700733052,
-      "version": 986,
-      "versionNonce": 550779124,
+      "version": 990,
+      "versionNonce": 1863238290,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1758441584190,
+      "updated": 1759212413674,
       "link": null,
       "locked": false
     },
@@ -2772,7 +2772,7 @@
       "id": "vwK2VTnVN0o0XXNIAQ9wH",
       "type": "text",
       "x": -6920,
-      "y": -1660,
+      "y": -1580,
       "width": 205.29586791992188,
       "height": 35,
       "angle": 0,
@@ -2790,8 +2790,8 @@
       "index": "b1K",
       "roundness": null,
       "seed": 543958780,
-      "version": 978,
-      "versionNonce": 1313531627,
+      "version": 982,
+      "versionNonce": 419209298,
       "isDeleted": false,
       "boundElements": [
         {
@@ -2799,7 +2799,7 @@
           "type": "arrow"
         }
       ],
-      "updated": 1758441757339,
+      "updated": 1759212413674,
       "link": null,
       "locked": false,
       "text": "Support_Tickets",
@@ -2816,7 +2816,7 @@
       "id": "vjUT3JoFq6LcWYDc6pjoH",
       "type": "text",
       "x": -6980,
-      "y": -1540,
+      "y": -1460,
       "width": 301.23114013671875,
       "height": 400.0000000000002,
       "angle": 0,
@@ -2834,11 +2834,11 @@
       "index": "b1L",
       "roundness": null,
       "seed": 46524284,
-      "version": 610,
-      "versionNonce": 1030459717,
+      "version": 614,
+      "versionNonce": 63583186,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1758441757339,
+      "updated": 1759212413675,
       "link": null,
       "locked": false,
       "text": "1. id\n2. student_id [Users]\n3. assigned_to_id [Users]\n4. title\n5. description\n6. status \n    - Open,\n    - In Progress,\n    - Closed\n7. created_at\n8. closed_at\n",
@@ -2855,7 +2855,7 @@
       "id": "xS3TTpegu-sPpRbCxBny7",
       "type": "rectangle",
       "x": -6520,
-      "y": -1640,
+      "y": -1600,
       "width": 360,
       "height": 739.9999999999998,
       "angle": 0,
@@ -2875,8 +2875,8 @@
         "type": 3
       },
       "seed": 1874592764,
-      "version": 949,
-      "versionNonce": 129046220,
+      "version": 953,
+      "versionNonce": 436054990,
       "isDeleted": false,
       "boundElements": [
         {
@@ -2884,7 +2884,7 @@
           "type": "arrow"
         }
       ],
-      "updated": 1758441584190,
+      "updated": 1759212410070,
       "link": null,
       "locked": false
     },
@@ -2892,7 +2892,7 @@
       "id": "2PKiCXPvioM8HNSjKliqA",
       "type": "text",
       "x": -6380,
-      "y": -1600,
+      "y": -1560,
       "width": 69.803955078125,
       "height": 35,
       "angle": 0,
@@ -2910,11 +2910,11 @@
       "index": "b1N",
       "roundness": null,
       "seed": 1980900476,
-      "version": 897,
-      "versionNonce": 1487506420,
+      "version": 901,
+      "versionNonce": 65245262,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1758441584190,
+      "updated": 1759212410071,
       "link": null,
       "locked": false,
       "text": "Posts",
@@ -2931,7 +2931,7 @@
       "id": "iW0FX5lh-hGy0bqik4Shn",
       "type": "text",
       "x": -6480,
-      "y": -1540,
+      "y": -1500,
       "width": 298.2957763671875,
       "height": 603.758350454792,
       "angle": 0,
@@ -2949,11 +2949,11 @@
       "index": "b1O",
       "roundness": null,
       "seed": 2110797052,
-      "version": 531,
-      "versionNonce": 159145292,
+      "version": 535,
+      "versionNonce": 837310094,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1758441584190,
+      "updated": 1759212410071,
       "link": null,
       "locked": false,
       "text": "1. id\n2. author_id [Users]\n3. title\n4. content\n5. post_type \n    - Blog,\n    - Notice,\n    - Social Media\n6. publish_media \n    - Website,\n    - Facebook,\n    - YouTube\n7. status \n    - Draft,\n    - Published,\n    - Archived\n8. published_at\n9. checked_by_id [Users]",
@@ -4821,7 +4821,7 @@
       "x": -5160,
       "y": -4595,
       "width": 1660.1000000000004,
-      "height": 2910,
+      "height": 2990,
       "angle": 0,
       "strokeColor": "#1971c2",
       "backgroundColor": "transparent",
@@ -4835,11 +4835,11 @@
       "index": "b1z",
       "roundness": null,
       "seed": 512814444,
-      "version": 596,
-      "versionNonce": 1307555572,
+      "version": 625,
+      "versionNonce": 1796575378,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1758441584190,
+      "updated": 1759212413983,
       "link": null,
       "locked": false,
       "points": [
@@ -4865,7 +4865,7 @@
         ],
         [
           -1660.1000000000004,
-          2910
+          2990
         ]
       ],
       "lastCommittedPoint": null,
@@ -5637,11 +5637,11 @@
       "index": "b28",
       "roundness": null,
       "seed": 622199508,
-      "version": 1074,
-      "versionNonce": 1205627813,
+      "version": 1121,
+      "versionNonce": 602014290,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1758441757340,
+      "updated": 1759212904132,
       "link": null,
       "locked": false,
       "points": [
@@ -5659,11 +5659,11 @@
         ],
         [
           160,
-          4455
+          4655
         ],
         [
           1080,
-          4455
+          4655
         ],
         [
           1080,
@@ -5712,18 +5712,18 @@
           ],
           "end": [
             160,
-            4455
+            4655
           ]
         },
         {
           "index": 4,
           "start": [
             160,
-            4455
+            4655
           ],
           "end": [
             1080,
-            4455
+            4655
           ]
         }
       ],
@@ -5849,7 +5849,7 @@
       "x": -5160,
       "y": -4595,
       "width": 1180.1000000000004,
-      "height": 2950,
+      "height": 2990,
       "angle": 0,
       "strokeColor": "#1971c2",
       "backgroundColor": "transparent",
@@ -5863,11 +5863,11 @@
       "index": "b2A",
       "roundness": null,
       "seed": 327610068,
-      "version": 553,
-      "versionNonce": 519757428,
+      "version": 570,
+      "versionNonce": 1207588046,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1758441584190,
+      "updated": 1759212410668,
       "link": null,
       "locked": false,
       "points": [
@@ -5893,7 +5893,7 @@
         ],
         [
           -1180.1000000000004,
-          2950
+          2990
         ]
       ],
       "lastCommittedPoint": null,
