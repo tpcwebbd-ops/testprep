@@ -1,0 +1,10 @@
+{
+  "Name": "TestPrep Center",
+  "logourl": "https://www.testprepcenter.com/assets/logo_main_light.svg",
+  "description": "TestPrep Center is a leading educational institute specializing in comprehensive preparation for the IELTS and other English language proficiency exams. We provide expert-led courses, extensive resources, and personalized coaching to help students achieve their academic and professional goals.",
+  "short description": "Your trusted partner for IELTS success.",
+  "mobileNumber": "+1-800-555-PREP",
+  "address": "123 Victory Avenue, Suite 400, Knowledge Park, USA 90210",
+  "menu": "[{\"name\":\"Home\", \"path\":\"/\"},{\"name\":\"Courses\", \"path\":\"/courses/ielts\"},{\"name\":\"About Us\", \"path\":\"/about\"},{\"name\":\"Contact\", \"path\":\"/contact\"}]",
+  "footer": "{\"copyright\":\"© 2025 TestPrep Center. All Rights Reserved.\",\"socials\":{\"facebook\":\"https://facebook.com/testprepcenter\",\"twitter\":\"https://twitter.com/testprepcenter\"},\"links\":[{\"title\":\"Privacy Policy\", \"path\":\"/privacy\"},{\"title\":\"Terms of Service\", \"path\":\"/terms\"}]}"
+}
