@@ -2,9 +2,9 @@
   "uid": "_Payments",
   "templateName": "Payments Template ",
   "schema": {
-    "payer_name":"",
-    "payer_email":"",
-    "payer_phone":"",
+    "payer_name":"STRING",
+    "payer_email":"EMAIL",
+    "payer_phone":"PHONE",
     "user_id":"STRING",
     "amount":"INTNUMBER",
     "transaction_id":"STRING",

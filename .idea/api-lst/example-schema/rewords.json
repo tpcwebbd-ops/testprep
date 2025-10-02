@@ -8,7 +8,7 @@
     "given_by_Name":"STRING",
     "reward_date":"DATE",
     "reward_time":"TIME",
-    "reason":"description"
+    "reason":"DESCRIPTION"
   },
   "namingConvention": {
     "Users_1_000___": "Rewards",

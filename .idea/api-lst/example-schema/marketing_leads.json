@@ -5,7 +5,7 @@
     "full_name":"STRING",
     "phone_number":"PHONE",
     "email":"EMAIL",
-    "source":"SELECT #Whats Apps, Facebook, Manual collection",
+    "source_content":"SELECT #Whats Apps, Facebook, Manual collection",
     "collected_by":"STRING",
     "notes":"DESCRIPTION"
   },
