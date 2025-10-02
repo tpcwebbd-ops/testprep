@@ -6,7 +6,7 @@
     "title":"STRING",
     "url_or_content":"SELECT#url, content",
     "media_id":"URL",
-    "content_type": "SELECT#video, pdf, text, doc"
+    "content_type": "SELECT#video, pdf, text, description"
   },
   "namingConvention": {
     "Users_1_000___": "Content_Resources",

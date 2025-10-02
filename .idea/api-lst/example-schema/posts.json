@@ -7,10 +7,10 @@
     "content":"DESCRIPTION",
     "published_date":"DATE",
     "published_time":"TIME",
-    "checked_by_id":"STRING",
+    "checked_by_user_id":"STRING",
     "post_type":"SELECT#Blog, Notice, Social Media",
     "publish_media":"SELECT#Website, Facebook, YouTube",
-    "status": "SELECT#Draft, Published, Archive"
+    "status": "SELECT#Draft, Published, Archive, Schedule"
   },
   "namingConvention": {
     "Users_1_000___": "Posts",

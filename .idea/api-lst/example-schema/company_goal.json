@@ -4,12 +4,12 @@
   "schema": {
     "title":"STRING",
     "description":"DESCRIPTION",
-    "set_by_id [Users]":"EMAIL",
+    "set_by_user_id":"STRING",
     "start_date":"DATE",
     "end_date":"DATE",
     "status":"SELECT#Think, Planning, Active, Completed, Failed",
     "notes":"DESCRIPTION",
-    "checked_by_id [Users]":"EMAIL"
+    "checked_by_user_id":"EMAIL"
   },
   "namingConvention": {
     "Users_1_000___": "Posts_n",

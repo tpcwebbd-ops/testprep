@@ -2,8 +2,8 @@
   "uid": "_Follow_Ups",
   "templateName": "Follow_Ups Template ",
   "schema": {
-    "lead_id [Marketing_Leads]":"STRING",
-    "followed_by_id [Users]":"STRING",
+    "lead_id":"STRING",
+    "followed_by_id":"STRING",
     "follow_up_date":"DATE",
     "follow_up_time":"TIME",
     "response_note":"DESCRIPTION"

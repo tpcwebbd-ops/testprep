@@ -4,11 +4,11 @@
   "templateName": "Batches Template ",
   "schema": {
     "batch_title": "STRING",
-    "course_id[Course]": "STRING",
+    "course_id": "STRING",
     "start_date": "DATE",
     "end_date": "DATE",
     "status": "SELECT#upcoming, ongoing, completed",
-    "instructors_id": "STRING",
+    "instructors_user_id": "STRING",
     "instructors_name": "STRING",
     "enroll_students": "STRING"
   },

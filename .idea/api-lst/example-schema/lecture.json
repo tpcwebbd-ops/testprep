@@ -2,8 +2,7 @@
   "uid": "_Lectures",
   "templateName": "Lectures Template ",
   "schema": {
-    "id":"",
-    "module_id [Modules]":"STRING",
+    "module_id":"STRING",
     "title":"STRING",
     "description":"DESCRIPTION",
     "lecture_date":"DATE",

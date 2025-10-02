@@ -4,11 +4,11 @@
   "schema": {
     "course_id":"STRING",
     "lecture_id":"STRING",
-    "student_id":"STRING",
+    "student_uid":"STRING",
     "question_text":"DESCRIPTION",
     "question_time":"TIME",
     "answer_text":"DESCRIPTION",
-    "answered_by_id":"STRING",
+    "answered_by_user_id":"STRING",
     "answer_time":"TIME"
   },
   "namingConvention": {
