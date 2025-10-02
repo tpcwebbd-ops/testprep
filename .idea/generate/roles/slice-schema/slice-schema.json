@@ -1,0 +1,17 @@
+{
+  "uid": "_Roles",
+  "templateName": "Roles Template ",
+  "schema": {
+    "role_name": "SELECT#MD, CTO, COO, CFO, Admin, Instructor, Moderator, Social media manager, Social media marketer, Mentor, Students, Users",
+    "description": "DESCRIPTION",
+    "assign_access": "STRING"
+  },
+  "namingConvention": {
+    "Users_1_000___": "Roles",
+    "users_2_000___": "roles",
+    "User_3_000___": "Role",
+    "user_4_000___": "role",
+    "ISelect_6_000___": "ISelect_n",
+    "select_5_000___": "select_n"
+  }
+}

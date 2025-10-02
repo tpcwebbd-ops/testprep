@@ -1,0 +1,19 @@
+{
+  "uid": "_Reviews",
+  "templateName": "Reviews Template ",
+  "schema": {
+    "course_id":"STRING",
+    "user_id":"STRING",
+    "rating":"INTNUMBER",
+    "review_text":"DESCRIPTION",
+    "created_at":"TIME"
+  },
+  "namingConvention": {
+    "Users_1_000___": "Reviews",
+    "users_2_000___": "reviews",
+    "User_3_000___": "Review",
+    "user_4_000___": "review",
+    "ISelect_6_000___": "ISelect_n",
+    "select_5_000___": "select_n"
+  }
+}

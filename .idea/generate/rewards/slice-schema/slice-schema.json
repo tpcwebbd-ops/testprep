@@ -1,0 +1,21 @@
+{
+  "uid": "_Rewards",
+  "templateName": "Rewards Template ",
+  "schema": {
+    "user_id":"STRING",
+    "user_Name":"STRING",
+    "given_by_id":"STRING",
+    "given_by_Name":"STRING",
+    "reward_date":"DATE",
+    "reward_time":"TIME",
+    "reason":"DESCRIPTION"
+  },
+  "namingConvention": {
+    "Users_1_000___": "Rewards",
+    "users_2_000___": "rewards",
+    "User_3_000___": "Reward",
+    "user_4_000___": "reward",
+    "ISelect_6_000___": "ISelect_n",
+    "select_5_000___": "select_n"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "uid": "_Posts",
+  "templateName": "Posts Template ",
+  "schema": {
+    "author_id":"STRING",
+    "title":"STRING",
+    "content":"DESCRIPTION",
+    "published_date":"DATE",
+    "published_time":"TIME",
+    "checked_by_user_id":"STRING",
+    "post_type":"SELECT#Blog, Notice, Social Media",
+    "publish_media":"SELECT#Website, Facebook, YouTube",
+    "status": "SELECT#Draft, Published, Archive, Schedule"
+  },
+  "namingConvention": {
+    "Users_1_000___": "Posts",
+    "users_2_000___": "posts",
+    "User_3_000___": "Post",
+    "user_4_000___": "post",
+    "ISelect_6_000___": "ISelect_n",
+    "select_5_000___": "select_n"
+  }
+}

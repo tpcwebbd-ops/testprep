@@ -1,0 +1,19 @@
+{
+  "uid": "_Lectures",
+  "templateName": "Lectures Template ",
+  "schema": {
+    "module_id":"STRING",
+    "title":"STRING",
+    "description":"DESCRIPTION",
+    "lecture_date":"DATE",
+    "order_index":"INTNUMBER"
+  },
+  "namingConvention": {
+    "Users_1_000___": "Lectures",
+    "users_2_000___": "lectures",
+    "User_3_000___": "Lecture",
+    "user_4_000___": "lecture",
+    "ISelect_6_000___": "ISelect_n",
+    "select_5_000___": "select_n"
+  }
+}
