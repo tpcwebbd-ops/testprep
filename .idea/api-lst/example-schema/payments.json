@@ -1,0 +1,28 @@
+{
+  "uid": "_Payments",
+  "templateName": "Payments Template ",
+  "schema": {
+    "payer_name":"",
+    "payer_email":"",
+    "payer_phone":"",
+    "user_id":"STRING",
+    "amount":"INTNUMBER",
+    "transaction_id":"STRING",
+    "payment_method":"STRING",
+    "verified_by_id":"STRING",
+    "payment_date":"DATE",
+    "payment_time":"TIME",
+    "send_by":"STRING",
+    "received_by":"STRING",
+    "payment_for":"SELECT#Course Enrollment, salary, commission, bonus, others",
+    "status":"SELECT#Completed, Failed, Pending"
+  },
+  "namingConvention": {
+    "Users_1_000___": "Payments",
+    "users_2_000___": "payments",
+    "User_3_000___": "Payment",
+    "user_4_000___": "payment",
+    "ISelect_6_000___": "ISelect_n",
+    "select_5_000___": "select_n"
+  }
+}

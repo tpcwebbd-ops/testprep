@@ -1,0 +1,16 @@
+{
+  "uid": "_Roles_Management",
+  "templateName": "Roles_Management Template ",
+  "schema": {
+    "users_id":"STRING",
+    "role_ids":"STRING"
+  },
+  "namingConvention": {
+    "Users_1_000___": "Roles_Management_s",
+    "users_2_000___": "roles_Management_s",
+    "User_3_000___": "Roles_Management",
+    "user_4_000___": "roles_Management",
+    "ISelect_6_000___": "ISelect_n",
+    "select_5_000___": "select_n"
+  }
+}

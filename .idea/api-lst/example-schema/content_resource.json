@@ -1,0 +1,19 @@
+{
+  "uid": "_Content_Resources",
+  "templateName": "Content_Resources Template ",
+  "schema": {
+    "lecture_id":"STRING",
+    "title":"STRING",
+    "url_or_content":"SELECT#url, content",
+    "media_id":"URL",
+    "content_type": "SELECT#video, pdf, text, doc"
+  },
+  "namingConvention": {
+    "Users_1_000___": "Content_Resources",
+    "users_2_000___": "content_Resources",
+    "User_3_000___": "Content_Resourc",
+    "user_4_000___": "content_Resourc",
+    "ISelect_6_000___": "ISelect_n",
+    "select_5_000___": "select_n"
+  }
+}

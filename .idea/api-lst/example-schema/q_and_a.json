@@ -1,0 +1,22 @@
+{
+  "uid": "_Q_and_A",
+  "templateName": "Q_and_A Template ",
+  "schema": {
+    "course_id":"STRING",
+    "lecture_id":"STRING",
+    "student_id":"STRING",
+    "question_text":"DESCRIPTION",
+    "question_time":"TIME",
+    "answer_text":"DESCRIPTION",
+    "answered_by_id":"STRING",
+    "answer_time":"TIME"
+  },
+  "namingConvention": {
+    "Users_1_000___": "Q_and_A_s",
+    "users_2_000___": "q_and_A_s",
+    "User_3_000___": "Q_and_A",
+    "user_4_000___": "q_and_A",
+    "ISelect_6_000___": "ISelect_n",
+    "select_5_000___": "select_n"
+  }
+}

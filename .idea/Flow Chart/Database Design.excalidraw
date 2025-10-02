@@ -27,8 +27,8 @@
         "type": 3
       },
       "seed": 1749330119,
-      "version": 552,
-      "versionNonce": 1068071397,
+      "version": 556,
+      "versionNonce": 252961180,
       "isDeleted": false,
       "boundElements": [
         {
@@ -100,7 +100,7 @@
           "type": "arrow"
         }
       ],
-      "updated": 1758441814611,
+      "updated": 1759386160078,
       "link": null,
       "locked": false
     },
@@ -126,11 +126,11 @@
       "index": "a3",
       "roundness": null,
       "seed": 344068873,
-      "version": 518,
-      "versionNonce": 86983403,
+      "version": 522,
+      "versionNonce": 97097252,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1758441814611,
+      "updated": 1759386160078,
       "link": null,
       "locked": false,
       "text": "Users",
@@ -167,8 +167,8 @@
         "type": 3
       },
       "seed": 671244233,
-      "version": 641,
-      "versionNonce": 445314373,
+      "version": 645,
+      "versionNonce": 1172131356,
       "isDeleted": false,
       "boundElements": [
         {
@@ -176,7 +176,7 @@
           "type": "arrow"
         }
       ],
-      "updated": 1758441814611,
+      "updated": 1759386160078,
       "link": null,
       "locked": false
     },
@@ -202,11 +202,11 @@
       "index": "a7",
       "roundness": null,
       "seed": 1645575849,
-      "version": 638,
-      "versionNonce": 1606266251,
+      "version": 642,
+      "versionNonce": 201011620,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1758441814611,
+      "updated": 1759386160078,
       "link": null,
       "locked": false,
       "text": "Profiles",
@@ -243,8 +243,8 @@
         "type": 3
       },
       "seed": 1741166983,
-      "version": 1412,
-      "versionNonce": 1181090981,
+      "version": 1416,
+      "versionNonce": 700787356,
       "isDeleted": false,
       "boundElements": [
         {
@@ -256,7 +256,7 @@
           "type": "arrow"
         }
       ],
-      "updated": 1758441814611,
+      "updated": 1759386160078,
       "link": null,
       "locked": false
     },
@@ -282,8 +282,8 @@
       "index": "af",
       "roundness": null,
       "seed": 112808103,
-      "version": 1502,
-      "versionNonce": 1046856747,
+      "version": 1506,
+      "versionNonce": 544038180,
       "isDeleted": false,
       "boundElements": [
         {
@@ -295,7 +295,7 @@
           "type": "arrow"
         }
       ],
-      "updated": 1758441814611,
+      "updated": 1759386160078,
       "link": null,
       "locked": false,
       "text": "Roles_Management",
@@ -313,8 +313,8 @@
       "type": "text",
       "x": -5180,
       "y": -5120,
-      "width": 240.83243387810364,
-      "height": 335.42130580821777,
+      "width": 240.79910278320312,
+      "height": 368.96343638903954,
       "angle": 0,
       "strokeColor": "#1971c2",
       "backgroundColor": "transparent",
@@ -330,20 +330,20 @@
       "index": "b0O",
       "roundness": null,
       "seed": 765653700,
-      "version": 109,
-      "versionNonce": 1409180532,
+      "version": 111,
+      "versionNonce": 1328765980,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1758441584190,
+      "updated": 1759386167649,
       "link": null,
       "locked": false,
-      "text": "1. id\n2. full_name\n3. email (Unique)\n4. password_hash\n5. phone_number\n6. profile_image_url\n7. status \n    - active,\n    - inactive,\n    - suspended",
+      "text": "1. id\n2. full_name\n3. email (Unique)\n4. password_hash\n5. phone_number\n6. profile_image_url\n7. sign_up_by\n8. status \n    - active,\n    - inactive,\n    - suspended",
       "fontSize": 26.83370446465742,
       "fontFamily": 6,
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "1. id\n2. full_name\n3. email (Unique)\n4. password_hash\n5. phone_number\n6. profile_image_url\n7. status \n    - active,\n    - inactive,\n    - suspended",
+      "originalText": "1. id\n2. full_name\n3. email (Unique)\n4. password_hash\n5. phone_number\n6. profile_image_url\n7. sign_up_by\n8. status \n    - active,\n    - inactive,\n    - suspended",
       "autoResize": true,
       "lineHeight": 1.25
     },
@@ -1494,10 +1494,6 @@
         },
         {
           "id": "n0HtsRncx_fBhOvbTNBmV",
-          "type": "arrow"
-        },
-        {
-          "id": "fmtWAL44QJFwQObGsNQP4",
           "type": "arrow"
         },
         {
@@ -5971,7 +5967,7 @@
       "version": 175,
       "versionNonce": 1519917710,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1759214173019,
       "link": null,
       "locked": false,

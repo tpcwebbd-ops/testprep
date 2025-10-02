@@ -1,0 +1,20 @@
+{
+  "uid": "_Enrollments",
+  "templateName": "Enrollments Template ",
+  "schema": {
+    "student_email  ":"EMAIL",
+    "batch_id":"STRING",
+    "enrollment_date":"DATE",
+    "enrollment_time":"TIME",
+    "is_complete":"SELECT#Pending, Completed, Failed, Rejected",
+    "payment_id":"STRING"
+  },
+  "namingConvention": {
+    "Users_1_000___": "Enrollments",
+    "users_2_000___": "enrollments",
+    "User_3_000___": "Enrollment",
+    "user_4_000___": "enrollment",
+    "ISelect_6_000___": "ISelect_n",
+    "select_5_000___": "select_n"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "uid": "_Company_Goals",
+  "templateName": "Company_Goals Template ",
+  "schema": {
+    "title":"STRING",
+    "description":"DESCRIPTION",
+    "set_by_id [Users]":"EMAIL",
+    "start_date":"DATE",
+    "end_date":"DATE",
+    "status":"SELECT#Think, Planning, Active, Completed, Failed",
+    "notes":"DESCRIPTION",
+    "checked_by_id [Users]":"EMAIL"
+  },
+  "namingConvention": {
+    "Users_1_000___": "Posts_n",
+    "users_2_000___": "posts_n",
+    "User_3_000___": "Post_n",
+    "user_4_000___": "post_n",
+    "ISelect_6_000___": "ISelect_n",
+    "select_5_000___": "select_n"
+  }
+}

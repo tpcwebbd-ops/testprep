@@ -1,0 +1,43 @@
+{
+  "uid": "_Roles",
+  "templateName": "Roles Template ",
+  "schema": {
+    "role_name":"SELECT#MD, CTO, COO, CFO, Admin, Instructor, Moderator, Social media manager, Social media marketer, Mentor, Students, Users",
+    "description":"DESCRIPTION",
+        "assign_access":{
+        "assessments":{"view": "CHECKBOX",    "create": "CHECKBOX",    "update": "CHECKBOX",    "delete": "CHECKBOX"},
+        "attendance":{"view": "CHECKBOX",    "create": "CHECKBOX",    "update": "CHECKBOX",    "delete": "CHECKBOX"},
+        "batches":{"view": "CHECKBOX",    "create": "CHECKBOX",    "update": "CHECKBOX",    "delete": "CHECKBOX"},
+        "company_goal":{"view": "CHECKBOX",    "create": "CHECKBOX",    "update": "CHECKBOX",    "delete": "CHECKBOX"},
+        "content_resource":{"view": "CHECKBOX",    "create": "CHECKBOX",    "update": "CHECKBOX",    "delete": "CHECKBOX"},
+        "course":{"view": "CHECKBOX",    "create": "CHECKBOX",    "update": "CHECKBOX",    "delete": "CHECKBOX"},
+        "employee_task":{"view": "CHECKBOX",    "create": "CHECKBOX",    "update": "CHECKBOX",    "delete": "CHECKBOX"},
+        "enrollemnts":{"view": "CHECKBOX",    "create": "CHECKBOX",    "update": "CHECKBOX",    "delete": "CHECKBOX"},
+        "followups":{"view": "CHECKBOX",    "create": "CHECKBOX",    "update": "CHECKBOX",    "delete": "CHECKBOX"},
+        "lecture":{"view": "CHECKBOX",    "create": "CHECKBOX",    "update": "CHECKBOX",    "delete": "CHECKBOX"},
+        "marketing_leads":{"view": "CHECKBOX",    "create": "CHECKBOX",    "update": "CHECKBOX",    "delete": "CHECKBOX"},
+        "media":{"view": "CHECKBOX",    "create": "CHECKBOX",    "update": "CHECKBOX",    "delete": "CHECKBOX"},
+        "messages":{"view": "CHECKBOX",    "create": "CHECKBOX",    "update": "CHECKBOX",    "delete": "CHECKBOX"},
+        "payments":{"view": "CHECKBOX",    "create": "CHECKBOX",    "update": "CHECKBOX",    "delete": "CHECKBOX"},
+        "posts":{"view": "CHECKBOX",    "create": "CHECKBOX",    "update": "CHECKBOX",    "delete": "CHECKBOX"},
+        "profile":{"view": "CHECKBOX",    "create": "CHECKBOX",    "update": "CHECKBOX",    "delete": "CHECKBOX"},
+        "q_and_a":{"view": "CHECKBOX",    "create": "CHECKBOX",    "update": "CHECKBOX",    "delete": "CHECKBOX"},
+        "reviews":{"view": "CHECKBOX",    "create": "CHECKBOX",    "update": "CHECKBOX",    "delete": "CHECKBOX"},
+        "rewords":{"view": "CHECKBOX",    "create": "CHECKBOX",    "update": "CHECKBOX",    "delete": "CHECKBOX"},
+        "tole_management":{"view": "CHECKBOX",    "create": "CHECKBOX",    "update": "CHECKBOX",    "delete": "CHECKBOX"},
+        "roles":{"view": "CHECKBOX",    "create": "CHECKBOX",    "update": "CHECKBOX",    "delete": "CHECKBOX"},
+        "submissions":{"view": "CHECKBOX",    "create": "CHECKBOX",    "update": "CHECKBOX",    "delete": "CHECKBOX"},
+        "support_tickets":{"view": "CHECKBOX",    "create": "CHECKBOX",    "update": "CHECKBOX",    "delete": "CHECKBOX"},
+        "users":{"view": "CHECKBOX",    "create": "CHECKBOX",    "update": "CHECKBOX",    "delete": "CHECKBOX"},
+        "website_settings":{"view": "CHECKBOX",    "create": "CHECKBOX",    "update": "CHECKBOX",    "delete": "CHECKBOX"}
+    }
+  },
+  "namingConvention": {
+    "Users_1_000___": "Roles",
+    "users_2_000___": "roles",
+    "User_3_000___": "Role",
+    "user_4_000___": "role",
+    "ISelect_6_000___": "ISelect_n",
+    "select_5_000___": "select_n"
+  }
+}
