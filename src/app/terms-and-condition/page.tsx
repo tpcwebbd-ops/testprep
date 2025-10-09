@@ -170,10 +170,8 @@ export default function TermsAndCondition() {
         </main>
 
         {/* ===== Main Footer (desktop only) ===== */}
-        <div className="hidden md:block">
-          <MainFooter />
-        </div>
       </div>
+      <MainFooter />
       {/* ===== Mobile Bottom Navbar ===== */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/70 backdrop-blur-xl border-t border-white/40 flex justify-around items-center h-16 md:hidden shadow-lg">
         <Link href="/" className="flex flex-col items-center justify-center text-blue-700 hover:text-blue-900 transition">
