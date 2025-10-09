@@ -1,25 +1,18 @@
 /*
 |-----------------------------------------
-| setting up Page for the App
-| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
-| @copyright: testprep-webapp, October, 2025
+| About Page (No Sidebar)
+| @author: Toufiquer Rahman
 |-----------------------------------------
 */
 
 'use client';
 
-import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Menu, X, Home, Info, MessageCircle, Users, Globe2, Award, Briefcase, BookOpen, GraduationCap, Link } from 'lucide-react';
+import React from 'react';
+import Link from 'next/link';
+import { Home, Info, MessageCircle, Globe2, BookOpen, GraduationCap, Award, Users, Briefcase } from 'lucide-react';
+import MainFooter from '@/components/common/MainFooter';
 
 export default function About() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [activeAccordion, setActiveAccordion] = useState<number | null>(null);
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
-
-  const toggleAccordion = (id: number) => {
-    setActiveAccordion(activeAccordion === id ? null : id);
-  };
-
   const aboutData = [
     {
       id: 1,
@@ -100,123 +93,39 @@ export default function About() {
         'Located at a convenient and accessible place, our centre welcomes students and professionals. For inquiries or admissions, visit our contact page or reach out via phone or email.',
     },
   ];
+
   return (
     <>
-      <div className="flex min-h-screen w-full bg-gradient-to-br from-blue-100/40 to-purple-100/30 backdrop-blur-xl text-gray-800 relative pb-20 md:pb-0">
-        {/* Sidebar */}
-        <aside
-          className={`hidden md:flex flex-col glassy h-screen transition-all duration-500 ease-in-out ${
-            isSidebarOpen ? 'w-72' : 'w-20'
-          } fixed left-0 top-0 p-4 bg-white/20 backdrop-blur-xl border-r border-white/30 shadow-lg`}
-        >
-          {/* Toggle Button */}
-          <button
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="p-2 bg-white/20 rounded-lg hover:bg-white/30 transition mb-6 flex items-center justify-center"
-          >
-            {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
+      <main className="min-h-screen w-full bg-gradient-to-br from-blue-100/40 to-purple-100/30 backdrop-blur-xl text-gray-800 p-6 pb-24 md:pb-6">
+        <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 transition-all duration-500">
+          {aboutData.map(item => (
+            <div
+              key={item.id}
+              className="p-6 rounded-2xl bg-white/30 backdrop-blur-xl shadow-xl hover:shadow-2xl transition-transform transform hover:-translate-y-1"
+            >
+              <div className="flex items-center gap-3 mb-3 text-blue-600">
+                {item.icon}
+                <h3 className="text-lg font-semibold">{item.name}</h3>
+              </div>
+              <p className="text-sm text-gray-700">{item.description}</p>
 
-          {/* Sidebar Items */}
-          <div className="overflow-y-auto custom-scroll flex-1">
-            {aboutData.map(item => (
-              <div key={item.id} className="mb-2">
-                <button
-                  onClick={() => (item.childData ? toggleAccordion(item.id) : null)}
-                  className={`w-full flex items-center gap-3 p-3 rounded-lg hover:bg-white/20 transition ${activeAccordion === item.id ? 'bg-white/20' : ''}`}
-                >
-                  <span className="text-blue-600">{item.icon}</span>
-                  {isSidebarOpen && <span className="text-sm font-semibold">{item.name}</span>}
-                  {item.childData && isSidebarOpen && (
-                    <span className="ml-auto">{activeAccordion === item.id ? <ChevronUp size={16} /> : <ChevronDown size={16} />}</span>
-                  )}
-                </button>
-
-                {/* Accordion Content */}
-                {item.childData && activeAccordion === item.id && isSidebarOpen && (
-                  <div className="pl-10 mt-1 space-y-2">
-                    {item.childData.map(child => (
-                      <Link href={child.path} key={child.id} className="block text-sm hover:text-blue-700 transition">
+              {item.childData && (
+                <div className="mt-4 pl-4 border-l-2 border-blue-300 space-y-2">
+                  {item.childData.map(child => (
+                    <div key={child.id} className="transition-all duration-300 hover:translate-x-1">
+                      <h4 className="text-base font-semibold flex items-center gap-2 text-blue-700">
+                        {child.icon}
                         {child.name}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </aside>
-
-        {/* Main Content */}
-        <main className={`flex-1 transition-all duration-500 ease-in-out p-6 md:ml-${isSidebarOpen ? '72' : '20'} pb-24 md:pb-0`}>
-          <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-            {aboutData.map(item => (
-              <div
-                key={item.id}
-                className="p-6 rounded-2xl bg-white/30 backdrop-blur-xl shadow-xl hover:shadow-2xl transition-transform transform hover:-translate-y-1"
-              >
-                <div className="flex items-center gap-3 mb-3 text-blue-600">
-                  {item.icon}
-                  <h3 className="text-lg font-semibold">{item.name}</h3>
+                      </h4>
+                      <p className="text-sm text-gray-700 pl-6">{child.description}</p>
+                    </div>
+                  ))}
                 </div>
-                <p className="text-sm text-gray-700">{item.description}</p>
-
-                {item.childData && (
-                  <div className="mt-4 pl-4 border-l-2 border-blue-300 space-y-2">
-                    {item.childData.map(child => (
-                      <div key={child.id}>
-                        <h4 className="text-base font-semibold flex items-center gap-2 text-blue-700">
-                          {child.icon}
-                          {child.name}
-                        </h4>
-                        <p className="text-sm text-gray-700 pl-6">{child.description}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </main>
-
-        {/* Mobile Sidebar */}
-        {isMobileSidebarOpen && (
-          <div className="fixed inset-0 bg-black/40 z-40 md:hidden">
-            <div className="absolute left-0 top-0 h-full w-3/4 bg-white/30 backdrop-blur-2xl p-4 shadow-lg animate-slideIn">
-              <button onClick={() => setIsMobileSidebarOpen(false)} className="p-2 bg-white/30 rounded-lg mb-6">
-                <X size={20} />
-              </button>
-
-              <div className="overflow-y-auto">
-                {aboutData.map(item => (
-                  <div key={item.id} className="mb-2">
-                    <button
-                      onClick={() => (item.childData ? toggleAccordion(item.id) : null)}
-                      className={`w-full flex items-center gap-3 p-3 rounded-lg hover:bg-white/20 transition ${
-                        activeAccordion === item.id ? 'bg-white/20' : ''
-                      }`}
-                    >
-                      <span className="text-blue-600">{item.icon}</span>
-                      <span className="text-sm font-semibold">{item.name}</span>
-                      {item.childData && <span className="ml-auto">{activeAccordion === item.id ? <ChevronUp size={16} /> : <ChevronDown size={16} />}</span>}
-                    </button>
-
-                    {item.childData && activeAccordion === item.id && (
-                      <div className="pl-10 mt-1 space-y-2">
-                        {item.childData.map(child => (
-                          <Link href={child.path} key={child.id} className="block text-sm hover:text-blue-700 transition">
-                            {child.name}
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
+              )}
             </div>
-          </div>
-        )}
-      </div>
+          ))}
+        </div>
+      </main>
 
       {/* ✅ Fixed Mobile Bottom Navbar */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/30 backdrop-blur-2xl border-t border-white/40 flex justify-around items-center h-16 md:hidden shadow-lg">
@@ -234,42 +143,33 @@ export default function About() {
           <span className="text-[10px] mt-1 font-medium">Chat</span>
         </Link>
 
-        <button onClick={() => setIsMobileSidebarOpen(true)} className="flex flex-col items-center justify-center text-blue-700 hover:text-blue-900 transition">
+        <Link href="/about" className="flex flex-col items-center justify-center text-blue-700 hover:text-blue-900 transition">
           <Info size={22} />
           <span className="text-[10px] mt-1 font-medium">About</span>
-        </button>
+        </Link>
       </nav>
 
+      <MainFooter />
       <style jsx>{`
         .glassy {
           background: rgba(255, 255, 255, 0.25);
           backdrop-filter: blur(10px);
         }
 
-        @keyframes slideIn {
-          from {
-            transform: translateX(-100%);
-          }
-          to {
-            transform: translateX(0);
-          }
+        /* Smooth card animation */
+        .card-enter {
+          opacity: 0;
+          transform: translateY(10px);
         }
-
-        .animate-slideIn {
-          animation: slideIn 0.4s ease forwards;
+        .card-enter-active {
+          opacity: 1;
+          transform: translateY(0);
+          transition: all 0.4s ease;
         }
 
         /* Fix bottom nav for iPhones and safe areas */
         nav {
           padding-bottom: env(safe-area-inset-bottom);
-        }
-
-        .custom-scroll::-webkit-scrollbar {
-          width: 6px;
-        }
-        .custom-scroll::-webkit-scrollbar-thumb {
-          background: rgba(0, 0, 0, 0.2);
-          border-radius: 3px;
         }
       `}</style>
     </>

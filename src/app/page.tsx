@@ -6,7 +6,7 @@
 |-----------------------------------------
 */
 
-import FooterSectionComponents from '../../.idea/backup for 9 October/components/Footer';
+import MainFooter from '@/components/common/MainFooter';
 import HeroSection from '../../.idea/backup for 9 October/components/Hero';
 import TestPrepHero from '../../.idea/backup for 9 October/components/Hero2';
 import TestPrepClasses from '../../.idea/backup for 9 October/components/OurClasses';
@@ -19,7 +19,7 @@ export default function Home() {
       <TestPrepHero />
       <TestPrepClasses />
       <StudyAbroad />
-      <FooterSectionComponents />
+      <MainFooter />
     </>
   );
 }
