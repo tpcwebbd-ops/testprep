@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Home, Settings, MessageCircle, ChevronDown, ChevronRight, MailCheck, ChevronLeft } from 'lucide-react';
+import { X, Home, Settings, MessageCircle, ChevronDown, ChevronRight, MailCheck, ChevronLeft, LogOut } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { signOut, useSession } from '@/lib/auth-client';
 
 const dashboardSidebarData = [
   { id: 1, name: 'Account', path: '/dashboard/account', icon: <MailCheck size={18} /> },
@@ -39,14 +40,32 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [expandedItem, setExpandedItem] = useState<number | null>(null);
+  const [loadingLogout, setLoadingLogout] = useState(false);
+
   const pathname = usePathname();
+  const router = useRouter();
+  const session = useSession();
+
+  // Redirect if not logged in
+  useEffect(() => {
+    if (!session?.data?.session && !session?.isPending) {
+      router.push('/login');
+    }
+  }, [session, router]);
 
   const toggleExpand = (id: number) => {
     setExpandedItem(expandedItem === id ? null : id);
   };
 
+  const handleLogout = async () => {
+    setLoadingLogout(true);
+    await signOut();
+  };
+
+  const user = session?.data?.user;
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-blue-500 flex relative">
+    <div className="min-h-[calc(100vh-65px)] bg-gradient-to-br from-indigo-500 via-purple-500 to-blue-500 flex relative">
       {/* ===== Desktop Sidebar ===== */}
       <motion.aside
         animate={{ width: isCollapsed ? '80px' : '250px' }}
@@ -67,7 +86,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         </div>
 
         {/* Sidebar Menu */}
-        <nav className="flex flex-col space-y-2 overflow-y-auto mt-4">
+        <nav className="flex-1 flex flex-col space-y-2 overflow-y-auto mt-4">
           {dashboardSidebarData.map(item => (
             <div key={item.id}>
               <button
@@ -109,6 +128,20 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
             </div>
           ))}
         </nav>
+
+        {/* Logout Button */}
+        {!isCollapsed && user && (
+          <div className="mt-auto border-t border-white/20 pt-3">
+            <button
+              onClick={handleLogout}
+              disabled={loadingLogout}
+              className="w-full flex items-center justify-center gap-2 py-2 rounded-lg bg-white/20 hover:bg-white/30 transition font-medium text-sm"
+            >
+              <LogOut size={18} />
+              {loadingLogout ? 'Logging out...' : 'Log out'}
+            </button>
+          </div>
+        )}
       </motion.aside>
 
       {/* ===== Main Content ===== */}
@@ -144,7 +177,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
               animate={{ x: 0 }}
               exit={{ x: -200 }}
               transition={{ duration: 0.4 }}
-              className="w-64 bg-white/10 backdrop-blur-xl text-white p-4 overflow-y-auto"
+              className="w-64 bg-white/10 backdrop-blur-xl text-white p-4 overflow-y-auto flex flex-col"
             >
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-lg font-semibold">Menu</h2>
@@ -153,7 +186,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                 </button>
               </div>
 
-              <nav className="flex flex-col space-y-2">
+              <nav className="flex-1 flex flex-col space-y-2">
                 {dashboardSidebarData.map(item => (
                   <div key={item.id}>
                     <button
@@ -196,6 +229,20 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                   </div>
                 ))}
               </nav>
+
+              {/* Logout button (mobile) */}
+              {user && (
+                <div className="border-t border-white/20 pt-3 mt-3">
+                  <button
+                    onClick={handleLogout}
+                    disabled={loadingLogout}
+                    className="w-full flex items-center justify-center gap-2 py-2 rounded-lg bg-white/20 hover:bg-white/30 transition font-medium text-sm"
+                  >
+                    <LogOut size={18} />
+                    {loadingLogout ? 'Logging out...' : 'Log out'}
+                  </button>
+                </div>
+              )}
             </motion.aside>
           </motion.div>
         )}
