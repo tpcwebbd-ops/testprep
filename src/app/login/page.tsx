@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { Loader2, Eye, EyeOff } from 'lucide-react';
 import ContinueWithGoogleButton from '@/components/common/GoogleButton';
+import { signIn } from '@/lib/auth-client';
 
 const LoginPage = () => {
   const router = useRouter();
@@ -102,6 +103,22 @@ const LoginPage = () => {
             {/* --- Login Button --- */}
             <button
               type="submit"
+              onClick={async () => {
+                await signIn.email(
+                  {
+                    email,
+                    password,
+                  },
+                  {
+                    onRequest: ctx => {
+                      setLoading(true);
+                    },
+                    onResponse: ctx => {
+                      setLoading(false);
+                    },
+                  },
+                );
+              }}
               disabled={loading}
               className="w-full py-2 mt-4 bg-gradient-to-r from-indigo-500 to-blue-500 hover:opacity-90 rounded-lg font-medium flex justify-center items-center gap-2 transition-all"
             >
@@ -125,7 +142,24 @@ const LoginPage = () => {
 
           {/* --- Google Login Button --- */}
           <div className="flex justify-center">
-            <ContinueWithGoogleButton onClick={() => alert('Google login clicked!')} />
+            <ContinueWithGoogleButton
+              onClick={async () => {
+                await signIn.social(
+                  {
+                    provider: 'google',
+                    callbackURL: '/dashboard',
+                  },
+                  {
+                    onRequest: ctx => {
+                      setLoading(true);
+                    },
+                    onResponse: ctx => {
+                      setLoading(false);
+                    },
+                  },
+                );
+              }}
+            />
           </div>
 
           {/* --- Redirect to Sign Up --- */}
