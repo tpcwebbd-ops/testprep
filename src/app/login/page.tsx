@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { Loader2, Eye, EyeOff } from 'lucide-react';
+import { Loader2, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import ContinueWithGoogleButton from '@/components/common/GoogleButton';
 import { signIn } from '@/lib/auth-client';
 
@@ -13,16 +13,35 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null); // ✅ new error state
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
 
-    // Simulate API delay
-    setTimeout(() => {
+    if (!email || !password) return; // extra safety
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await signIn.email(
+        { email, password },
+        {
+          onRequest: () => setLoading(true),
+          onResponse: () => setLoading(false),
+        },
+      );
+
+      if (res?.error) {
+        setError(res.error.message || 'Invalid email or password.');
+      } else {
+        router.push('/dashboard');
+      }
+    } catch (err: unknown) {
+      setError('Something went wrong. Please try again later.' + err);
+    } finally {
       setLoading(false);
-      router.push('/dashboard');
-    }, 1500);
+    }
   };
 
   return (
@@ -60,7 +79,7 @@ const LoginPage = () => {
           <h2 className="text-2xl md:text-3xl font-semibold text-center mb-6">Login to Your Account</h2>
 
           {/* --- Login Form --- */}
-          <form onSubmit={handleLogin} className="flex flex-col space-y-4">
+          <form className="flex flex-col space-y-4">
             <div>
               <label htmlFor="email" className="block mb-1 text-sm">
                 Email Address
@@ -100,27 +119,22 @@ const LoginPage = () => {
               </button>
             </div>
 
+            {/* --- Error Message --- */}
+            {error && (
+              <div className="flex items-center text-red-600 bg-red-50 border border-red-400 rounded-lg p-2 mt-2 text-sm">
+                <AlertCircle className="mr-2" size={16} />
+                {error}
+              </div>
+            )}
+
             {/* --- Login Button --- */}
             <button
               type="submit"
-              onClick={async () => {
-                await signIn.email(
-                  {
-                    email,
-                    password,
-                  },
-                  {
-                    onRequest: ctx => {
-                      setLoading(true);
-                    },
-                    onResponse: ctx => {
-                      setLoading(false);
-                    },
-                  },
-                );
-              }}
-              disabled={loading}
-              className="w-full py-2 mt-4 bg-gradient-to-r from-indigo-500 to-blue-500 hover:opacity-90 rounded-lg font-medium flex justify-center items-center gap-2 transition-all"
+              disabled={loading || !email || !password} // ✅ disable condition
+              onClick={handleLogin}
+              className={`w-full py-2 mt-4 rounded-lg font-medium flex justify-center items-center gap-2 transition-all ${
+                loading || !email || !password ? 'bg-gray-400 cursor-not-allowed' : 'bg-gradient-to-r from-indigo-500 to-blue-500 hover:opacity-90'
+              }`}
             >
               {loading ? (
                 <>
@@ -144,20 +158,22 @@ const LoginPage = () => {
           <div className="flex justify-center">
             <ContinueWithGoogleButton
               onClick={async () => {
-                await signIn.social(
-                  {
-                    provider: 'google',
-                    callbackURL: '/dashboard',
-                  },
-                  {
-                    onRequest: ctx => {
-                      setLoading(true);
+                setError(null);
+                try {
+                  await signIn.social(
+                    {
+                      provider: 'google',
+                      callbackURL: '/dashboard',
                     },
-                    onResponse: ctx => {
-                      setLoading(false);
+                    {
+                      onRequest: () => setLoading(true),
+                      onResponse: () => setLoading(false),
                     },
-                  },
-                );
+                  );
+                } catch (err) {
+                  setError('Google login failed. Please try again.');
+                  setLoading(false);
+                }
               }}
             />
           </div>
