@@ -99,7 +99,7 @@ export default function SessionPage() {
 
       {/* Table */}
       <Card className="backdrop-blur-md bg-white/10 border-white/20 shadow-lg text-white overflow-hidden">
-        <CardContent>
+        <CardContent className="p-0">
           {loading ? (
             <div className="flex justify-center py-10">
               <Loader2 className="animate-spin w-8 h-8 text-white" />
@@ -107,7 +107,7 @@ export default function SessionPage() {
           ) : sessions.length === 0 ? (
             <p className="text-center text-gray-300 py-6">No sessions found</p>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="w-full overflow-x-auto scrollbar-thin scrollbar-thumb-white/30 scrollbar-track-transparent">
               <table className="min-w-full text-sm border-collapse">
                 <thead>
                   <tr className="bg-white/20 text-left text-gray-200 uppercase text-xs">

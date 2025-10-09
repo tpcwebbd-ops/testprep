@@ -78,12 +78,12 @@ export default function UserPage() {
   };
 
   return (
-    <div className="min-h-screen ">
+    <div className="min-h-screen p-6">
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Form Card */}
         <Card className="backdrop-blur-md bg-white/10 border border-white/20 shadow-lg rounded-2xl">
           <CardHeader>
-            <CardTitle className="flex items-center justify-between text-xl font-semibold">
+            <CardTitle className="flex items-center justify-between text-xl font-semibold text-white">
               {isEditing ? 'Edit User' : 'Add New User'}
               {isEditing && (
                 <Button
@@ -148,26 +148,32 @@ export default function UserPage() {
         </Card>
 
         {/* User List */}
-        <Card className="backdrop-blur-md bg-white/10 border border-white/20 shadow-lg rounded-2xl overflow-hidden">
+        <Card className="backdrop-blur-md bg-white/10 border border-white/20 shadow-lg rounded-2xl">
           <CardHeader>
-            <CardTitle className="text-xl font-semibold">All Users</CardTitle>
+            <CardTitle className="text-xl font-semibold text-white flex items-center justify-between">
+              All Users
+              <Button onClick={fetchUsers} variant="outline" className="bg-white/10 hover:bg-white/20 text-white border-white/30">
+                Refresh
+              </Button>
+            </CardTitle>
           </CardHeader>
 
-          <CardContent>
+          <CardContent className="p-0">
             {loading ? (
-              <div className="flex justify-center p-6">
-                <Loader2 className="animate-spin w-6 h-6 text-blue-300" />
+              <div className="flex justify-center py-10">
+                <Loader2 className="animate-spin w-8 h-8 text-white" />
               </div>
             ) : users.length === 0 ? (
-              <p className="text-center text-gray-300">No users found</p>
+              <p className="text-center text-gray-300 py-6">No users found</p>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm text-left border-collapse">
-                  <thead className="bg-white/10 text-gray-200 uppercase text-xs">
+              // ✅ Responsive horizontal scroll wrapper
+              <div className="w-full overflow-x-auto scrollbar-thin scrollbar-thumb-white/30 scrollbar-track-transparent">
+                <table className="min-w-full text-sm border-collapse">
+                  <thead className="bg-white/20 text-gray-200 uppercase text-xs">
                     <tr>
                       <th className="p-3">Name</th>
                       <th className="p-3">Email</th>
-                      <th className="p-3">Verified</th>
+                      <th className="p-3 hidden sm:table-cell">Verified</th>
                       <th className="p-3">Actions</th>
                     </tr>
                   </thead>
@@ -175,25 +181,27 @@ export default function UserPage() {
                     {users.map(user => (
                       <tr key={user._id} className="border-t border-white/10 hover:bg-white/10 transition">
                         <td className="p-3">{user.name}</td>
-                        <td className="p-3">{user.email}</td>
-                        <td className="p-3">{user.emailVerified ? '✅' : '❌'}</td>
-                        <td className="p-3 flex items-center gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="bg-blue-500/20 border border-blue-300/30 hover:bg-blue-500/40 text-white"
-                            onClick={() => handleEdit(user)}
-                          >
-                            <Edit3 className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            className="bg-red-500/30 hover:bg-red-500/50 border border-red-300/30 text-white"
-                            onClick={() => handleDelete(user._id)}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
+                        <td className="p-3 break-all max-w-[220px] truncate">{user.email}</td>
+                        <td className="p-3 hidden sm:table-cell">{user.emailVerified ? '✅' : '❌'}</td>
+                        <td className="p-3 whitespace-nowrap">
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="bg-blue-500/20 border border-blue-300/30 hover:bg-blue-500/40 text-white"
+                              onClick={() => handleEdit(user)}
+                            >
+                              <Edit3 className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              className="bg-red-500/30 hover:bg-red-500/50 border border-red-300/30 text-white"
+                              onClick={() => handleDelete(user._id)}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
                         </td>
                       </tr>
                     ))}
