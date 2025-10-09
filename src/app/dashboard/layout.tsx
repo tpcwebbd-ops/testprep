@@ -2,11 +2,10 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Home, Settings, MessageCircle, ChevronDown, ChevronRight, MailCheck } from 'lucide-react';
+import { Menu, X, Home, Settings, MessageCircle, ChevronDown, ChevronRight, MailCheck, ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-// Example Sidebar Data
 const dashboardSidebarData = [
   { id: 1, name: 'Account', path: '/dashboard/account', icon: <MailCheck size={18} /> },
   { id: 2, name: 'User', path: '/dashboard/user', icon: <MailCheck size={18} /> },
@@ -37,7 +36,7 @@ const dashboardSidebarData = [
 ];
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [expandedItem, setExpandedItem] = useState<number | null>(null);
   const pathname = usePathname();
@@ -49,76 +48,68 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-blue-500 flex relative">
       {/* ===== Desktop Sidebar ===== */}
-      <AnimatePresence>
-        {isSidebarOpen && (
-          <motion.aside
-            initial={{ x: -200, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: -200, opacity: 0 }}
-            transition={{ duration: 0.4 }}
-            className="hidden md:flex flex-col w-64 backdrop-blur-xl bg-white/10 border-r border-white/20 text-white p-4 space-y-4"
-          >
-            <button onClick={() => setIsSidebarOpen(false)} className="self-end text-white hover:text-gray-300">
-              <X size={20} />
-            </button>
-
-            <nav className="flex flex-col space-y-2 overflow-y-auto">
-              {dashboardSidebarData.map(item => (
-                <div key={item.id}>
-                  <button
-                    onClick={() => item.childData && toggleExpand(item.id)}
-                    className={`w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-white/20 transition ${
-                      pathname === item.path ? 'bg-white/20' : ''
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      {item.icon}
-                      <Link href={item.path}>{item.name}</Link>
-                    </div>
-                    {item.childData && <span>{expandedItem === item.id ? <ChevronDown size={16} /> : <ChevronRight size={16} />}</span>}
-                  </button>
-
-                  {/* Accordion */}
-                  <AnimatePresence>
-                    {expandedItem === item.id && item.childData && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="ml-6 mt-2 flex flex-col space-y-1"
-                      >
-                        {item.childData.map(child => (
-                          <Link
-                            key={child.id}
-                            href={child.path}
-                            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-white/20 text-sm ${
-                              pathname === child.path ? 'bg-white/20' : ''
-                            }`}
-                          >
-                            {child.icon}
-                            {child.name}
-                          </Link>
-                        ))}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              ))}
-            </nav>
-          </motion.aside>
-        )}
-      </AnimatePresence>
-
-      {/* ===== Sidebar Toggle Button (Desktop) ===== */}
-      {!isSidebarOpen && (
+      <motion.aside
+        animate={{ width: isCollapsed ? '80px' : '250px' }}
+        transition={{ duration: 0.3 }}
+        className="hidden md:flex flex-col backdrop-blur-xl bg-white/10 border-r border-white/20 text-white p-3 space-y-4 relative"
+      >
+        {/* Toggle Button */}
         <button
-          onClick={() => setIsSidebarOpen(true)}
-          className="hidden md:block absolute top-4 left-4 p-2 rounded-full bg-white/20 hover:bg-white/30 text-white transition"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="absolute -right-3 top-6 bg-white/20 hover:bg-white/30 p-1 rounded-full text-white transition"
         >
-          <Menu size={20} />
+          {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
         </button>
-      )}
+
+        {/* Logo / Title */}
+        <div className={`transition-all duration-300 ${isCollapsed ? 'text-center' : 'pl-2'}`}>
+          <h1 className="text-lg font-bold">{isCollapsed ? 'DB' : 'Dashboard'}</h1>
+        </div>
+
+        {/* Sidebar Menu */}
+        <nav className="flex flex-col space-y-2 overflow-y-auto mt-4">
+          {dashboardSidebarData.map(item => (
+            <div key={item.id}>
+              <button
+                onClick={() => item.childData && toggleExpand(item.id)}
+                className={`w-full flex items-center justify-between px-2 py-2 rounded-lg hover:bg-white/20 transition ${
+                  pathname === item.path ? 'bg-white/20' : ''
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  {item.icon}
+                  {!isCollapsed && <Link href={item.path}>{item.name}</Link>}
+                </div>
+                {!isCollapsed && item.childData && <span>{expandedItem === item.id ? <ChevronDown size={16} /> : <ChevronRight size={16} />}</span>}
+              </button>
+
+              {/* Accordion */}
+              <AnimatePresence>
+                {!isCollapsed && expandedItem === item.id && item.childData && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="ml-6 mt-2 flex flex-col space-y-1"
+                  >
+                    {item.childData.map(child => (
+                      <Link
+                        key={child.id}
+                        href={child.path}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-white/20 text-sm ${pathname === child.path ? 'bg-white/20' : ''}`}
+                      >
+                        {child.icon}
+                        {child.name}
+                      </Link>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          ))}
+        </nav>
+      </motion.aside>
 
       {/* ===== Main Content ===== */}
       <motion.main initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="flex-1 p-6 md:p-10 text-white">
@@ -138,7 +129,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         </button>
       </div>
 
-      {/* ===== Mobile Sidebar Overlay ===== */}
+      {/* ===== Mobile Sidebar ===== */}
       <AnimatePresence>
         {mobileSidebarOpen && (
           <motion.div
