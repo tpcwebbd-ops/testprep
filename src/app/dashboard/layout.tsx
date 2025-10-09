@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Home, Settings, MessageCircle, ChevronDown, ChevronRight, MailCheck, ChevronLeft } from 'lucide-react';
+import { X, Home, Settings, MessageCircle, ChevronDown, ChevronRight, MailCheck, ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
