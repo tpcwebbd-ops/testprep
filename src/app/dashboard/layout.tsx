@@ -9,7 +9,8 @@ import { signOut, useSession } from '@/lib/auth-client';
 
 const dashboardSidebarData = [
   { id: 1, name: 'Account', path: '/dashboard/account', icon: <MailCheck size={18} /> },
-  { id: 2, name: 'User', path: '/dashboard/user', icon: <MailCheck size={18} /> },
+  { id: 21, name: 'User', path: '/dashboard/user', icon: <MailCheck size={18} /> },
+  { id: 22, name: 'My-class', path: '/dashboard/my-class', icon: <MailCheck size={18} /> },
   { id: 3, name: 'Session', path: '/dashboard/session', icon: <MailCheck size={18} /> },
   {
     id: 4,
