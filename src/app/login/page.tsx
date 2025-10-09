@@ -13,7 +13,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState<string | null>(null); // ✅ new error state
+  const [error, setError] = useState<string | null>(null);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -171,7 +171,7 @@ const LoginPage = () => {
                     },
                   );
                 } catch (err) {
-                  setError('Google login failed. Please try again.');
+                  setError('Google login failed. Please try again.' + err);
                   setLoading(false);
                 }
               }}

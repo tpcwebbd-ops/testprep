@@ -3,11 +3,13 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react';
 import ContinueWithGoogleButton from '@/components/common/GoogleButton';
+import { signUp, signIn } from '@/lib/auth-client';
 
 const RegistrationPage = () => {
   const router = useRouter();
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -18,6 +20,7 @@ const RegistrationPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null); // ✅ new error message state
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -28,17 +31,51 @@ const RegistrationPage = () => {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match!');
+
+    setError(null);
+
+    const { name, email, password, confirmPassword } = formData;
+
+    if (!name || !email || !password || !confirmPassword) {
+      setError('All fields are required.');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
       return;
     }
 
     setLoading(true);
-    setTimeout(() => {
+    try {
+      const res = await signUp.email(
+        {
+          email,
+          password,
+          name,
+          callbackURL: '/verify',
+        },
+        {
+          onRequest: () => setLoading(true),
+          onResponse: () => setLoading(false),
+        },
+      );
+
+      if (res?.error) {
+        setError(res.error.message || 'Registration failed. Please try again.');
+      } else {
+        router.push('/verify');
+      }
+    } catch (err: unknown) {
+      console.error(err);
+      setError('Something went wrong. Please try again later.');
+    } finally {
       setLoading(false);
-      router.push('/verify');
-    }, 1500);
+    }
   };
+
+  const { name, email, password, confirmPassword } = formData;
+  const isFormInvalid = !name || !email || !password || !confirmPassword || password !== confirmPassword;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 via-purple-600 to-blue-500 p-4">
@@ -72,9 +109,8 @@ const RegistrationPage = () => {
         <div className="flex-1 bg-white/10 backdrop-blur-lg p-8 flex flex-col justify-center text-white">
           <h2 className="text-2xl md:text-3xl font-semibold text-center mb-6">Sign Up</h2>
 
-          {/* --- Registration Form --- */}
           <form onSubmit={handleRegister} className="flex flex-col space-y-4">
-            {/* Name */}
+            {/* Full Name */}
             <div>
               <label htmlFor="name" className="block mb-1 text-sm">
                 Full Name
@@ -83,7 +119,7 @@ const RegistrationPage = () => {
                 id="name"
                 name="name"
                 type="text"
-                value={formData.name}
+                value={name}
                 onChange={handleChange}
                 required
                 className="w-full px-4 py-2 rounded-lg bg-white/20 border border-white/30 focus:outline-none focus:ring-2 focus:ring-purple-300 placeholder-white/60"
@@ -100,7 +136,7 @@ const RegistrationPage = () => {
                 id="email"
                 name="email"
                 type="email"
-                value={formData.email}
+                value={email}
                 onChange={handleChange}
                 required
                 className="w-full px-4 py-2 rounded-lg bg-white/20 border border-white/30 focus:outline-none focus:ring-2 focus:ring-purple-300 placeholder-white/60"
@@ -118,7 +154,7 @@ const RegistrationPage = () => {
                   id="password"
                   name="password"
                   type={showPassword ? 'text' : 'password'}
-                  value={formData.password}
+                  value={password}
                   onChange={handleChange}
                   required
                   className="w-full px-4 py-2 rounded-lg bg-white/20 border border-white/30 focus:outline-none focus:ring-2 focus:ring-purple-300 placeholder-white/60 pr-10"
@@ -144,7 +180,7 @@ const RegistrationPage = () => {
                   id="confirmPassword"
                   name="confirmPassword"
                   type={showConfirmPassword ? 'text' : 'password'}
-                  value={formData.confirmPassword}
+                  value={confirmPassword}
                   onChange={handleChange}
                   required
                   className="w-full px-4 py-2 rounded-lg bg-white/20 border border-white/30 focus:outline-none focus:ring-2 focus:ring-purple-300 placeholder-white/60 pr-10"
@@ -160,11 +196,25 @@ const RegistrationPage = () => {
               </div>
             </div>
 
+            {/* --- Error Message --- */}
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center text-red-300 bg-red-500/10 border border-red-400/30 rounded-lg p-2 mt-2 text-sm"
+              >
+                <AlertCircle className="mr-2" size={16} />
+                {error}
+              </motion.div>
+            )}
+
             {/* --- Register Button --- */}
             <button
               type="submit"
-              disabled={loading}
-              className="w-full py-2 mt-4 bg-gradient-to-r from-purple-500 to-blue-500 hover:opacity-90 rounded-lg font-medium flex justify-center items-center gap-2 transition-all"
+              disabled={loading || isFormInvalid}
+              className={`w-full py-2 mt-4 rounded-lg font-medium flex justify-center items-center gap-2 transition-all ${
+                loading || isFormInvalid ? 'bg-gray-400 cursor-not-allowed' : 'bg-gradient-to-r from-purple-500 to-blue-500 hover:opacity-90'
+              }`}
             >
               {loading ? (
                 <>
@@ -184,9 +234,28 @@ const RegistrationPage = () => {
             <div className="w-1/5 border-t border-white/30"></div>
           </div>
 
-          {/* --- Google Login Button --- */}
+          {/* --- Google Sign Up --- */}
           <div className="flex justify-center">
-            <ContinueWithGoogleButton />
+            <ContinueWithGoogleButton
+              onClick={async () => {
+                setError(null);
+                try {
+                  await signIn.social(
+                    {
+                      provider: 'google',
+                      callbackURL: '/dashboard',
+                    },
+                    {
+                      onRequest: () => setLoading(true),
+                      onResponse: () => setLoading(false),
+                    },
+                  );
+                } catch {
+                  setError('Google signup failed. Please try again.');
+                  setLoading(false);
+                }
+              }}
+            />
           </div>
 
           {/* --- Login Redirect --- */}
