@@ -22,6 +22,15 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/dashboard/finance/all/api/v1/overview/rr", "src/app/my-class/page-prmpt.text", ".note/prompt/base/dashboard/dashboard-prompt.text"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".idea/backup for 9 October/dashboard/finance/all/api/v1/overview/rr",
+    ".idea/backup for 9 October/my-class/page-prmpt.text",
+    ".note/prompt/base/dashboard/dashboard-prompt.text",
+    "src/lib/models/User"
+  ],
   "exclude": ["node_modules"]
 }

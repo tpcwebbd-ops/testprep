@@ -6,11 +6,11 @@
 |-----------------------------------------
 */
 
-import FooterSectionComponents from './components/Footer';
-import HeroSection from './components/Hero';
-import TestPrepHero from './components/Hero2';
-import TestPrepClasses from './components/OurClasses';
-import StudyAbroad from './components/StudyAbroad';
+import FooterSectionComponents from '../../.idea/backup for 9 October/components/Footer';
+import HeroSection from '../../.idea/backup for 9 October/components/Hero';
+import TestPrepHero from '../../.idea/backup for 9 October/components/Hero2';
+import TestPrepClasses from '../../.idea/backup for 9 October/components/OurClasses';
+import StudyAbroad from '../../.idea/backup for 9 October/components/StudyAbroad';
 
 export default function Home() {
   return (
