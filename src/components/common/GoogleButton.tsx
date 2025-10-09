@@ -13,7 +13,7 @@ const ContinueWithGoogleButton: React.FC<ContinueWithGoogleButtonProps> = ({ onC
       whileHover={{ scale: 1.03 }}
       whileTap={{ scale: 0.97 }}
       onClick={onClick}
-      className="flex items-center justify-center gap-3 w-full sm:w-auto px-6 py-3 rounded-lg bg-white text-gray-800 font-medium border border-gray-300 shadow-md hover:shadow-lg transition-all duration-300"
+      className="flex items-center justify-center gap-3 w-full sm:w-auto px-6 py-2 rounded-full bg-white text-gray-800 font-medium border border-gray-300 shadow-md hover:shadow-lg transition-all duration-300"
     >
       {/* Inline Google SVG */}
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="22" height="22">
