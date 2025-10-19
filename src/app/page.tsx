@@ -7,17 +7,17 @@
 */
 
 import MainFooter from '@/components/common/MainFooter';
-import HeroSection from '../../.idea/backup for 9 October/components/Hero';
-import TestPrepHero from '../../.idea/backup for 9 October/components/Hero2';
-import TestPrepClasses from '../../.idea/backup for 9 October/components/OurClasses';
-import StudyAbroad from '../../.idea/backup for 9 October/components/StudyAbroad';
+import HeroSection from '@/components/home-components/Hero';
+import TestPrepHero from '@/components/home-components/Hero2';
+import TestPrepClasses from '@/components/home-components/OurClasses';
+import StudyAbroad from '@/components/home-components/StudyAbroad';
 
 export default function Home() {
   return (
     <>
       <HeroSection />
       <TestPrepHero />
-      <TestPrepClasses />
+      {/* <TestPrepClasses /> */}
       <StudyAbroad />
       <MainFooter />
     </>

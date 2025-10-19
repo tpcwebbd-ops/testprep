@@ -48,11 +48,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const session = useSession();
 
   // Redirect if not logged in
-  useEffect(() => {
-    if (!session?.data?.session && !session?.isPending) {
-      router.push('/login');
-    }
-  }, [session, router]);
+ 
 
   const toggleExpand = (id: number) => {
     setExpandedItem(expandedItem === id ? null : id);
