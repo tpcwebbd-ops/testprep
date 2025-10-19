@@ -15,11 +15,13 @@ export const auth = betterAuth({
       console.log(' email and Pass ', data, request);
       // Send an email to the user with a link to reset their password
     },
+    allowLinking: true,
   },
   socialProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      allowLinking: true,
     },
   },
 
