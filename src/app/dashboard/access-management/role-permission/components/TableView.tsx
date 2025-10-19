@@ -359,24 +359,25 @@ const ViewTableNextComponents: React.FC = () => {
       {allData.length === 0 ? (
         <div className="py-12 text-center text-2xl text-slate-300">Ops! Nothing was found.</div>
       ) : (
-        <div className="w-full overflow-x-auto rounded-lg">
-          <Table className="min-w-full border">
+        <Table className="min-w-max border">
+          <>
             <TableHeader>
               <TableRow className="bg-blue-300/40 text-white font-bold">
                 <TableHead>
                   <Checkbox onCheckedChange={checked => handleSelectAll(!!checked)} checked={bulkData.length === allData.length && allData.length > 0} />
                 </TableHead>
                 {visibleHeaders.map(({ key, label }) => (
-                  <TableHead key={key} className="cursor-pointer bg-accent-100/60 text-slate-50 font-bold" onClick={() => handleSort(key)}>
-                    {label} {sortConfig?.key === key && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                  <TableHead key={key} className="cursor-pointer bg-accent-100/60 text-slate-50 font-bold whitespace-nowrap" onClick={() => handleSort(key)}>
+                    {label}
+                    {sortConfig?.key === key && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                   </TableHead>
                 ))}
-                <TableHead className="text-right bg-accent-100/60 text-slate-50 font-bold">Actions</TableHead>
+                <TableHead className="text-right bg-accent-100/60 text-slate-50 font-bold whitespace-nowrap">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>{renderTableRows()}</TableBody>
-          </Table>
-        </div>
+          </>
+        </Table>
       )}
 
       <Pagination
