@@ -20,13 +20,13 @@ const buttonVariants = cva(
         fire: 'text-slate-700 hover:text-slate-800 bg-rose-400 hover:bg-rose-500',
         water: 'text-slate-700 hover:text-slate-800 bg-blue-400 hover:bg-blue-500',
         outlineGarden:
-          'border-1 border-green-400 text-green-500 hover:text-green-50 shadow-xl bg-green-300/20 shadow-xs hover:bg-green-400 transition-all duration-300',
+          'border-1 border-green-400 text-green-800 hover:text-green-50 shadow-xl bg-green-300/40 shadow-xs hover:bg-green-400 transition-all duration-300',
         outlineFire:
-          'border-1 border-rose-400 shadow-xl bg-rose-300/20 shadow-xs hover:bg-rose-400 transition-all duration-300 text-rose-500 hover:text-rose-50',
+          'border-1 border-rose-400 shadow-xl bg-rose-300/40 shadow-xs hover:bg-rose-400 transition-all duration-300 text-rose-800 hover:text-rose-50',
         outlineWater:
-          'border-1 border-blue-400 shadow-xl bg-blue-300/20 shadow-xs hover:bg-blue-400 transition-all duration-300 text-blue-500 hover:text-blue-50',
+          'border-1 border-blue-400 shadow-xl bg-blue-300/40 shadow-xs hover:bg-blue-400 transition-all duration-300 text-blue-800 hover:text-blue-50',
         outlineDefault:
-          'border-1 border-gray-400 shadow-xl bg-gray-300/20 shadow-xs hover:bg-gray-400 transition-all duration-300 text-gray-500 hover:text-gray-50',
+          'border-1 border-gray-400 shadow-xl bg-gray-300/40 shadow-xs hover:bg-gray-400 transition-all duration-300 text-gray-800 hover:text-gray-50',
       },
       size: {
         default: 'h-9 px-4 py-2 has-[>svg]:px-3',

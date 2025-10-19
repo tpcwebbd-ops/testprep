@@ -9,7 +9,7 @@
 import MainFooter from '@/components/common/MainFooter';
 import HeroSection from '@/components/home-components/Hero';
 import TestPrepHero from '@/components/home-components/Hero2';
-import TestPrepClasses from '@/components/home-components/OurClasses';
+// import TestPrepClasses from '@/components/home-components/OurClasses';
 import StudyAbroad from '@/components/home-components/StudyAbroad';
 
 export default function Home() {

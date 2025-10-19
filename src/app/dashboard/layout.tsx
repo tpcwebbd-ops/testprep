@@ -35,6 +35,16 @@ const dashboardSidebarData = [
       { id: 59, name: 'Footer', path: '/dashboard/site-setting/footer', icon: <MailCheck size={16} /> },
     ],
   },
+  {
+    id: 6,
+    name: 'Access Management',
+    path: '/dashboard/access-management',
+    icon: <MailCheck size={18} />,
+    childData: [
+      { id: 61, name: 'Access Management', path: '/dashboard/access-management/access-management', icon: <MailCheck size={16} /> },
+      { id: 62, name: 'Role Parmission', path: '/dashboard/access-management/role-permission', icon: <MailCheck size={16} /> },
+    ],
+  },
 ];
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
