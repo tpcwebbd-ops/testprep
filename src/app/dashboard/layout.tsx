@@ -76,7 +76,9 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const user = session?.data?.user;
 
   return (
-    <div className="min-h-[calc(100vh-65px)] bg-gradient-to-br from-indigo-500 via-purple-500 to-blue-500 flex relative">
+    <div className="relative flex min-h-screen">
+      <div className="fixed inset-0 bg-gradient-to-br from-indigo-500 via-purple-500 to-blue-500 -z-10" />
+
       {/* ===== Desktop Sidebar ===== */}
       <motion.aside
         animate={{ width: isCollapsed ? '80px' : '250px' }}

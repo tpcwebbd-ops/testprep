@@ -2,7 +2,7 @@
 
 import { format } from 'date-fns';
 import React, { useState, useMemo } from 'react';
-import { MoreHorizontalIcon, EyeIcon, PencilIcon, TrashIcon, DownloadIcon } from 'lucide-react';
+import { MoreHorizontalIcon, EyeIcon, PencilIcon, TrashIcon, DownloadIcon, XIcon } from 'lucide-react';
 
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -19,26 +19,28 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { cn } from '@/lib/utils';
 
 import { IRoles } from '../store/data/data';
 import { pageLimitArr } from '../store/store-constant';
 import { useRolesStore } from '../store/store';
 import { useGetRolesQuery } from '@/redux/features/roles/rolesSlice';
 import Pagination from './Pagination';
-import ExportDialog from './ExportDialog'; // Import the new dialog component
+import ExportDialog from './ExportDialog';
 
-// Dynamically generated types for type safety
 type DisplayableRolesKeys = 'name' | 'email' | 'createdAt';
 type ColumnVisibilityState = Record<DisplayableRolesKeys, boolean>;
 
 const ViewTableNextComponents: React.FC = () => {
+  const [open, setOpen] = useState(false); // Add inside your component or move to a child if you prefer
   const [sortConfig, setSortConfig] = useState<{
     key: DisplayableRolesKeys;
     direction: 'asc' | 'desc';
   } | null>(null);
 
-  // State to control the export dialog visibility
   const [isExportDialogOpen, setExportDialogOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const {
     setSelectedRoles,
@@ -81,15 +83,7 @@ const ViewTableNextComponents: React.FC = () => {
 
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibilityState>(() => {
     const initialState = {} as ColumnVisibilityState;
-    let counter = 0;
-    for (const header of tableHeaders) {
-      if (counter > 3) {
-        initialState[header.key] = false;
-      } else {
-        initialState[header.key] = true;
-      }
-      counter++;
-    }
+    for (const header of tableHeaders) initialState[header.key] = true;
     return initialState;
   });
 
@@ -122,43 +116,109 @@ const ViewTableNextComponents: React.FC = () => {
   }, [allData, sortConfig]);
 
   const handleSelectAll = (isChecked: boolean) => setBulkData(isChecked ? allData : []);
-
   const handleSelectRow = (isChecked: boolean, item: IRoles) => setBulkData(isChecked ? [...bulkData, item] : bulkData.filter(i => i._id !== item._id));
 
-  const renderActions = (item: IRoles) => (
-    <div className="flex gap-2 justify-end">
-      <Button
-        variant="outlineWater"
-        size="sm"
-        onClick={() => {
-          setSelectedRoles(item);
-          toggleViewModal(true);
-        }}
-      >
-        <EyeIcon className="w-4 h-4" />
-      </Button>
-      <Button
-        variant="outlineWater"
-        size="sm"
-        onClick={() => {
-          setSelectedRoles(item);
-          toggleEditModal(true);
-        }}
-      >
-        <PencilIcon className="w-4 h-4" />
-      </Button>
-      <Button
-        variant="destructive"
-        size="sm"
-        onClick={() => {
-          setSelectedRoles(item);
-          toggleDeleteModal(true);
-        }}
-      >
-        <TrashIcon className="w-4 h-4" />
-      </Button>
-    </div>
-  );
+  const renderActions = (item: IRoles) => {
+    return (
+      <div className="flex justify-end items-center">
+        {/* ===== Desktop Actions ===== */}
+        <div className="hidden md:flex gap-2">
+          <Button
+            variant="outlineWater"
+            className="min-w-[8px]"
+            size="sm"
+            onClick={() => {
+              setSelectedRoles(item);
+              toggleViewModal(true);
+            }}
+          >
+            <EyeIcon className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="outlineWater"
+            className="min-w-[8px]"
+            size="sm"
+            onClick={() => {
+              setSelectedRoles(item);
+              toggleEditModal(true);
+            }}
+          >
+            <PencilIcon className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="destructive"
+            className="min-w-[8px]"
+            size="sm"
+            onClick={() => {
+              setSelectedRoles(item);
+              toggleDeleteModal(true);
+            }}
+          >
+            <TrashIcon className="w-4 h-4" />
+          </Button>
+        </div>
+
+        {/* ===== Mobile Actions (Sheet popup) ===== */}
+        <div className="md:hidden">
+          <Sheet open={open} onOpenChange={setOpen}>
+            <SheetTrigger asChild>
+              <Button size="icon" variant="outlineWater" className="min-w-[8px] rounded-full border-none">
+                <MoreHorizontalIcon className="h-4 w-4" />
+              </Button>
+            </SheetTrigger>
+
+            <SheetContent
+              side="bottom"
+              className={cn(
+                'w-full backdrop-blur-xl bg-white/10 border-t border-white/20 text-white shadow-2xl',
+                'rounded-t-2xl p-4 flex flex-col space-y-4 animate-in slide-in-from-bottom',
+              )}
+            >
+              <div className="flex justify-between items-center mb-2">
+                <h2 className="text-base font-semibold text-white/90">Actions</h2>
+              </div>
+
+              <Button
+                variant="outlineWater"
+                size="sm"
+                onClick={() => {
+                  setSelectedRoles(item);
+                  toggleViewModal(true);
+                  setOpen(false);
+                }}
+              >
+                <EyeIcon className="w-4 h-4 mr-2" /> View
+              </Button>
+
+              <Button
+                variant="outlineWater"
+                size="sm"
+                onClick={() => {
+                  setSelectedRoles(item);
+                  toggleEditModal(true);
+                  setOpen(false);
+                }}
+              >
+                <PencilIcon className="w-4 h-4 mr-2" /> Edit
+              </Button>
+
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => {
+                  setSelectedRoles(item);
+                  toggleDeleteModal(true);
+                  setOpen(false);
+                }}
+              >
+                <TrashIcon className="w-4 h-4 mr-2" /> Delete
+              </Button>
+            </SheetContent>
+          </Sheet>
+        </div>
+      </div>
+    );
+  };
 
   const renderTableRows = () =>
     sortedData.map((item: IRoles) => (
@@ -178,14 +238,16 @@ const ViewTableNextComponents: React.FC = () => {
 
   return (
     <div className="w-full flex flex-col">
+      {/* Toolbar Section */}
       <div className="w-full my-4">
-        <div className="w-full flex flex-col md:flex-row items-center justify-between gap-4 pb-2 border-b">
+        <div className="w-full flex md:flex-row items-center justify-between gap-4 pb-2 border-b">
           <div className="flex items-center gap-2 justify-start w-full">
-            <Label>Selected: </Label>
+            <Label>Selected:</Label>
             <span className="text-sm text-slate-300">({bulkData.length})</span>
           </div>
-          {/* Updated Toolbar Layout */}
-          <div className="flex items-center justify-end w-full gap-2">
+
+          {/* ===== Desktop Toolbar ===== */}
+          <div className="hidden md:flex items-center justify-end w-full gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outlineWater" size="sm">
@@ -214,12 +276,9 @@ const ViewTableNextComponents: React.FC = () => {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* Updated Export Button to open the dialog */}
             <Button size="sm" variant="outlineWater" onClick={() => setExportDialogOpen(true)} disabled={bulkData.length === 0}>
               <DownloadIcon className="w-4 h-4 mr-1" /> Export
             </Button>
-            <div className="w-2 h-auto" />
-
             <Button size="sm" variant="outlineWater" onClick={() => toggleBulkUpdateModal(true)} disabled={bulkData.length === 0}>
               <PencilIcon className="w-4 h-4 mr-1" /> B.Update
             </Button>
@@ -230,28 +289,94 @@ const ViewTableNextComponents: React.FC = () => {
               <TrashIcon className="w-4 h-4 mr-1" /> B.Delete
             </Button>
           </div>
+
+          {/* ===== Mobile Toolbar (Sheet) ===== */}
+          <div className="flex md:hidden justify-end w-full">
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button size="icon" variant="outlineWater" className="rounded-full backdrop-blur-md bg-white/10 border-white/20 min-w-[8px]">
+                  <MoreHorizontalIcon className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+
+              <SheetContent
+                side="right"
+                className={cn(
+                  'w-64 sm:w-72 backdrop-blur-xl bg-white/10 border border-white/20 text-white shadow-2xl',
+                  'rounded-l-2xl p-4 flex flex-col space-y-4',
+                )}
+              >
+                <SheetHeader className="flex justify-between items-center">
+                  <SheetTitle className="text-lg font-semibold text-white/90"></SheetTitle>
+                </SheetHeader>
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outlineWater" size="sm" className="justify-start">
+                      Columns
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>Toggle Columns</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {tableHeaders.map(header => (
+                      <DropdownMenuCheckboxItem
+                        key={header.key}
+                        className="capitalize"
+                        checked={columnVisibility[header.key]}
+                        onCheckedChange={value =>
+                          setColumnVisibility(prev => ({
+                            ...prev,
+                            [header.key]: !!value,
+                          }))
+                        }
+                      >
+                        {header.label}
+                      </DropdownMenuCheckboxItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                <Button size="sm" variant="outlineWater" onClick={() => setExportDialogOpen(true)} disabled={bulkData.length === 0}>
+                  <DownloadIcon className="w-4 h-4 mr-1" /> Export
+                </Button>
+                <Button size="sm" variant="outlineWater" onClick={() => toggleBulkUpdateModal(true)} disabled={bulkData.length === 0}>
+                  <PencilIcon className="w-4 h-4 mr-1" /> B.Update
+                </Button>
+                <Button size="sm" variant="outlineWater" onClick={() => toggleBulkEditModal(true)} disabled={bulkData.length === 0}>
+                  <PencilIcon className="w-4 h-4 mr-1" /> B.Edit
+                </Button>
+                <Button size="sm" variant="destructive" onClick={() => toggleBulkDeleteModal(true)} disabled={bulkData.length === 0}>
+                  <TrashIcon className="w-4 h-4 mr-1" /> B.Delete
+                </Button>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </div>
 
+      {/* ===== Responsive Scrollable Table ===== */}
       {allData.length === 0 ? (
         <div className="py-12 text-center text-2xl text-slate-300">Ops! Nothing was found.</div>
       ) : (
-        <Table className="border">
-          <TableHeader>
-            <TableRow className="bg-blue-300/40 text-white font-bold">
-              <TableHead>
-                <Checkbox onCheckedChange={checked => handleSelectAll(!!checked)} checked={bulkData.length === allData.length && allData.length > 0} />
-              </TableHead>
-              {visibleHeaders.map(({ key, label }) => (
-                <TableHead key={key} className="cursor-pointer bg-accent-100/60 text-slate-50 font-bold" onClick={() => handleSort(key)}>
-                  {label} {sortConfig?.key === key && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+        <div className="w-full overflow-x-auto rounded-lg">
+          <Table className="min-w-full border">
+            <TableHeader>
+              <TableRow className="bg-blue-300/40 text-white font-bold">
+                <TableHead>
+                  <Checkbox onCheckedChange={checked => handleSelectAll(!!checked)} checked={bulkData.length === allData.length && allData.length > 0} />
                 </TableHead>
-              ))}
-              <TableHead className="text-right bg-accent-100/60 text-slate-50 font-bold">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>{renderTableRows()}</TableBody>
-        </Table>
+                {visibleHeaders.map(({ key, label }) => (
+                  <TableHead key={key} className="cursor-pointer bg-accent-100/60 text-slate-50 font-bold" onClick={() => handleSort(key)}>
+                    {label} {sortConfig?.key === key && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                  </TableHead>
+                ))}
+                <TableHead className="text-right bg-accent-100/60 text-slate-50 font-bold">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>{renderTableRows()}</TableBody>
+          </Table>
+        </div>
       )}
 
       <Pagination
@@ -285,7 +410,6 @@ const ViewTableNextComponents: React.FC = () => {
         </Select>
       </div>
 
-      {/* Render the ExportDialog and pass it the required props */}
       <ExportDialog
         isOpen={isExportDialogOpen}
         onOpenChange={setExportDialogOpen}
@@ -296,4 +420,5 @@ const ViewTableNextComponents: React.FC = () => {
     </div>
   );
 };
+
 export default ViewTableNextComponents;
