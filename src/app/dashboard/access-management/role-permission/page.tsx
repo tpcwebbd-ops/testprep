@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { PlusIcon, XIcon } from 'lucide-react';
+import { Filter, Plus, Settings2, RefreshCcw, XIcon } from 'lucide-react';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { IoReloadCircleOutline } from 'react-icons/io5';
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 
 import AddFile from './components/Add';
 import EditFile from './components/Edit';
@@ -104,7 +104,7 @@ const MainNextPage: React.FC = () => {
     <div className="container mx-auto p-4">
       <div className="flex flex-col md:flex-row gap-2 justify-between items-center mb-6">
         <h1 className="h2 w-full">Role Management {isSuccess && <sup className="text-xs">(total:{getResponseData?.data?.total || '00'})</sup>}</h1>
-        <div className="w-full flex flex-col md:flex-row gap-2 item-center justify-end">
+        {/* <div className="w-full flex flex-col md:flex-row gap-2 item-center justify-end">
           <Summary />
           <Button size="sm" variant="outlineWater" onClick={handleFilter} disabled={isLoading}>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-filter-right mr-1" viewBox="0 0 16 16">
@@ -127,10 +127,75 @@ const MainNextPage: React.FC = () => {
             <PlusIcon className="w-4 h-4" />
             Add Role
           </Button>
+        </div> */}
+
+        {/* Toolbar (Responsive) */}
+        <div className="w-full flex md:hidden justify-end">
+          {/* Mobile Sheet Trigger */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outlineWater" size="icon" className="flex items-center justify-center" aria-label="Open actions">
+                <Settings2 className="w-5 h-5" />
+              </Button>
+            </SheetTrigger>
+
+            <SheetContent side="bottom" className="p-6 space-y-5 bg-white/10 backdrop-blur-xl border-t border-white/20 shadow-lg rounded-t-2xl">
+              <SheetHeader>
+                <SheetTitle className="text-white text-lg font-medium text-center">Role Actions</SheetTitle>
+              </SheetHeader>
+
+              {/* Mobile toolbar actions */}
+              <div className="flex flex-col gap-3">
+                <Summary />
+
+                <Button size="sm" variant="outlineWater" onClick={handleFilter} disabled={isLoading} className="w-full">
+                  <Filter className="w-4 h-4 mr-2" /> Filter
+                </Button>
+
+                <Button
+                  size="sm"
+                  variant="outlineWater"
+                  onClick={() => {
+                    refetch();
+                    handleSuccess('Reloaded!');
+                  }}
+                  disabled={isLoading}
+                  className="w-full"
+                >
+                  <RefreshCcw className="w-4 h-4 mr-2" /> Reload
+                </Button>
+
+                <Button size="sm" variant="outlineGarden" onClick={() => toggleAddModal(true)} className="w-full">
+                  <Plus className="w-4 h-4 mr-2" /> Add Role
+                </Button>
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
+
+        {/* Desktop Toolbar */}
+        <div className="hidden md:flex flex-row gap-2 items-center justify-end w-full">
+          <Summary />
+          <Button size="sm" variant="outlineWater" onClick={handleFilter} disabled={isLoading}>
+            <Filter className="w-4 h-4 mr-2" /> Filter
+          </Button>
+          <Button
+            size="sm"
+            variant="outlineWater"
+            onClick={() => {
+              refetch();
+              handleSuccess('Reloaded!');
+            }}
+            disabled={isLoading}
+          >
+            <RefreshCcw className="w-4 h-4 mr-2" /> Reload
+          </Button>
+          <Button size="sm" variant="outlineGarden" onClick={() => toggleAddModal(true)}>
+            <Plus className="w-4 h-4 mr-2" /> Add Role
+          </Button>
         </div>
       </div>
       <SearchBox onSearch={handleSearch} placeholder="Search here ..." autoFocus={false} />
-
       {activeFilter.isApplied && (
         <div className="flex items-center justify-start my-4">
           <Badge variant="secondary" className="flex items-center gap-2 pl-3 pr-1 py-1 text-sm font-normal">
@@ -141,12 +206,11 @@ const MainNextPage: React.FC = () => {
           </Badge>
         </div>
       )}
-
       <ViewRolesTable />
+
       {modals.map((ModalComponent, index) => (
         <ModalComponent key={index} />
       ))}
-
       <FilterDialog isOpen={isFilterModalOpen} onOpenChange={setFilterModalOpen} onApplyFilter={handleApplyFilter} onClearFilter={handleClearFilter} />
     </div>
   );

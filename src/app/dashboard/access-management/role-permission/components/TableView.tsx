@@ -28,6 +28,7 @@ import { useRolesStore } from '../store/store';
 import { useGetRolesQuery } from '@/redux/features/roles/rolesSlice';
 import Pagination from './Pagination';
 import ExportDialog from './ExportDialog';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 type DisplayableRolesKeys = 'name' | 'email' | 'createdAt';
 type ColumnVisibilityState = Record<DisplayableRolesKeys, boolean>;
@@ -359,25 +360,70 @@ const ViewTableNextComponents: React.FC = () => {
       {allData.length === 0 ? (
         <div className="py-12 text-center text-2xl text-slate-300">Ops! Nothing was found.</div>
       ) : (
-        <Table className="min-w-max border">
-          <>
-            <TableHeader>
-              <TableRow className="bg-blue-300/40 text-white font-bold">
-                <TableHead>
-                  <Checkbox onCheckedChange={checked => handleSelectAll(!!checked)} checked={bulkData.length === allData.length && allData.length > 0} />
-                </TableHead>
-                {visibleHeaders.map(({ key, label }) => (
-                  <TableHead key={key} className="cursor-pointer bg-accent-100/60 text-slate-50 font-bold whitespace-nowrap" onClick={() => handleSort(key)}>
-                    {label}
-                    {sortConfig?.key === key && (sortConfig.direction === 'asc' ? '↑' : '↓')}
-                  </TableHead>
-                ))}
-                <TableHead className="text-right bg-accent-100/60 text-slate-50 font-bold whitespace-nowrap">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>{renderTableRows()}</TableBody>
-          </>
-        </Table>
+        <div className="w-full">
+          <div className="md:hidden block">
+            <ScrollArea
+              className={cn(
+                'w-[420px] sm:w-[760px] md:w-full rounded-md border border-white/10 bg-white/5 backdrop-blur-md whitespace-nowrap transition-all duration-300',
+              )}
+            >
+              <div className="flex w-max">
+                <Table className="border">
+                  <>
+                    <TableHeader>
+                      <TableRow className="bg-blue-300/40 text-white font-bold">
+                        <TableHead>
+                          <Checkbox
+                            onCheckedChange={checked => handleSelectAll(!!checked)}
+                            checked={bulkData.length === allData.length && allData.length > 0}
+                          />
+                        </TableHead>
+                        {visibleHeaders.map(({ key, label }) => (
+                          <TableHead
+                            key={key}
+                            className="cursor-pointer bg-accent-100/60 text-slate-50 font-bold whitespace-nowrap"
+                            onClick={() => handleSort(key)}
+                          >
+                            {label}
+                            {sortConfig?.key === key && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                          </TableHead>
+                        ))}
+                        <TableHead className="text-right bg-accent-100/60 text-slate-50 font-bold whitespace-nowrap">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>{renderTableRows()}</TableBody>
+                  </>
+                </Table>
+              </div>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+          </div>
+          <div className="hidden md:block">
+            <Table className="border">
+              <>
+                <TableHeader>
+                  <TableRow className="bg-blue-300/40 text-white font-bold">
+                    <TableHead>
+                      <Checkbox onCheckedChange={checked => handleSelectAll(!!checked)} checked={bulkData.length === allData.length && allData.length > 0} />
+                    </TableHead>
+                    {visibleHeaders.map(({ key, label }) => (
+                      <TableHead
+                        key={key}
+                        className="cursor-pointer bg-accent-100/60 text-slate-50 font-bold whitespace-nowrap"
+                        onClick={() => handleSort(key)}
+                      >
+                        {label}
+                        {sortConfig?.key === key && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                      </TableHead>
+                    ))}
+                    <TableHead className="text-right bg-accent-100/60 text-slate-50 font-bold whitespace-nowrap">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>{renderTableRows()}</TableBody>
+              </>
+            </Table>
+          </div>
+        </div>
       )}
 
       <Pagination
