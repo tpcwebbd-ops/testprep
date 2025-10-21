@@ -2,47 +2,71 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Home, Settings, MessageCircle, ChevronDown, ChevronRight, MailCheck, ChevronLeft, LogOut } from 'lucide-react';
+import {
+  X,
+  Home,
+  Settings,
+  MessageCircle,
+  ChevronDown,
+  ChevronRight,
+  ChevronLeft,
+  LogOut,
+  FileText,
+  Info,
+  Wrench,
+  Phone,
+  HelpCircle,
+  Menu,
+  Lock,
+  ScrollText,
+  FileBadge,
+  ShieldCheck,
+  User,
+  Users,
+  GraduationCap,
+  FolderKanban,
+  FileSignature,
+} from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { signOut, useSession } from '@/lib/auth-client';
 
 const dashboardSidebarData = [
-  { id: 1, name: 'Account', path: '/dashboard/account', icon: <MailCheck size={18} /> },
-  { id: 21, name: 'User', path: '/dashboard/user', icon: <MailCheck size={18} /> },
-  { id: 22, name: 'My-class', path: '/dashboard/my-class', icon: <MailCheck size={18} /> },
-  { id: 3, name: 'Session', path: '/dashboard/session', icon: <MailCheck size={18} /> },
+  { id: 1, name: 'Account', path: '/dashboard/account', icon: <User size={18} /> },
+  { id: 21, name: 'User', path: '/dashboard/user', icon: <Users size={18} /> },
+  { id: 22, name: 'My-class', path: '/dashboard/my-class', icon: <GraduationCap size={18} /> },
+  { id: 3, name: 'Session', path: '/dashboard/session', icon: <FileText size={18} /> },
   {
     id: 4,
     name: 'Verification',
     path: '/dashboard/verification',
-    icon: <MailCheck size={18} />,
+    icon: <ShieldCheck size={18} />,
   },
   {
     id: 5,
     name: 'Site Setting',
     path: '/dashboard/site-setting',
-    icon: <MailCheck size={18} />,
+    icon: <Settings size={18} />,
     childData: [
-      { id: 51, name: 'Publish', path: '/dashboard/site-setting/publish', icon: <MailCheck size={16} /> },
-      { id: 52, name: 'About', path: '/dashboard/site-setting/about', icon: <MailCheck size={16} /> },
-      { id: 53, name: 'Service', path: '/dashboard/site-setting/service', icon: <MailCheck size={16} /> },
-      { id: 54, name: 'Contact', path: '/dashboard/site-setting/contact', icon: <MailCheck size={16} /> },
-      { id: 55, name: 'FAQ', path: '/dashboard/site-setting/Frequently-ask-question', icon: <MailCheck size={16} /> },
-      { id: 56, name: 'Menu', path: '/dashboard/site-setting/menu', icon: <MailCheck size={16} /> },
-      { id: 57, name: 'Privacy & Policy', path: '/dashboard/site-setting/privacy-and-policy', icon: <MailCheck size={16} /> },
-      { id: 58, name: 'Terms & Condition', path: '/dashboard/site-setting/terms-and-condition', icon: <MailCheck size={16} /> },
-      { id: 59, name: 'Footer', path: '/dashboard/site-setting/footer', icon: <MailCheck size={16} /> },
+      { id: 51, name: 'Publish', path: '/dashboard/site-setting/publish', icon: <FileText size={16} /> },
+      { id: 52, name: 'About', path: '/dashboard/site-setting/about', icon: <Info size={16} /> },
+      { id: 53, name: 'Service', path: '/dashboard/site-setting/service', icon: <Wrench size={16} /> },
+      { id: 54, name: 'Contact', path: '/dashboard/site-setting/contact', icon: <Phone size={16} /> },
+      { id: 55, name: 'FAQ', path: '/dashboard/site-setting/Frequently-ask-question', icon: <HelpCircle size={16} /> },
+      { id: 56, name: 'Menu', path: '/dashboard/site-setting/menu', icon: <Menu size={16} /> },
+      { id: 57, name: 'Privacy & Policy', path: '/dashboard/site-setting/privacy-and-policy', icon: <Lock size={16} /> },
+      { id: 58, name: 'Terms & Condition', path: '/dashboard/site-setting/terms-and-condition', icon: <ScrollText size={16} /> },
+      { id: 59, name: 'Footer', path: '/dashboard/site-setting/footer', icon: <FileBadge size={16} /> },
     ],
   },
   {
     id: 6,
     name: 'Access Management',
     path: '/dashboard',
-    icon: <MailCheck size={18} />,
+    icon: <ShieldCheck size={18} />,
     childData: [
-      { id: 61, name: 'Access Management', path: '/dashboard/access-management/access-management', icon: <MailCheck size={16} /> },
-      { id: 62, name: 'Role Parmission', path: '/dashboard/access-management/role-permission', icon: <MailCheck size={16} /> },
+      { id: 61, name: 'Access Management', path: '/dashboard/access-management/access-management', icon: <FolderKanban size={16} /> },
+      { id: 62, name: 'Role Permission', path: '/dashboard/access-management/role-permission', icon: <FileSignature size={16} /> },
     ],
   },
 ];

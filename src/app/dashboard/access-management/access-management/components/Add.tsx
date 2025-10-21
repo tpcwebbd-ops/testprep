@@ -46,7 +46,7 @@ const AddNextComponents: React.FC = () => {
   const sessionEmail = authClient.useSession().data?.user.email || '';
 
   // Handle Add
-  const handleAddAccessManagement = async (user: any) => {
+  const handleAddAccessManagement = async (user: { _id: string; name: string; email: string }) => {
     try {
       const payload: IAccessManagements = {
         ...defaultAccessManagements,
@@ -107,7 +107,7 @@ const AddNextComponents: React.FC = () => {
               <p className="text-center text-sm text-white/50">No users found.</p>
             ) : (
               <div className="space-y-2">
-                {users.map((user: any) => (
+                {users.map((user: { _id: string; name: string; email: string }) => (
                   <div
                     key={user._id}
                     className="flex justify-between items-center p-3 rounded-xl border border-white/10 
