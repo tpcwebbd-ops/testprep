@@ -63,7 +63,7 @@ const ExportDialog: React.FC<ExportDialogProps> = ({ isOpen, onOpenChange, heade
     // 1. Get only checked column keys and assert they are keyof IRoles
     const selectedKeys = Object.keys(selectedColumns).filter(key => selectedColumns[key]) as (keyof IAccessManagements)[];
 
-    // 2. Process the data to include only the selected columns
+    // 2. Process the data safely
     const processedData = data.map(row => {
       const newRow = {} as Partial<IAccessManagements>;
       selectedKeys.forEach(key => {
@@ -73,7 +73,7 @@ const ExportDialog: React.FC<ExportDialogProps> = ({ isOpen, onOpenChange, heade
       return newRow as IAccessManagements;
     });
 
-    // 3. Trigger the download and close the dialog
+    // 3. Trigger XLSX download
     downloadFile(processedData, fileName);
     onOpenChange(false);
   };

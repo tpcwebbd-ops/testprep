@@ -26,7 +26,6 @@ import { useAccessManagementsStore } from './store/store';
 import { useGetAccessManagementsQuery } from '@/redux/features/accessManagements/accessManagementsSlice';
 import { handleSuccess } from './components/utils';
 import { logger } from 'better-auth';
-
 const MainNextPage: React.FC = () => {
   const [hashSearchText, setHashSearchText] = useState('');
   const [isFilterModalOpen, setFilterModalOpen] = useState(false);

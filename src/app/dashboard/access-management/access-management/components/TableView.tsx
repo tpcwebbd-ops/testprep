@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
 import { format } from 'date-fns';
+import React, { useState, useMemo } from 'react';
 import { MoreHorizontalIcon, EyeIcon, PencilIcon, TrashIcon, DownloadIcon } from 'lucide-react';
 
 import { Label } from '@/components/ui/label';
@@ -29,7 +29,7 @@ import { useGetAccessManagementsQuery } from '@/redux/features/accessManagements
 import Pagination from './Pagination';
 import ExportDialog from './ExportDialog';
 
-type DisplayableAccessManagementsKeys = 'user_name' | 'user_email' | 'createdAt' | 'assign_role';
+type DisplayableAccessManagementsKeys = 'user_name' | 'user_email' | 'assign_role' | 'given_by_email' | 'createdAt';
 type ColumnVisibilityState = Record<DisplayableAccessManagementsKeys, boolean>;
 
 const ViewTableNextComponents: React.FC = () => {
@@ -72,13 +72,12 @@ const ViewTableNextComponents: React.FC = () => {
 
   const allData = useMemo(() => getResponseData?.data?.accessManagements || [], [getResponseData]);
 
-  const tableHeaders: {
-    key: DisplayableAccessManagementsKeys;
-    label: string;
-  }[] = useMemo(
+  const tableHeaders: { key: DisplayableAccessManagementsKeys; label: string }[] = useMemo(
     () => [
-      { key: 'user_name', label: 'User name' },
-      { key: 'user_email', label: 'User email' },
+      { key: 'user_name', label: 'User Name' },
+      { key: 'user_email', label: 'User Email' },
+      { key: 'assign_role', label: 'Assign Role' },
+      { key: 'given_by_email', label: 'Given by(email)' },
       { key: 'createdAt', label: 'Created At' },
     ],
     [],

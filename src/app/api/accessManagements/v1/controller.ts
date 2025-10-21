@@ -97,7 +97,7 @@ export async function getAccessManagements(req: Request): Promise<IResponse> {
                 const orConditions: FilterQuery<unknown>[] = []
 
                 // Add regex search conditions for all string-like fields
-                const stringFields = ["user_name","user_email"];
+                const stringFields = ["user_name","user_email","given_by_email"];
                 stringFields.forEach(field => {
                     orConditions.push({ [field]: { $regex: searchQuery, $options: 'i' } });
                 });

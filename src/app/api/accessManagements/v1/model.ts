@@ -6,7 +6,11 @@ const accessManagementSchema = new Schema({
           type: String,
           match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email'],
         },
-    "assign_role": [{ type: String }]
+    "assign_role": [{ type: String }],
+    "given_by_email": {
+          type: String,
+          match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email'],
+        }
 }, { timestamps: true })
 
 export default mongoose.models.AccessManagement || mongoose.model('AccessManagement', accessManagementSchema)

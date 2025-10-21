@@ -1,11 +1,11 @@
 import { useState } from 'react';
 
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
-// Static import for all possible form components
 import DynamicSelectField from '@/components/dashboard-ui/DynamicSelectField';
 import InputFieldForEmail from '@/components/dashboard-ui/InputFieldForEmail';
 import InputFieldForString from '@/components/dashboard-ui/InputFieldForString';
@@ -14,12 +14,13 @@ import { useAccessManagementsStore } from '../store/store';
 import { useAddAccessManagementsMutation } from '@/redux/features/accessManagements/accessManagementsSlice';
 import { IAccessManagements, defaultAccessManagements } from '../store/data/data';
 import { formatDuplicateKeyError, handleError, handleSuccess, isApiErrorResponse } from './utils';
+import { authClient } from '@/lib/auth-client';
 
 const AddNextComponents: React.FC = () => {
   const { toggleAddModal, isAddModalOpen, setAccessManagements } = useAccessManagementsStore();
   const [addAccessManagements, { isLoading }] = useAddAccessManagementsMutation();
   const [newAccessManagement, setNewAccessManagement] = useState<IAccessManagements>(defaultAccessManagements);
-
+  const sessionEmail = authClient.useSession().data?.user.email || '';
   const handleFieldChange = (name: string, value: unknown) => {
     setNewAccessManagement(prev => ({ ...prev, [name]: value }));
   };
@@ -55,7 +56,7 @@ const AddNextComponents: React.FC = () => {
 
         <ScrollArea className="h-[500px] w-full rounded-md border p-4">
           <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
+            <div className="grid grid-cols-1 items-center gap-4 pr-1">
               <Label htmlFor="user_name" className="text-right ">
                 User_name
               </Label>
@@ -68,7 +69,7 @@ const AddNextComponents: React.FC = () => {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
+            <div className="grid grid-cols-1 items-center gap-4 pr-1">
               <Label htmlFor="user_email" className="text-right ">
                 User_email
               </Label>
@@ -80,7 +81,7 @@ const AddNextComponents: React.FC = () => {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
+            <div className="grid grid-cols-1 items-center gap-4 pr-1">
               <Label htmlFor="assign_role" className="text-right ">
                 Assign_role
               </Label>
@@ -90,6 +91,14 @@ const AddNextComponents: React.FC = () => {
                   apiUrl="https://jsonplaceholder.typicode.com/users"
                   onChange={values => handleFieldChange('assign_role', values)}
                 />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 items-center gap-4 pr-1">
+              <Label htmlFor="given_by_email" className="text-right ">
+                Given_by_email
+              </Label>
+              <div className="col-span-3">
+                <Input id="given_by_email" value={sessionEmail} readOnly />
               </div>
             </div>
           </div>

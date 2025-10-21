@@ -6,12 +6,13 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 import DynamicSelectField from '@/components/dashboard-ui/DynamicSelectField';
+import InputFieldForEmail from '@/components/dashboard-ui/InputFieldForEmail';
 import InputFieldForString from '@/components/dashboard-ui/InputFieldForString';
+
 import { IAccessManagements, defaultAccessManagements } from '../store/data/data';
 import { useAccessManagementsStore } from '../store/store';
 import { useUpdateAccessManagementsMutation } from '@/redux/features/accessManagements/accessManagementsSlice';
 import { formatDuplicateKeyError, handleError, handleSuccess, isApiErrorResponse } from './utils';
-import InputFieldForEmail from '@/components/dashboard-ui/InputFieldForEmail';
 import { logger } from 'better-auth';
 
 const EditNextComponents: React.FC = () => {
@@ -97,6 +98,18 @@ const EditNextComponents: React.FC = () => {
                   value={editedAccessManagement['assign_role']}
                   apiUrl="https://jsonplaceholder.typicode.com/users"
                   onChange={values => handleFieldChange('assign_role', values)}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4 pr-1">
+              <Label htmlFor="given_by_email" className="text-right ">
+                Given_by_email
+              </Label>
+              <div className="col-span-3">
+                <InputFieldForEmail
+                  id="given_by_email"
+                  value={editedAccessManagement['given_by_email']}
+                  onChange={value => handleFieldChange('given_by_email', value as string)}
                 />
               </div>
             </div>

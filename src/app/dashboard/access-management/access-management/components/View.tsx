@@ -13,9 +13,7 @@ import { logger } from 'better-auth';
 const ViewNextComponents: React.FC = () => {
   const { isViewModalOpen, selectedAccessManagements, toggleViewModal, setSelectedAccessManagements } = useAccessManagementsStore();
 
-  const { data: accessManagementData, refetch } = useGetAccessManagementsByIdQuery(selectedAccessManagements?._id, {
-    skip: !selectedAccessManagements?._id,
-  });
+  const { data: accessManagementData, refetch } = useGetAccessManagementsByIdQuery(selectedAccessManagements?._id, { skip: !selectedAccessManagements?._id });
 
   useEffect(() => {
     if (selectedAccessManagements?._id) {
@@ -38,6 +36,8 @@ const ViewNextComponents: React.FC = () => {
       return 'Invalid Date';
     }
   };
+
+  const formatBoolean = (value?: boolean) => (value ? 'Yes' : 'No');
 
   const DetailRow: React.FC<{
     label: string;
@@ -66,6 +66,7 @@ const ViewNextComponents: React.FC = () => {
               <DetailRow label="User_name" value={selectedAccessManagements['user_name']} />
               <DetailRow label="User_email" value={selectedAccessManagements['user_email']} />
               <DetailRowArray label="Assign_role" values={selectedAccessManagements['assign_role']} />
+              <DetailRow label="Given_by_email" value={selectedAccessManagements['given_by_email']} />
               <DetailRow label="Created At" value={formatDate(selectedAccessManagements.createdAt)} />
               <DetailRow label="Updated At" value={formatDate(selectedAccessManagements.updatedAt)} />
             </div>
