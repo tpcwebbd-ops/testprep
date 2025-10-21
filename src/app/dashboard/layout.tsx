@@ -38,7 +38,7 @@ const dashboardSidebarData = [
   {
     id: 6,
     name: 'Access Management',
-    path: '/dashboard/access-management',
+    path: '/dashboard',
     icon: <MailCheck size={18} />,
     childData: [
       { id: 61, name: 'Access Management', path: '/dashboard/access-management/access-management', icon: <MailCheck size={16} /> },
