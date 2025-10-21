@@ -23,6 +23,7 @@ export const apiSlice = createApi({
     'tagTypeUsers_block_users_access',
     'tagTypeFinance',
     'tagTypeRoles',
+    'tagTypeAccessManagements',
   ],
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({
