@@ -37,8 +37,6 @@ const ViewNextComponents: React.FC = () => {
     }
   };
 
-  const formatBoolean = (value?: boolean) => (value ? 'Yes' : 'No');
-
   const DetailRow: React.FC<{
     label: string;
     value: React.ReactNode;

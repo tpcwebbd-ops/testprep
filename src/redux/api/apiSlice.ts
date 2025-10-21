@@ -15,6 +15,7 @@ export const apiSlice = createApi({
     'tagTypeSpoken',
     'tagTypeCourses',
     'tagTypeGAuthUsers',
+    'tagTypeUser',
     'tagTypeUsers_access',
     'tagTypeUsers_admin_access',
     'tagTypeUsers_mentor_access',

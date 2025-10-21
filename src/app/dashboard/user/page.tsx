@@ -1,217 +1,161 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import { PlusIcon, XIcon } from 'lucide-react';
+import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
+
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, Trash2, Edit3, Plus } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { IoReloadCircleOutline } from 'react-icons/io5';
 
-type User = {
-  _id: string;
-  name: string;
-  email: string;
-  emailVerified: boolean;
-  image?: string;
-  createdAt: string;
-  updatedAt: string;
-};
+import AddFile from './components/Add';
+import EditFile from './components/Edit';
+import ViewFile from './components/View';
+import SearchBox from './components/SearchBox';
+import DeleteFile from './components/Delete';
+import BulkEditFile from './components/BulkEdit';
+import TooManyRequests from './components/TooManyRequest';
+import BulkDeleteFile from './components/BulkDelete';
+import ViewUsersTable from './components/TableView';
+import BulkUpdateUsers from './components/BulkUpdate';
+import BulkDynamicUpdateUsers from './components/BulkDynamicUpdate';
+import FilterDialog, { FilterPayload } from './components/FilterDialog';
+import Summary from './components/Summary';
 
-export default function UserPage() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [formData, setFormData] = useState<Partial<User>>({});
-  const [isEditing, setIsEditing] = useState<boolean>(false);
+import { useUsersStore } from './store/store';
+import { useGetUsersQuery } from '@/redux/features/user/userSlice';
+import { handleSuccess } from './components/utils';
+import { logger } from 'better-auth';
 
-  const fetchUsers = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch('/api/user');
-      const data = await res.json();
-      setUsers(data);
-    } catch (error) {
-      console.error('Failed to fetch users:', error);
-    } finally {
-      setLoading(false);
+const MainNextPage: React.FC = () => {
+  const [hashSearchText, setHashSearchText] = useState('');
+  const [isFilterModalOpen, setFilterModalOpen] = useState(false);
+
+  const { toggleAddModal, queryPramsLimit, queryPramsPage, queryPramsQ, setQueryPramsPage, setQueryPramsQ } = useUsersStore();
+
+  const {
+    data: getResponseData,
+    isSuccess,
+    isLoading,
+    refetch,
+    status: statusCode,
+  } = useGetUsersQuery(
+    { q: queryPramsQ, page: queryPramsPage, limit: queryPramsLimit },
+    {
+      selectFromResult: ({ data, isSuccess, isLoading, status, error }) => ({
+        data,
+        isSuccess,
+        isLoading,
+        status: 'status' in (error || {}) ? (error as FetchBaseQueryError).status : status, // Extract HTTP status code
+        error,
+      }),
+    },
+  );
+
+  const activeFilter = useMemo(() => {
+    if (queryPramsQ && queryPramsQ.startsWith('createdAt:range:')) {
+      try {
+        const datePart = queryPramsQ.split(':')[2];
+        const [startDate, endDate] = datePart.split('_');
+        return {
+          isApplied: true,
+          displayText: `Filtering from ${startDate} to ${endDate}`,
+        };
+      } catch (e) {
+        logger.info(JSON.stringify(e));
+        return { isApplied: false, displayText: '' };
+      }
+    }
+    return { isApplied: false, displayText: '' };
+  }, [queryPramsQ]);
+
+  const handleSearch = (query: string) => {
+    if (query !== hashSearchText) {
+      setHashSearchText(query);
+      setQueryPramsPage(1);
+      setQueryPramsQ(query);
     }
   };
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.name || !formData.email) {
-      alert('Name and Email are required');
-      return;
-    }
-
-    try {
-      const res = await fetch(`/api/user${isEditing ? `?id=${formData._id}` : ''}`, {
-        method: isEditing ? 'PUT' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-      if (!res.ok) throw new Error('Failed to save user');
-      await fetchUsers();
-      setFormData({});
-      setIsEditing(false);
-    } catch (error) {
-      console.error(error);
-    }
+  const handleFilter = () => {
+    setFilterModalOpen(true);
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this user?')) return;
-    try {
-      const res = await fetch(`/api/user?id=${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Failed to delete user');
-      await fetchUsers();
-    } catch (error) {
-      console.error(error);
-    }
+  const handleApplyFilter = (filter: FilterPayload) => {
+    const { start, end } = filter.value;
+    const filterQuery = `createdAt:range:${start}_${end}`;
+
+    setQueryPramsQ(filterQuery);
+    setQueryPramsPage(1);
+    refetch();
+    handleSuccess('Filter Applied!');
   };
 
-  const handleEdit = (user: User) => {
-    setFormData(user);
-    setIsEditing(true);
+  const handleClearFilter = () => {
+    setQueryPramsQ('');
+    setQueryPramsPage(1);
+    refetch();
+    handleSuccess('Filter Cleared!');
   };
 
-  return (
-    <div className="min-h-screen p-6">
-      <div className="max-w-6xl mx-auto space-y-8">
-        {/* Form Card */}
-        <Card className="backdrop-blur-md bg-white/10 border border-white/20 shadow-lg rounded-2xl">
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between text-xl font-semibold text-white">
-              {isEditing ? 'Edit User' : 'Add New User'}
-              {isEditing && (
-                <Button
-                  variant="ghost"
-                  className="text-white hover:bg-white/20"
-                  onClick={() => {
-                    setFormData({});
-                    setIsEditing(false);
-                  }}
-                >
-                  Cancel
-                </Button>
-              )}
-            </CardTitle>
-          </CardHeader>
+  const modals = [AddFile, ViewFile, BulkDeleteFile, BulkEditFile, EditFile, DeleteFile, BulkUpdateUsers, BulkDynamicUpdateUsers];
 
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block mb-1 text-sm font-medium text-gray-200">Name</label>
-                <Input
-                  className="bg-white/20 text-white placeholder-gray-300 border border-white/30 focus:ring-2 focus:ring-blue-400"
-                  placeholder="Enter name"
-                  value={formData.name ?? ''}
-                  onChange={e => setFormData({ ...formData, name: e.target.value })}
-                />
-              </div>
-
-              <div>
-                <label className="block mb-1 text-sm font-medium text-gray-200">Email</label>
-                <Input
-                  className="bg-white/20 text-white placeholder-gray-300 border border-white/30 focus:ring-2 focus:ring-blue-400"
-                  placeholder="Enter email"
-                  type="email"
-                  value={formData.email ?? ''}
-                  onChange={e => setFormData({ ...formData, email: e.target.value })}
-                />
-              </div>
-
-              <div className="flex items-center gap-3">
-                <label className="text-sm text-gray-200">Email Verified:</label>
-                <input
-                  type="checkbox"
-                  checked={formData.emailVerified ?? false}
-                  onChange={e => setFormData({ ...formData, emailVerified: e.target.checked })}
-                />
-              </div>
-
-              <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-md transition-all duration-300">
-                {isEditing ? (
-                  <>
-                    <Edit3 className="w-4 h-4 mr-2" /> Update User
-                  </>
-                ) : (
-                  <>
-                    <Plus className="w-4 h-4 mr-2" /> Create User
-                  </>
-                )}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-
-        {/* User List */}
-        <Card className="backdrop-blur-md bg-white/10 border border-white/20 shadow-lg rounded-2xl">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold text-white flex items-center justify-between">
-              All Users
-              <Button onClick={fetchUsers} variant="outline" className="bg-white/10 hover:bg-white/20 text-white border-white/30">
-                Refresh
-              </Button>
-            </CardTitle>
-          </CardHeader>
-
-          <CardContent className="p-0">
-            {loading ? (
-              <div className="flex justify-center py-10">
-                <Loader2 className="animate-spin w-8 h-8 text-white" />
-              </div>
-            ) : users.length === 0 ? (
-              <p className="text-center text-gray-300 py-6">No users found</p>
-            ) : (
-              // ✅ Responsive horizontal scroll wrapper
-              <div className="w-full overflow-x-auto scrollbar-thin scrollbar-thumb-white/30 scrollbar-track-transparent">
-                <table className="min-w-full text-sm border-collapse">
-                  <thead className="bg-white/20 text-gray-200 uppercase text-xs">
-                    <tr>
-                      <th className="p-3">Name</th>
-                      <th className="p-3">Email</th>
-                      <th className="p-3 hidden sm:table-cell">Verified</th>
-                      <th className="p-3">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {users.map(user => (
-                      <tr key={user._id} className="border-t border-white/10 hover:bg-white/10 transition">
-                        <td className="p-3">{user.name}</td>
-                        <td className="p-3 break-all max-w-[220px] truncate">{user.email}</td>
-                        <td className="p-3 hidden sm:table-cell">{user.emailVerified ? '✅' : '❌'}</td>
-                        <td className="p-3 whitespace-nowrap">
-                          <div className="flex items-center gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="bg-blue-500/20 border border-blue-300/30 hover:bg-blue-500/40 text-white"
-                              onClick={() => handleEdit(user)}
-                            >
-                              <Edit3 className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              className="bg-red-500/30 hover:bg-red-500/50 border border-red-300/30 text-white"
-                              onClick={() => handleDelete(user._id)}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+  let renderUI = (
+    <div className="container mx-auto p-4">
+      <div className="flex flex-col md:flex-row gap-2 justify-between items-center mb-6">
+        <h1 className="h2 w-full">User Management {isSuccess && <sup className="text-xs">(total:{getResponseData?.data?.total || '00'})</sup>}</h1>
+        <div className="w-full flex flex-col md:flex-row gap-2 item-center justify-end">
+          <Summary />
+          <Button size="sm" variant="outlineWater" onClick={handleFilter} disabled={isLoading}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-filter-right mr-1" viewBox="0 0 16 16">
+              <path d="M14 10.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 .5-.5m0-3a.5.5 0 0 0-.5-.5h-7a.5.5 0 0 0 0 1h7a.5.5 0 0 0 .5-.5m0-3a.5.5 0 0 0-.5-.5h-11a.5.5 0 0 0 0 1h11a.5.5 0 0 0 .5-.5" />
+            </svg>
+            Filter
+          </Button>
+          <Button
+            size="sm"
+            variant="outlineWater"
+            onClick={() => {
+              refetch();
+              handleSuccess('Reloaded!');
+            }}
+            disabled={isLoading}
+          >
+            <IoReloadCircleOutline className="w-4 h-4 mr-1" /> Reload
+          </Button>
+          <Button size="sm" variant="outlineGarden" onClick={() => toggleAddModal(true)}>
+            <PlusIcon className="w-4 h-4" />
+            Add User
+          </Button>
+        </div>
       </div>
+      <SearchBox onSearch={handleSearch} placeholder="Search here ..." autoFocus={false} />
+
+      {activeFilter.isApplied && (
+        <div className="flex items-center justify-start my-4">
+          <Badge variant="secondary" className="flex items-center gap-2 pl-3 pr-1 py-1 text-sm font-normal">
+            <span>{activeFilter.displayText}</span>
+            <Button aria-label="Clear filter" variant="ghost" size="icon" className="h-6 w-6 rounded-full" onClick={handleClearFilter}>
+              <XIcon className="h-4 w-4" />
+            </Button>
+          </Badge>
+        </div>
+      )}
+
+      <ViewUsersTable />
+      {modals.map((ModalComponent, index) => (
+        <ModalComponent key={index} />
+      ))}
+
+      <FilterDialog isOpen={isFilterModalOpen} onOpenChange={setFilterModalOpen} onApplyFilter={handleApplyFilter} onClearFilter={handleClearFilter} />
     </div>
   );
-}
+
+  if (statusCode === 429) {
+    renderUI = <TooManyRequests />;
+  }
+
+  return renderUI;
+};
+
+export default MainNextPage;
