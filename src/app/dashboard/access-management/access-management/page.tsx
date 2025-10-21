@@ -124,7 +124,7 @@ const MainNextPage: React.FC = () => {
           </Button>
           <Button size="sm" variant="outlineGarden" onClick={() => toggleAddModal(true)}>
             <PlusIcon className="w-4 h-4" />
-            Add AccessManagement
+            Add User
           </Button>
         </div>
       </div>
