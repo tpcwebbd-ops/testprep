@@ -75,7 +75,7 @@ const ViewTableNextComponents: React.FC = () => {
   const tableHeaders: { key: DisplayableRolesKeys; label: string }[] = useMemo(
     () => [
       { key: 'name', label: 'Name' },
-      { key: 'email', label: 'Email' },
+      { key: 'email', label: 'Edit by (email)' },
       { key: 'createdAt', label: 'Created At' },
     ],
     [],
