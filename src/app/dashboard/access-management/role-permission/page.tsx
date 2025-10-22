@@ -101,33 +101,9 @@ const MainNextPage: React.FC = () => {
   const modals = [AddFile, ViewFile, BulkDeleteFile, BulkEditFile, EditFile, DeleteFile, BulkUpdateRoles, BulkDynamicUpdateRoles];
 
   let renderUI = (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto md:p-4">
       <div className="flex flex-col md:flex-row gap-2 justify-between items-center mb-6">
         <h1 className="h2 w-full">Role Management {isSuccess && <sup className="text-xs">(total:{getResponseData?.data?.total || '00'})</sup>}</h1>
-        {/* <div className="w-full flex flex-col md:flex-row gap-2 item-center justify-end">
-          <Summary />
-          <Button size="sm" variant="outlineWater" onClick={handleFilter} disabled={isLoading}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-filter-right mr-1" viewBox="0 0 16 16">
-              <path d="M14 10.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 .5-.5m0-3a.5.5 0 0 0-.5-.5h-7a.5.5 0 0 0 0 1h7a.5.5 0 0 0 .5-.5m0-3a.5.5 0 0 0-.5-.5h-11a.5.5 0 0 0 0 1h11a.5.5 0 0 0 .5-.5" />
-            </svg>
-            Filter
-          </Button>
-          <Button
-            size="sm"
-            variant="outlineWater"
-            onClick={() => {
-              refetch();
-              handleSuccess('Reloaded!');
-            }}
-            disabled={isLoading}
-          >
-            <IoReloadCircleOutline className="w-4 h-4 mr-1" /> Reload
-          </Button>
-          <Button size="sm" variant="outlineGarden" onClick={() => toggleAddModal(true)}>
-            <PlusIcon className="w-4 h-4" />
-            Add Role
-          </Button>
-        </div> */}
 
         {/* Toolbar (Responsive) */}
         <div className="w-full flex md:hidden justify-end">
