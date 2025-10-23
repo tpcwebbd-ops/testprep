@@ -202,7 +202,11 @@ const Modal: React.FC<{
         <div className="p-6 md:p-8 lg:p-12">
           <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6 lg:gap-8 mb-6 md:mb-7 lg:mb-8">
             <div className="flex-shrink-0 w-full md:w-40 lg:w-48 h-40 md:h-40 lg:h-48 rounded-2xl overflow-hidden shadow-2xl border-4 border-sky-400/30">
-              {item.image ? <Image src={item.image} alt={item.name} className="w-full h-full object-cover" /> : <DefaultSVG className="w-full h-full" />}
+              {item.image ? (
+                <Image width={400} height={400} src={item.image} alt={item.name} className="w-full h-full object-cover" />
+              ) : (
+                <DefaultSVG className="w-full h-full" />
+              )}
             </div>
             <div className="flex-1">
               <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-sky-300 to-blue-300 mb-3 md:mb-4">
@@ -233,7 +237,7 @@ const Modal: React.FC<{
                     <div className="flex flex-col md:flex-row gap-4 md:gap-5 lg:gap-6 items-start">
                       <div className="flex-shrink-0 w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden border-2 border-sky-400/30">
                         {child.image ? (
-                          <Image src={child.image} alt={child.name} className="w-full h-full object-cover" />
+                          <Image width={400} height={400} src={child.image} alt={child.name} className="w-full h-full object-cover" />
                         ) : (
                           <DefaultSVG className="w-full h-full" />
                         )}
@@ -272,6 +276,8 @@ const AboutCard: React.FC<{ item: AboutItem; index: number }> = ({ item, index }
             <div className="absolute inset-0 bg-gradient-to-br from-sky-600/20 to-blue-600/20 z-10 group-hover:opacity-0 transition-opacity duration-500" />
             {item.image ? (
               <Image
+                width={400}
+                height={400}
                 src={item.image}
                 alt={item.name}
                 className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
@@ -351,136 +357,138 @@ const AboutPage = () => {
   }, []);
 
   return (
-    <main className="min-h-screen py-6 px-2 md:py-8 md:px-4 lg:py-10 lg:px-8 bg-gradient-to-br from-slate-950 via-sky-950 to-blue-950 relative overflow-hidden">
-      <div className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-20" style={{ backgroundImage: "url('/bg/bg.PNG')" }} />
+    <div className="pt-12">
+      <main className="min-h-screen py-6 px-2 md:py-8 md:px-4 lg:py-10 lg:px-8 bg-gradient-to-br from-slate-950 via-sky-950 to-blue-950 relative overflow-hidden">
+        <div className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-20" style={{ backgroundImage: "url('/bg/bg.PNG')" }} />
 
-      <FloatingShape delay={0} duration={20} x="10%" y="10%" />
-      <FloatingShape delay={2} duration={25} x="80%" y="20%" />
-      <FloatingShape delay={4} duration={22} x="20%" y="70%" />
-      <FloatingShape delay={6} duration={28} x="70%" y="80%" />
+        <FloatingShape delay={0} duration={20} x="10%" y="10%" />
+        <FloatingShape delay={2} duration={25} x="80%" y="20%" />
+        <FloatingShape delay={4} duration={22} x="20%" y="70%" />
+        <FloatingShape delay={6} duration={28} x="70%" y="80%" />
 
-      <section className="relative z-10 mx-auto max-w-7xl">
-        <div className={`text-center mb-8 md:mb-12 lg:mb-16 transition-all duration-700 ${scrolled ? 'opacity-90 scale-98' : 'opacity-100 scale-100'}`}>
-          <div className="inline-block mb-3 md:mb-4 lg:mb-6 px-4 md:px-5 lg:px-6 py-2 md:py-2.5 lg:py-3 rounded-full bg-sky-500/20 border-2 border-sky-400/40 backdrop-blur-sm animate-pulse shadow-lg shadow-sky-500/20">
-            <span className="text-sky-300 text-xs md:text-sm font-bold uppercase tracking-wider">Welcome to TestPrep Centre</span>
-          </div>
-          <h1 className="text-3xl md:text-5xl lg:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-sky-300 via-blue-200 to-sky-300 drop-shadow-2xl mb-3 md:mb-4 lg:mb-6 animate-fadeIn leading-tight px-2">
-            About TestPrep Centre
-          </h1>
-          <p
-            className="mt-3 md:mt-4 lg:mt-6 text-sm md:text-base lg:text-xl text-sky-200 max-w-4xl mx-auto leading-relaxed animate-fadeIn px-2 md:px-4"
-            style={{ animationDelay: '300ms' }}
-          >
-            Empowering Bangladeshi students for global academic success through world-class test preparation, scholarship guidance, and personalized mentorship
-            for a brighter future.
-          </p>
-        </div>
-
-        <div className="space-y-4 md:space-y-6 lg:space-y-10">
-          {aboutData.map((item, index) => (
-            <AboutCard key={item.id} item={item} index={index} />
-          ))}
-        </div>
-
-        <div className="mt-10 md:mt-14 lg:mt-20 flex justify-center animate-fadeIn" style={{ animationDelay: '1s' }}>
-          <button
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="group px-6 md:px-8 lg:px-10 py-3 md:py-4 lg:py-5 rounded-2xl text-base md:text-lg font-bold bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white shadow-2xl shadow-sky-500/50 hover:shadow-sky-500/70 transition-all duration-500 hover:scale-105 flex items-center gap-3 md:gap-4 border-2 border-sky-300/30"
-          >
-            <span>Ready to Start Your Journey?</span>
-            <svg
-              className="w-6 h-6 transform group-hover:translate-x-2 transition-transform duration-300"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={3}
+        <section className="relative z-10 mx-auto max-w-7xl">
+          <div className={`text-center mb-8 md:mb-12 lg:mb-16 transition-all duration-700 ${scrolled ? 'opacity-90 scale-98' : 'opacity-100 scale-100'}`}>
+            <div className="inline-block mb-3 md:mb-4 lg:mb-6 px-4 md:px-5 lg:px-6 py-2 md:py-2.5 lg:py-3 rounded-full bg-sky-500/20 border-2 border-sky-400/40 backdrop-blur-sm animate-pulse shadow-lg shadow-sky-500/20">
+              <span className="text-sky-300 text-xs md:text-sm font-bold uppercase tracking-wider">Welcome to TestPrep Centre</span>
+            </div>
+            <h1 className="text-3xl md:text-5xl lg:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-sky-300 via-blue-200 to-sky-300 drop-shadow-2xl mb-3 md:mb-4 lg:mb-6 animate-fadeIn leading-tight px-2">
+              About TestPrep Centre
+            </h1>
+            <p
+              className="mt-3 md:mt-4 lg:mt-6 text-sm md:text-base lg:text-xl text-sky-200 max-w-4xl mx-auto leading-relaxed animate-fadeIn px-2 md:px-4"
+              style={{ animationDelay: '300ms' }}
             >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-            </svg>
-          </button>
-        </div>
-      </section>
+              Empowering Bangladeshi students for global academic success through world-class test preparation, scholarship guidance, and personalized
+              mentorship for a brighter future.
+            </p>
+          </div>
 
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
+          <div className="space-y-4 md:space-y-6 lg:space-y-10">
+            {aboutData.map((item, index) => (
+              <AboutCard key={item.id} item={item} index={index} />
+            ))}
+          </div>
+
+          <div className="mt-10 md:mt-14 lg:mt-20 flex justify-center animate-fadeIn" style={{ animationDelay: '1s' }}>
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="group px-6 md:px-8 lg:px-10 py-3 md:py-4 lg:py-5 rounded-2xl text-base md:text-lg font-bold bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white shadow-2xl shadow-sky-500/50 hover:shadow-sky-500/70 transition-all duration-500 hover:scale-105 flex items-center gap-3 md:gap-4 border-2 border-sky-300/30"
+            >
+              <span>Ready to Start Your Journey?</span>
+              <svg
+                className="w-6 h-6 transform group-hover:translate-x-2 transition-transform duration-300"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={3}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </button>
+          </div>
+        </section>
+
+        <style jsx>{`
+          @keyframes fadeIn {
+            from {
+              opacity: 0;
+              transform: translateY(20px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+
+          @keyframes slideIn {
+            from {
+              opacity: 0;
+              transform: translateX(-50px);
+            }
+            to {
+              opacity: 1;
+              transform: translateX(0);
+            }
+          }
+
+          @keyframes scaleIn {
+            from {
+              opacity: 0;
+              transform: scale(0.9);
+            }
+            to {
+              opacity: 1;
+              transform: scale(1);
+            }
+          }
+
+          @keyframes float {
+            0%,
+            100% {
+              transform: translateY(0) translateX(0);
+            }
+            25% {
+              transform: translateY(-30px) translateX(20px);
+            }
+            50% {
+              transform: translateY(20px) translateX(-20px);
+            }
+            75% {
+              transform: translateY(-10px) translateX(30px);
+            }
+          }
+
+          .animate-fadeIn {
+            animation: fadeIn 1s ease-out forwards;
             opacity: 0;
-            transform: translateY(20px);
           }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
 
-        @keyframes slideIn {
-          from {
+          .animate-slideIn {
+            animation: slideIn 0.8s ease-out forwards;
             opacity: 0;
-            transform: translateX(-50px);
           }
-          to {
-            opacity: 1;
-            transform: translateX(0);
+
+          .animate-scaleIn {
+            animation: scaleIn 0.5s ease-out forwards;
           }
-        }
 
-        @keyframes scaleIn {
-          from {
-            opacity: 0;
-            transform: scale(0.9);
+          .animate-float {
+            animation: float 20s ease-in-out infinite;
           }
-          to {
-            opacity: 1;
-            transform: scale(1);
+
+          .line-clamp-5 {
+            display: -webkit-box;
+            -webkit-line-clamp: 5;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
           }
-        }
 
-        @keyframes float {
-          0%,
-          100% {
-            transform: translateY(0) translateX(0);
+          .scale-98 {
+            transform: scale(0.98);
           }
-          25% {
-            transform: translateY(-30px) translateX(20px);
-          }
-          50% {
-            transform: translateY(20px) translateX(-20px);
-          }
-          75% {
-            transform: translateY(-10px) translateX(30px);
-          }
-        }
-
-        .animate-fadeIn {
-          animation: fadeIn 1s ease-out forwards;
-          opacity: 0;
-        }
-
-        .animate-slideIn {
-          animation: slideIn 0.8s ease-out forwards;
-          opacity: 0;
-        }
-
-        .animate-scaleIn {
-          animation: scaleIn 0.5s ease-out forwards;
-        }
-
-        .animate-float {
-          animation: float 20s ease-in-out infinite;
-        }
-
-        .line-clamp-5 {
-          display: -webkit-box;
-          -webkit-line-clamp: 5;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-        }
-
-        .scale-98 {
-          transform: scale(0.98);
-        }
-      `}</style>
-    </main>
+        `}</style>
+      </main>
+    </div>
   );
 };
 
