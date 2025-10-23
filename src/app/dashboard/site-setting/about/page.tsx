@@ -171,7 +171,7 @@ export default function AboutAdminPage() {
   const [error, setError] = useState<string | null>(null);
   const [productionEnabled, setProductionEnabled] = useState(false);
   const [timer, setTimer] = useState<number>(0);
-  const [isExistingData, setIsExistingData] = useState(false); // 🆕 Track data existence
+  const [isExistingData, setIsExistingData] = useState(false);
 
   // ----------------------
   // 📦 Fetch Data
@@ -221,7 +221,7 @@ export default function AboutAdminPage() {
   const handleSaveAll = async () => {
     setLoading(true);
     try {
-      const method = isExistingData ? 'PUT' : 'POST'; // 🧠 Dynamic method
+      const method = isExistingData ? 'PUT' : 'POST';
       const res = await fetch('/api/site-setting/about', {
         method,
         headers: { 'Content-Type': 'application/json' },
@@ -230,7 +230,7 @@ export default function AboutAdminPage() {
 
       const data = await res.json();
       if (res.ok) {
-        toast.success(isExistingData ? 'All changes updated successfully!' : 'New About data created successfully!');
+        toast.success(isExistingData ? 'About data updated successfully!' : 'About data created successfully!');
         fetchData();
       } else {
         toast.error(data.message || 'Failed to save changes.');
@@ -243,11 +243,13 @@ export default function AboutAdminPage() {
     }
   };
 
+  // ----------------------
+  // 🚀 Publish / Path Validation
+  // ----------------------
   const handlePublish = async () => {
     try {
       const paths = aboutList.map(item => item.path);
 
-      // 🧠 Validate all paths from backend API
       const res = await fetch('/api/pathValidation/about', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -264,7 +266,6 @@ export default function AboutAdminPage() {
         return;
       }
 
-      // ✅ If validation passed
       toast.success('All paths are valid. Production mode enabled for 10 minutes.');
       setProductionEnabled(true);
       setTimer(600);
@@ -296,16 +297,15 @@ export default function AboutAdminPage() {
   // 🧱 UI
   // ----------------------
   return (
-    <main className="min-h-screen bg-gradient-to-br p-8 text-white relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 via-sky-300/10 to-blue-500/20 blur-3xl opacity-60 -z-10" />
-      <h1 className="text-3xl md:text-4xl font-extrabold mb-10 text-center text-transparent bg-clip-text bg-gradient-to-r from-sky-300 via-blue-300 to-sky-200 drop-shadow-lg">
-        About Page Management
-      </h1>
+    <main className="min-h-screen p-8 text-white relative overflow-hidden">
+      {/* Background blur effect, now using a more neutral/subtle gradient */}
+      <div className="absolute inset-0  blur-3xl opacity-60 -z-10" />
+      <h1 className="text-3xl md:text-4xl font-extrabold mb-10 text-center text-transparent bg-clip-text drop-shadow-lg">About Page Management</h1>
 
       {/* Loading */}
       {loading && (
         <div className="flex justify-center items-center min-h-[60vh]">
-          <div className="w-12 h-12 border-4 border-sky-400 border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-12 h-12 border-4 border-t-transparent rounded-full animate-spin"></div>
         </div>
       )}
 
@@ -313,8 +313,8 @@ export default function AboutAdminPage() {
       {!loading && error && (
         <div className="text-center mt-20">
           <p className="text-red-400 mb-4">{error}</p>
-          <Button onClick={fetchData} className="bg-sky-600 hover:bg-sky-300">
-            Retry
+          <Button onClick={fetchData} className=" text-white">
+            Retry Loading Data
           </Button>
         </div>
       )}
@@ -325,74 +325,75 @@ export default function AboutAdminPage() {
           {aboutList.map((item, idx) => (
             <div
               key={`${item.id}-${idx}`}
-              className="bg-gradient-to-br from-blue-500/30 via-sky-500/20 to-blue-600/30 backdrop-blur-lg p-6 rounded-2xl border border-sky-400/30 shadow-lg hover:shadow-sky-400/40 transition-all duration-300 hover:scale-[1.01]"
+              className=" backdrop-blur-md p-6 rounded-2xl border  shadow-lg hover:shadow-white/30 transition-all duration-300 hover:scale-[1.01]"
             >
               <div className="flex flex-col gap-3">
                 <Input
                   value={item.name}
-                  onChange={e => setAboutList(prev => prev.map(x => (x.id === item.id || x.name === item.name ? { ...x, name: e.target.value } : x)))}
+                  onChange={e => setAboutList(prev => prev.map((x, i) => (i === idx ? { ...x, name: e.target.value } : x)))}
                   placeholder="Name"
-                  className="bg-slate-500/40 text-sky-100 border-sky-400/30 focus:border-sky-400"
+                  className=" text-white border-white/30 focus:border-white/60 placeholder-gray-300"
                 />
 
                 <Input
                   value={item.path}
-                  onChange={e => setAboutList(prev => prev.map(x => (x.id === item.id || x.name === item.name ? { ...x, path: e.target.value } : x)))}
+                  onChange={e => setAboutList(prev => prev.map((x, i) => (i === idx ? { ...x, path: e.target.value } : x)))}
                   placeholder="Path"
-                  className="bg-slate-500/40 text-sky-100 border-sky-400/30 focus:border-sky-400"
+                  className=" text-white border-white/30 focus:border-white/60 placeholder-gray-300"
                 />
 
                 <Textarea
                   value={item.description}
-                  onChange={e => setAboutList(prev => prev.map(x => (x.id === item.id || x.name === item.name ? { ...x, description: e.target.value } : x)))}
+                  onChange={e => setAboutList(prev => prev.map((x, i) => (i === idx ? { ...x, description: e.target.value } : x)))}
                   placeholder="Description"
                   rows={4}
-                  className="bg-slate-500/40 text-sky-100 border-sky-400/30 focus:border-sky-400"
+                  className=" text-white border-white/30 focus:border-white/60 placeholder-gray-300"
                 />
 
                 <ImageUploadFieldSingle
                   label="About Image"
                   value={item.image || null}
-                  onChange={url => setAboutList(prev => prev.map(x => (x.id === item.id || x.name === item.name ? { ...x, image: url || '' } : x)))}
+                  onChange={url => setAboutList(prev => prev.map((x, i) => (i === idx ? { ...x, image: url || '' } : x)))}
                 />
               </div>
 
+              {/* Child Data */}
               {item.childData && (
-                <div className="mt-4 border-t border-sky-400/20 pt-4 space-y-3">
-                  <h3 className="text-lg font-semibold mb-2 text-sky-200">Sub-sections</h3>
-                  {item.childData.map((child, idx) => (
-                    <div key={`${child.id}-${idx}`} className="p-3 rounded-xl bg-sky-500/30 border border-sky-600/20 backdrop-blur-md">
+                <div className="mt-4 border-t border-white/20 pt-4 space-y-3">
+                  <h3 className="text-lg font-semibold mb-2 text-gray-200">Sub-sections</h3>
+                  {item.childData.map((child, childIdx) => (
+                    <div key={`${child.id}-${childIdx}`} className="p-3 rounded-xl  border border-white/20 backdrop-blur-md">
                       <Input
                         value={child.name}
                         onChange={e => {
                           setAboutList(prev =>
-                            prev.map(x =>
-                              x.id === item.id
+                            prev.map((aboutItem, aboutItemIdx) =>
+                              aboutItemIdx === idx
                                 ? {
-                                    ...x,
-                                    childData: x.childData?.map(c => (c.id === child.id ? { ...c, name: e.target.value } : c)),
+                                    ...aboutItem,
+                                    childData: aboutItem.childData?.map((c, cIdx) => (cIdx === childIdx ? { ...c, name: e.target.value } : c)),
                                   }
-                                : x,
+                                : aboutItem,
                             ),
                           );
                         }}
-                        className="bg-slate-500/40 text-sky-100 border-sky-400/30 focus:border-sky-400"
+                        className=" text-white border-white/30 focus:border-white/60 placeholder-gray-300"
                       />
                       <Textarea
                         value={child.description}
                         onChange={e => {
                           setAboutList(prev =>
-                            prev.map(x =>
-                              x.id === item.id
+                            prev.map((aboutItem, aboutItemIdx) =>
+                              aboutItemIdx === idx
                                 ? {
-                                    ...x,
-                                    childData: x.childData?.map(c => (c.id === child.id ? { ...c, description: e.target.value } : c)),
+                                    ...aboutItem,
+                                    childData: aboutItem.childData?.map((c, cIdx) => (cIdx === childIdx ? { ...c, description: e.target.value } : c)),
                                   }
-                                : x,
+                                : aboutItem,
                             ),
                           );
                         }}
-                        className="mt-2 bg-slate-500/40 text-sky-100 border-sky-400/30 focus:border-sky-400"
+                        className="mt-2  text-white border-white/30 focus:border-white/60 placeholder-gray-300"
                         rows={2}
                       />
                       <ImageUploadFieldSingle
@@ -400,13 +401,13 @@ export default function AboutAdminPage() {
                         value={child.image || null}
                         onChange={url =>
                           setAboutList(prev =>
-                            prev.map(x =>
-                              x.id === item.id
+                            prev.map((aboutItem, aboutItemIdx) =>
+                              aboutItemIdx === idx
                                 ? {
-                                    ...x,
-                                    childData: x.childData?.map(c => (c.id === child.id ? { ...c, image: url || '' } : c)),
+                                    ...aboutItem,
+                                    childData: aboutItem.childData?.map((c, cIdx) => (cIdx === childIdx ? { ...c, image: url || '' } : c)),
                                   }
-                                : x,
+                                : aboutItem,
                             ),
                           )
                         }
@@ -419,20 +420,14 @@ export default function AboutAdminPage() {
             </div>
           ))}
 
-          {/* Bottom Global Action Buttons */}
+          {/* Global Buttons */}
           <div className="flex flex-col md:flex-row justify-center items-center gap-4 mt-10">
-            <Button disabled={loading} onClick={handleSaveAll} className="bg-sky-600 hover:bg-sky-300 text-white px-8 py-3 font-semibold text-lg">
-              {loading ? 'Saving...' : isExistingData ? 'Update About Data (PUT)' : 'Create About Data (POST)'}
+            <Button disabled={loading} onClick={handleSaveAll} variant="outlineWater" size="sm">
+              {loading ? 'Saving...' : 'Save All Changes'}
             </Button>
 
-            <Button
-              disabled={productionEnabled}
-              onClick={handlePublish}
-              className={`${
-                productionEnabled ? 'bg-gray-600 cursor-not-allowed' : 'bg-green-600 hover:bg-green-300'
-              } text-white px-8 py-3 font-semibold text-lg`}
-            >
-              {productionEnabled ? `Production Active (${formatTimer(timer)})` : 'Publish to Production'}
+            <Button disabled={productionEnabled} onClick={handlePublish} variant="outlineWater" size="sm">
+              {productionEnabled ? `Production Active (${formatTimer(timer)})` : 'Activate Production Mode'}
             </Button>
           </div>
         </div>
