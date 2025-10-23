@@ -1,17 +1,13 @@
 import { withDB } from '@/app/api/utils/db';
 import Role from '../model';
 import { logger } from 'better-auth';
-
-interface IResponse {
-  data: unknown;
-  message: string;
-  status: number;
-}
+import { IResponse } from '@/app/api/utils/utils';
 
 const formatResponse = (data: unknown, message: string, status: number): IResponse => ({
   data,
   message,
   status,
+  ok: status >= 200 && status < 300,
 });
 
 // ✅ Only return role names and IDs

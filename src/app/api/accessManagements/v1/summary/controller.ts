@@ -1,18 +1,14 @@
 import { withDB } from '@/app/api/utils/db';
 import AccessManagement from '../model';
 import { logger } from 'better-auth';
-
-interface IResponse {
-  data: unknown;
-  message: string;
-  status: number;
-}
+import { IResponse } from '@/app/api/utils/utils';
 
 // Helper to format responses
 const formatResponse = (data: unknown, message: string, status: number): IResponse => ({
   data,
   message,
   status,
+  ok: status >= 200 && status < 300,
 });
 
 export async function getAccessManagementSummary(req: Request): Promise<IResponse> {

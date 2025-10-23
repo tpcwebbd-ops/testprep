@@ -30,6 +30,7 @@ import {
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { signOut, useSession } from '@/lib/auth-client';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const dashboardSidebarData = [
   { id: 1, name: 'Account', path: '/dashboard/account', icon: <User size={18} /> },
@@ -100,7 +101,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const user = session?.data?.user;
 
   return (
-    <div className="relative flex min-h-screen">
+    <div className="fixed flex max-h-[calc(100vh-65px)] w-full">
       <div className="fixed inset-0 bg-gradient-to-br from-indigo-500 via-purple-500 to-blue-500 -z-10" />
 
       {/* ===== Desktop Sidebar ===== */}
@@ -183,7 +184,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
       {/* ===== Main Content ===== */}
       <motion.main initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="flex-1 lg:p-10 text-white">
-        {children}
+        <ScrollArea className="w-full h-[calc(100vh-65px)] pb-12">{children}</ScrollArea>
       </motion.main>
 
       {/* ===== Mobile Bottom Navigation ===== */}
@@ -207,7 +208,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
             transition={{ duration: 0.4 }}
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex pt-14"
           >
             <motion.aside
               initial={{ x: -200 }}
