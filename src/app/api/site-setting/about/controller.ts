@@ -26,7 +26,7 @@ export async function createAbout(req: Request): Promise<IResponse> {
 
       return formatResponse(created, 'About data created successfully', 201);
     } catch (error: unknown) {
-      const err = error as any;
+      const err = error as { code: number; message: string; keyValue: number };
       if (err.code === 11000) {
         return formatResponse(null, `Duplicate key error: ${JSON.stringify(err.keyValue)}`, 400);
       }
@@ -72,7 +72,7 @@ export async function updateAbout(req: Request): Promise<IResponse> {
 
       return formatResponse(updated, 'About data updated successfully', 200);
     } catch (error: unknown) {
-      const err = error as any;
+      const err = error as { code: number; message: string; keyValue: number };
       if (err.code === 11000) {
         return formatResponse(null, `Duplicate key error: ${JSON.stringify(err.keyValue)}`, 400);
       }

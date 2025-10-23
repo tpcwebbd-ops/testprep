@@ -7,7 +7,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'react-toastify';
 import ImageUploadFieldSingle from '@/components/dashboard-ui/ImageUploadFieldSingle';
 import { logger } from 'better-auth';
-import { ScrollArea } from '@/components/ui/scroll-area';
 
 // ----------------------
 // 🧩 Type Definitions
@@ -244,31 +243,47 @@ export default function AboutAdminPage() {
     }
   };
 
-  // ----------------------
-  // 🚀 Publish to Production
-  // ----------------------
   const handlePublish = async () => {
-    const invalidPaths = aboutList.filter(item => !item.path.startsWith('/about'));
-    if (invalidPaths.length > 0) {
-      toast.error('All paths must start with "/about".');
-      return;
-    }
+    try {
+      const paths = aboutList.map(item => item.path);
 
-    toast.success('Production mode enabled for 10 minutes.');
-    setProductionEnabled(true);
-    setTimer(600);
-
-    const countdown = setInterval(() => {
-      setTimer(prev => {
-        if (prev <= 1) {
-          clearInterval(countdown);
-          setProductionEnabled(false);
-          toast.info('Production mode expired.');
-          return 0;
-        }
-        return prev - 1;
+      // 🧠 Validate all paths from backend API
+      const res = await fetch('/api/pathValidation/about', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paths }),
       });
-    }, 1000);
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.message || 'Path validation failed.');
+        if (data.invalidPaths && data.invalidPaths.length > 0) {
+          console.warn('Invalid paths:', data.invalidPaths);
+        }
+        return;
+      }
+
+      // ✅ If validation passed
+      toast.success('All paths are valid. Production mode enabled for 10 minutes.');
+      setProductionEnabled(true);
+      setTimer(600);
+
+      const countdown = setInterval(() => {
+        setTimer(prev => {
+          if (prev <= 1) {
+            clearInterval(countdown);
+            setProductionEnabled(false);
+            toast.info('Production mode expired.');
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } catch (error) {
+      console.error('Path Validation Error:', error);
+      toast.error('Error occurred while validating paths.');
+    }
   };
 
   const formatTimer = (t: number) => {

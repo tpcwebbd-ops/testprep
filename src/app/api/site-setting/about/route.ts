@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import { getAbout, createAbout, updateAbout, deleteAbout } from './controller';
 import { handleRateLimit } from '../../utils/rate-limit';
+import { IResponse } from '../../utils/utils';
 
-const safeCall = async (fn: () => Promise<any>) => {
+const safeCall = async (fn: () => Promise<IResponse>) => {
   try {
     const result = await fn();
     return NextResponse.json({ data: result.data, message: result.message, ok: result.ok }, { status: result.status });
