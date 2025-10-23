@@ -7,6 +7,6 @@ export async function withDB(handler: () => Promise<IResponse>): Promise<IRespon
     return await handler();
   } catch (error) {
     console.error(error);
-    return { data: null, message: (error as Error).message, status: 400 };
+    return { data: null, message: (error as Error).message, status: 400, ok: false };
   }
 }

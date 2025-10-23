@@ -1,18 +1,19 @@
 import mongoose, { Schema, Document, Types } from 'mongoose';
 
 interface IChildData {
-  _id?: Types.ObjectId;
   name: string;
-  path: string;
+  path?: string;
   icon?: string;
   image?: string;
   svg?: string;
   description?: string;
 }
 
+// Make _id required to satisfy mongoose's Document type
 export interface IAboutItem extends Document {
+  _id: Types.ObjectId;
   name: string;
-  path: string;
+  path?: string;
   icon?: string;
   image?: string;
   svg?: string;
@@ -23,19 +24,19 @@ export interface IAboutItem extends Document {
 const childSchema = new Schema<IChildData>(
   {
     name: { type: String, required: true },
-    path: { type: String, required: true },
+    path: { type: String },
     icon: String,
     image: String,
     svg: String,
     description: String,
   },
-  { _id: true },
+  { _id: false }, // disable _id on subdocuments if you don't want them
 );
 
 const aboutSchema = new Schema<IAboutItem>(
   {
     name: { type: String, required: true },
-    path: { type: String, required: true },
+    path: String,
     icon: String,
     image: String,
     svg: String,
@@ -45,4 +46,5 @@ const aboutSchema = new Schema<IAboutItem>(
   { timestamps: true },
 );
 
-export default mongoose.models.About || mongoose.model<IAboutItem>('About', aboutSchema, 'about');
+// export model (collection name 'about')
+export default (mongoose.models.About as mongoose.Model<IAboutItem>) || mongoose.model<IAboutItem>('About', aboutSchema, 'about');
