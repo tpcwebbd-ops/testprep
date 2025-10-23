@@ -161,6 +161,7 @@ async function fetchAboutData(): Promise<AboutItem[]> {
 
     const resData = await res.json();
     const data = resData.data;
+    console.log('data ; ', data);
     if (!data || !Array.isArray(data) || data.length === 0) {
       logger.warn('⚠️ API returned no data, using fallback.');
       return defaultAboutData;
