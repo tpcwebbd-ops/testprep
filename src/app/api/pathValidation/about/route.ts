@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 
 /**
- * ✅ Validates that all paths start with "/about"
+ * ✅ Validates all paths and revalidates /about if valid.
  * Method: POST
  * Body: { paths: string[] }
  */
@@ -26,12 +27,19 @@ export async function POST(req: Request) {
       );
     }
 
+    // ✅ All paths valid — now revalidate each one
+    for (const path of body.paths) {
+      revalidatePath(path); // Revalidate cached ISR data for that route
+      console.log(`✅ Revalidated: ${path}`);
+    }
+
     return NextResponse.json({
       success: true,
-      message: 'All paths are valid for /about.',
+      message: 'All paths validated and revalidated successfully.',
+      revalidated: body.paths,
     });
   } catch (error) {
     console.error('Path Validation Error:', error);
-    return NextResponse.json({ success: false, message: 'Server error occurred while validating paths.' }, { status: 500 });
+    return NextResponse.json({ success: false, message: 'Server error occurred while validating/revalidating paths.' }, { status: 500 });
   }
 }
