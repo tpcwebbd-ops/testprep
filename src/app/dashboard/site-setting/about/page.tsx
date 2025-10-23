@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'react-toastify';
 import ImageUploadFieldSingle from '@/components/dashboard-ui/ImageUploadFieldSingle';
 import { logger } from 'better-auth';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 // ----------------------
 // 🧩 Type Definitions
@@ -280,8 +281,8 @@ export default function AboutAdminPage() {
   // 🧱 UI
   // ----------------------
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-950 via-slate-900 to-blue-950 p-8 text-white relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-800/20 via-sky-700/10 to-blue-900/20 blur-3xl opacity-60 -z-10" />
+    <main className="min-h-screen bg-gradient-to-br p-8 text-white relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 via-sky-300/10 to-blue-500/20 blur-3xl opacity-60 -z-10" />
       <h1 className="text-3xl md:text-4xl font-extrabold mb-10 text-center text-transparent bg-clip-text bg-gradient-to-r from-sky-300 via-blue-300 to-sky-200 drop-shadow-lg">
         About Page Management
       </h1>
@@ -297,7 +298,7 @@ export default function AboutAdminPage() {
       {!loading && error && (
         <div className="text-center mt-20">
           <p className="text-red-400 mb-4">{error}</p>
-          <Button onClick={fetchData} className="bg-sky-600 hover:bg-sky-700">
+          <Button onClick={fetchData} className="bg-sky-600 hover:bg-sky-300">
             Retry
           </Button>
         </div>
@@ -309,21 +310,21 @@ export default function AboutAdminPage() {
           {aboutList.map((item, idx) => (
             <div
               key={`${item.id}-${idx}`}
-              className="bg-gradient-to-br from-blue-900/30 via-sky-900/20 to-blue-950/30 backdrop-blur-lg p-6 rounded-2xl border border-sky-400/30 shadow-lg hover:shadow-sky-800/40 transition-all duration-300 hover:scale-[1.01]"
+              className="bg-gradient-to-br from-blue-500/30 via-sky-500/20 to-blue-600/30 backdrop-blur-lg p-6 rounded-2xl border border-sky-400/30 shadow-lg hover:shadow-sky-400/40 transition-all duration-300 hover:scale-[1.01]"
             >
               <div className="flex flex-col gap-3">
                 <Input
                   value={item.name}
                   onChange={e => setAboutList(prev => prev.map(x => (x.id === item.id || x.name === item.name ? { ...x, name: e.target.value } : x)))}
                   placeholder="Name"
-                  className="bg-slate-900/40 text-sky-100 border-sky-400/30 focus:border-sky-400"
+                  className="bg-slate-500/40 text-sky-100 border-sky-400/30 focus:border-sky-400"
                 />
 
                 <Input
                   value={item.path}
                   onChange={e => setAboutList(prev => prev.map(x => (x.id === item.id || x.name === item.name ? { ...x, path: e.target.value } : x)))}
                   placeholder="Path"
-                  className="bg-slate-900/40 text-sky-100 border-sky-400/30 focus:border-sky-400"
+                  className="bg-slate-500/40 text-sky-100 border-sky-400/30 focus:border-sky-400"
                 />
 
                 <Textarea
@@ -331,7 +332,7 @@ export default function AboutAdminPage() {
                   onChange={e => setAboutList(prev => prev.map(x => (x.id === item.id || x.name === item.name ? { ...x, description: e.target.value } : x)))}
                   placeholder="Description"
                   rows={4}
-                  className="bg-slate-900/40 text-sky-100 border-sky-400/30 focus:border-sky-400"
+                  className="bg-slate-500/40 text-sky-100 border-sky-400/30 focus:border-sky-400"
                 />
 
                 <ImageUploadFieldSingle
@@ -345,7 +346,7 @@ export default function AboutAdminPage() {
                 <div className="mt-4 border-t border-sky-400/20 pt-4 space-y-3">
                   <h3 className="text-lg font-semibold mb-2 text-sky-200">Sub-sections</h3>
                   {item.childData.map((child, idx) => (
-                    <div key={`${child.id}-${idx}`} className="p-3 rounded-xl bg-sky-900/30 border border-sky-600/20 backdrop-blur-md">
+                    <div key={`${child.id}-${idx}`} className="p-3 rounded-xl bg-sky-500/30 border border-sky-600/20 backdrop-blur-md">
                       <Input
                         value={child.name}
                         onChange={e => {
@@ -360,7 +361,7 @@ export default function AboutAdminPage() {
                             ),
                           );
                         }}
-                        className="bg-slate-900/40 text-sky-100 border-sky-400/30 focus:border-sky-400"
+                        className="bg-slate-500/40 text-sky-100 border-sky-400/30 focus:border-sky-400"
                       />
                       <Textarea
                         value={child.description}
@@ -376,7 +377,7 @@ export default function AboutAdminPage() {
                             ),
                           );
                         }}
-                        className="mt-2 bg-slate-900/40 text-sky-100 border-sky-400/30 focus:border-sky-400"
+                        className="mt-2 bg-slate-500/40 text-sky-100 border-sky-400/30 focus:border-sky-400"
                         rows={2}
                       />
                       <ImageUploadFieldSingle
@@ -405,7 +406,7 @@ export default function AboutAdminPage() {
 
           {/* Bottom Global Action Buttons */}
           <div className="flex flex-col md:flex-row justify-center items-center gap-4 mt-10">
-            <Button disabled={loading} onClick={handleSaveAll} className="bg-sky-600 hover:bg-sky-700 text-white px-8 py-3 font-semibold text-lg">
+            <Button disabled={loading} onClick={handleSaveAll} className="bg-sky-600 hover:bg-sky-300 text-white px-8 py-3 font-semibold text-lg">
               {loading ? 'Saving...' : isExistingData ? 'Update About Data (PUT)' : 'Create About Data (POST)'}
             </Button>
 
@@ -413,7 +414,7 @@ export default function AboutAdminPage() {
               disabled={productionEnabled}
               onClick={handlePublish}
               className={`${
-                productionEnabled ? 'bg-gray-600 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'
+                productionEnabled ? 'bg-gray-600 cursor-not-allowed' : 'bg-green-600 hover:bg-green-300'
               } text-white px-8 py-3 font-semibold text-lg`}
             >
               {productionEnabled ? `Production Active (${formatTimer(timer)})` : 'Publish to Production'}
