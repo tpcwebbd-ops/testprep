@@ -29,7 +29,7 @@ export async function POST(req: Request) {
 
     // ✅ All paths valid — now revalidate each one
     for (const path of body.paths) {
-      revalidatePath(path); // Revalidate cached ISR data for that route
+      revalidatePath('/about'); // Revalidate cached ISR data for that route
       console.log(`✅ Revalidated: ${path}`);
     }
 
