@@ -1,3 +1,4 @@
+import { logger } from 'better-auth';
 import { createJwt, formatResponse, IResponse } from '../utils';
 
 export async function POST(req: Request) {
@@ -12,7 +13,7 @@ export async function POST(req: Request) {
       }
     }
   } catch (err) {
-    console.log('err', err);
+    logger.error('err', err);
     const result: IResponse = { ok: false, data: [], message: 'some thing wrong', status: 502 };
     return formatResponse(false, result.data, result.message, result.status);
   }

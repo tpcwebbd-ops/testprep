@@ -6,6 +6,7 @@
 |-----------------------------------------
 */
 
+import { logger } from 'better-auth';
 import jwt, { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 
 interface JwtPayload {
@@ -35,7 +36,7 @@ export function verifyJwt(token: string): { isValid: boolean; payload?: Verified
   const jwtSecret = process.env.JWT_SECRET;
 
   if (!jwtSecret) {
-    console.error('JWT_SECRET is not configured in environment variables.');
+    logger.error('JWT_SECRET is not configured in environment variables.');
     return { isValid: false };
   }
 
@@ -45,11 +46,11 @@ export function verifyJwt(token: string): { isValid: boolean; payload?: Verified
     return { isValid: true, payload: decoded };
   } catch (error) {
     if (error instanceof TokenExpiredError) {
-      console.log('JWT verification failed: Token has expired.');
+      logger.error('JWT verification failed: Token has expired.');
     } else if (error instanceof JsonWebTokenError) {
-      console.log(`JWT verification failed: ${error.message}`);
+      logger.error(`JWT verification failed: ${error.message}`);
     } else {
-      console.error('An unexpected error occurred during JWT verification:', error);
+      logger.error('An unexpected error occurred during JWT verification:', error);
     }
 
     return { isValid: false };
