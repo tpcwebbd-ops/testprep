@@ -6,4 +6,11 @@ export interface IResponse {
   status: number;
   ok: boolean;
 }
-export const formatResponse = (data: unknown, message: string, status: number) => NextResponse.json({ data, message, status }, { status });
+
+// Helper to format responses
+export const formatResponse = (data: unknown, message: string, status: number): IResponse => ({
+  data,
+  message,
+  status,
+  ok: status > 209 ? false : true,
+});

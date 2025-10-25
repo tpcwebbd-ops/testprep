@@ -1,99 +1,62 @@
 interface Schema {
-    [key: string]: string | Schema
+  [key: string]: string | Schema;
 }
-
 
 interface NamingConvention {
-    Users_1_000___: string
-    users_2_000___: string
-    User_3_000___: string
-    user_4_000___: string
+  Users_1_000___: string;
+  users_2_000___: string;
+  User_3_000___: string;
+  user_4_000___: string;
 }
-
 
 interface InputConfig {
-    uid: string
-    templateName: string
-    schema: Schema
-    namingConvention: NamingConvention
+  uid: string;
+  templateName: string;
+  schema: Schema;
+  namingConvention: NamingConvention;
 }
 
-
 function generateController(inputJsonString: string): string {
-    const config: InputConfig = JSON.parse(inputJsonString)
-    const { namingConvention, schema } = config
+  const config: InputConfig = JSON.parse(inputJsonString);
+  const { namingConvention, schema } = config;
 
-   
-    const findAllKeysByTypes = (
-        obj: Schema,
-        types: string[],
-        prefix = ''
-    ): string[] => {
-        let keys: string[] = []
-        for (const key in obj) {
-            if (Object.prototype.hasOwnProperty.call(obj, key)) {
-                const newPrefix = prefix ? `${prefix}.${key}` : key
-                const value = obj[key]
+  const findAllKeysByTypes = (obj: Schema, types: string[], prefix = ''): string[] => {
+    let keys: string[] = [];
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        const newPrefix = prefix ? `${prefix}.${key}` : key;
+        const value = obj[key];
 
-                if (
-                    typeof value === 'object' &&
-                    value !== null &&
-                    !Array.isArray(value)
-                ) {
-                    keys = keys.concat(
-                        findAllKeysByTypes(value as Schema, types, newPrefix)
-                    )
-                } else if (
-                    typeof value === 'string' &&
-                    types.includes(value.toUpperCase()) 
-                ) {
-                    keys.push(newPrefix)
-                }
-            }
+        if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+          keys = keys.concat(findAllKeysByTypes(value as Schema, types, newPrefix));
+        } else if (typeof value === 'string' && types.includes(value.toUpperCase())) {
+          keys.push(newPrefix);
         }
-        return keys
+      }
     }
+    return keys;
+  };
 
-    const stringLikeTypes = [
-        'STRING',
-        'EMAIL',
-        'URL',
-        'PHONE',
-        'DESCRIPTION',
-        'RICHTEXT',
-        'SELECT',
-        'RADIOBUTTON',
-    ]
-    const numberLikeTypes = ['INTNUMBER', 'FLOATNUMBER']
+  const stringLikeTypes = ['STRING', 'EMAIL', 'URL', 'PHONE', 'DESCRIPTION', 'RICHTEXT', 'SELECT', 'RADIOBUTTON'];
+  const numberLikeTypes = ['INTNUMBER', 'FLOATNUMBER'];
 
-    const stringFields = findAllKeysByTypes(schema, stringLikeTypes)
-    const numberFields = findAllKeysByTypes(schema, numberLikeTypes)
+  const stringFields = findAllKeysByTypes(schema, stringLikeTypes);
+  const numberFields = findAllKeysByTypes(schema, numberLikeTypes);
 
-    const replacements = {
-        Users_1_000___: namingConvention.Users_1_000___,
-        users_2_000___: namingConvention.users_2_000___,
-        totalUsers_1_000___: `total${namingConvention.Users_1_000___}`,
-        User_3_000___: namingConvention.User_3_000___,
-        user_4_000___: namingConvention.user_4_000___,
-    }
+  const replacements = {
+    Users_1_000___: namingConvention.Users_1_000___,
+    users_2_000___: namingConvention.users_2_000___,
+    totalUsers_1_000___: `total${namingConvention.Users_1_000___}`,
+    User_3_000___: namingConvention.User_3_000___,
+    user_4_000___: namingConvention.user_4_000___,
+  };
 
-    const controllerTemplate = `import { withDB } from '@/app/api/utils/db'
+  const controllerTemplate = `import { withDB } from '@/app/api/utils/db'
 import { FilterQuery } from 'mongoose'
 
 import ${replacements.User_3_000___} from './model'
 
-interface IResponse {
-    data: unknown
-    message: string
-    status: number
-}
-
-// Helper to format responses
-const formatResponse = (data: unknown, message: string, status: number): IResponse => ({
-    data,
-    message,
-    status,
-})
+import { formatResponse, IResponse } from '@/app/api/utils/utils';
 
 // CREATE ${replacements.User_3_000___}
 export async function create${replacements.User_3_000___}(req: Request): Promise<IResponse> {
@@ -327,9 +290,9 @@ export async function bulkDelete${replacements.Users_1_000___}(req: Request): Pr
         )
     })
 }
-`
+`;
 
-    return controllerTemplate
+  return controllerTemplate;
 }
 
-export default generateController
+export default generateController;

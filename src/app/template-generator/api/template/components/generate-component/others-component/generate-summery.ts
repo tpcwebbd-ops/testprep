@@ -1,37 +1,32 @@
 interface NamingConvention {
-    Users_1_000___: string
-    users_2_000___: string
-    use_generate_folder: boolean
+  Users_1_000___: string;
+  users_2_000___: string;
+  use_generate_folder: boolean;
 }
 
 interface InputConfig {
-    schema: Record<string, string>
-    namingConvention: NamingConvention
+  schema: Record<string, string>;
+  namingConvention: NamingConvention;
 }
 
-export const generateSummaryComponentFile = (
-    inputJsonString: string
-): string => {
-    const { schema, namingConvention }: InputConfig =
-        JSON.parse(inputJsonString)
+export const generateSummaryComponentFile = (inputJsonString: string): string => {
+  const { schema, namingConvention }: InputConfig = JSON.parse(inputJsonString);
 
-    const pluralPascalCase = namingConvention.Users_1_000___
-    const pluralLowerCase = namingConvention.users_2_000___
+  const pluralPascalCase = namingConvention.Users_1_000___;
+  const pluralLowerCase = namingConvention.users_2_000___;
 
-    const isUsedGenerateFolder = namingConvention.use_generate_folder
+  const isUsedGenerateFolder = namingConvention.use_generate_folder;
 
-    let reduxPath = ''
-    if (isUsedGenerateFolder) {
-        reduxPath = `../redux/rtk-api`
-    } else {
-        reduxPath = `@/redux/features/${pluralLowerCase}/${pluralLowerCase}Slice`
-    }
+  let reduxPath = '';
+  if (isUsedGenerateFolder) {
+    reduxPath = `../redux/rtk-api`;
+  } else {
+    reduxPath = `@/redux/features/${pluralLowerCase}/${pluralLowerCase}Slice`;
+  }
 
-    const hasNumericFields = Object.values(schema).some(
-        (type) => type === 'INTNUMBER' || type === 'FLOATNUMBER'
-    )
+  const hasNumericFields = Object.values(schema).some(type => type === 'INTNUMBER' || type === 'FLOATNUMBER');
 
-    const numericSectionsTemplate = `
+  const numericSectionsTemplate = `
                         {/* Grand Total Summary Card */}
                         {summaryData.tableSummary && (
                             <Card>
@@ -56,7 +51,7 @@ export const generateSummaryComponentFile = (
                                                 {key.replace(/([A-Z])/g, ' $1').trim()}:
                                             </span>
                                             <strong>
-                                                {summaryData.tableSummary[key]}
+                                                {summaryData && summaryData.tableSummary![key]}
                                             </strong>
                                         </div>
                                     ))}
@@ -113,9 +108,9 @@ export const generateSummaryComponentFile = (
                                 </div>
                             </div>
                         )}
-`
+`;
 
-    const paginationTemplate = `
+  const paginationTemplate = `
                 {/* Pagination */}
                 <DialogFooter>
                     {summaryData?.pagination && summaryData.pagination.totalPages > 1 && (
@@ -150,9 +145,9 @@ export const generateSummaryComponentFile = (
                         </Pagination>
                     )}
                 </DialogFooter>
-`
+`;
 
-    const componentTemplate = `
+  const componentTemplate = `
 'use client'
 
 import { useState } from 'react'
@@ -312,7 +307,7 @@ const ${pluralPascalCase}Summary = () => {
 }
 
 export default ${pluralPascalCase}Summary;
-`
+`;
 
-    return componentTemplate
-}
+  return componentTemplate;
+};

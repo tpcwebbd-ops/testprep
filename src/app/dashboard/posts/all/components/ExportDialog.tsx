@@ -1,10 +1,4 @@
-export const generateExportDialogField = (inputJsonString: string): string => {
-  const { namingConvention } = JSON.parse(inputJsonString) || {};
-
-  // 1. Extract and format names.
-  const pluralPascalCase = namingConvention.Users_1_000___;
-  const interfaceName = `I${pluralPascalCase}`;
-  return `'use client'
+'use client'
 
 import React, { useState, useEffect } from 'react'
 import * as XLSX from 'xlsx'
@@ -23,7 +17,7 @@ import {
 
 // Define the shape of the data and headers we expect
 
-import { ${interfaceName}, default${pluralPascalCase} } from '../store/data/data'
+import { IPosts, defaultPosts } from '../store/data/data'
 
 type HeaderItem = { key: string; label: string }
 
@@ -31,12 +25,12 @@ interface ExportDialogProps {
     isOpen: boolean
     onOpenChange: (isOpen: boolean) => void
     headers: HeaderItem[]
-    data: ${interfaceName}[]
+    data: IPosts[]
     fileName: string
 }
 
 // Utility function to handle XLSX file download
-const downloadFile = (data: ${interfaceName}[], fileName: string) => {
+const downloadFile = (data: IPosts[], fileName: string) => {
     const workbook = XLSX.utils.book_new()
     const worksheet = XLSX.utils.json_to_sheet(data)
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Data')
@@ -92,7 +86,7 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
 
         // 2. Process the data to include only the selected columns
         const processedData = data.map((row) => {
-            const newRow: ${interfaceName} = {...default${pluralPascalCase}}
+            const newRow: IPosts = {...defaultPosts}
         
             return newRow
         })
@@ -119,14 +113,14 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
                             className="flex items-center space-x-2"
                         >
                             <Checkbox
-                                id={\`col-\${header.key}\`}
+                                id={`col-${header.key}`}
                                 checked={!!selectedColumns[header.key]}
                                 onCheckedChange={(checked) =>
                                     handleCheckedChange(header.key, !!checked)
                                 }
                             />
                             <Label
-                                htmlFor={\`col-\${header.key}\`}
+                                htmlFor={`col-${header.key}`}
                                 className="font-normal"
                             >
                                 {header.label}
@@ -150,5 +144,3 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
 }
 
 export default ExportDialog
-`;
-};

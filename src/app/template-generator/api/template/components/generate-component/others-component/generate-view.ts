@@ -1,82 +1,76 @@
 interface Schema {
-    [key: string]: string | Schema
+  [key: string]: string | Schema;
 }
 
 interface InputConfig {
-    uid: string
-    templateName: string
-    schema: Schema
-    namingConvention: {
-        Users_1_000___: string
-        users_2_000___: string
-        User_3_000___: string
-        user_4_000___: string
-        use_generate_folder: boolean
-    }
+  uid: string;
+  templateName: string;
+  schema: Schema;
+  namingConvention: {
+    Users_1_000___: string;
+    users_2_000___: string;
+    User_3_000___: string;
+    user_4_000___: string;
+    use_generate_folder: boolean;
+  };
 }
 
 export const generateViewComponentFile = (inputJsonFile: string): string => {
-    const { schema, namingConvention }: InputConfig =
-        JSON.parse(inputJsonFile) || {}
+  const { schema, namingConvention }: InputConfig = JSON.parse(inputJsonFile) || {};
 
-    const pluralPascalCase = namingConvention.Users_1_000___
-    const pluralLowerCase = pluralPascalCase.toLowerCase()
-    const singularLowerCase = namingConvention.user_4_000___
-    const interfaceName = `I${pluralPascalCase}`
-    const defaultInstanceName = `default${pluralPascalCase}`
+  const pluralPascalCase = namingConvention.Users_1_000___;
+  const pluralLowerCase = pluralPascalCase.toLowerCase();
+  const singularLowerCase = namingConvention.user_4_000___;
+  const interfaceName = `I${pluralPascalCase}`;
+  const defaultInstanceName = `default${pluralPascalCase}`;
 
-    const isUsedGenerateFolder = namingConvention.use_generate_folder
+  const isUsedGenerateFolder = namingConvention.use_generate_folder;
 
-    let reduxPath = ''
-    if (isUsedGenerateFolder) {
-        reduxPath = `../redux/rtk-api`
-    } else {
-        reduxPath = `@/redux/features/${pluralLowerCase}/${pluralLowerCase}Slice`
-    }
+  let reduxPath = '';
+  if (isUsedGenerateFolder) {
+    reduxPath = `../redux/rtk-api`;
+  } else {
+    reduxPath = `@/redux/features/${pluralLowerCase}/${pluralLowerCase}Slice`;
+  }
 
-    const generateDetailRowsJsx = (currentSchema: Schema): string => {
-        const imageKeys = Object.keys(currentSchema).filter((key) => {
-            const value = currentSchema[key]
-            return (
-                typeof value === 'string' &&
-                ['IMAGE', 'IMAGES'].includes(value.toUpperCase().split('#')[0])
-            )
-        })
+  const generateDetailRowsJsx = (currentSchema: Schema): string => {
+    const imageKeys = Object.keys(currentSchema).filter(key => {
+      const value = currentSchema[key];
+      return typeof value === 'string' && ['IMAGE', 'IMAGES'].includes(value.toUpperCase().split('#')[0]);
+    });
 
-        return Object.entries(currentSchema)
-            .filter(([key]) => !imageKeys.includes(key))
-            .map(([key, type]) => {
-                const label = key
-                    .replace(/-/g, ' ')
-                    .replace(/\b\w/g, (l) => l.toUpperCase())
+    return Object.entries(currentSchema)
+      .filter(([key]) => !imageKeys.includes(key))
+      .map(([key, type]) => {
+        const label = key.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 
-                if (typeof type === 'object' && !Array.isArray(type)) {
-                    return `<DetailRowJson label="${label}" value={selected${pluralPascalCase}['${key}']} />`
-                }
+        if (typeof type === 'object' && !Array.isArray(type)) {
+          return `<DetailRowJson label="${label}" value={selected${pluralPascalCase}['${key}']} />`;
+        }
 
-                const [typeName] = (type as string).toUpperCase().split('#')
+        const [typeName] = (type as string).toUpperCase().split('#');
 
-                switch (typeName) {
-                    case 'BOOLEAN':
-                    case 'CHECKBOX':
-                        return `<DetailRow label="${label}" value={formatBoolean(selected${pluralPascalCase}['${key}'])} />`
-                    case 'DATE':
-                        return `<DetailRow label="${label}" value={formatDate(selected${pluralPascalCase}['${key}'])} />`
-                    case 'IMAGES':
-                    case 'MULTICHECKBOX':
-                    case 'MULTIOPTIONS':
-                    case 'DYNAMICSELECT':
-                        return `<DetailRowArray label="${label}" values={selected${pluralPascalCase}['${key}']} />`
+        switch (typeName) {
+          case 'BOOLEAN':
+          case 'CHECKBOX':
+            return `<DetailRow label="${label}" value={formatBoolean(selected${pluralPascalCase}['${key}'])} />`;
+          case 'DATE':
+            return `<DetailRow label="${label}" value={formatDate(selected${pluralPascalCase}['${key}'])} />`;
+          case 'IMAGES':
+          case 'MULTICHECKBOX':
+          case 'MULTIOPTIONS':
+          case 'DYNAMICSELECT':
+            return `<DetailRowArray label="${label}" values={selected${pluralPascalCase}['${key}']} />`;
 
-                    case 'STRINGARRAY':
-                        return `<DetailRowJson label="${label}" value={selected${pluralPascalCase}['${key}']} />`
+          case 'STRINGARRAY':
+            return `<DetailRowJson label="${label}" value={selected${pluralPascalCase}['${key}']} />`;
 
-                    case 'DATERANGE':
-                        return `<DetailRow label="${label}" value={\`\${formatDate(selected${pluralPascalCase}['${key}']?.start)} to \${formatDate(selected${pluralPascalCase}['${key}']?.end)}\`} />`
-                    case 'TIMERANGE':
-                        return `<DetailRow label="${label}" value={\`\${selected${pluralPascalCase}['${key}']?.start || 'N/A'} to \${selected${pluralPascalCase}['${key}']?.end || 'N/A'}\`} />`
-                    case 'COLORPICKER':
-                        return `<DetailRow
+          case 'DATERANGE':
+            return `<DetailRow label="${label}" value={\`\${formatDate(selected${pluralPascalCase}['${key}']?.from)} to \${formatDate(selected${pluralPascalCase}['${key}']?.to)}\`} />`;
+          case 'TIMERANGE':
+            return `<DetailRow label="${label}" value={\`\${selected${pluralPascalCase}['${key}']?.start || 'N/A'} to \${selected${pluralPascalCase}['${key}']?.end || 'N/A'}\`} />`;
+          case 'COLORPICKER':
+            return `<DetailRow
                                 label="${label}"
                                 value={
                                     <div className="flex items-center gap-2">
@@ -87,27 +81,25 @@ export const generateViewComponentFile = (inputJsonFile: string): string => {
                                         />
                                     </div>
                                 }
-                            />`
-                    default:
-                        return `<DetailRow label="${label}" value={selected${pluralPascalCase}['${key}']} />`
-                }
-            })
-            .join('\n                            ')
-    }
+                            />`;
+          default:
+            return `<DetailRow label="${label}" value={selected${pluralPascalCase}['${key}']} />`;
+        }
+      })
+      .join('\n                            ');
+  };
 
-    const generateImageViewerJsx = (currentSchema: Schema): string => {
-        return Object.entries(currentSchema)
-            .map(([key, type]) => {
-                const label = key
-                    .replace(/-/g, ' ')
-                    .replace(/\b\w/g, (l) => l.toUpperCase())
+  const generateImageViewerJsx = (currentSchema: Schema): string => {
+    return Object.entries(currentSchema)
+      .map(([key, type]) => {
+        const label = key.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 
-                if (typeof type !== 'string') return ''
+        if (typeof type !== 'string') return '';
 
-                const [typeName] = type.toUpperCase().split('#')
+        const [typeName] = type.toUpperCase().split('#');
 
-                if (typeName === 'IMAGE') {
-                    return `
+        if (typeName === 'IMAGE') {
+          return `
                         <div className="mt-4">
                             <h3 className="font-semibold text-md mb-2">${label}</h3>
                             {selected${pluralPascalCase}['${key}'] ? (
@@ -122,10 +114,10 @@ export const generateViewComponentFile = (inputJsonFile: string): string => {
                             ) : (
                                 <p className="text-sm text-gray-500">No image provided.</p>
                             )}
-                        </div>`
-                }
-                if (typeName === 'IMAGES') {
-                    return `
+                        </div>`;
+        }
+        if (typeName === 'IMAGES') {
+          return `
                         <div className="mt-4">
                             <h3 className="font-semibold text-md mb-2">${label}</h3>
                             {Array.isArray(selected${pluralPascalCase}['${key}']) && selected${pluralPascalCase}['${key}'].length > 0 ? (
@@ -147,21 +139,22 @@ export const generateViewComponentFile = (inputJsonFile: string): string => {
                             ) : (
                                 <p className="text-sm text-gray-500">No images provided.</p>
                             )}
-                        </div>`
-                }
-                return ''
-            })
-            .join('')
-    }
+                        </div>`;
+        }
+        return '';
+      })
+      .join('');
+  };
 
-    const detailRowsJsx = generateDetailRowsJsx(schema)
-    const imageViewerJsx = generateImageViewerJsx(schema)
+  const detailRowsJsx = generateDetailRowsJsx(schema);
+  const imageViewerJsx = generateImageViewerJsx(schema);
 
-    return `import Image from 'next/image'
+  return `import Image from 'next/image'
 import { format } from 'date-fns'
 import React, { useEffect } from 'react'
 
 import { Button } from '@/components/ui/button'
+import { StringArrayData } from './others-field-type/types';
 import { ScrollArea } from '@/components/ui/scroll-area'
 import {
     Dialog,
@@ -231,7 +224,7 @@ const ViewNextComponents: React.FC = () => {
     // --- NEW HELPER COMPONENT FOR RENDERING JSON ---
     const DetailRowJson: React.FC<{
         label: string
-        value?: object | any[]
+        value?: object | StringArrayData[]
     }> = ({ label, value }) => (
         <div className="grid grid-cols-1 gap-1 py-2 border-b">
             <div className="font-semibold text-sm text-gray-600 dark:text-gray-300">{label}</div>
@@ -274,5 +267,5 @@ const ViewNextComponents: React.FC = () => {
 }
 
 export default ViewNextComponents
-`
-}
+`;
+};

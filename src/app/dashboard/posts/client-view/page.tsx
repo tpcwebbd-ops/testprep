@@ -1,33 +1,4 @@
-interface Schema {
-  [key: string]: string | Schema;
-}
-
-interface InputConfig {
-  uid: string;
-  templateName: string;
-  schema: Schema;
-  namingConvention: {
-    Users_1_000___: string;
-    users_2_000___: string;
-    User_3_000___: string;
-    user_4_000___: string;
-    use_generate_folder: boolean;
-  };
-}
-
-export const generateClientListPageFile = (inputJsonFile: string): string => {
-  const { schema, namingConvention }: InputConfig = JSON.parse(inputJsonFile) || {};
-
-  const pluralLowerCase = namingConvention.users_2_000___;
-  const pluralUpperCase = namingConvention.Users_1_000___;
-
-  const schemaKeys = Object.keys(schema);
-  const displayKey =
-    schemaKeys.find(key => key.toLowerCase() === 'title') ||
-    schemaKeys.find(key => key.toLowerCase() === 'name') ||
-    schemaKeys.find(key => schema[key] === 'STRING') ||
-    'name';
-  return `'use client'
+'use client'
 
 import { useEffect, useState } from 'react'
 import CustomLink from './CustomButton' // Renamed for clarity (component should be Link)
@@ -35,7 +6,7 @@ import CustomLink from './CustomButton' // Renamed for clarity (component should
 // A more specific type for the data items, ensuring type safety.
 type DataItem = {
     _id: string;
-    ${displayKey}: string;
+    title: string;
     [key: string]: unknown; // Allow for other properties from the API
 };
 
@@ -52,7 +23,7 @@ const Page = () => {
             try {
                 // Best practice: Use environment variables for API endpoints.
                 const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-                const url = \`\${baseUrl}/generate/${pluralLowerCase}/all/api/v1?page=1&limit=10\`;
+                const url = `${baseUrl}/generate/posts/all/api/v1?page=1&limit=10`;
 
                 // Example using a token from environment variables for authorization.
                 const token = process.env.NEXT_PUBLIC_Token
@@ -63,13 +34,13 @@ const Page = () => {
                 const response = await fetch(url, {
                     method: 'GET',
                     headers: {
-                        Authorization: \`Bearer \${token}\`,
+                        Authorization: `Bearer ${token}`,
                         'Content-Type': 'application/json',
                     },
                 })
 
                 if (!response.ok) {
-                    throw new Error(\`Failed to fetch data: \${response.statusText}\`);
+                    throw new Error(`Failed to fetch data: ${response.statusText}`);
                 }
 
                 const responseData = await response.json()
@@ -87,7 +58,7 @@ const Page = () => {
     }, [])
 
     if (loading) {
-        return <div className="text-center p-8">Loading ${pluralUpperCase}...</div>
+        return <div className="text-center p-8">Loading Posts...</div>
     }
 
     if (error) {
@@ -96,21 +67,21 @@ const Page = () => {
 
     return (
         <main className="w-full flex flex-col gap-4 p-1 md:p-4">
-            <h1 className="text-2xl font-bold">All ${pluralUpperCase}</h1>
+            <h1 className="text-2xl font-bold">All Posts</h1>
             {data.length > 0 ? (
                 <div className="flex flex-col gap-2">
                     {data.map((item) => (
                         <div key={item._id}>
                             <CustomLink
-                                name={item.${displayKey}}
-                                url={\`/dashboard/${pluralLowerCase}/client-view/details/\${item._id}\`}
+                                name={item.title}
+                                url={`/dashboard/posts/client-view/details/${item._id}`}
                             />
                         </div>
                     ))}
                 </div>
             ) : (
                 <div className="text-center p-8 bg-slate-100 dark:bg-slate-800 rounded-md">
-                    No ${pluralUpperCase} found.
+                    No Posts found.
                 </div>
             )}
         </main>
@@ -118,5 +89,3 @@ const Page = () => {
 }
 
 export default Page
-`;
-};

@@ -1,40 +1,27 @@
 interface InputConfig {
-    schema: Record<string, string>
-    namingConvention: {
-        User_3_000___: string
-    }
+  schema: Record<string, string>;
+  namingConvention: {
+    User_3_000___: string;
+  };
 }
 
-const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
+const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 export function generateSummaryController(inputJsonString: string): string {
-    const config: InputConfig = JSON.parse(inputJsonString)
-    const { namingConvention, schema } = config
+  const config: InputConfig = JSON.parse(inputJsonString);
+  const { namingConvention, schema } = config;
 
-    const singularName = namingConvention.User_3_000___
-    const getSummaryFunction = `get${singularName}Summary`
+  const singularName = namingConvention.User_3_000___;
+  const getSummaryFunction = `get${singularName}Summary`;
 
-    const numericFields = Object.keys(schema).filter(
-        (key) => schema[key] === 'INTNUMBER' || schema[key] === 'FLOATNUMBER'
-    )
+  const numericFields = Object.keys(schema).filter(key => schema[key] === 'INTNUMBER' || schema[key] === 'FLOATNUMBER');
 
-    if (numericFields.length === 0) {
-        return `
+  if (numericFields.length === 0) {
+    return `
 import { withDB } from '@/app/api/utils/db';
 import ${singularName} from '../model';
 
-interface IResponse {
-    data: unknown
-    message: string
-    status: number
-}
-
-// Helper to format responses
-const formatResponse = (data: unknown, message: string, status: number): IResponse => ({
-    data,
-    message,
-    status,
-})
+import { formatResponse, IResponse } from '@/app/api/utils/utils';
 
 export async function ${getSummaryFunction}(req: Request): Promise<IResponse> {
     return withDB(async () => {
@@ -61,53 +48,25 @@ export async function ${getSummaryFunction}(req: Request): Promise<IResponse> {
         );
     });
 }
-        `.trim()
-    }
+        `.trim();
+  }
 
-    const aggregationResultInterface = numericFields
-        .map((field) => `    total${capitalize(field)}: number;`)
-        .join('\n')
+  const aggregationResultInterface = numericFields.map(field => `    total${capitalize(field)}: number;`).join('\n');
 
-    const groupStageSums = numericFields
-        .map(
-            (field) =>
-                `                        total${capitalize(field)}: { $sum: '$${field}' },`
-        )
-        .join('\n')
+  const groupStageSums = numericFields.map(field => `                        total${capitalize(field)}: { $sum: '$${field}' },`).join('\n');
 
-    const monthlyTableProperties = numericFields
-        .map(
-            (field) =>
-                `                total${capitalize(field)}: stat.total${capitalize(field)} || 0,`
-        )
-        .join('\n')
+  const monthlyTableProperties = numericFields.map(field => `                total${capitalize(field)}: stat.total${capitalize(field)} || 0,`).join('\n');
 
-    const initialAccumulator = numericFields
-        .map((field) => `grandTotal${capitalize(field)}: 0,`)
-        .join(' ')
+  const initialAccumulator = numericFields.map(field => `grandTotal${capitalize(field)}: 0,`).join(' ');
 
-    const reduceLogic = numericFields
-        .map(
-            (field) =>
-                `            acc.grandTotal${capitalize(field)} += curr.total${capitalize(field)};`
-        )
-        .join('\n')
+  const reduceLogic = numericFields.map(field => `            acc.grandTotal${capitalize(field)} += curr.total${capitalize(field)};`).join('\n');
 
-    const controllerTemplate = `
+  const controllerTemplate = `
 import { withDB } from '@/app/api/utils/db';
 import ${singularName} from '../model';
 
-interface IResponse {
-    data: unknown;
-    message: string;
-    status: number;
-}
 
-const formatResponse = (data: unknown, message: string, status: number): IResponse => ({
-    data,
-    message,
-    status,
-});
+import { formatResponse, IResponse } from '@/app/api/utils/utils';
 
 interface AggregationResult {
     _id: {
@@ -189,6 +148,6 @@ ${reduceLogic}
         );
     });
 }
-`
-    return controllerTemplate.trim()
+`;
+  return controllerTemplate.trim();
 }
