@@ -6,6 +6,7 @@
 |-----------------------------------------
 */
 
+import { logger } from 'better-auth';
 import { createClient, RedisClientOptions, RedisClientType, SetOptions } from 'redis';
 
 const REDIS_USER = process.env.REDIS_USER;
@@ -35,10 +36,10 @@ const getClient = (): RedisClientType => {
 
   client = createClient(clientOptions) as RedisClientType;
 
-  client.on('error', err => console.error('Redis Client Error:', err));
-  client.on('connect', () => console.log('Connected to Redis successfully!'));
-  client.on('reconnecting', () => console.log('Reconnecting to Redis...'));
-  client.on('end', () => console.log('Disconnected from Redis.'));
+  client.on('error', err => logger.error('Redis Client Error:', err));
+  client.on('connect', () => logger.log('Connected to Redis successfully!'));
+  client.on('reconnecting', () => logger.log('Reconnecting to Redis...'));
+  client.on('end', () => logger.log('Disconnected from Redis.'));
 
   return client;
 };
