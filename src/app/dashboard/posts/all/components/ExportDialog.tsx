@@ -2,142 +2,128 @@
 
 import React, { useState, useEffect } from 'react'
 import * as XLSX from 'xlsx'
-import { logger } from 'better-auth';
+import { logger } from 'better-auth'
+
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogFooter,
-    DialogDescription,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
 } from '@/components/ui/dialog'
-
-// Define the shape of the data and headers we expect
 
 import { IPosts, defaultPosts } from '../store/data/data'
 
 type HeaderItem = { key: string; label: string }
 
 interface ExportDialogProps {
-    isOpen: boolean
-    onOpenChange: (isOpen: boolean) => void
-    headers: HeaderItem[]
-    data: IPosts[]
-    fileName: string
+  isOpen: boolean
+  onOpenChange: (isOpen: boolean) => void
+  headers: HeaderItem[]
+  data: IPosts[]
+  fileName: string
 }
 
-// Utility function to handle XLSX file download
 const downloadFile = (data: IPosts[], fileName: string) => {
-    const workbook = XLSX.utils.book_new()
-    const worksheet = XLSX.utils.json_to_sheet(data)
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Data')
-    XLSX.writeFile(workbook, fileName)
+  const workbook = XLSX.utils.book_new()
+  const worksheet = XLSX.utils.json_to_sheet(data)
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Data')
+  XLSX.writeFile(workbook, fileName)
 }
 
 const ExportDialog: React.FC<ExportDialogProps> = ({
-    isOpen,
-    onOpenChange,
-    headers,
-    data,
-    fileName,
+  isOpen,
+  onOpenChange,
+  headers,
+  data,
+  fileName,
 }) => {
-    // State to manage which columns are checked, initialized to all checked
-    const [selectedColumns, setSelectedColumns] = useState<
-        Record<string, boolean>
-    >({})
+  const [selectedColumns, setSelectedColumns] = useState<Record<string, boolean>>({})
 
-    // Reset the selected columns to all 'true' whenever the dialog is opened
-    useEffect(() => {
-        if (isOpen) {
-            const allSelected = headers.reduce(
-                (acc, header) => {
-                    acc[header.key] = true
-                    return acc
-                },
-                {} as Record<string, boolean>
-            )
-            setSelectedColumns(allSelected)
-        }
-    }, [isOpen, headers])
-
-    const handleCheckedChange = (key: string, isChecked: boolean) => {
-        // Enforce the rule: at least one checkbox must remain checked.
-        const currentlyCheckedCount =
-            Object.values(selectedColumns).filter(Boolean).length
-        if (currentlyCheckedCount === 1 && !isChecked) {
-            // If only one is left and the user is trying to uncheck it, do nothing.
-            return
-        }
-
-        setSelectedColumns((prev) => ({
-            ...prev,
-            [key]: isChecked,
-        }))
+  useEffect(() => {
+    if (isOpen) {
+      const allSelected = headers.reduce((acc, header) => {
+        acc[header.key] = true
+        return acc
+      }, {} as Record<string, boolean>)
+      setSelectedColumns(allSelected)
     }
+  }, [isOpen, headers])
 
-    const handleExport = () => {
-       
-        // 2. Process the data to include only the selected columns
-        const processedData = data.map((row) => {
-        logger.info(JSON.stringify(row));
-            const newRow: IPosts = {...defaultPosts}
-        
-            return newRow
-        })
+  const handleCheckedChange = (key: string, isChecked: boolean) => {
+    const currentlyCheckedCount = Object.values(selectedColumns).filter(Boolean).length
+    if (currentlyCheckedCount === 1 && !isChecked) return
 
-        // 3. Trigger the download and close the dialog
-        downloadFile(processedData, fileName)
-        onOpenChange(false)
-    }
+    setSelectedColumns(prev => ({
+      ...prev,
+      [key]: isChecked,
+    }))
+  }
 
-    return (
-        <Dialog open={isOpen} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                    <DialogTitle>Customize Your Export</DialogTitle>
-                    <DialogDescription>
-                        Select the columns you want to include in the XLSX file.
-                    </DialogDescription>
-                </DialogHeader>
+  const handleExport = () => {
+    const processedData = data.map(row => {
+      logger.info(JSON.stringify(row))
+      const newRow: IPosts = { ...defaultPosts }
+      return newRow
+    })
 
-                <div className="grid gap-4 py-4 max-h-60 overflow-y-auto pr-2">
-                    {headers.map((header) => (
-                        <div
-                            key={header.key}
-                            className="flex items-center space-x-2"
-                        >
-                            <Checkbox
-                                id={`col-${header.key}`}
-                                checked={!!selectedColumns[header.key]}
-                                onCheckedChange={(checked) =>
-                                    handleCheckedChange(header.key, !!checked)
-                                }
-                            />
-                            <Label
-                                htmlFor={`col-${header.key}`}
-                                className="font-normal"
-                            >
-                                {header.label}
-                            </Label>
-                        </div>
-                    ))}
-                </div>
+    downloadFile(processedData, fileName)
+    onOpenChange(false)
+  }
 
-                <DialogFooter>
-                    <Button
-                        variant="outline"
-                        onClick={() => onOpenChange(false)}
-                    >
-                        Cancel
-                    </Button>
-                    <Button onClick={handleExport}>Export Data</Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
-    )
+  return (
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[425px] rounded-xl border border-white/20 bg-white/10 text-white backdrop-blur-2xl shadow-xl transition-all">
+        <DialogHeader>
+          <DialogTitle className="bg-clip-text bg-gradient-to-r from-white to-blue-200 text-white">
+            Customize Your Export
+          </DialogTitle>
+          <DialogDescription className="text-white/70">
+            Select the columns you want to include in your XLSX file.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="grid gap-4 py-4 max-h-60 overflow-y-auto pr-2 backdrop-blur-md p-2">
+          {headers.map(header => (
+            <div key={header.key} className="flex items-center space-x-2">
+              <Checkbox
+                id={`col-${header.key}`}
+                checked={!!selectedColumns[header.key]}
+                onCheckedChange={checked =>
+                  handleCheckedChange(header.key, !!checked)
+                }
+                className="border-white/30 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-400"
+              />
+              <Label
+                htmlFor={`col-${header.key}`}
+                className="font-normal text-white/90"
+              >
+                {header.label}
+              </Label>
+            </div>
+          ))}
+        </div>
+
+        <DialogFooter className="gap-2">
+          <Button 
+            onClick={() => onOpenChange(false)}
+            variant="outlineWater" size="sm"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleExport} variant="outlineWater" size="sm"
+          >
+            Export Data
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
 }
 
 export default ExportDialog
