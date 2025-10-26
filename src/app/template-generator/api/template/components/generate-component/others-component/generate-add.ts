@@ -1,4 +1,4 @@
-// ✅ Updated generate-add.tsx
+// ✅ Updated generate-add.tsx (Glassmorphism output)
 interface Schema {
   [key: string]: string | Schema;
 }
@@ -39,7 +39,9 @@ export const generateAddComponentFile = (inputJsonFile: string): string => {
         }))
       : defaultOptions;
 
-    const optionsJsArrayString = `[\n${optionsArray.map(opt => `        { label: '${opt.label}', value: '${opt.value}' }`).join(',\n')}\n    ]`;
+    const optionsJsArrayString = `[
+${optionsArray.map(opt => `        { label: '${opt.label}', value: '${opt.value}' }`).join(',\n')}
+    ]`;
 
     componentBodyStatements.add(`    const ${varName} = ${optionsJsArrayString};`);
     return varName;
@@ -64,10 +66,10 @@ export const generateAddComponentFile = (inputJsonFile: string): string => {
 
     switch (typeName.toUpperCase()) {
       case 'STRING':
-        componentJsx = `<InputFieldForString id="${key}" placeholder="${label}" value={new${singularPascalCase}['${key}']} onChange={(value) => handleFieldChange('${key}', value as string)} />`;
+        componentJsx = `<InputFieldForString className="text-white" id="${key}" placeholder="${label}" value={new${singularPascalCase}['${key}']} onChange={(value) => handleFieldChange('${key}', value as string)} />`;
         break;
       case 'EMAIL':
-        componentJsx = `<InputFieldForEmail id="${key}" value={new${singularPascalCase}['${key}']} onChange={(value) => handleFieldChange('${key}', value as string)} />`;
+        componentJsx = `<InputFieldForEmail className="text-white" id="${key}" value={new${singularPascalCase}['${key}']} onChange={(value) => handleFieldChange('${key}', value as string)} />`;
         break;
       case 'PASSWORD':
         componentJsx = `<InputFieldForPassword id="${key}" value={new${singularPascalCase}['${key}']} onChange={(value) => handleFieldChange('${key}', value as string)} />`;
@@ -116,18 +118,21 @@ export const generateAddComponentFile = (inputJsonFile: string): string => {
       case 'COLORPICKER':
         componentJsx = `<ColorPickerField id="${key}" value={new${singularPascalCase}['${key}']} onChange={(value) => handleFieldChange('${key}', value as string)} />`;
         break;
-      case 'SELECT':
+      case 'SELECT': {
         const selectVarName = generateOptionsVariable(key, optionsString, [{ label: 'Option 1', value: 'Option 1' }]);
         componentJsx = `<SelectField options={${selectVarName}} value={new${singularPascalCase}['${key}']} onValueChange={(value) => handleFieldChange('${key}', value)} />`;
         break;
-      case 'RADIOBUTTON':
+      }
+      case 'RADIOBUTTON': {
         const radioVarName = generateOptionsVariable(key, optionsString, [{ label: 'Choice A', value: 'Choice A' }]);
         componentJsx = `<RadioButtonGroupField options={${radioVarName}} value={new${singularPascalCase}['${key}']} onChange={(value) => handleFieldChange('${key}', value)} />`;
         break;
-      case 'MULTIOPTIONS':
+      }
+      case 'MULTIOPTIONS': {
         const multiOptionsVarName = generateOptionsVariable(key, optionsString, [{ label: 'Default A', value: 'Default A' }]);
         componentJsx = `<MultiOptionsField options={${multiOptionsVarName}} value={new${singularPascalCase}['${key}']} onChange={(values) => handleFieldChange('${key}', values)} />`;
         break;
+      }
       case 'DYNAMICSELECT':
         componentJsx = `<DynamicSelectField value={new${singularPascalCase}['${key}']} apiUrl='https://jsonplaceholder.typicode.com/users' onChange={(values) => handleFieldChange('${key}', values)} />`;
         break;
@@ -274,22 +279,44 @@ ${dynamicVariablesContent}
 
     return (
         <Dialog open={isAddModalOpen} onOpenChange={toggleAddModal}>
-            <DialogContent className="sm:max-w-[825px]">
-                <DialogHeader>
-                    <DialogTitle>Add New ${singularPascalCase}</DialogTitle>
+            <DialogContent
+                className="sm:max-w-[825px] rounded-xl border border-white/20 bg-white/10
+                           backdrop-blur-2xl shadow-2xl overflow-hidden transition-all duration-300"
+            >
+                <DialogHeader className="pb-3">
+                    <DialogTitle
+                        className="text-xl font-semibold bg-clip-text text-transparent
+                                   bg-gradient-to-r from-white to-blue-200 drop-shadow-md"
+                    >
+                        Add New ${singularPascalCase}
+                    </DialogTitle>
                 </DialogHeader>
 
-                <ScrollArea className="h-[500px] w-full rounded-md border p-4">
+                <ScrollArea
+                    className="h-[500px] w-full rounded-xl border border-white/10 p-4
+                               bg-white/5 backdrop-blur-xl"
+                >
                     <div className="grid gap-4 py-4">
                         ${formFieldsJsx}
                     </div>
                 </ScrollArea>
 
-                <DialogFooter>
-                    <Button variant="outline" onClick={() => toggleAddModal(false)}>
+                <DialogFooter className="pt-4 gap-3">
+                    <Button
+                        variant="outline"
+                        onClick={() => toggleAddModal(false)}
+                        className="rounded-lg bg-white/10 text-white border-white/20 backdrop-blur-xl
+                                   hover:bg-white/20 hover:scale-105 active:scale-95 transition-all"
+                    >
                         Cancel
                     </Button>
-                    <Button disabled={isLoading} onClick={handleAdd${singularPascalCase}}>
+                    <Button
+                        disabled={isLoading}
+                        onClick={handleAdd${singularPascalCase}}
+                        className="rounded-lg bg-blue-600/60 text-white
+                                   hover:bg-blue-700/80 disabled:opacity-50
+                                   backdrop-blur-xl transition-all hover:scale-105 active:scale-95"
+                    >
                         {isLoading ? 'Adding...' : 'Add ${singularPascalCase}'}
                     </Button>
                 </DialogFooter>

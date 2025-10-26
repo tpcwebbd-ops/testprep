@@ -29,8 +29,15 @@ import { useGetPostsQuery } from '@/redux/features/posts/postsSlice';
 import Pagination from './Pagination';
 import ExportDialog from './ExportDialog';
 
-type DisplayablePostsKeys = 'title' | 'email' | 'age' | 'amount' | 'isActive' | 'policy' | 'createdAt';
-type ColumnVisibilityState = Record<DisplayablePostsKeys, boolean>;
+type DisplayablePostsKeys = 
+    | 'title'
+    | 'email'
+    | 'age'
+    | 'amount'
+    | 'isActive'
+    | 'policy'
+    | 'createdAt'
+type ColumnVisibilityState = Record<DisplayablePostsKeys, boolean>
 
 const ViewTableNextComponents: React.FC = () => {
   const [open, setOpen] = useState(false);
@@ -59,47 +66,51 @@ const ViewTableNextComponents: React.FC = () => {
     toggleBulkDeleteModal,
   } = usePostsStore();
 
-  const {
-    data: getResponseData,
-    isLoading,
-    isError,
-    error,
-  } = useGetPostsQuery({
-    q: queryPramsQ,
-    limit: queryPramsLimit,
-    page: queryPramsPage,
-  });
+    const {
+        data: getResponseData,
+        isLoading,
+        isError,
+        error,
+    } = useGetPostsQuery({
+        q: queryPramsQ,
+        limit: queryPramsLimit,
+        page: queryPramsPage,
+    })
 
-  const allData = useMemo(() => getResponseData?.data?.posts || [], [getResponseData]);
+    const allData = useMemo(
+        () => getResponseData?.data?.posts || [],
+        [getResponseData]
+    )
 
-  const tableHeaders: { key: DisplayablePostsKeys; label: string }[] = useMemo(
-    () => [
-      { key: 'title', label: 'Title' },
-      { key: 'email', label: 'Email' },
-      { key: 'age', label: 'Age' },
-      { key: 'amount', label: 'Amount' },
-      { key: 'isActive', label: 'Is Active' },
-      { key: 'policy', label: 'Policy' },
-      { key: 'createdAt', label: 'Created At' },
-    ],
-    [],
-  );
+    const tableHeaders: { key: DisplayablePostsKeys; label: string }[] = useMemo(()=>[
+        { key: 'title', label: 'Title' },
+        { key: 'email', label: 'Email' },
+        { key: 'age', label: 'Age' },
+        { key: 'amount', label: 'Amount' },
+        { key: 'isActive', label: 'Is Active' },
+        { key: 'policy', label: 'Policy' },
+        { key: 'createdAt', label: 'Created At' }
+    ],[]);
 
-  const [columnVisibility, setColumnVisibility] = useState<ColumnVisibilityState>(() => {
-    const initialState = {} as ColumnVisibilityState;
-    let counter = 0;
-    for (const header of tableHeaders) {
-      if (counter > 3) {
-        initialState[header.key] = false;
-      } else {
-        initialState[header.key] = true;
-      }
-      counter++;
-    }
-    return initialState;
-  });
-
-  const visibleHeaders = useMemo(() => tableHeaders.filter(header => columnVisibility[header.key]), [columnVisibility, tableHeaders]);
+    const [columnVisibility, setColumnVisibility] =
+        useState<ColumnVisibilityState>(() => {
+            const initialState = {} as ColumnVisibilityState
+            let counter = 0
+            for (const header of tableHeaders) {
+                if (counter > 3) {
+                    initialState[header.key] = false
+                } else {
+                    initialState[header.key] = true
+                }
+                counter++
+            }
+            return initialState
+        })
+            
+    const visibleHeaders = useMemo(
+        () => tableHeaders.filter(header => columnVisibility[header.key]),
+        [columnVisibility, tableHeaders]
+    );
 
   const formatDate = (date?: Date | string) => {
     if (!date) return 'N/A';
@@ -392,46 +403,43 @@ const ViewTableNextComponents: React.FC = () => {
         </Table>
       )}
 
-      <Pagination
-        currentPage={queryPramsPage}
-        itemsPerPage={queryPramsLimit}
-        onPageChange={page => setQueryPramsPage(page)}
-        totalItems={getResponseData?.data?.total || 0}
-      />
+            <Pagination
+                currentPage={queryPramsPage}
+                itemsPerPage={queryPramsLimit}
+                onPageChange={(page) => setQueryPramsPage(page)}
+                totalItems={getResponseData?.data?.total || 0}
+            />
 
-      <div className="max-w-xs flex items-center self-center justify-between pl-2 gap-4 border rounded-lg w-full mx-auto mt-8">
-        <Label htmlFor="set-limit" className="text-right text-slate-500 font-normal pl-3">
-          Posts per page
-        </Label>
-        <Select
-          onValueChange={value => {
-            setQueryPramsLimit(Number(value));
-            setQueryPramsPage(1);
-          }}
-          defaultValue={queryPramsLimit.toString()}
-        >
-          <SelectTrigger className="border-0">
-            <SelectValue placeholder="Select" />
-          </SelectTrigger>
-          <SelectContent>
-            {pageLimitArr.map(i => (
-              <SelectItem key={i} value={i.toString()} className="cursor-pointer">
-                {i}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+             <div className="max-w-xs flex items-center self-center justify-between pl-2 gap-4 border rounded-lg w-full mx-auto mt-8">
+                <Label htmlFor="set-limit" className="text-right text-slate-50 font-normal pl-3">
+                    Posts per page
+                </Label>
+                <Select
+                    onValueChange={(value) => { setQueryPramsLimit(Number(value)); setQueryPramsPage(1); }}
+                    defaultValue={queryPramsLimit.toString()}
+                >
+                    <SelectTrigger className="border-0">
+                        <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {pageLimitArr.map((i) => (
+                            <SelectItem key={i} value={i.toString()} className="cursor-pointer">
+                                {i}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
 
-      {/* Render the ExportDialog and pass it the required props */}
-      <ExportDialog
-        isOpen={isExportDialogOpen}
-        onOpenChange={setExportDialogOpen}
-        headers={tableHeaders}
-        data={bulkData}
-        fileName={`Exported_Posts_${new Date().toISOString()}.xlsx`}
-      />
-    </div>
-  );
-};
-export default ViewTableNextComponents;
+            {/* Render the ExportDialog and pass it the required props */}
+            <ExportDialog
+                isOpen={isExportDialogOpen}
+                onOpenChange={setExportDialogOpen}
+                headers={tableHeaders}
+                data={bulkData}
+                fileName={`Exported_Posts_${new Date().toISOString()}.xlsx`}
+            />
+        </div>
+    )
+}
+    export default ViewTableNextComponents

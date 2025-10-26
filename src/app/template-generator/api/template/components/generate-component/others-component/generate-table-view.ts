@@ -469,7 +469,7 @@ const ViewTableNextComponents: React.FC = () => {
             />
 
              <div className="max-w-xs flex items-center self-center justify-between pl-2 gap-4 border rounded-lg w-full mx-auto mt-8">
-                <Label htmlFor="set-limit" className="text-right text-slate-500 font-normal pl-3">
+                <Label htmlFor="set-limit" className="text-right text-slate-50 font-normal pl-3">
                     ${pluralPascalCase} per page
                 </Label>
                 <Select
