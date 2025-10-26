@@ -1,0 +1,24 @@
+{
+  "uid": "_Messages",
+  "templateName": "Messages Template ",
+  "schema": {
+    "sender_mobilenumber":"PHONE",
+    "sender_Name":"STRING",
+    "message_content":"DESCRIPTION",
+    "sent_time":"TIME",
+    "sent_date":"DATE",
+    "is_read":"SELECT#Read, Unread, Solved, Rejected",
+    "replayBy":"EMAIL",
+    "replayTime":"TIME",
+    "replayDate":"DATE",
+    "isAddTomarkeking":"SELECT#Pending, Yes, No"
+  },
+  "namingConvention": {
+    "Users_1_000___": "Messages",
+    "users_2_000___": "messages",
+    "User_3_000___": "Message",
+    "user_4_000___": "message",
+    "ISelect_6_000___": "ISelect_n",
+    "select_5_000___": "select_n"
+  }
+}

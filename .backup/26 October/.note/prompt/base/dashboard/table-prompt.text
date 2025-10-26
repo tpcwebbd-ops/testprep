@@ -1,0 +1,81 @@
+Act as a seniour developer in NextJs and Typescript.
+
+here is an example of url and responses json 
+url """/dashboard/batch/all/api"""
+and response Json 
+```
+{
+    "data": {
+        "batches": [
+            {
+                "_id": "68bd5c690de8a5ce02f64474",
+                "batchInfo": "Description of the batch",
+                "batchName": "IELTS Batch 100",
+                "mentorInfo": [
+                    {
+                        "mentorName": "Name of Mentor",
+                        "mentorEmail": "example@gmail.com",
+                        "studentsLst": [
+                            {
+                                "studentName": "Name of Student",
+                                "studentEmail": "example@gamil.com",
+                                "studentCourse": "studentCourse",
+                                "startDate": "1/1/2025",
+                                "endDate": "31/8/2025",
+                                "attendanceLst": [
+                                    {
+                                        "dateAndTime": "(time)",
+                                        "lectureName": "Lecture 1",
+                                        "_id": "68bd5c690de8a5ce02f64477"
+                                    },
+                                    {
+                                        "dateAndTime": "(time)",
+                                        "lectureName": "Lecture 1",
+                                        "_id": "68bd5c690de8a5ce02f64478"
+                                    }
+                                ],
+                                "_id": "68bd5c690de8a5ce02f64476"
+                            },
+                            {
+                                "studentName": "Name of Student 2",
+                                "studentEmail": "example2@gamil.com",
+                                "studentCourse": "studentCourse",
+                                "startDate": "1/1/2025",
+                                "endDate": "31/8/2025",
+                                "attendanceLst": [
+                                    {
+                                        "dateAndTime": "(time)",
+                                        "lectureName": "Lecture 1",
+                                        "_id": "68bd5c690de8a5ce02f6447a"
+                                    },
+                                    {
+                                        "dateAndTime": "(time)",
+                                        "lectureName": "Lecture 1",
+                                        "_id": "68bd5c690de8a5ce02f6447b"
+                                    }
+                                ],
+                                "_id": "68bd5c690de8a5ce02f64479"
+                            }
+                        ],
+                        "_id": "68bd5c690de8a5ce02f64475"
+                    }
+                ],
+                "createdAt": "2025-09-07T10:20:25.644Z",
+                "updatedAt": "2025-09-07T10:20:25.644Z",
+                "__v": 0
+            }
+        ],
+        "total": 1,
+        "page": 1,
+        "limit": 10
+    },
+    "message": "Batches fetched successfully",
+    "status": 200
+}
+```
+
+
+Now could you please generate a dashboard interface for manage the batches.
+I want a table in page.tsx
+Add, Edit, Delete, and a ViewButton.
+implement pegination and search bar for searching. 

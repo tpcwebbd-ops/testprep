@@ -1,0 +1,9 @@
+1. .env file must be update. copy local .env and past it in vercel
+2.  check url 
+-->> local       -->>  i.  http://localhost:3000
+-->> production  -->>  ii. https://b-varse.vercel.app
+
+     a. -->  /client-view/page.tsx
+     b. -->  /client-view/details/[id]/page.tsx
+     c. -->  /ssr-view/page.tsx
+     d. -->  /ssr-view/details/[id]/page.tsx

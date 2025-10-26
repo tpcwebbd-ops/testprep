@@ -1,0 +1,8 @@
+1. copy code form 
+   a. app/auth
+   b. app/api/auth
+
+2. Implementation
+   a. root layout wrap with NextAuthProvider
+   b. create google auth account and past client id and secret in .env file
+   c. check callback-url in [https://console.cloud.google.com]

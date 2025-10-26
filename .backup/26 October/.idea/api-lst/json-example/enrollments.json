@@ -1,0 +1,8 @@
+{
+  "student_email": "alex.jones@example.com",
+  "batch_id": "TPC-IELTS-DEC2025",
+  "enrollment_date": "2025-11-15T00:00:00.000Z",
+  "enrollment_time": "02:45 PM",
+  "is_complete": "Completed",
+  "payment_id": "PAY-XYZ123ABC456"
+}

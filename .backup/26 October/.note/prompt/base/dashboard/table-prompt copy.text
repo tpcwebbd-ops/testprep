@@ -1,0 +1,30 @@
+Act as a seniour developer in NextJs and Typescript.
+
+here is a sample of data
+{
+    id: 101,
+    studentName: "Abdul",
+    startCourse: "1/1/2025",
+    endCourse: "31/12/2025",
+    courseName: "IELTS",
+    totalModuleComplete: "25",
+    lastCompleteTime: "7/9/2025::3:00PM"
+}
+
+
+Now make a page with those features.
+
+1. generate a function that generate 100 of student and save the data to zustand.
+2. generate a table to view those data
+3. implement pagination to the table.
+4. implement searchbar to the table.
+5. each row there is three button called View, Edit, and Delete.
+    - View : if click the View button it will view the detalse of the student.
+    - Edit : to edit the student data
+    - Delete : to delete the student data
+6. At the top of the page on the right side there is a button call Add student.
+    - if I click Add button, it will show a popup
+    - after fill the form it add a new student in zustand store.
+
+
+Now please Make a page.tsx with all of those features.

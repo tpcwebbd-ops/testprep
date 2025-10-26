@@ -1,0 +1,18 @@
+{
+  "uid": "_Profiles",
+  "templateName": "Profiles Template ",
+  "schema": {
+    "user_id":"STRING",
+    "address":"STRING",
+    "bio":"DESCRIPTION",
+    "social_links":"STRING"
+  },
+  "namingConvention": {
+    "Users_1_000___": "Profiles",
+    "users_2_000___": "profiles",
+    "User_3_000___": "Profile",
+    "user_4_000___": "profile",
+    "ISelect_6_000___": "ISelect_n",
+    "select_5_000___": "select_n"
+  }
+}

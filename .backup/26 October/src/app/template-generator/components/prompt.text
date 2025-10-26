@@ -1,0 +1,9 @@
+Act as a seniour NextJs developer in typescript
+
+there is example of useState ```    const [jsonInput, setJsonInput] = useState<string>(
+        '{\n  "uid": "000",\n  "templateName": "Basic Template",\n  "schema": {\n    "title": "STRING",\n    "email": "EMAIL", \n    "password": "PASSWORD",\n    "passcode": "PASSCODE",\n    "area": "SELECT",\n    "books-list": "MULTISELECT",\n    "check-list": "MULTIDYNAMICSELECT",\n    "sub-area": "DYNAMICSELECT",\n    "products-images": "IMAGES",\n    "personal-image": "IMAGE",\n    "description": "DESCRIPTION",\n    "age": "INTNUMBER",\n    "amount": "FLOATNUMBER",\n    "isActive": "BOOLEAN",\n    "start-date": "DATE",\n    "start-time": "TIME",\n    "schedule-date": "DATERANGE",\n    "schedule-time": "TIMERANGE",\n    "favorite-color": "COLORPICKER",\n    "number": "PHONE",\n    "profile": "URL",\n    "test": "RICHTEXT",\n    "info": "AUTOCOMPLETE",\n    "shift": "RADIOBUTTON",\n    "policy": "CHECKBOX",\n    "hobbys": "MULTICHECKBOX"\n  },\n  "namingConvention": {\n    "Users_1_000___": "Posts",\n    "users_2_000___": "posts",\n    "User_3_000___": "Post",\n    "user_4_000___": "post",\n    "ISelect_6_000___": "ISelect",\n    "select_5_000___": "select"\n  }\n}'
+    )``` and here is a  function ```  const handleFormat = () => {
+      
+    }```
+
+    after invoke the function it will format the json. Now please update the function. 
