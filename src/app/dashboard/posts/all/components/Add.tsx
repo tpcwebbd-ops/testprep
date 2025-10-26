@@ -110,23 +110,22 @@ const AddNextComponents: React.FC = () => {
     return (
         <Dialog open={isAddModalOpen} onOpenChange={toggleAddModal}>
             <DialogContent
-                className="sm:max-w-[825px] rounded-xl border border-white/20 bg-white/10
-                           backdrop-blur-2xl shadow-2xl overflow-hidden transition-all duration-300"
+                className="sm:max-w-[825px] rounded-xl border mt-[35px] border-white/20 bg-white/10
+                           backdrop-blur-2xl shadow-2xl overflow-hidden transition-all duration-300 p-0"
             >
-                <DialogHeader className="pb-3">
-                    <DialogTitle
-                        className="text-xl font-semibold bg-clip-text text-transparent
-                                   bg-gradient-to-r from-white to-blue-200 drop-shadow-md"
-                    >
-                        Add New Post
-                    </DialogTitle>
-                </DialogHeader>
-
                 <ScrollArea
-                    className="h-[500px] w-full rounded-xl border border-white/10 p-4
-                               bg-white/5 backdrop-blur-xl"
+                    className="h-[75vh] max-h-[calc(100vh-2rem)] rounded-xl"
                 >
-                    <div className="grid gap-4 py-4 text-white">
+                    <DialogHeader className="p-6 pb-3">
+                        <DialogTitle
+                            className="text-xl font-semibold bg-clip-text text-transparent
+                                       bg-gradient-to-r from-white to-blue-200 drop-shadow-md"
+                        >
+                            Add New Post
+                        </DialogTitle>
+                    </DialogHeader>
+
+                    <div className="grid gap-4 py-4 px-6 text-white">
                         
                         <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
                             <Label htmlFor="title" className="text-right ">
@@ -347,21 +346,19 @@ const AddNextComponents: React.FC = () => {
                     </div>
                 </ScrollArea>
 
-                <DialogFooter className="pt-4 gap-3">
+                <DialogFooter className="p-6 pt-4 gap-3">
                     <Button
-                        variant="outline"
+                        variant="outlineWater"
                         onClick={() => toggleAddModal(false)}
-                        className="rounded-lg bg-white/10 text-white border-white/20 backdrop-blur-xl
-                                   hover:bg-white/20 hover:scale-105 active:scale-95 transition-all"
+                        size="sm"
                     >
                         Cancel
                     </Button>
                     <Button
                         disabled={isLoading}
                         onClick={handleAddPost}
-                        className="rounded-lg bg-blue-600/60 text-white
-                                   hover:bg-blue-700/80 disabled:opacity-50
-                                   backdrop-blur-xl transition-all hover:scale-105 active:scale-95"
+                        variant="outlineGarden"
+                        size="sm"
                     >
                         {isLoading ? 'Adding...' : 'Add Post'}
                     </Button>
