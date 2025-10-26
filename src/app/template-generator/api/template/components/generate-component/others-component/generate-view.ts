@@ -22,7 +22,6 @@ export const generateViewComponentFile = (inputJsonFile: string): string => {
 
   const pluralPascalCase = namingConvention.Users_1_000___;
   const pluralLowerCase = namingConvention.users_2_000___ || pluralPascalCase.toLowerCase();
-  const singularPascalCase = namingConvention.User_3_000___;
   const singularLowerCase = namingConvention.user_4_000___;
   const interfaceName = `I${pluralPascalCase}`;
   const defaultInstanceName = `default${pluralPascalCase}`;

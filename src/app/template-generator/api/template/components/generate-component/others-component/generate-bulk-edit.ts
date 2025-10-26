@@ -4,7 +4,6 @@ export const generateBulkEditComponentFile = (inputJsonFile: string): string => 
   // Names
   const pluralPascalCase = namingConvention.Users_1_000___;
   const pluralLowerCase = namingConvention.users_2_000___;
-  const singularPascalCase = namingConvention.User_3_000___;
 
   const isUsedGenerateFolder = namingConvention.use_generate_folder;
   const reduxPath = isUsedGenerateFolder ? `../redux/rtk-api` : `@/redux/features/${pluralLowerCase}/${pluralLowerCase}Slice`;

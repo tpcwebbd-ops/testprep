@@ -2,7 +2,7 @@ export interface IResponse {
   data: unknown;
   message: string;
   status: number;
-  ok: boolean;
+  ok?: boolean;
 }
 
 // Helper to format responses

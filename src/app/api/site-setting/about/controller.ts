@@ -5,7 +5,7 @@ interface IResponse {
   data: unknown;
   message: string;
   status: number;
-  ok: boolean;
+  ok?: boolean;
 }
 
 const formatResponse = (data: unknown, message: string, status: number): IResponse => ({
