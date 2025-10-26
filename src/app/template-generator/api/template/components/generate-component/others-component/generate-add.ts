@@ -85,7 +85,7 @@ ${optionsArray.map(opt => `        { label: '${opt.label}', value: '${opt.value}
         break;
       case 'DESCRIPTION':
         isTallComponent = true;
-        componentJsx = `<TextareaFieldForDescription id="${key}" value={new${singularPascalCase}['${key}']} onChange={(e) => handleFieldChange('${key}', e.target.value)} />`;
+        componentJsx = `<TextareaFieldForDescription className="text-white" id="${key}" value={new${singularPascalCase}['${key}']} onChange={(e) => handleFieldChange('${key}', e.target.value)} />`;
         break;
       case 'RICHTEXT':
         isTallComponent = true;
