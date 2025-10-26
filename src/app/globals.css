@@ -257,3 +257,9 @@
   top: 65px !important;
   right: 16px !important;
 }
+
+.calendar-element {
+  backdrop-filter: blur(4px);
+  background: transparent;
+  color: white;
+}
