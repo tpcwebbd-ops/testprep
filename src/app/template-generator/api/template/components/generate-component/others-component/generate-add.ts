@@ -19,13 +19,6 @@ interface InputConfig {
 export const generateAddComponentFile = (inputJsonFile: string): string => {
   const { schema, namingConvention }: InputConfig = JSON.parse(inputJsonFile) || {};
 
-  // For the expected output, we override these to 'Posts' and 'Post'
-  // If the intent is for these to be dynamic based on namingConvention,
-  // then the input JSON would need to provide 'Posts' for Users_1_000___
-  // and 'Post' for User_3_000___.
-  // Based on the expected output, the actual values from namingConvention seem to be 'Posts'/'Post'.
-  // I will assume the namingConvention *itself* provides these values as 'Posts' and 'Post'
-  // for the example to match, rather than hardcoding "Posts" and "Post" here.
   const pluralPascalCase = namingConvention.Users_1_000___; // e.g., "Posts"
   const singularPascalCase = namingConvention.User_3_000___; // e.g., "Post"
   const pluralLowerCase = namingConvention.users_2_000___; // e.g., "posts"
@@ -60,14 +53,14 @@ ${optionsArray.map(opt => `        { label: '${opt.label}', value: '${opt.value}
     const [typeName, optionsString] = type.split('#');
 
     const formFieldWrapper = (label: string, componentJsx: string, alignTop: boolean = false): string => `
-                        <div className="grid grid-cols-1 md:grid-cols-4 ${alignTop ? 'items-start' : 'items-center'} gap-4 pr-1">
-                            <Label htmlFor="${key}" className="text-right ${alignTop ? 'pt-3' : ''}">
-                                ${label}
-                            </Label>
-                            <div className="col-span-3">
-                                ${componentJsx}
-                            </div>
-                        </div>`;
+            <div className="grid grid-cols-1 md:grid-cols-4 ${alignTop ? 'items-start' : 'items-center'} gap-4 pr-1">
+              <Label htmlFor="${key}" className="text-right ${alignTop ? 'pt-3' : ''}">
+                ${label}
+              </Label>
+              <div className="col-span-3">
+                ${componentJsx}
+              </div>
+            </div>`;
 
     let componentJsx = '';
     let isTallComponent = false;
@@ -127,24 +120,22 @@ ${optionsArray.map(opt => `        { label: '${opt.label}', value: '${opt.value}
         componentJsx = `<ColorPickerField id="${key}" value={new${singularPascalCase}['${key}']} onChange={(value) => handleFieldChange('${key}', value as string)} />`;
         break;
       case 'SELECT': {
-        // Updated default options to match the expected output's 'areaOptions' format
         const selectVarName = generateOptionsVariable(key, optionsString, [{ label: 'Option 1', value: 'Option 1' }]);
         componentJsx = `<SelectField options={${selectVarName}} value={new${singularPascalCase}['${key}']} onValueChange={(value) => handleFieldChange('${key}', value)} />`;
         break;
       }
       case 'RADIOBUTTON': {
-        // Updated default options to match the expected output's 'shiftOptions' format
         const radioVarName = generateOptionsVariable(key, optionsString, [{ label: 'Choice A', value: 'Choice A' }]);
         componentJsx = `<RadioButtonGroupField options={${radioVarName}} value={new${singularPascalCase}['${key}']} onChange={(value) => handleFieldChange('${key}', value)} />`;
         break;
       }
       case 'MULTIOPTIONS': {
-        // Updated default options to match the expected output's 'ideasOptions' format
         const multiOptionsVarName = generateOptionsVariable(key, optionsString, [{ label: 'Default A', value: 'Default A' }]);
         componentJsx = `<MultiOptionsField options={${multiOptionsVarName}} value={new${singularPascalCase}['${key}']} onChange={(values) => handleFieldChange('${key}', values)} />`;
         break;
       }
       case 'DYNAMICSELECT':
+        isTallComponent = true; // DynamicSelectField is usually taller due to potential dropdown content
         componentJsx = `<DynamicSelectField value={new${singularPascalCase}['${key}']} apiUrl='https://jsonplaceholder.typicode.com/users' onChange={(values) => handleFieldChange('${key}', values)} />`;
         break;
       case 'IMAGE':
@@ -157,7 +148,6 @@ ${optionsArray.map(opt => `        { label: '${opt.label}', value: '${opt.value}
         isTallComponent = true;
         componentJsx = `<MultiCheckboxGroupField value={new${singularPascalCase}['${key}']} onChange={(values) => handleFieldChange('${key}', values)} />`;
         break;
-      // ✅ Fixed: Proper StringArray JSX
       case 'STRINGARRAY':
         isTallComponent = true;
         componentJsx = `<StringArrayField value={new${singularPascalCase}['${key}']} onChange={(value) => handleFieldChange('${key}', value)} />`;
@@ -177,16 +167,19 @@ ${optionsArray.map(opt => `        { label: '${opt.label}', value: '${opt.value}
     .map(([key, value]) => {
       if (typeof value === 'object' && !Array.isArray(value)) {
         const label = key.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-        const componentJsx = `<JsonTextareaField id="${key}" value={(new${singularPascalCase}['${key}'] || '')} onChange={(value) => handleFieldChange('${key}', value as string)} />`;
+        const componentJsx = `<JsonTextareaField id="${key}" value={JSON.stringify(new${singularPascalCase}['${key}'], null, 2) || ''} onChange={(value) => {
+          handleFieldChange('${key}', value); 
+                               
+                            }} />`;
         return `
-                        <div className="grid grid-cols-4 items-start gap-4 pr-1">
-                            <Label htmlFor="${key}" className="text-right pt-3">
-                                ${label}
-                            </Label>
-                            <div className="col-span-3">
-                                ${componentJsx}
-                            </div>
-                        </div>`;
+            <div className="grid grid-cols-4 items-start gap-4 pr-1">
+              <Label htmlFor="${key}" className="text-right pt-3">
+                ${label}
+              </Label>
+              <div className="col-span-3">
+                ${componentJsx}
+              </div>
+            </div>`;
       }
       return generateFormFieldJsx(key, value as string);
     })
@@ -194,11 +187,7 @@ ${optionsArray.map(opt => `        { label: '${opt.label}', value: '${opt.value}
 
   const dynamicVariablesContent = componentBodyStatements.size > 0 ? `${[...componentBodyStatements].sort().join('\n\n')}` : '';
 
-  // The expected output uses a specific path, overriding the dynamic one
-  // Assuming the expected output's path is desired for all cases if the template is for a specific context.
-  // If use_generate_folder should still be respected, the condition needs to be adjusted.
-  // For now, I'll hardcode to match the expected output.
-  const reduxPath = `@/redux/features/${pluralLowerCase}/${pluralLowerCase}Slice`; // Always use this path as per expected output
+  const reduxPath = `@/redux/features/${pluralLowerCase}/${pluralLowerCase}Slice`;
 
   const staticImports = `import AutocompleteField from '@/components/dashboard-ui/AutocompleteField'
 import ColorPickerField from '@/components/dashboard-ui/ColorPickerField'
