@@ -126,7 +126,7 @@ const AddNextComponents: React.FC = () => {
                     className="h-[500px] w-full rounded-xl border border-white/10 p-4
                                bg-white/5 backdrop-blur-xl"
                 >
-                    <div className="grid gap-4 py-4">
+                    <div className="grid gap-4 py-4 text-white">
                         
                         <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
                             <Label htmlFor="title" className="text-right ">

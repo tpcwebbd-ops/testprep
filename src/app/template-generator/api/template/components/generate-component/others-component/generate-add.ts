@@ -296,7 +296,7 @@ ${dynamicVariablesContent}
                     className="h-[500px] w-full rounded-xl border border-white/10 p-4
                                bg-white/5 backdrop-blur-xl"
                 >
-                    <div className="grid gap-4 py-4">
+                    <div className="grid gap-4 py-4 text-white">
                         ${formFieldsJsx}
                     </div>
                 </ScrollArea>
