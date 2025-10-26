@@ -1,192 +1,201 @@
-import Image from 'next/image'
-import { format } from 'date-fns'
-import React, { useEffect } from 'react'
+'use client';
 
-import { Button } from '@/components/ui/button'
+import Image from 'next/image';
+import React, { useEffect } from 'react';
+import { format } from 'date-fns';
+
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { StringArrayData } from './others-field-type/types';
-import { ScrollArea } from '@/components/ui/scroll-area'
-import {
-    Dialog,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog'
- import { logger } from 'better-auth';
+import { logger } from 'better-auth';
+import { formatDuplicateKeyError, isApiErrorResponse } from '@/components/common/utils';
 
-import { IPosts, defaultPosts } from '../store/data/data'
-import { usePostsStore } from '../store/store'
-import { useGetPostsByIdQuery } from '@/redux/features/posts/postsSlice'
+import { IPosts, defaultPosts } from '../store/data/data';
+import { usePostsStore } from '../store/store';
+import { useGetPostsByIdQuery } from '@/redux/features/posts/postsSlice';
+
+type Primitive = string | number | boolean | null | undefined;
+type Arrayish = Array<string | number | boolean>;
+type JSONLike =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | Record<string, unknown>
+  | StringArrayData[];
 
 const ViewNextComponents: React.FC = () => {
-    const {
-        isViewModalOpen,
-        selectedPosts,
-        toggleViewModal,
-        setSelectedPosts,
-    } = usePostsStore()
+  const { selectedPosts, isViewModalOpen, toggleViewModal, setSelectedPosts } = usePostsStore();
 
-    const { data: postData, refetch } = useGetPostsByIdQuery(
-        selectedPosts?._id,
-        { skip: !selectedPosts?._id }
-    )
+  const { data: postData, refetch } = useGetPostsByIdQuery(
+    selectedPosts?._id,
+    { skip: !selectedPosts?._id }
+  );
 
-    useEffect(() => {
-        if (selectedPosts?._id) {
-            refetch()
-        }
-    }, [selectedPosts?._id, refetch])
+  useEffect(() => {
+    if (selectedPosts?._id) refetch();
+  }, [selectedPosts?._id, refetch]);
 
-    useEffect(() => {
-        if (postData?.data) {
-            setSelectedPosts(postData.data)
-        }
-    }, [postData, setSelectedPosts])
+  useEffect(() => {
+    if (postData?.data) setSelectedPosts(postData.data as IPosts);
+  }, [postData, setSelectedPosts]);
 
-    const formatDate = (date?: Date | string) => {
-        if (!date) return 'N/A'
-        try {
-            return format(new Date(date), 'MMM dd, yyyy')
-        } catch (error) {
-               logger.error(JSON.stringify(error));
-            return 'Invalid Date'
-        }
+  const formatDate = (d?: string | Date): string => {
+    if (!d) return 'N/A';
+    try {
+      return format(new Date(d), 'MMM dd, yyyy');
+    } catch (error: unknown) {
+      let errMessage: string = 'Invalid Date';
+      if (isApiErrorResponse(error)) {
+        errMessage = formatDuplicateKeyError(error.data.message) || 'API error';
+      } else if (error instanceof Error) {
+        errMessage = error.message;
+      }
+      logger.error(JSON.stringify(errMessage));
+      return 'Invalid';
     }
+  };
 
-    const formatBoolean = (value?: boolean) => (value ? 'Yes' : 'No')
+  const formatBoolean = (v?: boolean): string => (v ? 'Yes' : 'No');
 
-    const DetailRow: React.FC<{
-        label: string
-        value: React.ReactNode
-    }> = ({ label, value }) => (
-        <div className="grid grid-cols-3 gap-2 py-2 border-b">
-            <div className="font-semibold text-sm text-gray-600 dark:text-gray-300">{label}</div>
-            <div className="col-span-2 text-sm text-gray-800 dark:text-gray-100">{value || 'N/A'}</div>
-        </div>
-    )
-    
-    const DetailRowArray: React.FC<{
-        label: string
-        values?: (string | number)[]
-    }> = ({ label, values }) => (
-        <DetailRow label={label} value={values?.join(', ') || 'N/A'} />
-    )
+  const DetailRow: React.FC<{ label: string; value: React.ReactNode }> = ({ label, value }) => (
+    <div className="grid grid-cols-3 gap-2 py-2 border-b border-white/10">
+      <span className="text-sm text-white/80">{label}</span>
+      <span className="col-span-2 text-sm text-white">{(value ?? 'N/A') as Primitive}</span>
+    </div>
+  );
 
-    // --- NEW HELPER COMPONENT FOR RENDERING JSON ---
-    const DetailRowJson: React.FC<{
-        label: string
-        value?: object | StringArrayData[]
-    }> = ({ label, value }) => (
-        <div className="grid grid-cols-1 gap-1 py-2 border-b">
-            <div className="font-semibold text-sm text-gray-600 dark:text-gray-300">{label}</div>
-            <div className="col-span-1 text-sm bg-slate-100 dark:bg-slate-800 p-2 rounded-md mt-1">
-                <pre className="whitespace-pre-wrap text-xs">{value ? JSON.stringify(value, null, 2) : 'N/A'}</pre>
-            </div>
-        </div>
-    )
+  const DetailRowArray: React.FC<{ label: string; values?: Arrayish | null }> = ({ label, values }) => (
+    <DetailRow label={label} value={values?.join(', ') || 'N/A'} />
+  );
 
-    return (
-        <Dialog open={isViewModalOpen} onOpenChange={toggleViewModal}>
-            <DialogContent className="sm:max-w-[625px]">
-                <DialogHeader>
-                    <DialogTitle>Posts Details</DialogTitle>
-                </DialogHeader>
-                {selectedPosts && (
-                    <ScrollArea className="h-[500px] w-full rounded-md border p-4">
-                        <div className="grid gap-1">
-                            <DetailRow label="Title" value={selectedPosts['title']} />
-                            <DetailRow label="Email" value={selectedPosts['email']} />
-                            <DetailRow label="Password" value={selectedPosts['password']} />
-                            <DetailRow label="Passcode" value={selectedPosts['passcode']} />
-                            <DetailRow label="Area" value={selectedPosts['area']} />
-                            <DetailRowArray label="Sub Area" values={selectedPosts['sub-area']} />
-                            <DetailRow label="Description" value={selectedPosts['description']} />
-                            <DetailRow label="Age" value={selectedPosts['age']} />
-                            <DetailRow label="Amount" value={selectedPosts['amount']} />
-                            <DetailRow label="IsActive" value={formatBoolean(selectedPosts['isActive'])} />
-                            <DetailRow label="Start Date" value={formatDate(selectedPosts['start-date'])} />
-                            <DetailRow label="Start Time" value={selectedPosts['start-time']} />
-                            <DetailRow label="Schedule Date" value={`${formatDate(selectedPosts['schedule-date']?.from)} to ${formatDate(selectedPosts['schedule-date']?.to)}`} />
-                            <DetailRow label="Schedule Time" value={`${selectedPosts['schedule-time']?.start || 'N/A'} to ${selectedPosts['schedule-time']?.end || 'N/A'}`} />
-                            <DetailRow
-                                label="Favorite Color"
-                                value={
-                                    <div className="flex items-center gap-2">
-                                        <span>{selectedPosts['favorite-color']}</span>
-                                        <div
-                                            className="w-5 h-5 rounded-full border"
-                                            style={{ backgroundColor: selectedPosts['favorite-color'] }}
-                                        />
-                                    </div>
-                                }
-                            />
-                            <DetailRow label="Number" value={selectedPosts['number']} />
-                            <DetailRow label="Profile" value={selectedPosts['profile']} />
-                            <DetailRow label="Test" value={selectedPosts['test']} />
-                            <DetailRow label="Info" value={selectedPosts['info']} />
-                            <DetailRow label="Shift" value={selectedPosts['shift']} />
-                            <DetailRow label="Policy" value={formatBoolean(selectedPosts['policy'])} />
-                            <DetailRowArray label="Hobbies" values={selectedPosts['hobbies']} />
-                            <DetailRowArray label="Ideas" values={selectedPosts['ideas']} />
-                            <DetailRowJson label="Students" value={selectedPosts['students']} />
-                            <DetailRowJson label="ComplexValue" value={selectedPosts['complexValue']} />
-                            <DetailRow label="Created At" value={formatDate(selectedPosts.createdAt)} />
-                            <DetailRow label="Updated At" value={formatDate(selectedPosts.updatedAt)} />
-                        </div>
-                        
-                        <div className="mt-4">
-                            <h3 className="font-semibold text-md mb-2">Products Images</h3>
-                            {Array.isArray(selectedPosts['products-images']) && selectedPosts['products-images'].length > 0 ? (
-                                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                                    {selectedPosts['products-images'].map((image: string, index: number) => (
-                                        <div
-                                            key={`${index}-${image}`}
-                                            className="relative w-full h-32 border rounded-lg overflow-hidden"
-                                        >
-                                            <Image
-                                                src={image}
-                                                fill
-                                                style={{ objectFit: 'cover' }}
-                                                alt={`Image ${index + 1}`}
-                                            />
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <p className="text-sm text-gray-500">No images provided.</p>
-                            )}
-                        </div>
-                        <div className="mt-4">
-                            <h3 className="font-semibold text-md mb-2">Personal Image</h3>
-                            {selectedPosts['personal-image'] ? (
-                                <div className="relative w-full h-48 border rounded-lg overflow-hidden">
-                                    <Image
-                                        src={selectedPosts['personal-image']}
-                                        fill
-                                        style={{ objectFit: 'cover' }}
-                                        alt="Personal Image"
-                                    />
-                                </div>
-                            ) : (
-                                <p className="text-sm text-gray-500">No image provided.</p>
-                            )}
-                        </div>
-                    </ScrollArea>
-                )}
-                <DialogFooter>
-                    <Button
-                        variant="outline"
-                        onClick={() => {
-                            toggleViewModal(false)
-                            setSelectedPosts(defaultPosts as IPosts)
-                        }}
-                    >
-                        Close
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
-    )
-}
+  const DetailRowJson: React.FC<{ label: string; value?: JSONLike }> = ({ label, value }) => (
+    <div className="py-2 border-b border-white/10">
+      <div className="text-sm text-white/80">{label}</div>
+      <pre className="text-[11px] text-white/90 bg-white/5 rounded-md p-2 mt-1 overflow-auto">{value ? JSON.stringify(value, null, 2) : 'N/A'}</pre>
+    </div>
+  );
 
-export default ViewNextComponents
+  return (
+    <Dialog open={isViewModalOpen} onOpenChange={toggleViewModal}>
+      <DialogContent className="sm:max-w-2xl rounded-xl bg-white/10 backdrop-blur-2xl border border-white/20 text-white">
+        <DialogHeader>
+          <DialogTitle className="bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-200">
+            Posts Details
+          </DialogTitle>
+        </DialogHeader>
+
+        <ScrollArea className="max-h-[520px] rounded-lg border border-white/10 bg-white/5 backdrop-blur-xl p-4 mt-3">
+          {selectedPosts && (
+            <>
+              <DetailRow label="Title" value={selectedPosts['title']} />
+              <DetailRow label="Email" value={selectedPosts['email']} />
+              <DetailRow label="Password" value={selectedPosts['password']} />
+              <DetailRow label="Passcode" value={selectedPosts['passcode']} />
+              <DetailRow label="Area" value={selectedPosts['area']} />
+              <DetailRowArray label="Sub Area" values={selectedPosts['sub-area']} />
+              
+              
+              <DetailRow label="Description" value={selectedPosts['description']} />
+              <DetailRow label="Age" value={selectedPosts['age']} />
+              <DetailRow label="Amount" value={selectedPosts['amount']} />
+              <DetailRow label="IsActive" value={formatBoolean(selectedPosts['isActive'])} />
+              <DetailRow label="Start Date" value={formatDate(selectedPosts['start-date'])} />
+              <DetailRow label="Start Time" value={selectedPosts['start-time']} />
+              <DetailRow label="Schedule Date" value={`${formatDate(selectedPosts['schedule-date']?.from)} - ${formatDate(selectedPosts['schedule-date']?.to)}`} />
+              <DetailRow label="Schedule Time" value={`${selectedPosts['schedule-time']?.start || 'N/A'} - ${selectedPosts['schedule-time']?.end || 'N/A'}`} />
+              <DetailRow
+              label="Favorite Color"
+              value={
+                <div className="flex items-center gap-2">
+                  <span>{selectedPosts['favorite-color']}</span>
+                  <div className="w-5 h-5 rounded-full border border-white/20" style={{ backgroundColor: selectedPosts['favorite-color'] }} />
+                </div>
+              }
+            />
+              <DetailRow label="Number" value={selectedPosts['number']} />
+              <DetailRow label="Profile" value={selectedPosts['profile']} />
+              <DetailRow label="Test" value={selectedPosts['test']} />
+              <DetailRow label="Info" value={selectedPosts['info']} />
+              <DetailRow label="Shift" value={selectedPosts['shift']} />
+              <DetailRow label="Policy" value={formatBoolean(selectedPosts['policy'])} />
+              <DetailRowArray label="Hobbies" values={selectedPosts['hobbies']} />
+              <DetailRowArray label="Ideas" values={selectedPosts['ideas']} />
+              <DetailRowJson label="Students" value={selectedPosts['students']} />
+              <DetailRowJson label="ComplexValue" value={selectedPosts['complexValue']} />
+              <DetailRow label="Created At" value={formatDate(selectedPosts.createdAt)} />
+              <DetailRow label="Updated At" value={formatDate(selectedPosts.updatedAt)} />
+              
+
+
+
+
+
+
+          <div className="mt-6">
+            <h3 className="text-white font-medium mb-2">Products Images</h3>
+            {Array.isArray(selectedPosts['products-images']) && selectedPosts['products-images'].length > 0 ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                {selectedPosts['products-images'].map((img: string, i: number) => (
+                  <div key={i} className="relative h-32 rounded-lg overflow-hidden border border-white/20 bg-white/10 backdrop-blur-lg">
+                    <Image src={img} fill className="object-cover" alt={`Products Images ${i + 1}`} />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-white/70 text-sm">No images.</p>
+            )}
+          </div>
+
+          <div className="mt-6">
+            <h3 className="text-white font-medium mb-2">Personal Image</h3>
+            {selectedPosts['personal-image'] ? (
+              <div className="relative w-full h-48 rounded-lg overflow-hidden border border-white/20 bg-white/10 backdrop-blur-lg">
+                <Image src={selectedPosts['personal-image']} fill className="object-cover" alt="Personal Image" />
+              </div>
+            ) : (
+              <p className="text-white/70 text-sm">No image.</p>
+            )}
+          </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            </>
+          )}
+        </ScrollArea>
+
+        <DialogFooter className="gap-2">
+          <Button
+            variant="outlineWater"
+            onClick={() => {
+              toggleViewModal(false);
+              setSelectedPosts(defaultPosts as IPosts);
+            }}
+          >
+            Close
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default ViewNextComponents;

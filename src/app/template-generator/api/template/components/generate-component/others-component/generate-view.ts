@@ -2,272 +2,254 @@ interface Schema {
   [key: string]: string | Schema;
 }
 
+interface NamingConvention {
+  Users_1_000___: string;
+  users_2_000___: string;
+  User_3_000___: string;
+  user_4_000___: string;
+  use_generate_folder: boolean;
+}
+
 interface InputConfig {
   uid: string;
   templateName: string;
   schema: Schema;
-  namingConvention: {
-    Users_1_000___: string;
-    users_2_000___: string;
-    User_3_000___: string;
-    user_4_000___: string;
-    use_generate_folder: boolean;
-  };
+  namingConvention: NamingConvention;
 }
 
 export const generateViewComponentFile = (inputJsonFile: string): string => {
   const { schema, namingConvention }: InputConfig = JSON.parse(inputJsonFile) || {};
 
   const pluralPascalCase = namingConvention.Users_1_000___;
-  const pluralLowerCase = pluralPascalCase.toLowerCase();
+  const pluralLowerCase = namingConvention.users_2_000___ || pluralPascalCase.toLowerCase();
+  const singularPascalCase = namingConvention.User_3_000___;
   const singularLowerCase = namingConvention.user_4_000___;
   const interfaceName = `I${pluralPascalCase}`;
   const defaultInstanceName = `default${pluralPascalCase}`;
-
   const isUsedGenerateFolder = namingConvention.use_generate_folder;
 
-  let reduxPath = '';
-  if (isUsedGenerateFolder) {
-    reduxPath = `../redux/rtk-api`;
-  } else {
-    reduxPath = `@/redux/features/${pluralLowerCase}/${pluralLowerCase}Slice`;
-  }
+  const reduxPath = isUsedGenerateFolder ? `../redux/rtk-api` : `@/redux/features/${pluralLowerCase}/${pluralLowerCase}Slice`;
 
-  const generateDetailRowsJsx = (currentSchema: Schema): string => {
-    const imageKeys = Object.keys(currentSchema).filter(key => {
-      const value = currentSchema[key];
-      return typeof value === 'string' && ['IMAGE', 'IMAGES'].includes(value.toUpperCase().split('#')[0]);
-    });
-
-    return Object.entries(currentSchema)
-      .filter(([key]) => !imageKeys.includes(key))
+  // Build all non-image rows (including arrays and nested objects as JSON blocks)
+  const generateDetailRowsJsx = (s: Schema): string =>
+    Object.entries(s)
       .map(([key, type]) => {
         const label = key.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 
+        // Nested object -> render JSON block (N1 choice)
         if (typeof type === 'object' && !Array.isArray(type)) {
           return `<DetailRowJson label="${label}" value={selected${pluralPascalCase}['${key}']} />`;
         }
 
         const [typeName] = (type as string).toUpperCase().split('#');
 
-        switch (typeName) {
-          case 'BOOLEAN':
-          case 'CHECKBOX':
-            return `<DetailRow label="${label}" value={formatBoolean(selected${pluralPascalCase}['${key}'])} />`;
-          case 'DATE':
-            return `<DetailRow label="${label}" value={formatDate(selected${pluralPascalCase}['${key}'])} />`;
-          case 'IMAGES':
-          case 'MULTICHECKBOX':
-          case 'MULTIOPTIONS':
-          case 'DYNAMICSELECT':
-            return `<DetailRowArray label="${label}" values={selected${pluralPascalCase}['${key}']} />`;
+        // Skip images here; handled in a separate viewer block
+        if (typeName === 'IMAGE' || typeName === 'IMAGES') return '';
 
-          case 'STRINGARRAY':
-            return `<DetailRowJson label="${label}" value={selected${pluralPascalCase}['${key}']} />`;
-
-          case 'DATERANGE':
-            return `<DetailRow label="${label}" value={\`\${formatDate(selected${pluralPascalCase}['${key}']?.from)} to \${formatDate(selected${pluralPascalCase}['${key}']?.to)}\`} />`;
-          case 'TIMERANGE':
-            return `<DetailRow label="${label}" value={\`\${selected${pluralPascalCase}['${key}']?.start || 'N/A'} to \${selected${pluralPascalCase}['${key}']?.end || 'N/A'}\`} />`;
-          case 'COLORPICKER':
-            return `<DetailRow
-                                label="${label}"
-                                value={
-                                    <div className="flex items-center gap-2">
-                                        <span>{selected${pluralPascalCase}['${key}']}</span>
-                                        <div
-                                            className="w-5 h-5 rounded-full border"
-                                            style={{ backgroundColor: selected${pluralPascalCase}['${key}'] }}
-                                        />
-                                    </div>
-                                }
-                            />`;
-          default:
-            return `<DetailRow label="${label}" value={selected${pluralPascalCase}['${key}']} />`;
+        // Array-like fields
+        if (['MULTICHECKBOX', 'MULTIOPTIONS', 'DYNAMICSELECT'].includes(typeName)) {
+          return `<DetailRowArray label="${label}" values={selected${pluralPascalCase}['${key}']} />`;
         }
+
+        // StringArray (array of objects) -> JSON block
+        if (typeName === 'STRINGARRAY') {
+          return `<DetailRowJson label="${label}" value={selected${pluralPascalCase}['${key}']} />`;
+        }
+
+        // Specialized formatters
+        if (typeName === 'BOOLEAN' || typeName === 'CHECKBOX') {
+          return `<DetailRow label="${label}" value={formatBoolean(selected${pluralPascalCase}['${key}'])} />`;
+        }
+
+        if (typeName === 'DATE') {
+          return `<DetailRow label="${label}" value={formatDate(selected${pluralPascalCase}['${key}'])} />`;
+        }
+
+        if (typeName === 'DATERANGE') {
+          return `<DetailRow label="${label}" value={\`\${formatDate(selected${pluralPascalCase}['${key}']?.from)} - \${formatDate(selected${pluralPascalCase}['${key}']?.to)}\`} />`;
+        }
+
+        if (typeName === 'TIMERANGE') {
+          return `<DetailRow label="${label}" value={\`\${selected${pluralPascalCase}['${key}']?.start || 'N/A'} - \${selected${pluralPascalCase}['${key}']?.end || 'N/A'}\`} />`;
+        }
+
+        if (typeName === 'COLORPICKER') {
+          return `<DetailRow
+              label="${label}"
+              value={
+                <div className="flex items-center gap-2">
+                  <span>{selected${pluralPascalCase}['${key}']}</span>
+                  <div className="w-5 h-5 rounded-full border border-white/20" style={{ backgroundColor: selected${pluralPascalCase}['${key}'] }} />
+                </div>
+              }
+            />`;
+        }
+
+        // Default primitive
+        return `<DetailRow label="${label}" value={selected${pluralPascalCase}['${key}']} />`;
       })
-      .join('\n                            ');
-  };
+      .join('\n              ');
 
-  const generateImageViewerJsx = (currentSchema: Schema): string => {
-    return Object.entries(currentSchema)
+  // Build image viewer sections for IMAGE and IMAGES
+  const generateImageViewerJsx = (s: Schema): string =>
+    Object.entries(s)
       .map(([key, type]) => {
-        const label = key.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-
         if (typeof type !== 'string') return '';
-
         const [typeName] = type.toUpperCase().split('#');
+        const label = key.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 
         if (typeName === 'IMAGE') {
           return `
-                        <div className="mt-4">
-                            <h3 className="font-semibold text-md mb-2">${label}</h3>
-                            {selected${pluralPascalCase}['${key}'] ? (
-                                <div className="relative w-full h-48 border rounded-lg overflow-hidden">
-                                    <Image
-                                        src={selected${pluralPascalCase}['${key}']}
-                                        fill
-                                        style={{ objectFit: 'cover' }}
-                                        alt="${label}"
-                                    />
-                                </div>
-                            ) : (
-                                <p className="text-sm text-gray-500">No image provided.</p>
-                            )}
-                        </div>`;
+          <div className="mt-6">
+            <h3 className="text-white font-medium mb-2">${label}</h3>
+            {selected${pluralPascalCase}['${key}'] ? (
+              <div className="relative w-full h-48 rounded-lg overflow-hidden border border-white/20 bg-white/10 backdrop-blur-lg">
+                <Image src={selected${pluralPascalCase}['${key}']} fill className="object-cover" alt="${label}" />
+              </div>
+            ) : (
+              <p className="text-white/70 text-sm">No image.</p>
+            )}
+          </div>`;
         }
+
         if (typeName === 'IMAGES') {
           return `
-                        <div className="mt-4">
-                            <h3 className="font-semibold text-md mb-2">${label}</h3>
-                            {Array.isArray(selected${pluralPascalCase}['${key}']) && selected${pluralPascalCase}['${key}'].length > 0 ? (
-                                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                                    {selected${pluralPascalCase}['${key}'].map((image: string, index: number) => (
-                                        <div
-                                            key={\`\${index}-\${image}\`}
-                                            className="relative w-full h-32 border rounded-lg overflow-hidden"
-                                        >
-                                            <Image
-                                                src={image}
-                                                fill
-                                                style={{ objectFit: 'cover' }}
-                                                alt={\`Image \${index + 1}\`}
-                                            />
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <p className="text-sm text-gray-500">No images provided.</p>
-                            )}
-                        </div>`;
+          <div className="mt-6">
+            <h3 className="text-white font-medium mb-2">${label}</h3>
+            {Array.isArray(selected${pluralPascalCase}['${key}']) && selected${pluralPascalCase}['${key}'].length > 0 ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                {selected${pluralPascalCase}['${key}'].map((img: string, i: number) => (
+                  <div key={i} className="relative h-32 rounded-lg overflow-hidden border border-white/20 bg-white/10 backdrop-blur-lg">
+                    <Image src={img} fill className="object-cover" alt={\`${label} \${i + 1}\`} />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-white/70 text-sm">No images.</p>
+            )}
+          </div>`;
         }
+
         return '';
       })
-      .join('');
-  };
+      .join('\n');
 
-  const detailRowsJsx = generateDetailRowsJsx(schema);
-  const imageViewerJsx = generateImageViewerJsx(schema);
+  return `'use client';
 
-  return `import Image from 'next/image'
-import { format } from 'date-fns'
-import React, { useEffect } from 'react'
+import Image from 'next/image';
+import React, { useEffect } from 'react';
+import { format } from 'date-fns';
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { StringArrayData } from './others-field-type/types';
-import { ScrollArea } from '@/components/ui/scroll-area'
-import {
-    Dialog,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog'
- import { logger } from 'better-auth';
+import { logger } from 'better-auth';
+import { formatDuplicateKeyError, isApiErrorResponse } from '@/components/common/utils';
 
-import { ${interfaceName}, ${defaultInstanceName} } from '../store/data/data'
-import { use${pluralPascalCase}Store } from '../store/store'
-import { useGet${pluralPascalCase}ByIdQuery } from '${reduxPath}'
+import { ${interfaceName}, ${defaultInstanceName} } from '../store/data/data';
+import { use${pluralPascalCase}Store } from '../store/store';
+import { useGet${pluralPascalCase}ByIdQuery } from '${reduxPath}';
+
+type Primitive = string | number | boolean | null | undefined;
+type Arrayish = Array<string | number | boolean>;
+type JSONLike =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | Record<string, unknown>
+  | StringArrayData[];
 
 const ViewNextComponents: React.FC = () => {
-    const {
-        isViewModalOpen,
-        selected${pluralPascalCase},
-        toggleViewModal,
-        setSelected${pluralPascalCase},
-    } = use${pluralPascalCase}Store()
+  const { selected${pluralPascalCase}, isViewModalOpen, toggleViewModal, setSelected${pluralPascalCase} } = use${pluralPascalCase}Store();
 
-    const { data: ${singularLowerCase}Data, refetch } = useGet${pluralPascalCase}ByIdQuery(
-        selected${pluralPascalCase}?._id,
-        { skip: !selected${pluralPascalCase}?._id }
-    )
+  const { data: ${singularLowerCase}Data, refetch } = useGet${pluralPascalCase}ByIdQuery(
+    selected${pluralPascalCase}?._id,
+    { skip: !selected${pluralPascalCase}?._id }
+  );
 
-    useEffect(() => {
-        if (selected${pluralPascalCase}?._id) {
-            refetch()
-        }
-    }, [selected${pluralPascalCase}?._id, refetch])
+  useEffect(() => {
+    if (selected${pluralPascalCase}?._id) refetch();
+  }, [selected${pluralPascalCase}?._id, refetch]);
 
-    useEffect(() => {
-        if (${singularLowerCase}Data?.data) {
-            setSelected${pluralPascalCase}(${singularLowerCase}Data.data)
-        }
-    }, [${singularLowerCase}Data, setSelected${pluralPascalCase}])
+  useEffect(() => {
+    if (${singularLowerCase}Data?.data) setSelected${pluralPascalCase}(${singularLowerCase}Data.data as ${interfaceName});
+  }, [${singularLowerCase}Data, setSelected${pluralPascalCase}]);
 
-    const formatDate = (date?: Date | string) => {
-        if (!date) return 'N/A'
-        try {
-            return format(new Date(date), 'MMM dd, yyyy')
-        } catch (error) {
-               logger.error(JSON.stringify(error));
-            return 'Invalid Date'
-        }
+  const formatDate = (d?: string | Date): string => {
+    if (!d) return 'N/A';
+    try {
+      return format(new Date(d), 'MMM dd, yyyy');
+    } catch (error: unknown) {
+      let errMessage: string = 'Invalid Date';
+      if (isApiErrorResponse(error)) {
+        errMessage = formatDuplicateKeyError(error.data.message) || 'API error';
+      } else if (error instanceof Error) {
+        errMessage = error.message;
+      }
+      logger.error(JSON.stringify(errMessage));
+      return 'Invalid';
     }
+  };
 
-    const formatBoolean = (value?: boolean) => (value ? 'Yes' : 'No')
+  const formatBoolean = (v?: boolean): string => (v ? 'Yes' : 'No');
 
-    const DetailRow: React.FC<{
-        label: string
-        value: React.ReactNode
-    }> = ({ label, value }) => (
-        <div className="grid grid-cols-3 gap-2 py-2 border-b">
-            <div className="font-semibold text-sm text-gray-600 dark:text-gray-300">{label}</div>
-            <div className="col-span-2 text-sm text-gray-800 dark:text-gray-100">{value || 'N/A'}</div>
-        </div>
-    )
-    
-    const DetailRowArray: React.FC<{
-        label: string
-        values?: (string | number)[]
-    }> = ({ label, values }) => (
-        <DetailRow label={label} value={values?.join(', ') || 'N/A'} />
-    )
+  const DetailRow: React.FC<{ label: string; value: React.ReactNode }> = ({ label, value }) => (
+    <div className="grid grid-cols-3 gap-2 py-2 border-b border-white/10">
+      <span className="text-sm text-white/80">{label}</span>
+      <span className="col-span-2 text-sm text-white">{(value ?? 'N/A') as Primitive}</span>
+    </div>
+  );
 
-    // --- NEW HELPER COMPONENT FOR RENDERING JSON ---
-    const DetailRowJson: React.FC<{
-        label: string
-        value?: object | StringArrayData[]
-    }> = ({ label, value }) => (
-        <div className="grid grid-cols-1 gap-1 py-2 border-b">
-            <div className="font-semibold text-sm text-gray-600 dark:text-gray-300">{label}</div>
-            <div className="col-span-1 text-sm bg-slate-100 dark:bg-slate-800 p-2 rounded-md mt-1">
-                <pre className="whitespace-pre-wrap text-xs">{value ? JSON.stringify(value, null, 2) : 'N/A'}</pre>
-            </div>
-        </div>
-    )
+  const DetailRowArray: React.FC<{ label: string; values?: Arrayish | null }> = ({ label, values }) => (
+    <DetailRow label={label} value={values?.join(', ') || 'N/A'} />
+  );
 
-    return (
-        <Dialog open={isViewModalOpen} onOpenChange={toggleViewModal}>
-            <DialogContent className="sm:max-w-[625px]">
-                <DialogHeader>
-                    <DialogTitle>${pluralPascalCase} Details</DialogTitle>
-                </DialogHeader>
-                {selected${pluralPascalCase} && (
-                    <ScrollArea className="h-[500px] w-full rounded-md border p-4">
-                        <div className="grid gap-1">
-                            ${detailRowsJsx}
-                            <DetailRow label="Created At" value={formatDate(selected${pluralPascalCase}.createdAt)} />
-                            <DetailRow label="Updated At" value={formatDate(selected${pluralPascalCase}.updatedAt)} />
-                        </div>
-                        ${imageViewerJsx}
-                    </ScrollArea>
-                )}
-                <DialogFooter>
-                    <Button
-                        variant="outline"
-                        onClick={() => {
-                            toggleViewModal(false)
-                            setSelected${pluralPascalCase}(${defaultInstanceName} as ${interfaceName})
-                        }}
-                    >
-                        Close
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
-    )
-}
+  const DetailRowJson: React.FC<{ label: string; value?: JSONLike }> = ({ label, value }) => (
+    <div className="py-2 border-b border-white/10">
+      <div className="text-sm text-white/80">{label}</div>
+      <pre className="text-[11px] text-white/90 bg-white/5 rounded-md p-2 mt-1 overflow-auto">{value ? JSON.stringify(value, null, 2) : 'N/A'}</pre>
+    </div>
+  );
 
-export default ViewNextComponents
+  return (
+    <Dialog open={isViewModalOpen} onOpenChange={toggleViewModal}>
+      <DialogContent className="sm:max-w-2xl rounded-xl bg-white/10 backdrop-blur-2xl border border-white/20 text-white">
+        <DialogHeader>
+          <DialogTitle className="bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-200">
+            ${pluralPascalCase} Details
+          </DialogTitle>
+        </DialogHeader>
+
+        <ScrollArea className="max-h-[520px] rounded-lg border border-white/10 bg-white/5 backdrop-blur-xl p-4 mt-3">
+          {selected${pluralPascalCase} && (
+            <>
+              ${generateDetailRowsJsx(schema)}
+              <DetailRow label="Created At" value={formatDate(selected${pluralPascalCase}.createdAt)} />
+              <DetailRow label="Updated At" value={formatDate(selected${pluralPascalCase}.updatedAt)} />
+              ${generateImageViewerJsx(schema)}
+            </>
+          )}
+        </ScrollArea>
+
+        <DialogFooter className="gap-2">
+          <Button
+            variant="outlineWater"
+            onClick={() => {
+              toggleViewModal(false);
+              setSelected${pluralPascalCase}(${defaultInstanceName} as ${interfaceName});
+            }}
+          >
+            Close
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default ViewNextComponents;
 `;
 };
