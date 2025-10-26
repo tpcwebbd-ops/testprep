@@ -46,7 +46,7 @@ const SuccessPopup = ({ isVisible, message }: { isVisible: boolean; message: str
   if (!isVisible) return null;
 
   return (
-    <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-top-2 duration-300">
+    <div className="fixed top-[65px] right-4 z-50 animate-in slide-in-from-top-2 duration-300">
       <div className="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg border border-green-400 flex items-center gap-2">
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
@@ -288,7 +288,7 @@ const JsonEditor: React.FC = () => {
   };
 
   const customBtn =
-    'px-6 py-2 mb-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white font-medium rounded-lg hover:from-purple-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg';
+    "inline-flex items-center justify-center whitespace-nowrap text-sm font-medium disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive cursor-pointer min-w-[80px] border-1 border-green-400 shadow-xl bg-green-300/40 hover:bg-green-400 transition-all duration-300 text-green-800 hover:text-green-50 h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5";
   return (
     <>
       <SuccessPopup isVisible={showSuccessPopup} message={successMessage} />
@@ -297,36 +297,15 @@ const JsonEditor: React.FC = () => {
         {/* ✅ Path Action Buttons */}
         {pathButton && (
           <div className="flex flex-wrap items-center justify-center gap-3">
-            <Link
-              href={`${pathButton}/all`}
-              target="_blank"
-              className="px-5 py-2 rounded-lg text-white font-medium
-                        bg-white/10 border border-white/20 backdrop-blur-xl
-                        hover:bg-white/20 hover:scale-105 active:scale-95
-                        transition-all duration-200 shadow-md"
-            >
+            <Link href={`${pathButton}/all`} target="_blank" className={customBtn}>
               Go Live
             </Link>
 
-            <Link
-              href={`${pathButton}/ssr-view`}
-              target="_blank"
-              className="px-5 py-2 rounded-lg text-white font-medium
-                        bg-white/10 border border-white/20 backdrop-blur-xl
-                        hover:bg-white/20 hover:scale-105 active:scale-95
-                        transition-all duration-200 shadow-md"
-            >
+            <Link href={`${pathButton}/ssr-view`} target="_blank" className={customBtn}>
               SSR View
             </Link>
 
-            <Link
-              href={`${pathButton}/client-view`}
-              target="_blank"
-              className="px-5 py-2 rounded-lg text-white font-medium
-                        bg-white/10 border border-white/20 backdrop-blur-xl
-                        hover:bg-white/20 hover:scale-105 active:scale-95
-                        transition-all duration-200 shadow-md"
-            >
+            <Link href={`${pathButton}/client-view`} target="_blank" className={customBtn}>
               Client View
             </Link>
           </div>

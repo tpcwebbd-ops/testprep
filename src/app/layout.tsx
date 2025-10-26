@@ -36,7 +36,7 @@ export default function RootLayout({
           <MenuComponentWithSession />
           <div className="pt-[65px]">{children}</div>
         </ReduxProvider>
-        <ToastContainer />
+        <ToastContainer style={{ top: '65px' }} />
       </body>
     </html>
   );

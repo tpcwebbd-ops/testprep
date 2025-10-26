@@ -69,7 +69,7 @@ export const generateViewTableComponentFile = (inputJsonFile: string): string =>
 
   const columnVisibilityStateType = `type ColumnVisibilityState = Record<${displayableKeysTypeName}, boolean>`;
 
-  return `\`use client\`;
+  return `'use client';
 
 import { format } from 'date-fns';
 import React, { useState, useMemo } from 'react';

@@ -252,3 +252,8 @@
 .animate-pulse-glow {
   animation: pulse-glow 2s ease-in-out infinite;
 }
+
+.Toastify__toast-container--top-right {
+  top: 65px !important;
+  right: 16px !important;
+}

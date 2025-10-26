@@ -38,7 +38,9 @@ const JsonEditorSingleItem = ({
   };
 
   const templateName =
-    typeof item.data === 'object' && item.data !== null && 'templateName' in item.data ? (item.data as any).templateName : 'Untitled Template';
+    typeof item.data === 'object' && item.data !== null && 'templateName' in item.data
+      ? (item.data as unknown as { templateName: string }).templateName
+      : 'Untitled Template';
 
   return (
     <div
@@ -64,7 +66,7 @@ const JsonEditorSingleItem = ({
               className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
             bg-blue-500/20 text-blue-100 border border-blue-300/20 backdrop-blur-xl"
             >
-              Field Count: {Object.keys((item.data as any)?.schema || {}).length}
+              Field Count: {Object.keys((item.data as unknown as { schema: Record<string, unknown> })?.schema || {}).length}
             </span>
 
             {/* ✅ Size Chip */}
@@ -76,12 +78,12 @@ const JsonEditorSingleItem = ({
             </span>
 
             {/* ✅ UID Chip */}
-            {(item.data as any)?.uid && (
+            {(item.data as unknown as { uid: string })?.uid && (
               <span
                 className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
               bg-purple-500/20 text-purple-100 border border-purple-300/20 backdrop-blur-xl"
               >
-                ID: {(item.data as any).uid}
+                ID: {(item.data as unknown as { uid: string }).uid}
               </span>
             )}
           </div>
