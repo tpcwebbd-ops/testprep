@@ -1,94 +1,92 @@
-import React from 'react'
+'use client';
 
-import { Button } from '@/components/ui/button'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import {
-    Dialog,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog'
+import React from 'react';
 
-import { usePostsStore } from '../store/store'
-import { useBulkDeletePostsMutation } from '@/redux/features/posts/postsSlice'
-import { handleSuccess, handleError } from './utils'
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+
+import { usePostsStore } from '../store/store';
+import { useBulkDeletePostsMutation } from '@/redux/features/posts/postsSlice';
+import { handleSuccess, handleError } from './utils';
 
 const BulkDeleteNextComponents: React.FC = () => {
-    const {
-        isBulkDeleteModalOpen,
-        toggleBulkDeleteModal,
-        bulkData,
-        setBulkData,
-    } = usePostsStore()
-    
-    const [bulkDeletePosts, { isLoading }] = useBulkDeletePostsMutation()
+  const {
+    isBulkDeleteModalOpen,
+    toggleBulkDeleteModal,
+    bulkData,
+    setBulkData,
+  } = usePostsStore();
 
-    const handleBulkDelete = async () => {
-        if (!bulkData?.length) return
-        try {
-            const ids = bulkData.map((posts) => posts._id)
-            await bulkDeletePosts({ ids }).unwrap()
-            toggleBulkDeleteModal(false)
-            setBulkData([])
-            handleSuccess('Delete Successful')
-        } catch (error) {
-            console.error('Failed to delete Posts:', error)
-            handleError('Failed to delete items. Please try again.')
-        }
+  const [bulkDeletePosts, { isLoading }] =
+    useBulkDeletePostsMutation();
+
+  const handleBulkDelete = async () => {
+    if (!bulkData?.length) return;
+    try {
+      const ids = bulkData.map((item) => item._id);
+      await bulkDeletePosts({ ids }).unwrap();
+
+      toggleBulkDeleteModal(false);
+      setBulkData([]);
+      handleSuccess('Delete Successful');
+    } catch (error) {
+      console.error('Failed to delete posts:', error);
+      handleError('Failed to delete items. Please try again.');
     }
+  };
 
-    return (
-        <Dialog
-            open={isBulkDeleteModalOpen}
-            onOpenChange={toggleBulkDeleteModal}
-        >
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Confirm Deletion</DialogTitle>
-                </DialogHeader>
-                {bulkData?.length > 0 && (
-                    <div className="pt-4">
-                        <p>
-                            You are about to delete{' '}
-                            <span className="font-semibold">
-                                ({bulkData.length})
-                            </span>{' '}
-                            posts.
-                        </p>
-                    </div>
-                )}
-                <ScrollArea className="h-[400px] w-full rounded-md border p-4">
-                    <div className="flex flex-col">
-                        {bulkData.map((posts, idx) => (
-                            <span
-                                key={(posts._id as string) + idx}
-                                className="text-xs"
-                            >
-                                {idx + 1}. {(posts)['title'] as string || ''}
-                            </span>
-                        ))}
-                    </div>
-                </ScrollArea>
-                <DialogFooter>
-                    <Button
-                        className="cursor-pointer"
-                        variant="outline"
-                        onClick={() => toggleBulkDeleteModal(false)}
-                    >
-                        Cancel
-                    </Button>
-                    <Button
-                        disabled={isLoading}
-                        variant="destructive"
-                        onClick={handleBulkDelete}
-                    >
-                        {isLoading ? 'Deleting...' : 'Delete Selected'}
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
-    )
-}
+  return (
+    <Dialog open={isBulkDeleteModalOpen} onOpenChange={toggleBulkDeleteModal}>
+      <DialogContent
+        className="sm:max-w-md rounded-xl border border-white/20 bg-white/10 backdrop-blur-2xl shadow-xl text-white"
+      >
+        <DialogHeader>
+          <DialogTitle className="text-white bg-clip-text bg-gradient-to-r from-white to-red-200">
+            Confirm Deletion
+          </DialogTitle>
+        </DialogHeader>
 
-export default BulkDeleteNextComponents
+        {bulkData?.length > 0 && (
+          <p className="text-white/80 mt-2">
+            You are deleting&nbsp;
+            <strong>({bulkData.length})</strong> posts.
+          </p>
+        )}
+
+        <ScrollArea className="h-[420px] w-full rounded-lg border border-white/20 bg-white/5 backdrop-blur-md p-4 mt-3">
+          <div className="flex flex-col gap-2">
+            {bulkData.map((item, idx) => (
+              <span
+                key={(item._id as string) + idx}
+                className="text-sm text-white/90"
+              >
+                {idx + 1}. {String(item['title'] || '')}
+              </span>
+            ))}
+          </div>
+        </ScrollArea>
+
+        <DialogFooter className="gap-2 mt-3">
+          <Button
+            variant="outlineWater"
+            size="sm"
+            onClick={() => toggleBulkDeleteModal(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="outlineFire"
+            size="sm"
+            disabled={isLoading}
+            onClick={handleBulkDelete}
+          >
+            {isLoading ? 'Deleting…' : 'Delete Selected'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default BulkDeleteNextComponents;
