@@ -1,221 +1,183 @@
 interface Schema {
-    [key: string]: string | Schema
+  [key: string]: string | Schema;
 }
 
 interface InputConfig {
-    uid: string
-    templateName: string
-    schema: Schema
-    namingConvention: {
-        Users_1_000___: string
-        users_2_000___: string
-        User_3_000___: string
-        user_4_000___: string
-        use_generate_folder: boolean
-    }
+  uid: string;
+  templateName: string;
+  schema: Schema;
+  namingConvention: {
+    Users_1_000___: string;
+    users_2_000___: string;
+    User_3_000___: string;
+    user_4_000___: string;
+    use_generate_folder: boolean;
+  };
 }
 
 export const generateEditComponentFile = (inputJsonFile: string): string => {
-    const { schema, namingConvention }: InputConfig =
-        JSON.parse(inputJsonFile) || {}
+  const { schema, namingConvention }: InputConfig = JSON.parse(inputJsonFile) || {};
 
-    const pluralPascalCase = namingConvention.Users_1_000___
-    const singularPascalCase = namingConvention.User_3_000___
-    const pluralLowerCase = namingConvention.users_2_000___
-    const interfaceName = `I${pluralPascalCase}`
-    const defaultInstanceName = `default${pluralPascalCase}`
-    const editedStateName = `edited${singularPascalCase}`
-    const isUsedGenerateFolder = namingConvention.use_generate_folder
+  const pluralPascalCase = namingConvention.Users_1_000___;
+  const singularPascalCase = namingConvention.User_3_000___;
+  const pluralLowerCase = namingConvention.users_2_000___;
+  const interfaceName = `I${pluralPascalCase}`;
+  const defaultInstanceName = `default${pluralPascalCase}`;
+  const editedStateName = `edited${singularPascalCase}`;
+  const isUsedGenerateFolder = namingConvention.use_generate_folder;
 
-    const componentBodyStatements = new Set<string>()
+  const componentBodyStatements = new Set<string>();
 
-    const toCamelCase = (str: string) => {
-        return str.replace(/-(\w)/g, (_, c) => c.toUpperCase())
-    }
+  const toCamelCase = (str: string) => {
+    return str.replace(/-(\w)/g, (_, c) => c.toUpperCase());
+  };
 
-    const generateOptionsVariable = (
-        key: string,
-        optionsString: string | undefined,
-        defaultOptions: { label: string; value: string }[]
-    ): string => {
-        const varName = `${toCamelCase(key)}Options`
-        const optionsArray = optionsString
-            ? optionsString.split(',').map((opt) => ({
-                  label: opt.trim(),
-                  value: opt.trim(),
-              }))
-            : defaultOptions
+  const generateOptionsVariable = (key: string, optionsString: string | undefined, defaultOptions: { label: string; value: string }[]): string => {
+    const varName = `${toCamelCase(key)}Options`;
+    const optionsArray = optionsString
+      ? optionsString.split(',').map(opt => ({
+          label: opt.trim(),
+          value: opt.trim(),
+        }))
+      : defaultOptions;
 
-        const optionsJsArrayString = `[\n${optionsArray
-            .map(
-                (opt) =>
-                    `        { label: '${opt.label}', value: '${opt.value}' }`
-            )
-            .join(',\n')}\n    ]`
+    const optionsJsArrayString = `[\n${optionsArray.map(opt => `        { label: '${opt.label}', value: '${opt.value}' }`).join(',\n')}\n    ]`;
 
-        componentBodyStatements.add(
-            `    const ${varName} = ${optionsJsArrayString};`
-        )
-        return varName
-    }
+    componentBodyStatements.add(`    const ${varName} = ${optionsJsArrayString};`);
+    return varName;
+  };
 
-    const generateFormFieldJsx = (key: string, type: string): string => {
-        const label = key
-            .replace(/-/g, ' ')
-            .replace(/\b\w/g, (l) => l.toUpperCase())
+  const generateFormFieldJsx = (key: string, type: string): string => {
+    const label = key.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 
-        const [typeName, optionsString] = type.split('#')
+    const [typeName, optionsString] = type.split('#');
 
-        const formFieldWrapper = (
-            label: string,
-            componentJsx: string,
-            alignTop: boolean = false
-        ): string => `
-                        <div className="grid grid-cols-4 ${
-                            alignTop ? 'items-start' : 'items-center'
-                        } gap-4 pr-1">
-                            <Label htmlFor="${key}" className="text-right ${
-                                alignTop ? 'pt-3' : ''
-                            }">
+    const formFieldWrapper = (label: string, componentJsx: string, alignTop: boolean = false): string => `
+                        <div className="grid grid-cols-4 ${alignTop ? 'items-start' : 'items-center'} gap-4 pr-1">
+                            <Label htmlFor="${key}" className="text-right ${alignTop ? 'pt-3' : ''}">
                                 ${label}
                             </Label>
                             <div className="col-span-3">
                                 ${componentJsx}
                             </div>
-                        </div>`
+                        </div>`;
 
-        let componentJsx: string
-        let isTallComponent = false
+    let componentJsx: string;
+    let isTallComponent = false;
 
-        switch (typeName.toUpperCase()) {
-            case 'STRING':
-                componentJsx = `<InputFieldForString id="${key}" placeholder="${label}" value={${editedStateName}['${key}']} onChange={(value) => handleFieldChange('${key}', value as string)} />`
-                break
-            case 'EMAIL':
-                componentJsx = `<InputFieldForEmail id="${key}" value={${editedStateName}['${key}']} onChange={(value) => handleFieldChange('${key}', value as string)} />`
-                break
-            case 'PASSWORD':
-                componentJsx = `<InputFieldForPassword id="${key}" value={${editedStateName}['${key}']} onChange={(value) => handleFieldChange('${key}', value as string)} />`
-                break
-            case 'PASSCODE':
-                componentJsx = `<InputFieldForPasscode id="${key}" value={${editedStateName}['${key}']} onChange={(value) => handleFieldChange('${key}', value as string)} />`
-                break
-            case 'URL':
-                componentJsx = `<UrlInputField id="${key}" value={${editedStateName}['${key}']} onChange={(value) => handleFieldChange('${key}', value as string)} />`
-                break
-            case 'PHONE':
-                componentJsx = `<PhoneInputField id="${key}" value={${editedStateName}['${key}']} onChange={(value) => handleFieldChange('${key}', value)} />`
-                break
-            case 'DESCRIPTION':
-                isTallComponent = true
-                componentJsx = `<TextareaFieldForDescription id="${key}" value={${editedStateName}['${key}']} onChange={(e) => handleFieldChange('${key}', e.target.value)} />`
-                break
-            case 'RICHTEXT':
-                isTallComponent = true
-                componentJsx = `<RichTextEditorField id="${key}" value={${editedStateName}['${key}']} onChange={(value) => handleFieldChange('${key}', value)} />`
-                break
-            case 'INTNUMBER':
-                componentJsx = `<NumberInputFieldInteger id="${key}" value={${editedStateName}['${key}']} onChange={(value) => handleFieldChange('${key}', value as number)} />`
-                break
-            case 'FLOATNUMBER':
-                componentJsx = `<NumberInputFieldFloat id="${key}" value={${editedStateName}['${key}']} onChange={(value) => handleFieldChange('${key}', value as number)} />`
-                break
-            case 'BOOLEAN':
-                componentJsx = `<BooleanInputField id="${key}" checked={${editedStateName}['${key}']} onCheckedChange={(checked) => handleFieldChange('${key}', checked)} />`
-                break
-            case 'CHECKBOX':
-                componentJsx = `<CheckboxField id="${key}" checked={${editedStateName}['${key}']} onCheckedChange={(checked) => handleFieldChange('${key}', checked)} />`
-                break
-            case 'DATE':
-                componentJsx = `<DateField id="${key}" value={${editedStateName}['${key}']} onChange={(date) => handleFieldChange('${key}', date)} />`
-                break
-            case 'TIME':
-                componentJsx = `<TimeField id="${key}" value={${editedStateName}['${key}']} onChange={(time) => handleFieldChange('${key}', time)} />`
-                break
-            case 'DATERANGE':
-                componentJsx = `<DateRangePickerField id="${key}" value={${editedStateName}['${key}']} onChange={(range) => handleFieldChange('${key}', range)} />`
-                break
-            case 'TIMERANGE':
-                componentJsx = `<TimeRangePickerField id="${key}" value={${editedStateName}['${key}']} onChange={(range) => handleFieldChange('${key}', range)} />`
-                break
-            case 'COLORPICKER':
-                componentJsx = `<ColorPickerField id="${key}" value={${editedStateName}['${key}']} onChange={(value) => handleFieldChange('${key}', value as string)} />`
-                break
-            case 'SELECT':
-                const selectVarName = generateOptionsVariable(
-                    key,
-                    optionsString,
-                    [{ label: 'Option 1', value: 'Option 1' }]
-                )
-                componentJsx = `<SelectField options={${selectVarName}} value={${editedStateName}['${key}']} onValueChange={(value) => handleFieldChange('${key}', value)} />`
-                break
-            case 'RADIOBUTTON':
-                const radioVarName = generateOptionsVariable(
-                    key,
-                    optionsString,
-                    [{ label: 'Choice A', value: 'Choice A' }]
-                )
-                componentJsx = `<RadioButtonGroupField options={${radioVarName}} value={${editedStateName}['${key}']} onChange={(value) => handleFieldChange('${key}', value)} />`
-                break
-            case 'DYNAMICSELECT':
-                componentJsx = `<DynamicSelectField value={${editedStateName}['${key}']} apiUrl='https://jsonplaceholder.typicode.com/users' onChange={(values) => handleFieldChange('${key}', values)} />`
-                break
-            case 'IMAGE':
-                componentJsx = `<ImageUploadFieldSingle value={${editedStateName}['${key}']} onChange={(url) => handleFieldChange('${key}', url)} />`
-                break
-            case 'IMAGES':
-                componentJsx = `<ImageUploadManager value={${editedStateName}['${key}']} onChange={(urls) => handleFieldChange('${key}', urls)} />`
-                break
-            case 'MULTICHECKBOX':
-                isTallComponent = true
-                componentJsx = `<MultiCheckboxGroupField value={${editedStateName}['${key}']} onChange={(values) => handleFieldChange('${key}', values)} />`
-                break
-            case 'MULTIOPTIONS':
-                const multiOptionsVarName = generateOptionsVariable(
-                    key,
-                    optionsString,
-                    [{ label: 'Default A', value: 'Default A' }]
-                )
-                componentJsx = `<MultiOptionsField options={${multiOptionsVarName}} value={${editedStateName}['${key}']} onChange={(values) => handleFieldChange('${key}', values)} />`
-                break
+    switch (typeName.toUpperCase()) {
+      case 'STRING':
+        componentJsx = `<InputFieldForString id="${key}" placeholder="${label}" value={${editedStateName}['${key}']} onChange={(value) => handleFieldChange('${key}', value as string)} />`;
+        break;
+      case 'EMAIL':
+        componentJsx = `<InputFieldForEmail id="${key}" value={${editedStateName}['${key}']} onChange={(value) => handleFieldChange('${key}', value as string)} />`;
+        break;
+      case 'PASSWORD':
+        componentJsx = `<InputFieldForPassword id="${key}" value={${editedStateName}['${key}']} onChange={(value) => handleFieldChange('${key}', value as string)} />`;
+        break;
+      case 'PASSCODE':
+        componentJsx = `<InputFieldForPasscode id="${key}" value={${editedStateName}['${key}']} onChange={(value) => handleFieldChange('${key}', value as string)} />`;
+        break;
+      case 'URL':
+        componentJsx = `<UrlInputField id="${key}" value={${editedStateName}['${key}']} onChange={(value) => handleFieldChange('${key}', value as string)} />`;
+        break;
+      case 'PHONE':
+        componentJsx = `<PhoneInputField id="${key}" value={${editedStateName}['${key}']} onChange={(value) => handleFieldChange('${key}', value)} />`;
+        break;
+      case 'DESCRIPTION':
+        isTallComponent = true;
+        componentJsx = `<TextareaFieldForDescription id="${key}" value={${editedStateName}['${key}']} onChange={(e) => handleFieldChange('${key}', e.target.value)} />`;
+        break;
+      case 'RICHTEXT':
+        isTallComponent = true;
+        componentJsx = `<RichTextEditorField id="${key}" value={${editedStateName}['${key}']} onChange={(value) => handleFieldChange('${key}', value)} />`;
+        break;
+      case 'INTNUMBER':
+        componentJsx = `<NumberInputFieldInteger id="${key}" value={${editedStateName}['${key}']} onChange={(value) => handleFieldChange('${key}', value as number)} />`;
+        break;
+      case 'FLOATNUMBER':
+        componentJsx = `<NumberInputFieldFloat id="${key}" value={${editedStateName}['${key}']} onChange={(value) => handleFieldChange('${key}', value as number)} />`;
+        break;
+      case 'BOOLEAN':
+        componentJsx = `<BooleanInputField id="${key}" checked={${editedStateName}['${key}']} onCheckedChange={(checked) => handleFieldChange('${key}', checked)} />`;
+        break;
+      case 'CHECKBOX':
+        componentJsx = `<CheckboxField id="${key}" checked={${editedStateName}['${key}']} onCheckedChange={(checked) => handleFieldChange('${key}', checked)} />`;
+        break;
+      case 'DATE':
+        componentJsx = `<DateField id="${key}" value={${editedStateName}['${key}']} onChange={(date) => handleFieldChange('${key}', date)} />`;
+        break;
+      case 'TIME':
+        componentJsx = `<TimeField id="${key}" value={${editedStateName}['${key}']} onChange={(time) => handleFieldChange('${key}', time)} />`;
+        break;
+      case 'DATERANGE':
+        componentJsx = `<DateRangePickerField id="${key}" value={${editedStateName}['${key}']} onChange={(range) => handleFieldChange('${key}', range)} />`;
+        break;
+      case 'TIMERANGE':
+        componentJsx = `<TimeRangePickerField id="${key}" value={${editedStateName}['${key}']} onChange={(range) => handleFieldChange('${key}', range)} />`;
+        break;
+      case 'COLORPICKER':
+        componentJsx = `<ColorPickerField id="${key}" value={${editedStateName}['${key}']} onChange={(value) => handleFieldChange('${key}', value as string)} />`;
+        break;
+      case 'SELECT':
+        const selectVarName = generateOptionsVariable(key, optionsString, [{ label: 'Option 1', value: 'Option 1' }]);
+        componentJsx = `<SelectField options={${selectVarName}} value={${editedStateName}['${key}']} onValueChange={(value) => handleFieldChange('${key}', value)} />`;
+        break;
+      case 'RADIOBUTTON':
+        const radioVarName = generateOptionsVariable(key, optionsString, [{ label: 'Choice A', value: 'Choice A' }]);
+        componentJsx = `<RadioButtonGroupField options={${radioVarName}} value={${editedStateName}['${key}']} onChange={(value) => handleFieldChange('${key}', value)} />`;
+        break;
+      case 'DYNAMICSELECT':
+        componentJsx = `<DynamicSelectField value={${editedStateName}['${key}']} apiUrl='https://jsonplaceholder.typicode.com/users' onChange={(values) => handleFieldChange('${key}', values)} />`;
+        break;
+      case 'IMAGE':
+        componentJsx = `<ImageUploadFieldSingle value={${editedStateName}['${key}']} onChange={(url) => handleFieldChange('${key}', url)} />`;
+        break;
+      case 'IMAGES':
+        componentJsx = `<ImageUploadManager value={${editedStateName}['${key}']} onChange={(urls) => handleFieldChange('${key}', urls)} />`;
+        break;
+      case 'MULTICHECKBOX':
+        isTallComponent = true;
+        componentJsx = `<MultiCheckboxGroupField value={${editedStateName}['${key}']} onChange={(values) => handleFieldChange('${key}', values)} />`;
+        break;
+      case 'MULTIOPTIONS':
+        const multiOptionsVarName = generateOptionsVariable(key, optionsString, [{ label: 'Default A', value: 'Default A' }]);
+        componentJsx = `<MultiOptionsField options={${multiOptionsVarName}} value={${editedStateName}['${key}']} onChange={(values) => handleFieldChange('${key}', values)} />`;
+        break;
 
-            // ✅ UPDATED STRINGARRAY HANDLER
-            case 'STRINGARRAY':
-                isTallComponent = true
-                let fields: string[] = []
-                if (optionsString) {
-                    fields = optionsString.split(',').map((pair) => {
-                        const [field, fType] = pair
-                            .split(':')
-                            .map((v) => v.trim())
-                        return `{ label: '${field}', type: '${fType?.toUpperCase() || 'STRING'}' }`
-                    })
-                }
-                console.log('fields : ', fields)
-
-                componentJsx = `<StringArrayField value={${editedStateName}['${key}']} onChange={(value) => handleFieldChange('${key}', value)} />`
-                break
-
-            case 'AUTOCOMPLETE':
-                componentJsx = `<AutocompleteField id="${key}" value={${editedStateName}['${key}']} />`
-                break
-
-            default:
-                componentJsx = `<Input id="${key}" value={String(${editedStateName}['${key}'] || '')} disabled placeholder="Unsupported type: ${typeName}" />`
-                break
+      // ✅ UPDATED STRINGARRAY HANDLER
+      case 'STRINGARRAY':
+        isTallComponent = true;
+        let fields: string[] = [];
+        if (optionsString) {
+          fields = optionsString.split(',').map(pair => {
+            const [field, fType] = pair.split(':').map(v => v.trim());
+            return `{ label: '${field}', type: '${fType?.toUpperCase() || 'STRING'}' }`;
+          });
         }
+        console.log('fields : ', fields);
 
-        return formFieldWrapper(label, componentJsx, isTallComponent)
+        componentJsx = `<StringArrayField value={${editedStateName}['${key}']} onChange={(value) => handleFieldChange('${key}', value)} />`;
+        break;
+
+      case 'AUTOCOMPLETE':
+        componentJsx = `<AutocompleteField id="${key}" value={${editedStateName}['${key}']} />`;
+        break;
+
+      default:
+        componentJsx = `<Input id="${key}" value={String(${editedStateName}['${key}'] || '')} disabled placeholder="Unsupported type: ${typeName}" />`;
+        break;
     }
 
-    const formFieldsJsx = Object.entries(schema)
-        .map(([key, value]) => {
-            if (typeof value === 'object' && !Array.isArray(value)) {
-                const label = key
-                    .replace(/-/g, ' ')
-                    .replace(/\b\w/g, (l) => l.toUpperCase())
-                const componentJsx = `<JsonTextareaField id="${key}" value={${editedStateName}['${key}'] || {}} onChange={(value) => handleFieldChange('${key}', value)} />`
-                return `
+    return formFieldWrapper(label, componentJsx, isTallComponent);
+  };
+
+  const formFieldsJsx = Object.entries(schema)
+    .map(([key, value]) => {
+      if (typeof value === 'object' && !Array.isArray(value)) {
+        const label = key.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        const componentJsx = `<JsonTextareaField id="${key}" value={${editedStateName}['${key}'] || {}} onChange={(value) => handleFieldChange('${key}', value)} />`;
+        return `
                         <div className="grid grid-cols-4 items-start gap-4 pr-1">
                             <Label htmlFor="${key}" className="text-right pt-3">
                                 ${label}
@@ -223,22 +185,17 @@ export const generateEditComponentFile = (inputJsonFile: string): string => {
                             <div className="col-span-3">
                                 ${componentJsx}
                             </div>
-                        </div>`
-            }
-            return generateFormFieldJsx(key, value as string)
-        })
-        .join('')
+                        </div>`;
+      }
+      return generateFormFieldJsx(key, value as string);
+    })
+    .join('');
 
-    const dynamicVariablesContent =
-        componentBodyStatements.size > 0
-            ? `${[...componentBodyStatements].sort().join('\n\n')}`
-            : ''
+  const dynamicVariablesContent = componentBodyStatements.size > 0 ? `${[...componentBodyStatements].sort().join('\n\n')}` : '';
 
-    const reduxPath = isUsedGenerateFolder
-        ? `../redux/rtk-api`
-        : `@/redux/features/${pluralLowerCase}/${pluralLowerCase}Slice`
+  const reduxPath = isUsedGenerateFolder ? `../redux/rtk-api` : `@/redux/features/${pluralLowerCase}/${pluralLowerCase}Slice`;
 
-    const staticImports = `import StringArrayField from '@/app/dashboard/${pluralLowerCase}/all/components/others-field-type/StringArrayField'
+  const staticImports = `import StringArrayField from '@/app/dashboard/${pluralLowerCase}/all/components/others-field-type/StringArrayField'
 import AutocompleteField from '@/components/dashboard-ui/AutocompleteField'
 import ColorPickerField from '@/components/dashboard-ui/ColorPickerField'
 import DateRangePickerField from '@/components/dashboard-ui/DateRangePickerField'
@@ -264,11 +221,11 @@ import { BooleanInputField } from '@/components/dashboard-ui/BooleanInputField'
 import { CheckboxField } from '@/components/dashboard-ui/CheckboxField'
 import { DateField } from '@/components/dashboard-ui/DateField'
 import { RadioButtonGroupField } from '@/components/dashboard-ui/RadioButtonGroupField'
-import { SelectField } from '@/components/dashboard-ui/SelectField'`
+import { SelectField } from '@/components/dashboard-ui/SelectField'`;
 
-    return `import React, { useEffect, useState } from 'react'
+  return `import React, { useEffect, useState } from 'react'
 
-import { Input } from '@/components/ui/input'
+import { logger } from 'better-auth';
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -313,6 +270,7 @@ const EditNextComponents: React.FC = () => {
 
         try {
             const { _id, createdAt, updatedAt, ...updateData } = ${editedStateName};
+            logger.info(JSON.stringify({ _id, createdAt, updatedAt }));
             await update${pluralPascalCase}({
                 id: selected${pluralPascalCase}._id,
                 ...updateData,
@@ -370,5 +328,5 @@ ${dynamicVariablesContent}
 }
 
 export default EditNextComponents
-`
-}
+`;
+};

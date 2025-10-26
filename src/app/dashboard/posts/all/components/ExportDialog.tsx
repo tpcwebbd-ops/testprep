@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import * as XLSX from 'xlsx'
-
+import { logger } from 'better-auth';
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
@@ -79,13 +79,10 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
     }
 
     const handleExport = () => {
-        // 1. Get the keys of the columns that are still selected
-        const selectedKeys = Object.keys(selectedColumns).filter(
-            (key) => selectedColumns[key]
-        )
-
+       
         // 2. Process the data to include only the selected columns
         const processedData = data.map((row) => {
+        logger.info(JSON.stringify(row));
             const newRow: IPosts = {...defaultPosts}
         
             return newRow

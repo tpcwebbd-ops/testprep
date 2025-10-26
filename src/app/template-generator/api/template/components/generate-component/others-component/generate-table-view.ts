@@ -1,104 +1,79 @@
-export const generateViewTableComponentFile = (
-    inputJsonFile: string
-): string => {
-    const { schema, namingConvention } = JSON.parse(inputJsonFile)
+export const generateViewTableComponentFile = (inputJsonFile: string): string => {
+  const { schema, namingConvention } = JSON.parse(inputJsonFile);
 
-    const pluralPascalCase = namingConvention.Users_1_000___
-    const pluralLowerCase = namingConvention.users_2_000___
-    const interfaceName = `I${pluralPascalCase}`
-    const displayableKeysTypeName = `Displayable${pluralPascalCase}Keys`
-    const isUsedGenerateFolder = namingConvention.use_generate_folder
+  const pluralPascalCase = namingConvention.Users_1_000___;
+  const pluralLowerCase = namingConvention.users_2_000___;
+  const interfaceName = `I${pluralPascalCase}`;
+  const displayableKeysTypeName = `Displayable${pluralPascalCase}Keys`;
+  const isUsedGenerateFolder = namingConvention.use_generate_folder;
 
-    let reduxPath = ''
-    if (isUsedGenerateFolder) {
-        reduxPath = `../redux/rtk-api`
-    } else {
-        reduxPath = `@/redux/features/${pluralLowerCase}/${pluralLowerCase}Slice`
-    }
+  let reduxPath = '';
+  if (isUsedGenerateFolder) {
+    reduxPath = `../redux/rtk-api`;
+  } else {
+    reduxPath = `@/redux/features/${pluralLowerCase}/${pluralLowerCase}Slice`;
+  }
 
-    const suitableTypes = [
-        'STRING',
-        'EMAIL',
-        'SELECT',
-        'RADIOBUTTON',
-        'INTNUMBER',
-        'FLOATNUMBER',
-        'BOOLEAN',
-        'CHECKBOX',
-        'DATE',
-        'TIME',
-    ]
-    const excludedKeys = [
-        'password',
-        'passcode',
-        'description',
-        'richtext',
-        'image',
-        'images',
-    ]
+  const suitableTypes = ['STRING', 'EMAIL', 'SELECT', 'RADIOBUTTON', 'INTNUMBER', 'FLOATNUMBER', 'BOOLEAN', 'CHECKBOX', 'DATE', 'TIME'];
+  const excludedKeys = ['password', 'passcode', 'description', 'richtext', 'image', 'images'];
 
-    // helper: normalize key for V2-style (roleName -> name, authorEmail -> email)
-    const normalizeKey = (key: string) => {
-        const k = key.trim().toLowerCase()
-        if (k.includes('role') || k.includes('name')) return 'name'
-        if (k.includes('email')) return 'email'
-        // remove spaces and convert eventual "createdat" to createdAt
-        return key.replace(/\s+/g, '_')
-    }
+  // helper: normalize key for V2-style (roleName -> name, authorEmail -> email)
+  const normalizeKey = (key: string) => {
+    const k = key.trim().toLowerCase();
+    if (k.includes('role') || k.includes('name')) return 'name';
+    if (k.includes('email')) return 'email';
+    // remove spaces and convert eventual "createdat" to createdAt
+    return key.replace(/\s+/g, '_');
+  };
 
-    // helper: humanize label
-    const humanizeLabel = (key: string) =>
-        key
-            .replace(/_/g, ' ')
-            .replace(/([A-Z])/g, ' $1')
-            .replace(/^./, (s) => s.toUpperCase())
-            .trim()
+  // helper: humanize label
+  const humanizeLabel = (key: string) =>
+    key
+      .replace(/_/g, ' ')
+      .replace(/([A-Z])/g, ' $1')
+      .replace(/^./, s => s.toUpperCase())
+      .trim();
 
-    const rawHeaders = Object.entries(schema)
-        .filter(
-            ([key, type]) =>
-                typeof type === 'string' &&
-                !key.includes('-') &&
-                suitableTypes.includes(type.toUpperCase()) &&
-                !excludedKeys.includes(key.toLowerCase())
-        )
-        .slice(0, 7)
-        .map(([key]) => ({
-            origKey: key,
-            key: normalizeKey(key),
-            label: humanizeLabel(key),
-        }))
+  const rawHeaders = Object.entries(schema)
+    .filter(
+      ([key, type]) =>
+        typeof type === 'string' && !key.includes('-') && suitableTypes.includes(type.toUpperCase()) && !excludedKeys.includes(key.toLowerCase()),
+    )
+    .slice(0, 7)
+    .map(([key]) => ({
+      origKey: key,
+      key: normalizeKey(key),
+      label: humanizeLabel(key),
+    }));
 
-    // ensure unique keys (in case normalization produced duplicates)
-    const seen = new Set<string>()
-    const tableHeaders = rawHeaders.filter((h) => {
-        if (seen.has(h.key)) return false
-        seen.add(h.key)
-        return true
-    })
+  // ensure unique keys (in case normalization produced duplicates)
+  const seen = new Set<string>();
+  const tableHeaders = rawHeaders.filter(h => {
+    if (seen.has(h.key)) return false;
+    seen.add(h.key);
+    return true;
+  });
 
-    // always ensure createdAt exists at end
-    if (!tableHeaders.some((h) => h.key === 'createdAt')) {
-        tableHeaders.push({
-            origKey: 'createdAt',
-            key: 'createdAt',
-            label: 'Created At',
-        })
-    }
+  // always ensure createdAt exists at end
+  if (!tableHeaders.some(h => h.key === 'createdAt')) {
+    tableHeaders.push({
+      origKey: 'createdAt',
+      key: 'createdAt',
+      label: 'Created At',
+    });
+  }
 
-    const displayableKeys = tableHeaders.map((h) => h.key)
+  const displayableKeys = tableHeaders.map(h => h.key);
 
-    const displayableKeysType = `type ${displayableKeysTypeName} = \n    | '${displayableKeys
-        .map((k) => k)
-        .join("'\n    | '")}'`
+  const displayableKeysType = `type ${displayableKeysTypeName} = \n    | '${displayableKeys.map(k => k).join("'\n    | '")}'`;
 
-    const columnVisibilityStateType = `type ColumnVisibilityState = Record<${displayableKeysTypeName}, boolean>`
+  const columnVisibilityStateType = `type ColumnVisibilityState = Record<${displayableKeysTypeName}, boolean>`;
 
-    return `\`use client\`;
+  return `\`use client\`;
 
 import { format } from 'date-fns';
 import React, { useState, useMemo } from 'react';
-import { MoreHorizontalIcon, EyeIcon, PencilIcon, TrashIcon, DownloadIcon, XIcon } from 'lucide-react';
+import { MoreHorizontalIcon, EyeIcon, PencilIcon, TrashIcon, DownloadIcon } from 'lucide-react';
 
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -171,9 +146,9 @@ const ViewTableNextComponents: React.FC = () => {
         [getResponseData]
     )
 
-    const tableHeaders: { key: ${displayableKeysTypeName}; label: string }[] = [
-        ${tableHeaders.map((h) => `{ key: '${h.key}', label: '${h.label}' }`).join(',\n        ')}
-    ];
+    const tableHeaders: { key: ${displayableKeysTypeName}; label: string }[] = useMemo(()=>[
+        ${tableHeaders.map(h => `{ key: '${h.key}', label: '${h.label}' }`).join(',\n        ')}
+    ],[]);
 
     const [columnVisibility, setColumnVisibility] =
         useState<ColumnVisibilityState>(() => {
@@ -526,5 +501,5 @@ const ViewTableNextComponents: React.FC = () => {
     )
 }
     export default ViewTableNextComponents
-`
-}
+`;
+};

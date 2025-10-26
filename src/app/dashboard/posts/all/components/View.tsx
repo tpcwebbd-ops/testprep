@@ -12,6 +12,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog'
+ import { logger } from 'better-auth';
 
 import { IPosts, defaultPosts } from '../store/data/data'
 import { usePostsStore } from '../store/store'
@@ -47,6 +48,7 @@ const ViewNextComponents: React.FC = () => {
         try {
             return format(new Date(date), 'MMM dd, yyyy')
         } catch (error) {
+               logger.error(JSON.stringify(error));
             return 'Invalid Date'
         }
     }

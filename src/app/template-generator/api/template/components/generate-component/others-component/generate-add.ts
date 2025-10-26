@@ -214,7 +214,6 @@ import { StringArrayData } from './others-field-type/types';
 
   return `import { useState } from 'react'
 
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'

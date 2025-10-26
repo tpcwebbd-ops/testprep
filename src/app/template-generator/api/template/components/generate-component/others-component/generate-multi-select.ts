@@ -1,12 +1,11 @@
 export const generateMultiSelectComponentFile = (): string => {
-    return `'use client'
+  return `'use client'
 
 import { useEffect, useState } from 'react'
 import { X } from 'lucide-react'
 
 import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge' 
 import {
     Select,
     SelectContent,
@@ -186,5 +185,5 @@ const MultiSelect = ({
 }
 
 export default MultiSelect
-`
-}
+`;
+};

@@ -1,5 +1,3 @@
-import { NextResponse } from 'next/server';
-
 export interface IResponse {
   data: unknown;
   message: string;

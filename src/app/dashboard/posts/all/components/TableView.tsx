@@ -2,7 +2,7 @@
 
 import { format } from 'date-fns';
 import React, { useState, useMemo } from 'react';
-import { MoreHorizontalIcon, EyeIcon, PencilIcon, TrashIcon, DownloadIcon, XIcon } from 'lucide-react';
+import { MoreHorizontalIcon, EyeIcon, PencilIcon, TrashIcon, DownloadIcon } from 'lucide-react';
 
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -82,7 +82,7 @@ const ViewTableNextComponents: React.FC = () => {
         [getResponseData]
     )
 
-    const tableHeaders: { key: DisplayablePostsKeys; label: string }[] = [
+    const tableHeaders: { key: DisplayablePostsKeys; label: string }[] = useMemo(()=>[
         { key: 'title', label: 'Title' },
         { key: 'email', label: 'Email' },
         { key: 'age', label: 'Age' },
@@ -90,7 +90,7 @@ const ViewTableNextComponents: React.FC = () => {
         { key: 'isActive', label: 'Is Active' },
         { key: 'policy', label: 'Policy' },
         { key: 'createdAt', label: 'Created At' }
-    ];
+    ],[]);
 
     const [columnVisibility, setColumnVisibility] =
         useState<ColumnVisibilityState>(() => {

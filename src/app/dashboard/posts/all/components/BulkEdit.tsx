@@ -1,15 +1,8 @@
 import React from 'react'
 
-import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select'
+
 import {
     Dialog,
     DialogContent,
@@ -17,8 +10,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog'
-
-import { IPosts } from '../store/data/data'
+ 
 import { usePostsStore } from '../store/store'
 import { useBulkUpdatePostsMutation } from '@/redux/features/posts/postsSlice'
 import { handleSuccess, handleError } from './utils'
@@ -45,15 +37,6 @@ const BulkEditNextComponents: React.FC = () => {
         }
     }
 
-    const handleFieldChange = (itemId: string, fieldName: string, value: string) => {
-        setBulkData(
-            bulkData.map((post) =>
-                post._id === itemId
-                    ? { ...post, [fieldName]: value }
-                    : post
-            ) as IPosts[]
-        )
-    }
 
     return (
         <Dialog open={isBulkEditModalOpen} onOpenChange={toggleBulkEditModal}>

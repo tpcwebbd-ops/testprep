@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-import { Input } from '@/components/ui/input'
+import { logger } from 'better-auth';
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -71,6 +71,7 @@ const EditNextComponents: React.FC = () => {
 
         try {
             const { _id, createdAt, updatedAt, ...updateData } = editedPost;
+            logger.info(JSON.stringify({ _id, createdAt, updatedAt }));
             await updatePosts({
                 id: selectedPosts._id,
                 ...updateData,

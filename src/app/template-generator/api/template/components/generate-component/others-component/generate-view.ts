@@ -163,6 +163,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog'
+ import { logger } from 'better-auth';
 
 import { ${interfaceName}, ${defaultInstanceName} } from '../store/data/data'
 import { use${pluralPascalCase}Store } from '../store/store'
@@ -198,6 +199,7 @@ const ViewNextComponents: React.FC = () => {
         try {
             return format(new Date(date), 'MMM dd, yyyy')
         } catch (error) {
+               logger.error(JSON.stringify(error));
             return 'Invalid Date'
         }
     }
