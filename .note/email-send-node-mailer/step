@@ -3,3 +3,7 @@
 3. Note your Gmail address — this is GMAIL_USER.
 
 make sure the file is exist
+1. /api/send-verification/route.ts
+2. /api/verify/route.ts
+
+3. 
