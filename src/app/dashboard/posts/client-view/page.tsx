@@ -23,7 +23,7 @@ const Page = () => {
             try {
                 // Best practice: Use environment variables for API endpoints.
                 const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-                const url = `${baseUrl}/generate/posts/all/api/v1?page=1&limit=10`;
+                const url = `${baseUrl}/api/posts/v1?page=1&limit=10`;
 
                 // Example using a token from environment variables for authorization.
                 const token = process.env.NEXT_PUBLIC_Token

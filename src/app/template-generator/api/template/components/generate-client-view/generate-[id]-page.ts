@@ -1,130 +1,104 @@
-
 interface Schema {
-    [key: string]: string | Schema
+  [key: string]: string | Schema;
 }
 
 interface InputConfig {
-    uid: string
-    templateName: string
-    schema: Schema
-    namingConvention: {
-        Users_1_000___: string
-        users_2_000___: string
-        User_3_000___: string
-        user_4_000___: string
-        use_generate_folder: boolean
-    }
+  uid: string;
+  templateName: string;
+  schema: Schema;
+  namingConvention: {
+    Users_1_000___: string;
+    users_2_000___: string;
+    User_3_000___: string;
+    user_4_000___: string;
+    use_generate_folder: boolean;
+  };
 }
 
-
 export const generateClientDetailPageFile = (inputJsonFile: string): string => {
-    const { schema, namingConvention }: InputConfig =
-        JSON.parse(inputJsonFile) || {}
+  const { schema, namingConvention }: InputConfig = JSON.parse(inputJsonFile) || {};
 
-    const pluralLowerCase = namingConvention.users_2_000___ 
-    const singularUpperCase = namingConvention.User_3_000___
+  const pluralLowerCase = namingConvention.users_2_000___;
+  const singularUpperCase = namingConvention.User_3_000___;
 
+  const mapSchemaTypeToTsType = (type: string): string => {
+    const [typeName, options] = type.split('#');
 
-    const mapSchemaTypeToTsType = (type: string): string => {
-        const [typeName, options] = type.split('#')
-
-        switch (typeName.toUpperCase()) {
-            case 'INTNUMBER':
-            case 'FLOATNUMBER':
-                return 'number'
-            case 'BOOLEAN':
-            case 'CHECKBOX':
-                return 'boolean'
-            case 'IMAGES':
-            case 'MULTICHECKBOX':
-            case 'MULTIOPTIONS':
-            case 'DYNAMICSELECT':
-                return 'string[]'
-            case 'DATE':
-                return 'Date | string'
-            case 'DATERANGE':
-                return '{ start: Date | string; end: Date | string }'
-            case 'TIMERANGE':
-                return '{ start: string; end: string }'
-            case 'STRINGARRAY':
-                if (options) {
-                    const fields = options
-                        .split(',')
-                        .map((field) => `${field.trim()}: string`)
-                        .join('; ')
-                    return `Array<{ ${fields} }>`
-                }
-                return 'Array<{ [key: string]: string }>'
-            default:
-                return 'string'
+    switch (typeName.toUpperCase()) {
+      case 'INTNUMBER':
+      case 'FLOATNUMBER':
+        return 'number';
+      case 'BOOLEAN':
+      case 'CHECKBOX':
+        return 'boolean';
+      case 'IMAGES':
+      case 'MULTICHECKBOX':
+      case 'MULTIOPTIONS':
+      case 'DYNAMICSELECT':
+        return 'string[]';
+      case 'DATE':
+        return 'Date | string';
+      case 'DATERANGE':
+        return '{ start: Date | string; end: Date | string }';
+      case 'TIMERANGE':
+        return '{ start: string; end: string }';
+      case 'STRINGARRAY':
+        if (options) {
+          const fields = options
+            .split(',')
+            .map(field => `${field.trim()}: string`)
+            .join('; ');
+          return `Array<{ ${fields} }>`;
         }
+        return 'Array<{ [key: string]: string }>';
+      default:
+        return 'string';
     }
+  };
 
-  
-    const generateTsTypeProperties = (
-        currentSchema: Schema,
-        depth: number
-    ): string => {
-        const indent = '    '.repeat(depth)
-        return Object.entries(currentSchema)
-            .map(([key, value]) => {
-                const quotedKey = `"${key}"`
-                if (typeof value === 'object' && !Array.isArray(value)) {
-                    return `${indent}${quotedKey}?: {\n${generateTsTypeProperties(
-                        value,
-                        depth + 1
-                    )}\n${indent}}`
-                }
-                return `${indent}${quotedKey}?: ${mapSchemaTypeToTsType(
-                    value as string
-                )}`
-            })
-            .join(';\n')
-    }
+  const generateTsTypeProperties = (currentSchema: Schema, depth: number): string => {
+    const indent = '    '.repeat(depth);
+    return Object.entries(currentSchema)
+      .map(([key, value]) => {
+        const quotedKey = `"${key}"`;
+        if (typeof value === 'object' && !Array.isArray(value)) {
+          return `${indent}${quotedKey}?: {\n${generateTsTypeProperties(value, depth + 1)}\n${indent}}`;
+        }
+        return `${indent}${quotedKey}?: ${mapSchemaTypeToTsType(value as string)}`;
+      })
+      .join(';\n');
+  };
 
- 
-    const generateDetailsJsx = (currentSchema: Schema): string => {
-        return Object.entries(currentSchema)
-            .map(([key, value]) => {
-                const isNestedObject =
-                    typeof value === 'object' && !Array.isArray(value)
-                const [baseType = ''] =
-                    typeof value === 'string'
-                        ? (value as string).toUpperCase().split('#')
-                        : []
+  const generateDetailsJsx = (currentSchema: Schema): string => {
+    return Object.entries(currentSchema)
+      .map(([key, value]) => {
+        const isNestedObject = typeof value === 'object' && !Array.isArray(value);
+        const [baseType = ''] = typeof value === 'string' ? (value as string).toUpperCase().split('#') : [];
 
-                const isSimpleArray = [
-                    'IMAGES',
-                    'MULTICHECKBOX',
-                    'MULTIOPTIONS',
-                    'DYNAMICSELECT',
-                ].includes(baseType)
-                const isObjectArray = baseType === 'STRINGARRAY'
+        const isSimpleArray = ['IMAGES', 'MULTICHECKBOX', 'MULTIOPTIONS', 'DYNAMICSELECT'].includes(baseType);
+        const isObjectArray = baseType === 'STRINGARRAY';
 
-                let displayValue
-                if (isNestedObject || isObjectArray) {
-                    displayValue = `<pre className="text-sm bg-slate-200 dark:bg-slate-900 p-2 rounded-md whitespace-pre-wrap">{JSON.stringify(data?.["${key}"], null, 2)}</pre>`
-                } else if (isSimpleArray) {
-                    displayValue = `{(data?.["${key}"] as string[])?.join(', ')}`
-                } else {
-                    displayValue = `{data?.["${key}"]?.toString()}`
-                }
+        let displayValue;
+        if (isNestedObject || isObjectArray) {
+          displayValue = `<pre className="text-sm bg-slate-200 dark:bg-slate-900 p-2 rounded-md whitespace-pre-wrap">{JSON.stringify(data?.["${key}"], null, 2)}</pre>`;
+        } else if (isSimpleArray) {
+          displayValue = `{(data?.["${key}"] as string[])?.join(', ')}`;
+        } else {
+          displayValue = `{data?.["${key}"]?.toString()}`;
+        }
 
-                return `
+        return `
             <div className="w-full hover:bg-slate-200 bg-slate-100 block p-2 border-b border-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 dark:border-slate-500">
-                <strong className="capitalize">${key.replace(
-                    /-/g,
-                    ' '
-                )}:</strong> ${displayValue}
-            </div>`
-            })
-            .join('')
-    }
+                <strong className="capitalize">${key.replace(/-/g, ' ')}:</strong> ${displayValue}
+            </div>`;
+      })
+      .join('');
+  };
 
-    const tsTypeProperties = generateTsTypeProperties(schema, 1)
-    const detailsJsx = generateDetailsJsx(schema)
+  const tsTypeProperties = generateTsTypeProperties(schema, 1);
+  const detailsJsx = generateDetailsJsx(schema);
 
-    return `'use client'
+  return `'use client'
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -159,7 +133,7 @@ const Page = () => {
             
             // It's best practice to use environment variables for API URLs.
             const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-            const url = \`\${baseUrl}/generate/${pluralLowerCase}/all/api/v1?id=\${id}\`;
+            const url = \`\${baseUrl}/api/${pluralLowerCase}/v1?id=\${id}\`;
             
             try {
                 // Using a generic token from env for auth example.
@@ -225,5 +199,5 @@ const Page = () => {
     )
 }
 export default Page
-`
-}
+`;
+};
