@@ -353,7 +353,7 @@ const JsonEditor: React.FC = () => {
             <textarea
               value={jsonInput}
               onChange={handleInputChange}
-              className="w-full h-64 p-4 rounded-lg resize-vertical font-mono text-sm
+              className="w-full h-[500px] p-4 rounded-lg resize-vertical font-mono text-sm
                         bg-white/5 text-blue-50 backdrop-blur-xl
                         border border-white/10 focus:ring-2 ring-blue-400"
               placeholder="Enter your JSON..."
@@ -433,7 +433,7 @@ const JsonEditor: React.FC = () => {
           {items.length === 0 ? (
             <p className="text-center text-gray-200 py-10">No items saved yet</p>
           ) : (
-            <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
+            <div className="space-y-3 max-h-96 overflow-y-auto pr-2 z-30">
               {items.map(item => (
                 <JsonEditorSingleItem key={item.id} item={item} removeItem={removeItem} setJsonInput={setJsonInput} />
               ))}
