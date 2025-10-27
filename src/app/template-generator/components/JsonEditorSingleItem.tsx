@@ -104,7 +104,7 @@ const JsonEditorSingleItem = ({
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel className="text-gray-200">Cancel</AlertDialogCancel>
+                <AlertDialogCancel className="text-black border-none">Cancel</AlertDialogCancel>
                 <AlertDialogAction className="px-4 py-2 text-xs rounded-lg text-white bg-red-600/70 hover:bg-red-700/80 transition-all" onClick={handleRemove}>
                   Confirm
                 </AlertDialogAction>

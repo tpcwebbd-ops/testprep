@@ -391,11 +391,10 @@ const JsonEditor: React.FC = () => {
                     <AlertDialogDescription className="text-gray-200">This will delete all saved templates.</AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel className="text-gray-100">Cancel</AlertDialogCancel>
+                    <AlertDialogCancel className="text-black">Cancel</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={clearItems}
-                      className="px-4 py-2 text-sm rounded-lg text-white
-                                        bg-red-600/60 hover:bg-red-700/80 transition-all"
+                      className="px-4 py-2 text-sm rounded-lg text-white bg-red-600/60 hover:bg-red-700/80 transition-all"
                     >
                       Confirm
                     </AlertDialogAction>
