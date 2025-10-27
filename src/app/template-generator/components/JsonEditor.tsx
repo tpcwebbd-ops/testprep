@@ -298,15 +298,15 @@ const JsonEditor: React.FC = () => {
         {pathButton && (
           <div className="flex flex-wrap items-center justify-center gap-3">
             <Link href={`${pathButton}/all`} target="_blank" className={customBtn}>
-              Go Live
+              Dashboard
             </Link>
 
             <Link href={`${pathButton}/ssr-view`} target="_blank" className={customBtn}>
-              SSR View
+              SSR
             </Link>
 
             <Link href={`${pathButton}/client-view`} target="_blank" className={customBtn}>
-              Client View
+              CSR
             </Link>
           </div>
         )}
