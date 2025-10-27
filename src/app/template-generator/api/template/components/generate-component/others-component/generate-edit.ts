@@ -155,7 +155,6 @@ export const generateEditComponentFile = (inputJsonFile: string): string => {
             return `{ label: '${field}', type: '${fType?.toUpperCase() || 'STRING'}' }`;
           });
         }
-        console.log('fields : ', fields);
 
         componentJsx = `<StringArrayField value={${editedStateName}['${key}']} onChange={(value) => handleFieldChange('${key}', value)} />`;
         break;
