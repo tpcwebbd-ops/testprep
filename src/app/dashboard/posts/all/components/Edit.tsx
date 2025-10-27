@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 
-import { logger } from 'better-auth';
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -12,7 +11,6 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog'
 
-import StringArrayField from '@/app/dashboard/posts/all/components/others-field-type/StringArrayField'
 import AutocompleteField from '@/components/dashboard-ui/AutocompleteField'
 import ColorPickerField from '@/components/dashboard-ui/ColorPickerField'
 import DateRangePickerField from '@/components/dashboard-ui/DateRangePickerField'
@@ -40,6 +38,10 @@ import { DateField } from '@/components/dashboard-ui/DateField'
 import { RadioButtonGroupField } from '@/components/dashboard-ui/RadioButtonGroupField'
 import { SelectField } from '@/components/dashboard-ui/SelectField'
 
+import StringArrayField from './others-field-type/StringArrayField'
+import { StringArrayData } from './others-field-type/types';
+
+
 import { IPosts, defaultPosts } from '../store/data/data'
 import { usePostsStore } from '../store/store'
 import { useUpdatePostsMutation } from '@/redux/features/posts/postsSlice'
@@ -63,19 +65,33 @@ const EditNextComponents: React.FC = () => {
     }, [selectedPosts])
 
     const handleFieldChange = (name: string, value: unknown) => {
-        setPost(prev => ({ ...prev, [name]: value }));
-    };
+        setPost(prev => ({ ...prev, [name]: value }))
+    }
 
     const handleEditPost = async () => {
         if (!selectedPosts) return
 
         try {
-            const { _id, createdAt, updatedAt, ...updateData } = editedPost;
-            logger.info(JSON.stringify({ _id, createdAt, updatedAt }));
+            const updateData = { ...editedPost }
+            // Strip server-only fields
+            delete updateData._id
+            delete updateData.createdAt
+            delete updateData.updatedAt
+
+            // Normalize StringArray items (remove nested _id)
+            if (updateData.students) {
+                updateData.students = updateData.students.map((i: StringArrayData) => {
+                    const r = { ...i }
+                    delete r._id
+                    return r
+                })
+            }
+
             await updatePosts({
                 id: selectedPosts._id,
                 ...updateData,
             }).unwrap()
+
             toggleEditModal(false)
             handleSuccess('Edit Successful')
         } catch (error: unknown) {
@@ -113,247 +129,257 @@ const EditNextComponents: React.FC = () => {
 
     return (
         <Dialog open={isEditModalOpen} onOpenChange={toggleEditModal}>
-            <DialogContent className="sm:max-w-[625px]">
-                <DialogHeader>
-                    <DialogTitle>Edit Post</DialogTitle>
-                </DialogHeader>
+            <DialogContent
+                className="sm:max-w-[825px] rounded-xl border mt-[35px] border-white/20 bg-white/10
+                           backdrop-blur-2xl shadow-2xl overflow-hidden transition-all duration-300 p-0"
+            >
+                <ScrollArea className="h-[75vh] max-h-[calc(100vh-2rem)] rounded-xl">
+                    <DialogHeader className="p-6 pb-3">
+                        <DialogTitle
+                            className="text-xl font-semibold bg-clip-text text-transparent
+                                       bg-gradient-to-r from-white to-blue-200 drop-shadow-md"
+                        >
+                            Edit Post
+                        </DialogTitle>
+                    </DialogHeader>
 
-                <ScrollArea className="h-[500px] w-full rounded-md border p-4">
-                    <div className="grid gap-4 py-4">
+                    <div className="grid gap-4 py-4 px-6 text-white">
                         
-                        <div className="grid grid-cols-4 items-center gap-4 pr-1">
-                            <Label htmlFor="title" className="text-right ">
-                                Title
-                            </Label>
-                            <div className="col-span-3">
-                                <InputFieldForString id="title" placeholder="Title" value={editedPost['title']} onChange={(value) => handleFieldChange('title', value as string)} />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4 pr-1">
-                            <Label htmlFor="email" className="text-right ">
-                                Email
-                            </Label>
-                            <div className="col-span-3">
-                                <InputFieldForEmail id="email" value={editedPost['email']} onChange={(value) => handleFieldChange('email', value as string)} />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4 pr-1">
-                            <Label htmlFor="password" className="text-right ">
-                                Password
-                            </Label>
-                            <div className="col-span-3">
-                                <InputFieldForPassword id="password" value={editedPost['password']} onChange={(value) => handleFieldChange('password', value as string)} />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4 pr-1">
-                            <Label htmlFor="passcode" className="text-right ">
-                                Passcode
-                            </Label>
-                            <div className="col-span-3">
-                                <InputFieldForPasscode id="passcode" value={editedPost['passcode']} onChange={(value) => handleFieldChange('passcode', value as string)} />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4 pr-1">
-                            <Label htmlFor="area" className="text-right ">
-                                Area
-                            </Label>
-                            <div className="col-span-3">
-                                <SelectField options={areaOptions} value={editedPost['area']} onValueChange={(value) => handleFieldChange('area', value)} />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4 pr-1">
-                            <Label htmlFor="sub-area" className="text-right ">
-                                Sub Area
-                            </Label>
-                            <div className="col-span-3">
-                                <DynamicSelectField value={editedPost['sub-area']} apiUrl='https://jsonplaceholder.typicode.com/users' onChange={(values) => handleFieldChange('sub-area', values)} />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4 pr-1">
-                            <Label htmlFor="products-images" className="text-right ">
-                                Products Images
-                            </Label>
-                            <div className="col-span-3">
-                                <ImageUploadManager value={editedPost['products-images']} onChange={(urls) => handleFieldChange('products-images', urls)} />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4 pr-1">
-                            <Label htmlFor="personal-image" className="text-right ">
-                                Personal Image
-                            </Label>
-                            <div className="col-span-3">
-                                <ImageUploadFieldSingle value={editedPost['personal-image']} onChange={(url) => handleFieldChange('personal-image', url)} />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-4 items-start gap-4 pr-1">
-                            <Label htmlFor="description" className="text-right pt-3">
-                                Description
-                            </Label>
-                            <div className="col-span-3">
-                                <TextareaFieldForDescription id="description" value={editedPost['description']} onChange={(e) => handleFieldChange('description', e.target.value)} />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4 pr-1">
-                            <Label htmlFor="age" className="text-right ">
-                                Age
-                            </Label>
-                            <div className="col-span-3">
-                                <NumberInputFieldInteger id="age" value={editedPost['age']} onChange={(value) => handleFieldChange('age', value as number)} />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4 pr-1">
-                            <Label htmlFor="amount" className="text-right ">
-                                Amount
-                            </Label>
-                            <div className="col-span-3">
-                                <NumberInputFieldFloat id="amount" value={editedPost['amount']} onChange={(value) => handleFieldChange('amount', value as number)} />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4 pr-1">
-                            <Label htmlFor="isActive" className="text-right ">
-                                IsActive
-                            </Label>
-                            <div className="col-span-3">
-                                <BooleanInputField id="isActive" checked={editedPost['isActive']} onCheckedChange={(checked) => handleFieldChange('isActive', checked)} />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4 pr-1">
-                            <Label htmlFor="start-date" className="text-right ">
-                                Start Date
-                            </Label>
-                            <div className="col-span-3">
-                                <DateField id="start-date" value={editedPost['start-date']} onChange={(date) => handleFieldChange('start-date', date)} />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4 pr-1">
-                            <Label htmlFor="start-time" className="text-right ">
-                                Start Time
-                            </Label>
-                            <div className="col-span-3">
-                                <TimeField id="start-time" value={editedPost['start-time']} onChange={(time) => handleFieldChange('start-time', time)} />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4 pr-1">
-                            <Label htmlFor="schedule-date" className="text-right ">
-                                Schedule Date
-                            </Label>
-                            <div className="col-span-3">
-                                <DateRangePickerField id="schedule-date" value={editedPost['schedule-date']} onChange={(range) => handleFieldChange('schedule-date', range)} />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4 pr-1">
-                            <Label htmlFor="schedule-time" className="text-right ">
-                                Schedule Time
-                            </Label>
-                            <div className="col-span-3">
-                                <TimeRangePickerField id="schedule-time" value={editedPost['schedule-time']} onChange={(range) => handleFieldChange('schedule-time', range)} />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4 pr-1">
-                            <Label htmlFor="favorite-color" className="text-right ">
-                                Favorite Color
-                            </Label>
-                            <div className="col-span-3">
-                                <ColorPickerField id="favorite-color" value={editedPost['favorite-color']} onChange={(value) => handleFieldChange('favorite-color', value as string)} />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4 pr-1">
-                            <Label htmlFor="number" className="text-right ">
-                                Number
-                            </Label>
-                            <div className="col-span-3">
-                                <PhoneInputField id="number" value={editedPost['number']} onChange={(value) => handleFieldChange('number', value)} />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4 pr-1">
-                            <Label htmlFor="profile" className="text-right ">
-                                Profile
-                            </Label>
-                            <div className="col-span-3">
-                                <UrlInputField id="profile" value={editedPost['profile']} onChange={(value) => handleFieldChange('profile', value as string)} />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-4 items-start gap-4 pr-1">
-                            <Label htmlFor="test" className="text-right pt-3">
-                                Test
-                            </Label>
-                            <div className="col-span-3">
-                                <RichTextEditorField id="test" value={editedPost['test']} onChange={(value) => handleFieldChange('test', value)} />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4 pr-1">
-                            <Label htmlFor="info" className="text-right ">
-                                Info
-                            </Label>
-                            <div className="col-span-3">
-                                <AutocompleteField id="info" value={editedPost['info']} />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4 pr-1">
-                            <Label htmlFor="shift" className="text-right ">
-                                Shift
-                            </Label>
-                            <div className="col-span-3">
-                                <RadioButtonGroupField options={shiftOptions} value={editedPost['shift']} onChange={(value) => handleFieldChange('shift', value)} />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4 pr-1">
-                            <Label htmlFor="policy" className="text-right ">
-                                Policy
-                            </Label>
-                            <div className="col-span-3">
-                                <CheckboxField id="policy" checked={editedPost['policy']} onCheckedChange={(checked) => handleFieldChange('policy', checked)} />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-4 items-start gap-4 pr-1">
-                            <Label htmlFor="hobbies" className="text-right pt-3">
-                                Hobbies
-                            </Label>
-                            <div className="col-span-3">
-                                <MultiCheckboxGroupField value={editedPost['hobbies']} onChange={(values) => handleFieldChange('hobbies', values)} />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4 pr-1">
-                            <Label htmlFor="ideas" className="text-right ">
-                                Ideas
-                            </Label>
-                            <div className="col-span-3">
-                                <MultiOptionsField options={ideasOptions} value={editedPost['ideas']} onChange={(values) => handleFieldChange('ideas', values)} />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-4 items-start gap-4 pr-1">
-                            <Label htmlFor="students" className="text-right pt-3">
-                                Students
-                            </Label>
-                            <div className="col-span-3">
-                                <StringArrayField value={editedPost['students']} onChange={(value) => handleFieldChange('students', value)} />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-4 items-start gap-4 pr-1">
-                            <Label htmlFor="complexValue" className="text-right pt-3">
-                                ComplexValue
-                            </Label>
-                            <div className="col-span-3">
-                                <JsonTextareaField id="complexValue" value={editedPost['complexValue'] || {}} onChange={(value) => handleFieldChange('complexValue', value)} />
-                            </div>
-                        </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
+              <Label htmlFor="title" className="text-right ">
+                Title
+              </Label>
+              <div className="col-span-3">
+                <InputFieldForString className="text-white" id="title" placeholder="Title" value={editedPost['title']} onChange={(value) => handleFieldChange('title', value as string)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
+              <Label htmlFor="email" className="text-right ">
+                Email
+              </Label>
+              <div className="col-span-3">
+                <InputFieldForEmail className="text-white" id="email" value={editedPost['email']} onChange={(value) => handleFieldChange('email', value as string)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
+              <Label htmlFor="password" className="text-right ">
+                Password
+              </Label>
+              <div className="col-span-3">
+                <InputFieldForPassword id="password" value={editedPost['password']} onChange={(value) => handleFieldChange('password', value as string)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
+              <Label htmlFor="passcode" className="text-right ">
+                Passcode
+              </Label>
+              <div className="col-span-3">
+                <InputFieldForPasscode id="passcode" value={editedPost['passcode']} onChange={(value) => handleFieldChange('passcode', value as string)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
+              <Label htmlFor="area" className="text-right ">
+                Area
+              </Label>
+              <div className="col-span-3">
+                <SelectField options={areaOptions} value={editedPost['area']} onValueChange={(value) => handleFieldChange('area', value)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 items-start gap-4 pr-1">
+              <Label htmlFor="sub-area" className="text-right pt-3">
+                Sub Area
+              </Label>
+              <div className="col-span-3">
+                <DynamicSelectField value={editedPost['sub-area']} apiUrl='https://jsonplaceholder.typicode.com/users' onChange={(values) => handleFieldChange('sub-area', values)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
+              <Label htmlFor="products-images" className="text-right ">
+                Products Images
+              </Label>
+              <div className="col-span-3">
+                <ImageUploadManager value={editedPost['products-images']} onChange={(urls) => handleFieldChange('products-images', urls)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
+              <Label htmlFor="personal-image" className="text-right ">
+                Personal Image
+              </Label>
+              <div className="col-span-3">
+                <ImageUploadFieldSingle value={editedPost['personal-image']} onChange={(url) => handleFieldChange('personal-image', url)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 items-start gap-4 pr-1">
+              <Label htmlFor="description" className="text-right pt-3">
+                Description
+              </Label>
+              <div className="col-span-3">
+                <TextareaFieldForDescription className="text-white" id="description" value={editedPost['description']} onChange={(e) => handleFieldChange('description', e.target.value)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
+              <Label htmlFor="age" className="text-right ">
+                Age
+              </Label>
+              <div className="col-span-3">
+                <NumberInputFieldInteger id="age" value={editedPost['age']} onChange={(value) => handleFieldChange('age', value as number)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
+              <Label htmlFor="amount" className="text-right ">
+                Amount
+              </Label>
+              <div className="col-span-3">
+                <NumberInputFieldFloat id="amount" value={editedPost['amount']} onChange={(value) => handleFieldChange('amount', value as number)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
+              <Label htmlFor="isActive" className="text-right ">
+                IsActive
+              </Label>
+              <div className="col-span-3">
+                <BooleanInputField id="isActive" checked={editedPost['isActive']} onCheckedChange={(checked) => handleFieldChange('isActive', checked)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
+              <Label htmlFor="start-date" className="text-right ">
+                Start Date
+              </Label>
+              <div className="col-span-3">
+                <DateField id="start-date" value={editedPost['start-date']} onChange={(date) => handleFieldChange('start-date', date)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
+              <Label htmlFor="start-time" className="text-right ">
+                Start Time
+              </Label>
+              <div className="col-span-3">
+                <TimeField id="start-time" value={editedPost['start-time']} onChange={(time) => handleFieldChange('start-time', time)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
+              <Label htmlFor="schedule-date" className="text-right ">
+                Schedule Date
+              </Label>
+              <div className="col-span-3">
+                <DateRangePickerField id="schedule-date" value={editedPost['schedule-date']} onChange={(range) => handleFieldChange('schedule-date', range)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
+              <Label htmlFor="schedule-time" className="text-right ">
+                Schedule Time
+              </Label>
+              <div className="col-span-3">
+                <TimeRangePickerField id="schedule-time" value={editedPost['schedule-time']} onChange={(range) => handleFieldChange('schedule-time', range)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
+              <Label htmlFor="favorite-color" className="text-right ">
+                Favorite Color
+              </Label>
+              <div className="col-span-3">
+                <ColorPickerField id="favorite-color" value={editedPost['favorite-color']} onChange={(value) => handleFieldChange('favorite-color', value as string)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
+              <Label htmlFor="number" className="text-right ">
+                Number
+              </Label>
+              <div className="col-span-3">
+                <PhoneInputField id="number" value={editedPost['number']} onChange={(value) => handleFieldChange('number', value)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
+              <Label htmlFor="profile" className="text-right ">
+                Profile
+              </Label>
+              <div className="col-span-3">
+                <UrlInputField id="profile" value={editedPost['profile']} onChange={(value) => handleFieldChange('profile', value as string)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 items-start gap-4 pr-1">
+              <Label htmlFor="test" className="text-right pt-3">
+                Test
+              </Label>
+              <div className="col-span-3">
+                <RichTextEditorField id="test" value={editedPost['test']} onChange={(value) => handleFieldChange('test', value)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
+              <Label htmlFor="info" className="text-right ">
+                Info
+              </Label>
+              <div className="col-span-3">
+                <AutocompleteField id="info" value={editedPost['info']} />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
+              <Label htmlFor="shift" className="text-right ">
+                Shift
+              </Label>
+              <div className="col-span-3">
+                <RadioButtonGroupField options={shiftOptions} value={editedPost['shift']} onChange={(value) => handleFieldChange('shift', value)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
+              <Label htmlFor="policy" className="text-right ">
+                Policy
+              </Label>
+              <div className="col-span-3">
+                <CheckboxField id="policy" checked={editedPost['policy']} onCheckedChange={(checked) => handleFieldChange('policy', checked)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 items-start gap-4 pr-1">
+              <Label htmlFor="hobbies" className="text-right pt-3">
+                Hobbies
+              </Label>
+              <div className="col-span-3">
+                <MultiCheckboxGroupField value={editedPost['hobbies']} onChange={(values) => handleFieldChange('hobbies', values)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
+              <Label htmlFor="ideas" className="text-right ">
+                Ideas
+              </Label>
+              <div className="col-span-3">
+                <MultiOptionsField options={ideasOptions} value={editedPost['ideas']} onChange={(values) => handleFieldChange('ideas', values)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 items-start gap-4 pr-1">
+              <Label htmlFor="students" className="text-right pt-3">
+                Students
+              </Label>
+              <div className="col-span-3">
+                <StringArrayField value={editedPost['students']} onChange={(value) => handleFieldChange('students', value)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 items-start gap-4 pr-1">
+              <Label htmlFor="complexValue" className="text-right pt-3">
+                ComplexValue
+              </Label>
+              <div className="col-span-3">
+                <JsonTextareaField id="complexValue" value={JSON.stringify(editedPost['complexValue'], null, 2) || ''} onChange={(value) => { handleFieldChange('complexValue', value); }} />
+              </div>
+            </div>
                     </div>
                 </ScrollArea>
 
-                <DialogFooter>
+                <DialogFooter className="p-6 pt-4 gap-3">
                     <Button
-                        variant="outline"
+                        variant="outlineWater"
                         onClick={() => {
                             toggleEditModal(false)
                             setSelectedPosts(null)
                         }}
+                        size="sm"
                     >
                         Cancel
                     </Button>
                     <Button
                         disabled={isLoading}
                         onClick={handleEditPost}
-                        className="bg-green-100 text-green-600 hover:bg-green-200"
+                        variant="outlineGarden"
+                        size="sm"
                     >
                         {isLoading ? 'Saving...' : 'Save Changes'}
                     </Button>

@@ -31,8 +31,9 @@ const JsonTextareaField: React.FC<JsonTextareaFieldProps> = ({ id, value, onChan
       lastValidRef.current = jsonText;
       onChange(parsed);
       return true;
-    } catch (err: any) {
-      setError(err.message);
+    } catch (error) {
+      const err = error as Error;
+      setError(err.message || 'Invalid JSON format');
       return false;
     }
   };

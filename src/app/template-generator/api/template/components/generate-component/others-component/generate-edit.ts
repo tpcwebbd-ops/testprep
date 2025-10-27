@@ -1,3 +1,4 @@
+// ✅ Updated generate-edit.tsx (Glassmorphism output, unified imports)
 interface Schema {
   [key: string]: string | Schema;
 }
@@ -21,16 +22,14 @@ export const generateEditComponentFile = (inputJsonFile: string): string => {
   const pluralPascalCase = namingConvention.Users_1_000___;
   const singularPascalCase = namingConvention.User_3_000___;
   const pluralLowerCase = namingConvention.users_2_000___;
+
   const interfaceName = `I${pluralPascalCase}`;
   const defaultInstanceName = `default${pluralPascalCase}`;
   const editedStateName = `edited${singularPascalCase}`;
-  const isUsedGenerateFolder = namingConvention.use_generate_folder;
 
   const componentBodyStatements = new Set<string>();
 
-  const toCamelCase = (str: string) => {
-    return str.replace(/-(\w)/g, (_, c) => c.toUpperCase());
-  };
+  const toCamelCase = (str: string) => str.replace(/-(\w)/g, (_, c) => c.toUpperCase());
 
   const generateOptionsVariable = (key: string, optionsString: string | undefined, defaultOptions: { label: string; value: string }[]): string => {
     const varName = `${toCamelCase(key)}Options`;
@@ -41,7 +40,9 @@ export const generateEditComponentFile = (inputJsonFile: string): string => {
         }))
       : defaultOptions;
 
-    const optionsJsArrayString = `[\n${optionsArray.map(opt => `        { label: '${opt.label}', value: '${opt.value}' }`).join(',\n')}\n    ]`;
+    const optionsJsArrayString = `[
+${optionsArray.map(opt => `        { label: '${opt.label}', value: '${opt.value}' }`).join(',\n')}
+    ]`;
 
     componentBodyStatements.add(`    const ${varName} = ${optionsJsArrayString};`);
     return varName;
@@ -49,28 +50,27 @@ export const generateEditComponentFile = (inputJsonFile: string): string => {
 
   const generateFormFieldJsx = (key: string, type: string): string => {
     const label = key.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-
     const [typeName, optionsString] = type.split('#');
 
     const formFieldWrapper = (label: string, componentJsx: string, alignTop: boolean = false): string => `
-                        <div className="grid grid-cols-4 ${alignTop ? 'items-start' : 'items-center'} gap-4 pr-1">
-                            <Label htmlFor="${key}" className="text-right ${alignTop ? 'pt-3' : ''}">
-                                ${label}
-                            </Label>
-                            <div className="col-span-3">
-                                ${componentJsx}
-                            </div>
-                        </div>`;
+            <div className="grid grid-cols-1 md:grid-cols-4 ${alignTop ? 'items-start' : 'items-center'} gap-4 pr-1">
+              <Label htmlFor="${key}" className="text-right ${alignTop ? 'pt-3' : ''}">
+                ${label}
+              </Label>
+              <div className="col-span-3">
+                ${componentJsx}
+              </div>
+            </div>`;
 
-    let componentJsx: string;
+    let componentJsx = '';
     let isTallComponent = false;
 
     switch (typeName.toUpperCase()) {
       case 'STRING':
-        componentJsx = `<InputFieldForString id="${key}" placeholder="${label}" value={${editedStateName}['${key}']} onChange={(value) => handleFieldChange('${key}', value as string)} />`;
+        componentJsx = `<InputFieldForString className="text-white" id="${key}" placeholder="${label}" value={${editedStateName}['${key}']} onChange={(value) => handleFieldChange('${key}', value as string)} />`;
         break;
       case 'EMAIL':
-        componentJsx = `<InputFieldForEmail id="${key}" value={${editedStateName}['${key}']} onChange={(value) => handleFieldChange('${key}', value as string)} />`;
+        componentJsx = `<InputFieldForEmail className="text-white" id="${key}" value={${editedStateName}['${key}']} onChange={(value) => handleFieldChange('${key}', value as string)} />`;
         break;
       case 'PASSWORD':
         componentJsx = `<InputFieldForPassword id="${key}" value={${editedStateName}['${key}']} onChange={(value) => handleFieldChange('${key}', value as string)} />`;
@@ -86,7 +86,7 @@ export const generateEditComponentFile = (inputJsonFile: string): string => {
         break;
       case 'DESCRIPTION':
         isTallComponent = true;
-        componentJsx = `<TextareaFieldForDescription id="${key}" value={${editedStateName}['${key}']} onChange={(e) => handleFieldChange('${key}', e.target.value)} />`;
+        componentJsx = `<TextareaFieldForDescription className="text-white" id="${key}" value={${editedStateName}['${key}']} onChange={(e) => handleFieldChange('${key}', e.target.value)} />`;
         break;
       case 'RICHTEXT':
         isTallComponent = true;
@@ -119,15 +119,18 @@ export const generateEditComponentFile = (inputJsonFile: string): string => {
       case 'COLORPICKER':
         componentJsx = `<ColorPickerField id="${key}" value={${editedStateName}['${key}']} onChange={(value) => handleFieldChange('${key}', value as string)} />`;
         break;
-      case 'SELECT':
+      case 'SELECT': {
         const selectVarName = generateOptionsVariable(key, optionsString, [{ label: 'Option 1', value: 'Option 1' }]);
         componentJsx = `<SelectField options={${selectVarName}} value={${editedStateName}['${key}']} onValueChange={(value) => handleFieldChange('${key}', value)} />`;
         break;
-      case 'RADIOBUTTON':
+      }
+      case 'RADIOBUTTON': {
         const radioVarName = generateOptionsVariable(key, optionsString, [{ label: 'Choice A', value: 'Choice A' }]);
         componentJsx = `<RadioButtonGroupField options={${radioVarName}} value={${editedStateName}['${key}']} onChange={(value) => handleFieldChange('${key}', value)} />`;
         break;
+      }
       case 'DYNAMICSELECT':
+        isTallComponent = true;
         componentJsx = `<DynamicSelectField value={${editedStateName}['${key}']} apiUrl='https://jsonplaceholder.typicode.com/users' onChange={(values) => handleFieldChange('${key}', values)} />`;
         break;
       case 'IMAGE':
@@ -140,29 +143,18 @@ export const generateEditComponentFile = (inputJsonFile: string): string => {
         isTallComponent = true;
         componentJsx = `<MultiCheckboxGroupField value={${editedStateName}['${key}']} onChange={(values) => handleFieldChange('${key}', values)} />`;
         break;
-      case 'MULTIOPTIONS':
+      case 'MULTIOPTIONS': {
         const multiOptionsVarName = generateOptionsVariable(key, optionsString, [{ label: 'Default A', value: 'Default A' }]);
         componentJsx = `<MultiOptionsField options={${multiOptionsVarName}} value={${editedStateName}['${key}']} onChange={(values) => handleFieldChange('${key}', values)} />`;
         break;
-
-      // ✅ UPDATED STRINGARRAY HANDLER
+      }
       case 'STRINGARRAY':
         isTallComponent = true;
-        let fields: string[] = [];
-        if (optionsString) {
-          fields = optionsString.split(',').map(pair => {
-            const [field, fType] = pair.split(':').map(v => v.trim());
-            return `{ label: '${field}', type: '${fType?.toUpperCase() || 'STRING'}' }`;
-          });
-        }
-
         componentJsx = `<StringArrayField value={${editedStateName}['${key}']} onChange={(value) => handleFieldChange('${key}', value)} />`;
         break;
-
       case 'AUTOCOMPLETE':
         componentJsx = `<AutocompleteField id="${key}" value={${editedStateName}['${key}']} />`;
         break;
-
       default:
         componentJsx = `<Input id="${key}" value={String(${editedStateName}['${key}'] || '')} disabled placeholder="Unsupported type: ${typeName}" />`;
         break;
@@ -175,16 +167,16 @@ export const generateEditComponentFile = (inputJsonFile: string): string => {
     .map(([key, value]) => {
       if (typeof value === 'object' && !Array.isArray(value)) {
         const label = key.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-        const componentJsx = `<JsonTextareaField id="${key}" value={${editedStateName}['${key}'] || {}} onChange={(value) => handleFieldChange('${key}', value)} />`;
+        const componentJsx = `<JsonTextareaField id="${key}" value={JSON.stringify(${editedStateName}['${key}'], null, 2) || ''} onChange={(value) => { handleFieldChange('${key}', value); }} />`;
         return `
-                        <div className="grid grid-cols-4 items-start gap-4 pr-1">
-                            <Label htmlFor="${key}" className="text-right pt-3">
-                                ${label}
-                            </Label>
-                            <div className="col-span-3">
-                                ${componentJsx}
-                            </div>
-                        </div>`;
+            <div className="grid grid-cols-1 md:grid-cols-4 items-start gap-4 pr-1">
+              <Label htmlFor="${key}" className="text-right pt-3">
+                ${label}
+              </Label>
+              <div className="col-span-3">
+                ${componentJsx}
+              </div>
+            </div>`;
       }
       return generateFormFieldJsx(key, value as string);
     })
@@ -192,10 +184,10 @@ export const generateEditComponentFile = (inputJsonFile: string): string => {
 
   const dynamicVariablesContent = componentBodyStatements.size > 0 ? `${[...componentBodyStatements].sort().join('\n\n')}` : '';
 
-  const reduxPath = isUsedGenerateFolder ? `../redux/rtk-api` : `@/redux/features/${pluralLowerCase}/${pluralLowerCase}Slice`;
+  // ✅ Unify with Add generator imports path
+  const reduxPath = `@/redux/features/${pluralLowerCase}/${pluralLowerCase}Slice`;
 
-  const staticImports = `import StringArrayField from '@/app/dashboard/${pluralLowerCase}/all/components/others-field-type/StringArrayField'
-import AutocompleteField from '@/components/dashboard-ui/AutocompleteField'
+  const staticImports = `import AutocompleteField from '@/components/dashboard-ui/AutocompleteField'
 import ColorPickerField from '@/components/dashboard-ui/ColorPickerField'
 import DateRangePickerField from '@/components/dashboard-ui/DateRangePickerField'
 import DynamicSelectField from '@/components/dashboard-ui/DynamicSelectField'
@@ -220,11 +212,14 @@ import { BooleanInputField } from '@/components/dashboard-ui/BooleanInputField'
 import { CheckboxField } from '@/components/dashboard-ui/CheckboxField'
 import { DateField } from '@/components/dashboard-ui/DateField'
 import { RadioButtonGroupField } from '@/components/dashboard-ui/RadioButtonGroupField'
-import { SelectField } from '@/components/dashboard-ui/SelectField'`;
+import { SelectField } from '@/components/dashboard-ui/SelectField'
+
+import StringArrayField from './others-field-type/StringArrayField'
+import { StringArrayData } from './others-field-type/types';
+`;
 
   return `import React, { useEffect, useState } from 'react'
 
-import { logger } from 'better-auth';
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -261,19 +256,33 @@ const EditNextComponents: React.FC = () => {
     }, [selected${pluralPascalCase}])
 
     const handleFieldChange = (name: string, value: unknown) => {
-        set${singularPascalCase}(prev => ({ ...prev, [name]: value }));
-    };
+        set${singularPascalCase}(prev => ({ ...prev, [name]: value }))
+    }
 
     const handleEdit${singularPascalCase} = async () => {
         if (!selected${pluralPascalCase}) return
 
         try {
-            const { _id, createdAt, updatedAt, ...updateData } = ${editedStateName};
-            logger.info(JSON.stringify({ _id, createdAt, updatedAt }));
+            const updateData = { ...${editedStateName} }
+            // Strip server-only fields
+            delete updateData._id
+            delete updateData.createdAt
+            delete updateData.updatedAt
+
+            // Normalize StringArray items (remove nested _id)
+            if (updateData.students) {
+                updateData.students = updateData.students.map((i: StringArrayData) => {
+                    const r = { ...i }
+                    delete r._id
+                    return r
+                })
+            }
+
             await update${pluralPascalCase}({
                 id: selected${pluralPascalCase}._id,
                 ...updateData,
             }).unwrap()
+
             toggleEditModal(false)
             handleSuccess('Edit Successful')
         } catch (error: unknown) {
@@ -292,31 +301,41 @@ ${dynamicVariablesContent}
 
     return (
         <Dialog open={isEditModalOpen} onOpenChange={toggleEditModal}>
-            <DialogContent className="sm:max-w-[625px]">
-                <DialogHeader>
-                    <DialogTitle>Edit ${singularPascalCase}</DialogTitle>
-                </DialogHeader>
+            <DialogContent
+                className="sm:max-w-[825px] rounded-xl border mt-[35px] border-white/20 bg-white/10
+                           backdrop-blur-2xl shadow-2xl overflow-hidden transition-all duration-300 p-0"
+            >
+                <ScrollArea className="h-[75vh] max-h-[calc(100vh-2rem)] rounded-xl">
+                    <DialogHeader className="p-6 pb-3">
+                        <DialogTitle
+                            className="text-xl font-semibold bg-clip-text text-transparent
+                                       bg-gradient-to-r from-white to-blue-200 drop-shadow-md"
+                        >
+                            Edit ${singularPascalCase}
+                        </DialogTitle>
+                    </DialogHeader>
 
-                <ScrollArea className="h-[500px] w-full rounded-md border p-4">
-                    <div className="grid gap-4 py-4">
+                    <div className="grid gap-4 py-4 px-6 text-white">
                         ${formFieldsJsx}
                     </div>
                 </ScrollArea>
 
-                <DialogFooter>
+                <DialogFooter className="p-6 pt-4 gap-3">
                     <Button
-                        variant="outline"
+                        variant="outlineWater"
                         onClick={() => {
                             toggleEditModal(false)
                             setSelected${pluralPascalCase}(null)
                         }}
+                        size="sm"
                     >
                         Cancel
                     </Button>
                     <Button
                         disabled={isLoading}
                         onClick={handleEdit${singularPascalCase}}
-                        className="bg-green-100 text-green-600 hover:bg-green-200"
+                        variant="outlineGarden"
+                        size="sm"
                     >
                         {isLoading ? 'Saving...' : 'Save Changes'}
                     </Button>

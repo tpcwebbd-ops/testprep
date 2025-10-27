@@ -80,7 +80,7 @@ const ViewNextComponents: React.FC = () => {
 
   return (
     <Dialog open={isViewModalOpen} onOpenChange={toggleViewModal}>
-      <DialogContent className="sm:max-w-2xl rounded-xl bg-white/10 backdrop-blur-2xl border border-white/20 text-white">
+      <DialogContent className="sm:max-w-2xl mt-8 rounded-xl bg-white/10 backdrop-blur-2xl border border-white/20 text-white">
         <DialogHeader>
           <DialogTitle className="bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-200">
             Posts Details

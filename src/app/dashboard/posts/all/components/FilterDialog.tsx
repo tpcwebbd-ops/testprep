@@ -131,8 +131,12 @@ const FilterDialog: React.FC<FilterDialogProps> = ({ isOpen, onOpenChange, onApp
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2 bg-white/10 backdrop-blur-lg rounded-lg text-white border border-white/20">
-              <TabsTrigger value="month" className="data-[state=active]:bg-white/20 data-[state=active]:shadow-none">By Month</TabsTrigger>
-              <TabsTrigger value="range" className="data-[state=active]:bg-white/20 data-[state=active]:shadow-none">By Date Range</TabsTrigger>
+            <TabsTrigger value="month" className="data-[state=active]:bg-white/20 data-[state=active]:shadow-none text-white">
+                By Month
+              </TabsTrigger>
+              <TabsTrigger value="range" className="data-[state=active]:bg-white/20 data-[state=active]:shadow-none text-white">
+                By Date Range
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="month" className="py-4">

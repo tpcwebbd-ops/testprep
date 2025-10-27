@@ -44,8 +44,8 @@ export interface IPosts {
         };
         "note": string
     };
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
     _id?: string;
 }
 

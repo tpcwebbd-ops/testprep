@@ -117,8 +117,8 @@ import { StringArrayData } from '../../components/others-field-type/types'
 
 export interface I${interfaceName} {
 ${interfaceContent};
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
     _id?: string;
 }
 
