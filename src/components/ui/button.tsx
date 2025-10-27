@@ -22,7 +22,7 @@ const buttonVariants = cva(
         outlineGarden:
           'border-1 border-green-400 text-green-50 hover:text-green-50 shadow-xl bg-green-300/40 shadow-xs hover:bg-green-400 transition-all duration-300',
         outlineFire:
-          'border-1 border-rose-400 shadow-xl bg-rose-300/40 shadow-xs hover:bg-rose-400 transition-all duration-300 text-rose-800 hover:text-rose-50',
+          'border-1 border-rose-400 shadow-xl bg-rose-300/40 shadow-xs hover:bg-rose-400 transition-all duration-300 text-rose-500 hover:text-rose-50',
         outlineWater:
           'border-1 border-blue-400 shadow-xl bg-blue-300/40 shadow-xs hover:bg-blue-400 transition-all duration-300 text-blue-50 hover:text-blue-50',
         outlineDefault:

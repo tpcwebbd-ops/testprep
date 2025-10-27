@@ -15,7 +15,7 @@ import StudyAbroad from '@/components/home-components/StudyAbroad';
 export default function Home() {
   return (
     <>
-      <div className="mt-[-65px]" />
+      <div className="mt-[-65px] " />
       <HeroSection />
       <TestPrepHero />
       {/* <TestPrepClasses /> */}

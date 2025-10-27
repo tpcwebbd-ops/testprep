@@ -51,7 +51,7 @@ const TestPrepHero: React.FC = () => {
   }, [testimonials.length]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br pt-[65px] from-indigo-900 via-purple-900 to-pink-800 relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0">
         <div className="absolute top-20 left-10 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
