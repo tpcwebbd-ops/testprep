@@ -92,9 +92,11 @@ const StringArrayField: React.FC<StringArrayFieldProps> = ({ value, onChange }) 
             ))
           )}
 
-          <Button variant="outlineGarden" onClick={() => setIsEditing(true)}>
-            Update
-          </Button>
+          <div className="w-full flex items-center justify-center">
+            <Button variant="outlineGarden" onClick={() => setIsEditing(true)} size="sm">
+              Update
+            </Button>
+          </div>
         </div>
       )}
 
@@ -153,7 +155,7 @@ const StringArrayField: React.FC<StringArrayFieldProps> = ({ value, onChange }) 
             <Button variant="outlineWater" onClick={handleSubmit} size="sm">
               Submit
             </Button>
-            <Button variant="outlineFire" onClick={handleCancel} size="sm">
+            <Button variant="outlineFire" onClick={handleCancel} size="sm" className="text-white">
               Cancel
             </Button>
           </div>
