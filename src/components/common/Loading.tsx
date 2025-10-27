@@ -15,17 +15,16 @@ const AnimatedCircle: React.FC<{
 }> = ({ className, style, animate, transition }) => <motion.div className={className} style={style} animate={animate} transition={transition} />;
 
 const LoadingComponent: React.FC<FullPageLoaderProps> = ({
-  bgColor = 'rgba(15, 23, 42, 0.8)', // Dark slate background
-  accentColor = '#10b981', // emerald-500 green
+  accentColor = '#10b981', // emerald green stays same
   message = 'Please wait...',
 }) => {
   const circleStyle = { borderColor: accentColor };
   const dotStyle = { backgroundColor: accentColor };
 
   return (
-    <div className="fixed inset-0 flex flex-col items-center justify-center z-50" style={{ backgroundColor: bgColor }}>
+    <div className="min-h-screen w-full fixed top-0 left-0 inset-0 flex flex-col items-center justify-center z-[1000] pointer-events-none">
       <motion.div
-        className="p-8 rounded-lg backdrop-blur-sm bg-white/10 flex flex-col items-center border border-white/20"
+        className="p-8 rounded-lg backdrop-blur-[2px] bg-white/10 flex flex-col items-center border border-white/20" // ✅ Blur set to 2px
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.3, ease: 'easeOut' }}
@@ -83,7 +82,7 @@ const LoadingComponent: React.FC<FullPageLoaderProps> = ({
           {message}
         </motion.p>
 
-        {/* Animated progress bar */}
+        {/* Progress bar remains untouched */}
         <motion.div
           className="mt-4 w-32 h-1 rounded-full overflow-hidden bg-white/20"
           initial={{ width: 0 }}
@@ -102,32 +101,6 @@ const LoadingComponent: React.FC<FullPageLoaderProps> = ({
             style={{ backgroundColor: accentColor }}
           />
         </motion.div>
-
-        {/* Subtle floating particles */}
-        <div className="absolute inset-0 pointer-events-none">
-          {[...Array(3)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-1 h-1 rounded-full"
-              style={{
-                backgroundColor: accentColor,
-                opacity: 0.4,
-                left: `${30 + i * 20}%`,
-                top: `${40 + i * 10}%`,
-              }}
-              animate={{
-                y: [-10, -30, -10],
-                opacity: [0.4, 0.8, 0.4],
-              }}
-              transition={{
-                duration: 3 + i * 0.5,
-                repeat: Infinity,
-                delay: i * 0.5,
-                ease: 'easeInOut',
-              }}
-            />
-          ))}
-        </div>
       </motion.div>
     </div>
   );
