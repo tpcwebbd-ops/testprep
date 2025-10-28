@@ -1,0 +1,22 @@
+{
+  "uid": "_Users",
+  "templateName": "Users Template ",
+  "schema": {
+    "full_name":"STRING",
+    "uid":"STRING",
+    "email":"EMAIL",
+    "password_hash":"STRING",
+    "phone_number":"PHONE",
+    "profile_image_url":"URL",
+    "sign_up_by":"SELECT#Google, Email",
+    "status":"SELECT#active, inactive, suspended"
+  },
+  "namingConvention": {
+    "Users_1_000___": "Users",
+    "users_2_000___": "users",
+    "User_3_000___": "User",
+    "user_4_000___": "user",
+    "ISelect_6_000___": "ISelect_n",
+    "select_5_000___": "select_n"
+  }
+}

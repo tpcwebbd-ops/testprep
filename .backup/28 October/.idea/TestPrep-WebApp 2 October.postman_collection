@@ -1,0 +1,1114 @@
+{
+	"info": {
+		"_postman_id": "b328a987-16ae-4507-91bd-5452a5199554",
+		"name": "TestPrep-WebApp",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "47556218",
+		"_collection_link": "https://tpc-web-bd-5637092.postman.co/workspace/Sharif-Russel's-Workspace~cd989a89-604c-4f16-859f-7b55a44c884e/collection/47556218-b328a987-16ae-4507-91bd-5452a5199554?action=share&source=collection_link&creator=47556218"
+	},
+	"item": [
+		{
+			"name": "Local Host",
+			"item": [
+				{
+					"name": "Users-old",
+					"item": [
+						{
+							"name": "Access Management",
+							"item": [
+								{
+									"name": "Get Users",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseURL}}/dashboard/access-management/all/api/v1",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"access-management",
+												"all",
+												"api",
+												"v1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get Users by email",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseURL}}/dashboard/access-management/all/api/v1/get-user-by-email?email=tpc.web.bd@gmail.com",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"access-management",
+												"all",
+												"api",
+												"v1",
+												"get-user-by-email"
+											],
+											"query": [
+												{
+													"key": "email",
+													"value": "tpc.web.bd@gmail.com"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n                \"role\": \"admin\",\r\n                \"name\": \"ExampleName505\",\r\n                \"email\": \"tpc.web.bd@gmail.com\",\r\n                \"assignBy\": \"Toufiquer\",\r\n                \"createdAt\": \"2025-08-23T10:37:08.415Z\",\r\n                \"updatedAt\": \"2025-08-23T12:05:45.270Z\",\r\n                \"__v\": 0\r\n            }",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/dashboard/access-management/all/api/v1",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"access-management",
+												"all",
+												"api",
+												"v1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": " {\r\n    \"id\": \"68ac157e0dba2b0f6e2d0327\",\r\n    \"role\": \"admin\",\r\n    \"assignBy\": \"Sharif Russel\",\r\n    \"assignByEmail\": \"tpc.web.bd@gmail.com\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/dashboard/access-management/all/api/v1",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"access-management",
+												"all",
+												"api",
+												"v1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Bulk Update",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "[    {\r\n                \"id\": \"68ac15a10dba2b0f6e2d0332\",\r\n                \"updateData\" : {\"role\":\"student\"}\r\n            },    {\r\n                \"id\": \"68ac157e0dba2b0f6e2d0327\",  \"updateData\" : {\"role\":\"student\"}\r\n            }]",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/dashboard/access-management/all/api/v1?bulk=true",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"access-management",
+												"all",
+												"api",
+												"v1"
+											],
+											"query": [
+												{
+													"key": "bulk",
+													"value": "true"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n        \"id\": \"68a9868ca84cbe87069aba5d\"\r\n    }",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/dashboard/access-management/all/api/v1",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"access-management",
+												"all",
+												"api",
+												"v1"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "users",
+							"item": [
+								{
+									"name": "Get Users",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseURL}}/dashboard/users/all/api/v1",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"users",
+												"all",
+												"api",
+												"v1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"courseName\": \"IELTS Writing\",\r\n  \"courseCode\": 101,\r\n  \"totalLecture\": 25,\r\n  \"totalPdf\": 15,\r\n  \"totalWord\": 10,\r\n  \"totalLiveClass\": 5,\r\n  \"enrollStudents\": 200,\r\n  \"runningStudent\": 150,\r\n  \"enrolmentStatus\": true,\r\n  \"enrolmentStart\": \"2025-09-01T00:00:00.000Z\",\r\n  \"enrolmentEnd\": \"2026-08-31T23:59:59.000Z\",\r\n  \"courseDetails\": \"This is a detailed description of the sample course, covering all modules and learning objectives.\",\r\n  \"review\": [\r\n    \"This was a great course!\",\r\n    \"Learned a lot, thank you.\"\r\n  ],\r\n  \"coursePrice\": 5000,\r\n  \"courseDuration\": \"1 Year\",\r\n  \"courseNote\": \"All course materials are available for download. Live classes are held every Tuesday.\",\r\n  \"courseShortDescription\": \"A short and catchy description for the course card.\",\r\n  \"courseBannerPicture\": \"/images/banner_picture.jpg\",\r\n  \"courseIntroVideo\": \"/videos/intro_video.mp4\",\r\n  \"howCourseIsRunningView\": \"The course is structured into weekly modules with video lectures, reading materials, and quizzes.\",\r\n  \"certifications\": \"A certificate of completion will be awarded upon successfully passing the final exam.\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/dashboard/course/all/api/v1",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"course",
+												"all",
+												"api",
+												"v1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n   \r\n                \"courseBannerPicture\": \"https://i.ibb.co.com/PGXYXwTq/img.jpg\",\r\n        \"id\": \"68a5a019d53e5c591dc78ce4\"\r\n    }",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/dashboard/course/all/api/v1",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"course",
+												"all",
+												"api",
+												"v1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Copy",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n   \r\n                   \"id\": \"68a5a090d53e5c591dc78cef\",\r\n                \"coursePrice\": 15000\r\n    }",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/dashboard/course/all/api/v1",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"course",
+												"all",
+												"api",
+												"v1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n        \"id\": \"68a59fefd53e5c591dc78ce0\"\r\n    }",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/dashboard/course/all/api/v1",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"course",
+												"all",
+												"api",
+												"v1"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "admin",
+							"item": [
+								{
+									"name": "Get IELTS",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseURL}}/dashboard/course/all/api/v1",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"course",
+												"all",
+												"api",
+												"v1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"courseName\": \"IELTS Writing\",\r\n  \"courseCode\": 101,\r\n  \"totalLecture\": 25,\r\n  \"totalPdf\": 15,\r\n  \"totalWord\": 10,\r\n  \"totalLiveClass\": 5,\r\n  \"enrollStudents\": 200,\r\n  \"runningStudent\": 150,\r\n  \"enrolmentStatus\": true,\r\n  \"enrolmentStart\": \"2025-09-01T00:00:00.000Z\",\r\n  \"enrolmentEnd\": \"2026-08-31T23:59:59.000Z\",\r\n  \"courseDetails\": \"This is a detailed description of the sample course, covering all modules and learning objectives.\",\r\n  \"review\": [\r\n    \"This was a great course!\",\r\n    \"Learned a lot, thank you.\"\r\n  ],\r\n  \"coursePrice\": 5000,\r\n  \"courseDuration\": \"1 Year\",\r\n  \"courseNote\": \"All course materials are available for download. Live classes are held every Tuesday.\",\r\n  \"courseShortDescription\": \"A short and catchy description for the course card.\",\r\n  \"courseBannerPicture\": \"/images/banner_picture.jpg\",\r\n  \"courseIntroVideo\": \"/videos/intro_video.mp4\",\r\n  \"howCourseIsRunningView\": \"The course is structured into weekly modules with video lectures, reading materials, and quizzes.\",\r\n  \"certifications\": \"A certificate of completion will be awarded upon successfully passing the final exam.\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/dashboard/course/all/api/v1",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"course",
+												"all",
+												"api",
+												"v1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n   \r\n                \"courseBannerPicture\": \"https://i.ibb.co.com/PGXYXwTq/img.jpg\",\r\n        \"id\": \"68a5a019d53e5c591dc78ce4\"\r\n    }",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/dashboard/course/all/api/v1",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"course",
+												"all",
+												"api",
+												"v1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Copy",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n   \r\n                   \"id\": \"68a5a090d53e5c591dc78cef\",\r\n                \"coursePrice\": 15000\r\n    }",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/dashboard/course/all/api/v1",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"course",
+												"all",
+												"api",
+												"v1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n        \"id\": \"68a59fefd53e5c591dc78ce0\"\r\n    }",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/dashboard/course/all/api/v1",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"course",
+												"all",
+												"api",
+												"v1"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "students",
+							"item": [
+								{
+									"name": "Get IELTS",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseURL}}/dashboard/course/all/api/v1",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"course",
+												"all",
+												"api",
+												"v1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"courseName\": \"IELTS Writing\",\r\n  \"courseCode\": 101,\r\n  \"totalLecture\": 25,\r\n  \"totalPdf\": 15,\r\n  \"totalWord\": 10,\r\n  \"totalLiveClass\": 5,\r\n  \"enrollStudents\": 200,\r\n  \"runningStudent\": 150,\r\n  \"enrolmentStatus\": true,\r\n  \"enrolmentStart\": \"2025-09-01T00:00:00.000Z\",\r\n  \"enrolmentEnd\": \"2026-08-31T23:59:59.000Z\",\r\n  \"courseDetails\": \"This is a detailed description of the sample course, covering all modules and learning objectives.\",\r\n  \"review\": [\r\n    \"This was a great course!\",\r\n    \"Learned a lot, thank you.\"\r\n  ],\r\n  \"coursePrice\": 5000,\r\n  \"courseDuration\": \"1 Year\",\r\n  \"courseNote\": \"All course materials are available for download. Live classes are held every Tuesday.\",\r\n  \"courseShortDescription\": \"A short and catchy description for the course card.\",\r\n  \"courseBannerPicture\": \"/images/banner_picture.jpg\",\r\n  \"courseIntroVideo\": \"/videos/intro_video.mp4\",\r\n  \"howCourseIsRunningView\": \"The course is structured into weekly modules with video lectures, reading materials, and quizzes.\",\r\n  \"certifications\": \"A certificate of completion will be awarded upon successfully passing the final exam.\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/dashboard/course/all/api/v1",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"course",
+												"all",
+												"api",
+												"v1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n   \r\n                \"courseBannerPicture\": \"https://i.ibb.co.com/PGXYXwTq/img.jpg\",\r\n        \"id\": \"68a5a019d53e5c591dc78ce4\"\r\n    }",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/dashboard/course/all/api/v1",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"course",
+												"all",
+												"api",
+												"v1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Copy",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n   \r\n                   \"id\": \"68a5a090d53e5c591dc78cef\",\r\n                \"coursePrice\": 15000\r\n    }",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/dashboard/course/all/api/v1",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"course",
+												"all",
+												"api",
+												"v1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n        \"id\": \"68a59fefd53e5c591dc78ce0\"\r\n    }",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/dashboard/course/all/api/v1",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"course",
+												"all",
+												"api",
+												"v1"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "instructor",
+							"item": [
+								{
+									"name": "Get IELTS",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseURL}}/dashboard/course/all/api/v1",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"course",
+												"all",
+												"api",
+												"v1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"courseName\": \"IELTS Writing\",\r\n  \"courseCode\": 101,\r\n  \"totalLecture\": 25,\r\n  \"totalPdf\": 15,\r\n  \"totalWord\": 10,\r\n  \"totalLiveClass\": 5,\r\n  \"enrollStudents\": 200,\r\n  \"runningStudent\": 150,\r\n  \"enrolmentStatus\": true,\r\n  \"enrolmentStart\": \"2025-09-01T00:00:00.000Z\",\r\n  \"enrolmentEnd\": \"2026-08-31T23:59:59.000Z\",\r\n  \"courseDetails\": \"This is a detailed description of the sample course, covering all modules and learning objectives.\",\r\n  \"review\": [\r\n    \"This was a great course!\",\r\n    \"Learned a lot, thank you.\"\r\n  ],\r\n  \"coursePrice\": 5000,\r\n  \"courseDuration\": \"1 Year\",\r\n  \"courseNote\": \"All course materials are available for download. Live classes are held every Tuesday.\",\r\n  \"courseShortDescription\": \"A short and catchy description for the course card.\",\r\n  \"courseBannerPicture\": \"/images/banner_picture.jpg\",\r\n  \"courseIntroVideo\": \"/videos/intro_video.mp4\",\r\n  \"howCourseIsRunningView\": \"The course is structured into weekly modules with video lectures, reading materials, and quizzes.\",\r\n  \"certifications\": \"A certificate of completion will be awarded upon successfully passing the final exam.\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/dashboard/course/all/api/v1",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"course",
+												"all",
+												"api",
+												"v1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n   \r\n                \"courseBannerPicture\": \"https://i.ibb.co.com/PGXYXwTq/img.jpg\",\r\n        \"id\": \"68a5a019d53e5c591dc78ce4\"\r\n    }",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/dashboard/course/all/api/v1",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"course",
+												"all",
+												"api",
+												"v1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Copy",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n   \r\n                   \"id\": \"68a5a090d53e5c591dc78cef\",\r\n                \"coursePrice\": 15000\r\n    }",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/dashboard/course/all/api/v1",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"course",
+												"all",
+												"api",
+												"v1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n        \"id\": \"68a59fefd53e5c591dc78ce0\"\r\n    }",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/dashboard/course/all/api/v1",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"course",
+												"all",
+												"api",
+												"v1"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "modarator",
+							"item": [
+								{
+									"name": "Get IELTS",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseURL}}/dashboard/course/all/api/v1",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"course",
+												"all",
+												"api",
+												"v1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"courseName\": \"IELTS Writing\",\r\n  \"courseCode\": 101,\r\n  \"totalLecture\": 25,\r\n  \"totalPdf\": 15,\r\n  \"totalWord\": 10,\r\n  \"totalLiveClass\": 5,\r\n  \"enrollStudents\": 200,\r\n  \"runningStudent\": 150,\r\n  \"enrolmentStatus\": true,\r\n  \"enrolmentStart\": \"2025-09-01T00:00:00.000Z\",\r\n  \"enrolmentEnd\": \"2026-08-31T23:59:59.000Z\",\r\n  \"courseDetails\": \"This is a detailed description of the sample course, covering all modules and learning objectives.\",\r\n  \"review\": [\r\n    \"This was a great course!\",\r\n    \"Learned a lot, thank you.\"\r\n  ],\r\n  \"coursePrice\": 5000,\r\n  \"courseDuration\": \"1 Year\",\r\n  \"courseNote\": \"All course materials are available for download. Live classes are held every Tuesday.\",\r\n  \"courseShortDescription\": \"A short and catchy description for the course card.\",\r\n  \"courseBannerPicture\": \"/images/banner_picture.jpg\",\r\n  \"courseIntroVideo\": \"/videos/intro_video.mp4\",\r\n  \"howCourseIsRunningView\": \"The course is structured into weekly modules with video lectures, reading materials, and quizzes.\",\r\n  \"certifications\": \"A certificate of completion will be awarded upon successfully passing the final exam.\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/dashboard/course/all/api/v1",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"course",
+												"all",
+												"api",
+												"v1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n   \r\n                \"courseBannerPicture\": \"https://i.ibb.co.com/PGXYXwTq/img.jpg\",\r\n        \"id\": \"68a5a019d53e5c591dc78ce4\"\r\n    }",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/dashboard/course/all/api/v1",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"course",
+												"all",
+												"api",
+												"v1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Copy",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n   \r\n                   \"id\": \"68a5a090d53e5c591dc78cef\",\r\n                \"coursePrice\": 15000\r\n    }",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/dashboard/course/all/api/v1",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"course",
+												"all",
+												"api",
+												"v1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n        \"id\": \"68a59fefd53e5c591dc78ce0\"\r\n    }",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/dashboard/course/all/api/v1",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"course",
+												"all",
+												"api",
+												"v1"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "mentor",
+							"item": [
+								{
+									"name": "Get IELTS",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseURL}}/dashboard/course/all/api/v1",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"course",
+												"all",
+												"api",
+												"v1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"courseName\": \"IELTS Writing\",\r\n  \"courseCode\": 101,\r\n  \"totalLecture\": 25,\r\n  \"totalPdf\": 15,\r\n  \"totalWord\": 10,\r\n  \"totalLiveClass\": 5,\r\n  \"enrollStudents\": 200,\r\n  \"runningStudent\": 150,\r\n  \"enrolmentStatus\": true,\r\n  \"enrolmentStart\": \"2025-09-01T00:00:00.000Z\",\r\n  \"enrolmentEnd\": \"2026-08-31T23:59:59.000Z\",\r\n  \"courseDetails\": \"This is a detailed description of the sample course, covering all modules and learning objectives.\",\r\n  \"review\": [\r\n    \"This was a great course!\",\r\n    \"Learned a lot, thank you.\"\r\n  ],\r\n  \"coursePrice\": 5000,\r\n  \"courseDuration\": \"1 Year\",\r\n  \"courseNote\": \"All course materials are available for download. Live classes are held every Tuesday.\",\r\n  \"courseShortDescription\": \"A short and catchy description for the course card.\",\r\n  \"courseBannerPicture\": \"/images/banner_picture.jpg\",\r\n  \"courseIntroVideo\": \"/videos/intro_video.mp4\",\r\n  \"howCourseIsRunningView\": \"The course is structured into weekly modules with video lectures, reading materials, and quizzes.\",\r\n  \"certifications\": \"A certificate of completion will be awarded upon successfully passing the final exam.\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/dashboard/course/all/api/v1",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"course",
+												"all",
+												"api",
+												"v1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n   \r\n                \"courseBannerPicture\": \"https://i.ibb.co.com/PGXYXwTq/img.jpg\",\r\n        \"id\": \"68a5a019d53e5c591dc78ce4\"\r\n    }",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/dashboard/course/all/api/v1",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"course",
+												"all",
+												"api",
+												"v1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Copy",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n   \r\n                   \"id\": \"68a5a090d53e5c591dc78cef\",\r\n                \"coursePrice\": 15000\r\n    }",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/dashboard/course/all/api/v1",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"course",
+												"all",
+												"api",
+												"v1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n        \"id\": \"68a59fefd53e5c591dc78ce0\"\r\n    }",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/dashboard/course/all/api/v1",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"dashboard",
+												"course",
+												"all",
+												"api",
+												"v1"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Assessments",
+					"item": [
+						{
+							"name": "Get",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:3000/api/assessments/v1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"assessments",
+										"v1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Live",
+			"item": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": "http://localhost:3000",
+			"type": "default"
+		}
+	]
+}
