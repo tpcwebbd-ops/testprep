@@ -93,7 +93,7 @@ const JsonEditorSingleItem = ({
         <div className="flex items-center gap-2">
           {/* Remove */}
           <AlertDialog>
-            <AlertDialogTrigger className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive cursor-pointer min-w-[80px] border-1 border-rose-400 shadow-xl bg-rose-300/40 hover:bg-rose-400 transition-all duration-300 hover:text-rose-50 h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5">
+            <AlertDialogTrigger className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive cursor-pointer min-w-[80px] border-1 border-rose-400 shadow-xl bg-rose-300/40 hover:bg-rose-400 transition-all duration-300 hover:text-rose-50 h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5 text-rose-50">
               Remove
             </AlertDialogTrigger>
             <AlertDialogContent className="rounded-xl border border-white/20 bg-white/10 backdrop-blur-xl">
