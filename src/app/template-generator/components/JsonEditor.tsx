@@ -111,8 +111,7 @@ const initialJsonTemplate: JsonTemplate = {
     users_2_000___: 'posts',
     User_3_000___: 'Post',
     user_4_000___: 'post',
-    ISelect_6_000___: 'ISelect',
-    select_5_000___: 'select',
+
     use_generate_folder: false,
     bulk_action: ['title', 'area'],
   },
