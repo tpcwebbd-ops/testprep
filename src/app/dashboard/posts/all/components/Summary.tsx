@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Loader2, TrendingUp, BarChart3, PieChart } from 'lucide-react';
+import { Loader2, TrendingUp, BarChart3, PieChart, Calendar, Activity } from 'lucide-react';
 
 import { useGetPostsSummaryQuery } from '@/redux/features/posts/postsSlice';
 
@@ -81,163 +81,241 @@ const PostsSummary = () => {
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <Button variant="outlineWater" size="sm" className="text-white">
+        <Button variant="outline" size="sm" className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border-white/30 text-white hover:from-blue-500/30 hover:to-purple-500/30 hover:border-white/50 transition-all duration-300">
           <TrendingUp className="mr-2 h-4 w-4" />
           Summary
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-6xl max-h-[85vh] mt-8 overflow-y-auto rounded-xl border border-white/20 bg-white/10 backdrop-blur-2xl shadow-xl text-white transition-all">
-        <DialogHeader>
-          <DialogTitle>Posts Summary</DialogTitle>
-          <DialogDescription className="text-white/70">Overview of posts data aggregated by month.</DialogDescription>
+      <DialogContent className="sm:max-w-7xl max-h-[90vh] mt-4 overflow-y-auto rounded-2xl border border-white/20 bg-gradient-to-br from-slate-900/95 via-blue-900/90 to-purple-900/95 backdrop-blur-3xl shadow-2xl text-white">
+        <DialogHeader className="space-y-3 pb-4 border-b border-white/10">
+          <DialogTitle className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+            Posts Analytics Dashboard
+          </DialogTitle>
+          <DialogDescription className="text-white/60 text-base">
+            Comprehensive overview of your posts data with interactive visualizations
+          </DialogDescription>
         </DialogHeader>
 
         {isLoading && (
-          <div className="flex items-center justify-center p-12">
-            <Loader2 className="h-8 w-8 animate-spin text-white" />
+          <div className="flex items-center justify-center p-16">
+            <div className="text-center space-y-4">
+              <Loader2 className="h-12 w-12 animate-spin text-blue-400 mx-auto" />
+              <p className="text-white/70">Loading analytics...</p>
+            </div>
           </div>
         )}
 
-        {isError && <div className="text-center text-red-300 p-12">Failed to load summary data.</div>}
+        {isError && (
+          <div className="text-center p-16">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-500/20 mb-4">
+              <Activity className="h-8 w-8 text-red-400" />
+            </div>
+            <p className="text-red-300 text-lg">Failed to load summary data.</p>
+          </div>
+        )}
 
         {!isLoading && !isError && summaryData && (
-          <div className="grid gap-4">
-            {/* Core Stats */}
-            <Card className="border-white/20 bg-white/10 backdrop-blur-xl shadow-lg text-white">
-              <CardHeader>
-                <CardTitle>Creation Statistics</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-white/60">Total Records:</span>
-                  <strong>{summaryData.overall.totalRecords ?? 'N/A'}</strong>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-white/60">Last 24 Hours:</span>
-                  <strong>{summaryData.overall.recordsLast24Hours ?? 'N/A'}</strong>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-white/60">Last Month:</span>
-                  <strong>{summaryData.overall.recordsLastMonth ?? 'N/A'}</strong>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Overall Stats Chart */}
-            <Card className="border-white/20 bg-white/10 backdrop-blur-xl shadow-lg text-white">
-              <CardHeader>
-                <CardTitle>Overall Statistics</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={200}>
-                  <BarChart data={overallStatsData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                    <XAxis dataKey="name" stroke="rgba(255,255,255,0.7)" />
-                    <YAxis stroke="rgba(255,255,255,0.7)" />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: 'rgba(0,0,0,0.8)',
-                        border: '1px solid rgba(255,255,255,0.2)',
-                        borderRadius: '8px',
-                        color: 'white',
-                      }}
-                    />
-                    <Bar dataKey="value" fill="#60a5fa" radius={[8, 8, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-
-            {/* Grand Total Summary */}
-            {summaryData.tableSummary && (
-              <Card className="border-white/20 bg-white/10 backdrop-blur-xl shadow-lg text-white">
-                <CardHeader>
-                  <CardTitle>Grand Total Summary</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-white/60">Total Months:</span>
-                        <strong>{summaryData.tableSummary.totalMonths}</strong>
-                      </div>
-                      {summaryKeys.map(key => (
-                        <div key={key} className="flex justify-between">
-                          <span className="text-white/60">{key.replace(/([A-Z])/g, ' $1').trim()}:</span>
-                          <strong>{summaryData.tableSummary![key]}</strong>
-                        </div>
-                      ))}
+          <div className="space-y-6 py-2">
+            {/* Core Stats - 3 column grid on desktop, stack on mobile */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card className="border-white/20 bg-gradient-to-br from-blue-500/20 to-blue-600/10 backdrop-blur-xl shadow-lg text-white hover:shadow-blue-500/20 transition-all duration-300 hover:scale-[1.02]">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-white/60 text-sm mb-1">Total Records</p>
+                      <p className="text-3xl font-bold">{summaryData.overall.totalRecords ?? 'N/A'}</p>
                     </div>
-                    <ResponsiveContainer width="100%" height={200}>
-                      <RechartsPieChart>
-                        <Pie
-                          data={pieChartData}
-                          cx="50%"
-                          cy="50%"
-                          labelLine={false}
-                          label={(props: PieLabelRenderProps) => {
-                            const name = props.name as string;
-                            const percent = props.percent as number;
-                            return `${name}: ${(percent * 100).toFixed(0)}%`;
-                          }}
-                          outerRadius={80}
-                          fill="#8884d8"
-                          dataKey="value"
-                        >
-                          {pieChartData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                          ))}
-                        </Pie>
-                        <Tooltip
-                          contentStyle={{
-                            backgroundColor: 'rgba(0,0,0,0.8)',
-                            border: '1px solid rgba(255,255,255,0.2)',
-                            borderRadius: '8px',
-                            color: 'white',
-                          }}
-                        />
-                      </RechartsPieChart>
-                    </ResponsiveContainer>
+                    <div className="h-12 w-12 rounded-full bg-blue-500/30 flex items-center justify-center">
+                      <Calendar className="h-6 w-6 text-blue-300" />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
-            )}
+
+              <Card className="border-white/20 bg-gradient-to-br from-green-500/20 to-green-600/10 backdrop-blur-xl shadow-lg text-white hover:shadow-green-500/20 transition-all duration-300 hover:scale-[1.02]">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-white/60 text-sm mb-1">Last 24 Hours</p>
+                      <p className="text-3xl font-bold">{summaryData.overall.recordsLast24Hours ?? 'N/A'}</p>
+                    </div>
+                    <div className="h-12 w-12 rounded-full bg-green-500/30 flex items-center justify-center">
+                      <Activity className="h-6 w-6 text-green-300" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-white/20 bg-gradient-to-br from-purple-500/20 to-purple-600/10 backdrop-blur-xl shadow-lg text-white hover:shadow-purple-500/20 transition-all duration-300 hover:scale-[1.02]">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-white/60 text-sm mb-1">Last Month</p>
+                      <p className="text-3xl font-bold">{summaryData.overall.recordsLastMonth ?? 'N/A'}</p>
+                    </div>
+                    <div className="h-12 w-12 rounded-full bg-purple-500/30 flex items-center justify-center">
+                      <TrendingUp className="h-6 w-6 text-purple-300" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Overall Stats Chart and Grand Total - 2 columns on desktop, stack on mobile */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card className="border-white/20 bg-white/5 backdrop-blur-xl shadow-lg text-white">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5 text-blue-400" />
+                    Overall Statistics
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={250}>
+                    <BarChart data={overallStatsData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                      <XAxis dataKey="name" stroke="rgba(255,255,255,0.7)" tick={{ fontSize: 12 }} />
+                      <YAxis stroke="rgba(255,255,255,0.7)" tick={{ fontSize: 12 }} />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: 'rgba(0,0,0,0.9)',
+                          border: '1px solid rgba(255,255,255,0.2)',
+                          borderRadius: '12px',
+                          color: 'white',
+                        }}
+                      />
+                      <Bar dataKey="value" fill="url(#colorGradient)" radius={[8, 8, 0, 0]} />
+                      <defs>
+                        <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#60a5fa" stopOpacity={1} />
+                          <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.8} />
+                        </linearGradient>
+                      </defs>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              {summaryData.tableSummary && (
+                <Card className="border-white/20 bg-white/5 backdrop-blur-xl shadow-lg text-white">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <PieChart className="h-5 w-5 text-purple-400" />
+                      Grand Total Summary
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 gap-6">
+                      <div className="space-y-3">
+                        <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+                          <p className="text-white/60 text-xs mb-1">Total Months</p>
+                          <p className="text-2xl font-bold">{summaryData.tableSummary.totalMonths}</p>
+                        </div>
+                        {summaryKeys.map((key, index) => (
+                          <div key={key} className="p-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+                            <p className="text-white/60 text-xs mb-1">{key.replace(/([A-Z])/g, ' $1').trim()}</p>
+                            <p className="text-xl font-bold" style={{ color: COLORS[index % COLORS.length] }}>
+                              {summaryData.tableSummary![key].toLocaleString()}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                      <ResponsiveContainer width="100%" height={250}>
+                        <RechartsPieChart>
+                          <Pie
+                            data={pieChartData}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            label={(props: PieLabelRenderProps) => {
+                              const percent = props.percent as number;
+                              return `${(percent * 100).toFixed(0)}%`;
+                            }}
+                            outerRadius={85}
+                            fill="#8884d8"
+                            dataKey="value"
+                          >
+                            {pieChartData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            ))}
+                          </Pie>
+                          <Tooltip
+                            contentStyle={{
+                              backgroundColor: 'rgba(0,0,0,0.9)',
+                              border: '1px solid rgba(255,255,255,0.2)',
+                              borderRadius: '12px',
+                              color: 'white',
+                            }}
+                          />
+                        </RechartsPieChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
 
             {/* Monthly Data with View Toggle */}
             {summaryData.monthlyTable && (
-              <Card className="border-white/20 bg-white/10 backdrop-blur-xl shadow-lg text-white">
+              <Card className="border-white/20 bg-white/5 backdrop-blur-xl shadow-lg text-white">
                 <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle>Monthly Data</CardTitle>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <CardTitle className="text-xl">Monthly Data Breakdown</CardTitle>
                     <div className="flex gap-2">
-                      <Button size="sm" variant={viewMode === 'table' ? 'default' : 'ghost'} onClick={() => setViewMode('table')} className="h-8 text-white">
+                      <Button 
+                        size="sm" 
+                        variant={viewMode === 'table' ? 'default' : 'ghost'} 
+                        onClick={() => setViewMode('table')} 
+                        className={cn(
+                          "h-9 px-4 transition-all duration-200",
+                          viewMode === 'table' ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-white/70 hover:text-white hover:bg-white/10"
+                        )}
+                      >
                         Table
                       </Button>
-                      <Button size="sm" variant={viewMode === 'bar' ? 'default' : 'ghost'} onClick={() => setViewMode('bar')} className="h-8 text-white">
-                        <BarChart3 className="h-4 w-4" />
+                      <Button 
+                        size="sm" 
+                        variant={viewMode === 'bar' ? 'default' : 'ghost'} 
+                        onClick={() => setViewMode('bar')} 
+                        className={cn(
+                          "h-9 px-4 transition-all duration-200",
+                          viewMode === 'bar' ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-white/70 hover:text-white hover:bg-white/10"
+                        )}
+                      >
+                        <BarChart3 className="h-4 w-4 mr-1" />
+                        Bar
                       </Button>
-                      <Button size="sm" variant={viewMode === 'pie' ? 'default' : 'ghost'} onClick={() => setViewMode('pie')} className="h-8 text-white">
-                        <PieChart className="h-4 w-4" />
+                      <Button 
+                        size="sm" 
+                        variant={viewMode === 'pie' ? 'default' : 'ghost'} 
+                        onClick={() => setViewMode('pie')} 
+                        className={cn(
+                          "h-9 px-4 transition-all duration-200",
+                          viewMode === 'pie' ? "bg-blue-500 hover:bg-blue-600 text-white" : "text-white/70 hover:text-white hover:bg-white/10"
+                        )}
+                      >
+                        <PieChart className="h-4 w-4 mr-1" />
+                        Pie
                       </Button>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className={`relative ${isFetching ? 'opacity-50' : ''}`}>
+                  <div className={`relative transition-opacity duration-200 ${isFetching ? 'opacity-50' : ''}`}>
                     {isFetching && (
                       <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-lg backdrop-blur-sm z-10">
-                        <Loader2 className="h-6 w-6 animate-spin text-white" />
+                        <Loader2 className="h-8 w-8 animate-spin text-white" />
                       </div>
                     )}
 
                     {viewMode === 'table' && (
                       <div className="rounded-xl border border-white/20 bg-white/5 backdrop-blur-xl overflow-hidden">
                         <Table className="text-white">
-                          <TableHeader className="bg-white/10">
-                            <TableRow>
+                          <TableHeader className="bg-gradient-to-r from-blue-500/20 to-purple-500/20">
+                            <TableRow className="border-white/10 hover:bg-transparent">
                               {tableHeaders.map(header => (
-                                <TableHead key={header} className="text-white whitespace-nowrap">
+                                <TableHead key={header} className="text-white font-semibold whitespace-nowrap">
                                   {header.charAt(0).toUpperCase() +
                                     header
                                       .slice(1)
@@ -250,7 +328,7 @@ const PostsSummary = () => {
                           <TableBody>
                             {summaryData.monthlyTable.length > 0 ? (
                               summaryData.monthlyTable.map((row, index) => (
-                                <TableRow key={index} className="hover:bg-white/10 transition-colors">
+                                <TableRow key={index} className="hover:bg-white/10 transition-colors border-white/5">
                                   {tableHeaders.map(header => (
                                     <TableCell key={header} className="text-white/90">
                                       {row[header]}
@@ -260,7 +338,7 @@ const PostsSummary = () => {
                               ))
                             ) : (
                               <TableRow>
-                                <TableCell colSpan={tableHeaders.length} className="h-24 text-center text-white/70">
+                                <TableCell colSpan={tableHeaders.length} className="h-32 text-center text-white/70">
                                   No monthly data to display.
                                 </TableCell>
                               </TableRow>
@@ -271,30 +349,32 @@ const PostsSummary = () => {
                     )}
 
                     {viewMode === 'bar' && (
-                      <ResponsiveContainer width="100%" height={400}>
-                        <BarChart data={barChartData}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                          <XAxis dataKey={tableHeaders[0]} stroke="rgba(255,255,255,0.7)" angle={-45} textAnchor="end" height={80} />
-                          <YAxis stroke="rgba(255,255,255,0.7)" />
-                          <Tooltip
-                            contentStyle={{
-                              backgroundColor: 'rgba(0,0,0,0.8)',
-                              border: '1px solid rgba(255,255,255,0.2)',
-                              borderRadius: '8px',
-                              color: 'white',
-                            }}
-                          />
-                          <Legend />
-                          {tableHeaders.slice(1).map((header, index) => (
-                            <Bar key={header} dataKey={header} fill={COLORS[index % COLORS.length]} radius={[8, 8, 0, 0]} />
-                          ))}
-                        </BarChart>
-                      </ResponsiveContainer>
+                      <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                        <ResponsiveContainer width="100%" height={400}>
+                          <BarChart data={barChartData}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                            <XAxis dataKey={tableHeaders[0]} stroke="rgba(255,255,255,0.7)" angle={-45} textAnchor="end" height={80} />
+                            <YAxis stroke="rgba(255,255,255,0.7)" />
+                            <Tooltip
+                              contentStyle={{
+                                backgroundColor: 'rgba(0,0,0,0.9)',
+                                border: '1px solid rgba(255,255,255,0.2)',
+                                borderRadius: '12px',
+                                color: 'white',
+                              }}
+                            />
+                            <Legend />
+                            {tableHeaders.slice(1).map((header, index) => (
+                              <Bar key={header} dataKey={header} fill={COLORS[index % COLORS.length]} radius={[8, 8, 0, 0]} />
+                            ))}
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
                     )}
 
                     {viewMode === 'pie' && barChartData.length > 0 && (
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {tableHeaders.slice(1).map((header) => {
+                        {tableHeaders.slice(1).map((header, idx) => {
                           const chartData = barChartData
                             .map(row => ({
                               name: String(row[tableHeaders[0]]),
@@ -303,9 +383,11 @@ const PostsSummary = () => {
                             .filter(item => item.value > 0);
 
                           return (
-                            <div key={header} className="border border-white/10 rounded-lg p-4 bg-white/5">
-                              <h3 className="text-sm font-medium mb-2 text-center">{header.replace(/([A-Z])/g, ' $1').trim()}</h3>
-                              <ResponsiveContainer width="100%" height={200}>
+                            <div key={header} className="border border-white/20 rounded-xl p-5 bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-xl hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300 hover:scale-[1.02]">
+                              <h3 className="text-base font-semibold mb-4 text-center text-white/90 pb-2 border-b border-white/10">
+                                {header.replace(/([A-Z])/g, ' $1').trim()}
+                              </h3>
+                              <ResponsiveContainer width="100%" height={220}>
                                 <RechartsPieChart>
                                   <Pie
                                     data={chartData}
@@ -316,19 +398,19 @@ const PostsSummary = () => {
                                       const value = props.value as number;
                                       return value && value > 0 ? String(value) : '';
                                     }}
-                                    outerRadius={60}
+                                    outerRadius={70}
                                     fill="#8884d8"
                                     dataKey="value"
                                   >
                                     {chartData.map((entry, index) => (
-                                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                      <Cell key={`cell-${index}`} fill={COLORS[(index + idx) % COLORS.length]} />
                                     ))}
                                   </Pie>
                                   <Tooltip
                                     contentStyle={{
-                                      backgroundColor: 'rgba(0,0,0,0.8)',
+                                      backgroundColor: 'rgba(0,0,0,0.9)',
                                       border: '1px solid rgba(255,255,255,0.2)',
-                                      borderRadius: '8px',
+                                      borderRadius: '12px',
                                       color: 'white',
                                     }}
                                   />
@@ -347,9 +429,9 @@ const PostsSummary = () => {
         )}
 
         {/* Pagination */}
-        <DialogFooter>
+        <DialogFooter className="border-t border-white/10 pt-4 mt-2">
           {summaryData?.pagination && summaryData.pagination.totalPages > 1 && (
-            <Pagination className="text-white">
+            <Pagination className="text-white w-full justify-center">
               <PaginationContent>
                 <PaginationItem>
                   <PaginationPrevious
@@ -358,11 +440,14 @@ const PostsSummary = () => {
                       e.preventDefault();
                       handlePageChange(page - 1);
                     }}
-                    className={cn('border-white/20 bg-white/10 backdrop-blur-lg text-white hover:bg-white/20', page <= 1 && 'pointer-events-none opacity-50')}
+                    className={cn(
+                      'border-white/30 bg-white/10 backdrop-blur-lg text-white hover:bg-white/20 transition-all duration-200',
+                      page <= 1 && 'pointer-events-none opacity-40'
+                    )}
                   />
                 </PaginationItem>
                 <PaginationItem>
-                  <PaginationLink isActive className="border-white/20 bg-white/20 backdrop-blur-xl text-white">
+                  <PaginationLink isActive className="border-white/30 bg-blue-500/30 backdrop-blur-xl text-white hover:bg-blue-500/40 transition-all duration-200">
                     Page {page} of {summaryData.pagination.totalPages}
                   </PaginationLink>
                 </PaginationItem>
@@ -374,8 +459,8 @@ const PostsSummary = () => {
                       handlePageChange(page + 1);
                     }}
                     className={cn(
-                      'border-white/20 bg-white/10 backdrop-blur-lg text-white hover:bg-white/20',
-                      page >= summaryData.pagination.totalPages && 'pointer-events-none opacity-50',
+                      'border-white/30 bg-white/10 backdrop-blur-lg text-white hover:bg-white/20 transition-all duration-200',
+                      page >= summaryData.pagination.totalPages && 'pointer-events-none opacity-40'
                     )}
                   />
                 </PaginationItem>

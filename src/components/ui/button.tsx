@@ -27,6 +27,8 @@ const buttonVariants = cva(
           'border-1 border-blue-400 shadow-xl bg-blue-300/40 shadow-xs hover:bg-blue-400 transition-all duration-300 text-blue-50 hover:text-blue-50',
         outlineDefault:
           'border-1 border-gray-400 shadow-xl bg-gray-300/40 shadow-xs hover:bg-gray-400 transition-all duration-300 text-gray-50 hover:text-gray-50',
+        outlineGlassy:
+          'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border-white/30 text-white hover:from-blue-500/50 hover:to-purple-500/50 hover:border-white/50 transition-all duration-300',
       },
       size: {
         default: 'h-9 px-4 py-2 has-[>svg]:px-3',

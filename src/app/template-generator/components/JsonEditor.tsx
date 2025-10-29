@@ -350,15 +350,15 @@ const JsonEditor: React.FC = () => {
 
           {/* ✅ Buttons */}
           <div className="flex flex-wrap gap-3 mt-6">
-            <Button onClick={handleSave} disabled={isLoading} variant="outlineWater">
+            <Button onClick={handleSave} disabled={isLoading} variant="outlineGlassy" size="sm" className="border-1 border-slate-50/50 shadow-xl">
               {isLoading ? 'Saving...' : 'Save'}
             </Button>
 
-            <Button onClick={handleFormat} variant="outlineWater">
+            <Button onClick={handleFormat} variant="outlineGlassy" size="sm" className="border-1 border-slate-50/50 shadow-xl">
               Format
             </Button>
 
-            <Button onClick={handleGenerate} disabled={isGenerating} variant="outlineWater">
+            <Button onClick={handleGenerate} disabled={isGenerating} variant="outlineGlassy" size="sm" className="border-1 border-slate-50/50 shadow-xl">
               {isGenerating ? 'Generating...' : 'Generate'}
             </Button>
           </div>

@@ -429,7 +429,7 @@ const ViewDataType = () => {
   return (
     <div className="  bg-gradient-to-br from-slate-900 via-purple-900 to-slate-800 rounded-lg">
       {/* Trigger Button */}
-      <Button onClick={() => setIsDialogOpen(true)} variant="outlineGarden">
+      <Button onClick={() => setIsDialogOpen(true)} variant="outlineGlassy">
         {/* <div className="absolute inset-0 bg-gradient-to-r from-blue-600/30 to-purple-600/30 opacity-0 transition-opacity duration-300 group-hover:opacity-100" /> */}
         <span className="relative flex items-center gap-2">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
