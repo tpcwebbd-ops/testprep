@@ -17,8 +17,7 @@ const LoginPage = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!email || !password) return; // extra safety
+    if (!email || !password) return;
 
     setLoading(true);
     setError(null);
@@ -78,7 +77,6 @@ const LoginPage = () => {
         <div className="flex-1 bg-white/10 backdrop-blur-lg p-8 flex flex-col justify-center text-white">
           <h2 className="text-2xl md:text-3xl font-semibold text-center mb-6">Login to Your Account</h2>
 
-          {/* --- Login Form --- */}
           <form className="flex flex-col space-y-4">
             <div>
               <label htmlFor="email" className="block mb-1 text-sm">
@@ -119,6 +117,13 @@ const LoginPage = () => {
               </button>
             </div>
 
+            {/* === Forgot Password Link === */}
+            <div className="text-right mt-1">
+              <a href="/forgot-password" className="text-sm text-blue-300 hover:underline">
+                Forgot Password?
+              </a>
+            </div>
+
             {/* --- Error Message --- */}
             {error && (
               <div className="flex items-center text-red-600 bg-red-50 border border-red-400 rounded-lg p-2 mt-2 text-sm">
@@ -130,7 +135,7 @@ const LoginPage = () => {
             {/* --- Login Button --- */}
             <button
               type="submit"
-              disabled={loading || !email || !password} // ✅ disable condition
+              disabled={loading || !email || !password}
               onClick={handleLogin}
               className={`w-full py-2 mt-4 rounded-lg font-medium flex justify-center items-center gap-2 transition-all ${
                 loading || !email || !password ? 'bg-gray-400 cursor-not-allowed' : 'bg-gradient-to-r from-indigo-500 to-blue-500 hover:opacity-90'
