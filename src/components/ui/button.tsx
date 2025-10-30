@@ -16,26 +16,61 @@ const buttonVariants = cva(
         secondary: 'bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80',
         ghost: 'hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50',
         link: 'text-primary underline-offset-4 hover:underline',
-        garden: 'text-slate-700 hover:text-slate-800 bg-green-400 hover:bg-green-500 ',
-        fire: 'text-slate-700 hover:text-slate-800 bg-rose-400 hover:bg-rose-500',
-        water: 'text-slate-700 hover:text-slate-800 bg-blue-400 hover:bg-blue-500',
+
+        // Solid variants with improved shadows and transitions
+        garden:
+          'text-white bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600 shadow-lg shadow-green-500/30 hover:shadow-xl hover:shadow-green-500/40 hover:scale-[1.02]',
+        fire: 'text-white bg-gradient-to-r from-rose-400 to-rose-500 hover:from-rose-500 hover:to-rose-600 shadow-lg shadow-rose-500/30 hover:shadow-xl hover:shadow-rose-500/40 hover:scale-[1.02]',
+        water:
+          'text-white bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-[1.02]',
+
+        // Enhanced glassmorphism outline variants
         outlineGarden:
-          'border-1 border-green-400 text-green-50 hover:text-green-50 shadow-xl bg-green-300/40 shadow-xs hover:bg-green-400 transition-all duration-300',
+          'border border-green-400/50 text-green-100 bg-green-400/20 backdrop-blur-md shadow-lg shadow-green-500/20 hover:bg-green-400/30 hover:border-green-400/70 hover:shadow-xl hover:shadow-green-500/30 hover:scale-[1.02] transition-all duration-300',
         outlineFire:
-          'border-1 border-rose-400 shadow-xl bg-rose-300/40 shadow-xs hover:bg-rose-400 transition-all duration-300 text-rose-50 hover:text-rose-50',
+          'border border-rose-400/50 text-rose-100 bg-rose-400/20 backdrop-blur-md shadow-lg shadow-rose-500/20 hover:bg-rose-400/30 hover:border-rose-400/70 hover:shadow-xl hover:shadow-rose-500/30 hover:scale-[1.02] transition-all duration-300',
         outlineWater:
-          'border-1 border-blue-400 shadow-xl bg-blue-300/40 shadow-xs hover:bg-blue-400 transition-all duration-300 text-blue-50 hover:text-blue-50',
+          'border border-blue-400/50 text-blue-100 bg-blue-400/20 backdrop-blur-md shadow-lg shadow-blue-500/20 hover:bg-blue-400/30 hover:border-blue-400/70 hover:shadow-xl hover:shadow-blue-500/30 hover:scale-[1.02] transition-all duration-300',
         outlineDefault:
-          'border-1 border-gray-400 shadow-xl bg-gray-300/40 shadow-xs hover:bg-gray-400 transition-all duration-300 text-gray-50 hover:text-gray-50',
+          'border border-gray-400/50 text-gray-100 bg-gray-400/20 backdrop-blur-md shadow-lg shadow-gray-500/20 hover:bg-gray-400/30 hover:border-gray-400/70 hover:shadow-xl hover:shadow-gray-500/30 hover:scale-[1.02] transition-all duration-300',
+
+        // Premium glassmorphism variants
         outlineGlassy:
-          'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border-white/30 text-white hover:from-blue-500/50 hover:to-purple-500/50 hover:border-white/50 transition-all duration-300',
+          'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-white/30 text-white backdrop-blur-xl shadow-lg shadow-blue-500/20 hover:from-blue-500/30 hover:to-purple-500/30 hover:border-white/50 hover:shadow-xl hover:shadow-purple-500/30 hover:scale-[1.02] transition-all duration-300',
+        glassyPrimary:
+          'bg-white/10 border border-white/20 text-white backdrop-blur-2xl shadow-lg hover:bg-white/20 hover:border-white/30 hover:shadow-xl hover:scale-[1.02] transition-all duration-300',
+        glassySuccess:
+          'bg-gradient-to-r from-emerald-500/20 to-green-500/20 border border-emerald-400/30 text-emerald-100 backdrop-blur-xl shadow-lg shadow-emerald-500/20 hover:from-emerald-500/30 hover:to-green-500/30 hover:border-emerald-400/50 hover:shadow-xl hover:shadow-emerald-500/30 hover:scale-[1.02] transition-all duration-300',
+        glassyDanger:
+          'bg-gradient-to-r from-red-500/20 to-pink-500/20 border border-red-400/30 text-red-100 backdrop-blur-xl shadow-lg shadow-red-500/20 hover:from-red-500/30 hover:to-pink-500/30 hover:border-red-400/50 hover:shadow-xl hover:shadow-red-500/30 hover:scale-[1.02] transition-all duration-300',
+        glassyWarning:
+          'bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-400/30 text-amber-100 backdrop-blur-xl shadow-lg shadow-amber-500/20 hover:from-amber-500/30 hover:to-orange-500/30 hover:border-amber-400/50 hover:shadow-xl hover:shadow-amber-500/30 hover:scale-[1.02] transition-all duration-300',
+        glassyInfo:
+          'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-400/30 text-cyan-100 backdrop-blur-xl shadow-lg shadow-cyan-500/20 hover:from-cyan-500/30 hover:to-blue-500/30 hover:border-cyan-400/50 hover:shadow-xl hover:shadow-cyan-500/30 hover:scale-[1.02] transition-all duration-300',
+        glassyDark:
+          'bg-gradient-to-r from-slate-800/40 to-slate-900/40 border border-slate-600/30 text-slate-100 backdrop-blur-xl shadow-lg shadow-slate-900/30 hover:from-slate-800/50 hover:to-slate-900/50 hover:border-slate-600/50 hover:shadow-xl hover:shadow-slate-900/40 hover:scale-[1.02] transition-all duration-300',
+        glassyLight:
+          'bg-gradient-to-r from-white/30 to-gray-100/30 border border-white/40 text-gray-800 backdrop-blur-xl shadow-lg hover:from-white/40 hover:to-gray-100/40 hover:border-white/60 hover:shadow-xl hover:scale-[1.02] transition-all duration-300',
+
+        // Neon glow variants
+        neonBlue:
+          'bg-blue-500/20 border border-blue-400/50 text-blue-100 backdrop-blur-xl shadow-[0_0_15px_rgba(59,130,246,0.5)] hover:shadow-[0_0_25px_rgba(59,130,246,0.7)] hover:bg-blue-500/30 hover:border-blue-400/70 hover:scale-[1.02] transition-all duration-300',
+        neonPink:
+          'bg-pink-500/20 border border-pink-400/50 text-pink-100 backdrop-blur-xl shadow-[0_0_15px_rgba(236,72,153,0.5)] hover:shadow-[0_0_25px_rgba(236,72,153,0.7)] hover:bg-pink-500/30 hover:border-pink-400/70 hover:scale-[1.02] transition-all duration-300',
+        neonGreen:
+          'bg-green-500/20 border border-green-400/50 text-green-100 backdrop-blur-xl shadow-[0_0_15px_rgba(34,197,94,0.5)] hover:shadow-[0_0_25px_rgba(34,197,94,0.7)] hover:bg-green-500/30 hover:border-green-400/70 hover:scale-[1.02] transition-all duration-300',
+        neonPurple:
+          'bg-purple-500/20 border border-purple-400/50 text-purple-100 backdrop-blur-xl shadow-[0_0_15px_rgba(168,85,247,0.5)] hover:shadow-[0_0_25px_rgba(168,85,247,0.7)] hover:bg-purple-500/30 hover:border-purple-400/70 hover:scale-[1.02] transition-all duration-300',
       },
       size: {
         default: 'h-9 px-4 py-2 has-[>svg]:px-3',
         sm: 'h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5',
-        xs: 'h-6 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5',
+        xs: 'h-6 rounded-md gap-1.5 px-3 text-xs has-[>svg]:px-2.5',
         lg: 'h-10 rounded-md px-6 has-[>svg]:px-4',
+        xl: 'h-12 rounded-lg px-8 text-base has-[>svg]:px-5',
         icon: 'size-9',
+        iconSm: 'size-8',
+        iconLg: 'size-10',
       },
     },
     defaultVariants: {
