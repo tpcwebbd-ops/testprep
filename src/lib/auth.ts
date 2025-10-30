@@ -1,21 +1,36 @@
 import { betterAuth } from 'better-auth';
 import { mongodbAdapter } from 'better-auth/adapters/mongodb';
 import { MongoClient } from 'mongodb';
+
 const client = new MongoClient(process.env.mongooseURI!);
 const db = client.db();
 
 export const auth = betterAuth({
   database: mongodbAdapter(db, {
-    // Optional: if you don't provide a client, database transactions won't be enabled.
     client,
   }),
   emailAndPassword: {
     enabled: true,
+    requireEmailVerification: true,
     async sendResetPassword(data, request) {
-      console.log(' email and Pass ', data, request);
-      // Send an email to the user with a link to reset their password
+      console.log('email and Pass', data, request);
     },
     allowLinking: true,
+  },
+  emailVerification: {
+    sendVerificationEmail: async ({ user, url, token }, request) => {
+      console.log('emailVerification', user, url, token, request);
+      await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/send-verification`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: user.email,
+          verificationUrl: url,
+          token,
+        }),
+      });
+    },
+    sendOnSignUp: true,
   },
   socialProviders: {
     google: {
@@ -24,7 +39,4 @@ export const auth = betterAuth({
       allowLinking: true,
     },
   },
-
-  /** if no database is provided, the user data will be stored in memory.
-   * Make sure to provide a database to persist user data **/
 });
