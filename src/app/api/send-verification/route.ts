@@ -30,7 +30,6 @@ export async function POST(req: Request): Promise<NextResponse<IResponse>> {
       const response = formatResponse(null, 'Invalid email provided.', 400);
       return NextResponse.json(response, { status: response.status });
     }
-    console.log('\nSending verification email to:', email, '\n');
 
     const token = jwt.sign({ email }, EMAIL_TOKEN_SECRET, { expiresIn: '1h' });
     const verificationUrl = `${BASE_URL}/verify?token=${encodeURIComponent(token)}`;
