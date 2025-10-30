@@ -19,7 +19,6 @@ export const auth = betterAuth({
   },
   emailVerification: {
     sendVerificationEmail: async ({ user, url, token }, request) => {
-      console.log('emailVerification', user, url, token, request);
       await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/send-verification`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
