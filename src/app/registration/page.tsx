@@ -53,7 +53,7 @@ const RegistrationPage = () => {
           email,
           password,
           name,
-          callbackURL: '/verify',
+          callbackURL: '/email-send',
         },
         {
           onRequest: () => setLoading(true),
@@ -64,7 +64,7 @@ const RegistrationPage = () => {
       if (res?.error) {
         setError(res.error.message || 'Registration failed. Please try again.');
       } else {
-        router.push('/verify');
+        router.push('/email-send');
       }
     } catch (err: unknown) {
       console.error(err);

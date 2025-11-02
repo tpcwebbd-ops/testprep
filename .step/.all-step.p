@@ -6,7 +6,7 @@
 [done]  Step -> 6. backend
 [done]  Step -> 7. UI
 
-[on-going] Step -> 8. UI (requirement, login, signup, reset password, verify account, so on)
+[on-going] Step -> 8. UI (requirement:site-setting, login, signup, reset password, verify account, so on)
 
 Step -> 9. UI - (Users work flow -> Mentor, Students, Users)
 Step -> 10. UI - (Users work flow -> MD, CTO, COO, CFO, Admin,)

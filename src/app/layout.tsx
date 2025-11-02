@@ -34,7 +34,7 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ReduxProvider>
           <MenuComponentWithSession />
-          <div className="pt-[65px]">{children}</div>
+          <div>{children}</div>
         </ReduxProvider>
         <ToastContainer style={{ top: '65px' }} />
       </body>
