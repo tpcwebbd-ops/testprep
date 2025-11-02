@@ -77,7 +77,11 @@ export default function ForgotPasswordForm() {
         body: JSON.stringify({ email, code }),
       });
 
+      console.log('verify/code:response : ', response);
       if (response.ok) {
+        const res = await response.json();
+        const resPonseToken = res?.data?.token;
+        console.log('res : ', res?.data?.token);
         setSuccess('Code verified successfully!');
         setStep('password');
       } else {

@@ -3,6 +3,8 @@ import mongoose from 'mongoose';
 import Verification from '../verification/v1/model';
 import { formatResponse, IResponse } from '../utils/utils';
 
+import jwt from 'jsonwebtoken';
+const EMAIL_TOKEN_SECRET = process.env.EMAIL_TOKEN_SECRET!;
 const MONGOOSE_URI = process.env.mongooseURI!;
 
 async function connectDB() {
@@ -14,7 +16,7 @@ async function connectDB() {
 export async function POST(req: Request): Promise<NextResponse<IResponse>> {
   try {
     const { email, code } = await req.json();
-
+    console.log('email:code :: ', email, ' : ', code);
     if (!email || !code) {
       const response = formatResponse(null, 'Email and code are required.', 400);
       return NextResponse.json(response, { status: response.status });
@@ -23,7 +25,7 @@ export async function POST(req: Request): Promise<NextResponse<IResponse>> {
     await connectDB();
 
     const record = await Verification.findOne({ email }).sort({ createdAt: -1 });
-
+    console.log('record', record);
     if (!record) {
       const response = formatResponse(null, 'No verification record found for this email.', 404);
       return NextResponse.json(response, { status: response.status });
@@ -48,7 +50,9 @@ export async function POST(req: Request): Promise<NextResponse<IResponse>> {
     record.verified = true;
     await record.save();
 
-    const response = formatResponse({ email: record.email }, 'Verification successful.', 200);
+    const token = jwt.sign({ email }, EMAIL_TOKEN_SECRET, { expiresIn: '1h' });
+    const response = formatResponse({ email: record.email, token }, 'Verification successful.', 200);
+    console.log('response', response);
     return NextResponse.json(response, { status: response.status });
   } catch (error: unknown) {
     let response;
