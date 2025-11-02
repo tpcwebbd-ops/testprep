@@ -101,7 +101,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const user = session?.data?.user;
 
   return (
-    <div className="fixed flex max-h-[calc(100vh-65px)] w-full">
+    <div className="fixed flex max-h-[calc(100vh-65px)] w-full pt-[65px]">
       <div className="fixed inset-0 bg-gradient-to-br from-indigo-500 via-purple-500 to-blue-500 -z-10" />
 
       {/* ===== Desktop Sidebar ===== */}

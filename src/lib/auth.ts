@@ -12,10 +12,23 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
-    async sendResetPassword(data, request) {
-      console.log('email and Pass', data, request);
-    },
+
     allowLinking: true,
+    sendResetPassword: async ({ user, url, token }, request) => {
+      await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/send-verification`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: user.email,
+          verificationUrl: url,
+          token,
+        }),
+      });
+    },
+    onPasswordReset: async ({ user }, request) => {
+      // your logic here
+      console.log(`Password for user ${user.email} has been reset.`);
+    },
   },
   emailVerification: {
     sendVerificationEmail: async ({ user, url, token }, request) => {
