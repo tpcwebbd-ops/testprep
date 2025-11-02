@@ -25,13 +25,12 @@ const transporter = nodemailer.createTransport({
 
 export async function POST(req: Request): Promise<NextResponse<IResponse>> {
   try {
-    const { email } = await req.json();
+    const { email, token } = await req.json();
     if (!email || typeof email !== 'string') {
       const response = formatResponse(null, 'Invalid email provided.', 400);
       return NextResponse.json(response, { status: response.status });
     }
 
-    const token = jwt.sign({ email }, EMAIL_TOKEN_SECRET, { expiresIn: '1h' });
     const verificationUrl = `${BASE_URL}/reset-password?token=${encodeURIComponent(token)}`;
 
     const mailOptions = {
