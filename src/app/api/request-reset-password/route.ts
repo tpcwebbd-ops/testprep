@@ -31,86 +31,120 @@ export async function POST(req: Request): Promise<NextResponse<IResponse>> {
       return NextResponse.json(response, { status: response.status });
     }
 
-    const verificationUrl = `${BASE_URL}/reset-password?token=${encodeURIComponent(token)}`;
+    const resetUrl = `${BASE_URL}/reset-password?token=${encodeURIComponent(token)}`;
 
     const mailOptions = {
       from: GMAIL_USER,
       to: email,
-      subject: 'Verify your email address',
+      subject: 'Reset Your Password',
       html: `
     <!DOCTYPE html>
     <html lang="en">
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Email Verification</title>
+      <title>Password Reset Request</title>
     </head>
-    <body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;">
+    <body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background:linear-gradient(135deg,#8b5cf6 0%,#ec4899 50%,#d946ef 100%);min-height:100vh;">
       <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
         <tr>
           <td align="center" style="padding:40px 20px;">
-            <table role="presentation" style="width:100%;max-width:600px;border-collapse:collapse;border:0;border-spacing:0;background:#ffffff;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,0.15);overflow:hidden;">
+            <table role="presentation" style="width:100%;max-width:600px;border-collapse:collapse;border:0;border-spacing:0;background:#ffffff;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,0.3);overflow:hidden;">
               
-              <!-- Header with gradient -->
+              <!-- Header with animated gradient -->
               <tr>
                 <td style="padding:0;">
-                  <div style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:40px 30px;text-align:center;">
-                    <div style="background:rgba(255,255,255,0.2);width:80px;height:80px;margin:0 auto 20px;border-radius:50%;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px);">
-                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="white"/>
+                  <div style="background:linear-gradient(135deg,#8b5cf6 0%,#ec4899 50%,#d946ef 100%);padding:50px 30px;text-align:center;position:relative;">
+                    <!-- Glassmorphic icon container -->
+                    <div style="background:rgba(255,255,255,0.25);width:100px;height:100px;margin:0 auto 24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;backdrop-filter:blur(10px);border:2px solid rgba(255,255,255,0.3);box-shadow:0 8px 32px rgba(0,0,0,0.1);">
+                      <svg width="50" height="50" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zM9 7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9V7zm9 13H6v-8h12v8z" fill="white"/>
+                        <circle cx="12" cy="16" r="1.5" fill="white"/>
+                        <path d="M12 17.5v2" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
                       </svg>
                     </div>
-                    <h1 style="margin:0;color:#ffffff;font-size:28px;font-weight:600;letter-spacing:-0.5px;">Verify Your Email</h1>
+                    <h1 style="margin:0;color:#ffffff;font-size:32px;font-weight:700;letter-spacing:-0.5px;text-shadow:0 2px 10px rgba(0,0,0,0.2);">Password Reset</h1>
+                    <p style="margin:12px 0 0;color:rgba(255,255,255,0.95);font-size:16px;font-weight:500;">Secure your account in just one click</p>
                   </div>
                 </td>
               </tr>
               
               <!-- Content -->
               <tr>
-                <td style="padding:40px 30px;">
-                  <p style="margin:0 0 20px;color:#374151;font-size:16px;line-height:1.6;">
-                    Hey there! 👋
+                <td style="padding:45px 35px;">
+                  <p style="margin:0 0 16px;color:#1f2937;font-size:18px;line-height:1.6;font-weight:600;">
+                    Hello there! 👋
                   </p>
-                  <p style="margin:0 0 30px;color:#6b7280;font-size:15px;line-height:1.6;">
-                    We're excited to have you on board! Just one more step to get started. Click the button below to verify your email address and activate your account.
+                  <p style="margin:0 0 24px;color:#4b5563;font-size:15px;line-height:1.7;">
+                    We received a request to reset your password. Don't worry, we've got you covered! Click the button below to create a new password and regain access to your account.
                   </p>
                   
-                  <!-- Button -->
+                  <!-- Stylish Button with hover effect -->
                   <div style="text-align:center;margin:40px 0;">
-                    <a href="${verificationUrl}" style="display:inline-block;padding:16px 40px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#ffffff;text-decoration:none;border-radius:50px;font-weight:600;font-size:16px;box-shadow:0 4px 15px rgba(102,126,234,0.4);transition:all 0.3s ease;">
-                      ✨ Verify Email Address
+                    <a href="${resetUrl}" style="display:inline-block;padding:18px 50px;background:linear-gradient(135deg,#8b5cf6 0%,#ec4899 50%,#d946ef 100%);color:#ffffff;text-decoration:none;border-radius:50px;font-weight:700;font-size:17px;box-shadow:0 10px 30px rgba(139,92,246,0.4);letter-spacing:0.5px;text-transform:uppercase;transition:all 0.3s ease;">
+                      🔐 Reset Password Now
                     </a>
                   </div>
                   
-                  <p style="margin:30px 0 0;color:#9ca3af;font-size:13px;line-height:1.6;text-align:center;">
+                  <p style="margin:35px 0 0;color:#9ca3af;font-size:14px;line-height:1.6;text-align:center;font-weight:500;">
                     Or copy and paste this link in your browser:
                   </p>
-                  <p style="margin:8px 0 0;color:#667eea;font-size:13px;line-height:1.6;text-align:center;word-break:break-all;">
-                    ${verificationUrl}
-                  </p>
+                  <div style="margin:12px 0;padding:16px;background:linear-gradient(135deg,#f3f4f6 0%,#e5e7eb 100%);border-radius:12px;border:1px solid #d1d5db;">
+                    <p style="margin:0;color:#8b5cf6;font-size:13px;line-height:1.6;text-align:center;word-break:break-all;font-family:monospace;">
+                      ${resetUrl}
+                    </p>
+                  </div>
                 </td>
               </tr>
               
-              <!-- Info Box -->
+              <!-- Security Warning Box -->
               <tr>
-                <td style="padding:0 30px 40px;">
-                  <div style="background:linear-gradient(135deg,#fef3c7 0%,#fde68a 100%);border-left:4px solid #f59e0b;padding:16px 20px;border-radius:8px;">
-                    <p style="margin:0;color:#92400e;font-size:14px;line-height:1.5;">
-                      ⏰ <strong>Quick heads up:</strong> This verification link will expire in 1 hour for security reasons.
+                <td style="padding:0 35px 40px;">
+                  <div style="background:linear-gradient(135deg,#fef3c7 0%,#fde68a 100%);border-left:5px solid #f59e0b;padding:20px 24px;border-radius:12px;box-shadow:0 4px 15px rgba(245,158,11,0.2);">
+                    <p style="margin:0 0 8px;color:#92400e;font-size:15px;line-height:1.6;font-weight:700;">
+                      ⚡ Important Security Notice
                     </p>
+                    <p style="margin:0;color:#78350f;font-size:14px;line-height:1.6;">
+                      This password reset link will expire in <strong>1 hour</strong> for your security. If you didn't request this reset, please ignore this email or contact support immediately.
+                    </p>
+                  </div>
+                </td>
+              </tr>
+              
+              <!-- Additional Info -->
+              <tr>
+                <td style="padding:0 35px 40px;">
+                  <div style="background:linear-gradient(135deg,#e0e7ff 0%,#ddd6fe 100%);padding:20px 24px;border-radius:12px;border:1px solid #c7d2fe;">
+                    <p style="margin:0 0 12px;color:#4c1d95;font-size:14px;line-height:1.6;font-weight:600;">
+                      💡 Password Tips:
+                    </p>
+                    <ul style="margin:0;padding-left:20px;color:#5b21b6;font-size:13px;line-height:1.8;">
+                      <li>Use at least 8 characters</li>
+                      <li>Include uppercase and lowercase letters</li>
+                      <li>Add numbers and special characters</li>
+                      <li>Avoid common words or personal information</li>
+                    </ul>
                   </div>
                 </td>
               </tr>
               
               <!-- Footer -->
               <tr>
-                <td style="padding:30px;background:#f9fafb;border-top:1px solid #e5e7eb;">
-                  <p style="margin:0 0 10px;color:#9ca3af;font-size:13px;line-height:1.6;text-align:center;">
-                    If you didn't create an account, you can safely ignore this email.
+                <td style="padding:35px 35px;background:linear-gradient(135deg,#f9fafb 0%,#f3f4f6 100%);border-top:2px solid #e5e7eb;">
+                  <p style="margin:0 0 12px;color:#6b7280;font-size:14px;line-height:1.6;text-align:center;font-weight:500;">
+                    Need help? We're here for you!
                   </p>
-                  <p style="margin:0;color:#d1d5db;font-size:12px;line-height:1.6;text-align:center;">
-                    © ${new Date().getFullYear()} Your Company. All rights reserved.
+                  <p style="margin:0 0 20px;color:#9ca3af;font-size:13px;line-height:1.6;text-align:center;">
+                    If you didn't request a password reset, please ignore this email. Your password will remain unchanged.
                   </p>
+                  <div style="text-align:center;margin:20px 0 0;">
+                    <p style="margin:0 0 8px;color:#8b5cf6;font-size:20px;font-weight:700;">
+                      Your Company
+                    </p>
+                    <p style="margin:0;color:#d1d5db;font-size:12px;line-height:1.6;">
+                      © ${new Date().getFullYear()} Your Company. All rights reserved.
+                    </p>
+                  </div>
                 </td>
               </tr>
               
@@ -125,10 +159,10 @@ export async function POST(req: Request): Promise<NextResponse<IResponse>> {
 
     await transporter.sendMail(mailOptions);
 
-    const response = formatResponse(null, 'Verification email sent successfully.', 200);
+    const response = formatResponse(null, 'Password reset email sent successfully.', 200);
     return NextResponse.json(response, { status: response.status });
   } catch (error: unknown) {
-    console.error('Error sending verification email:', error);
+    console.error('Error sending password reset email:', error);
 
     const err = error as { code?: string; message?: string; keyValue?: Record<string, unknown> };
 

@@ -33,7 +33,8 @@ import { signOut, useSession } from '@/lib/auth-client';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 const dashboardSidebarData = [
-  { id: 1, name: 'Account', path: '/dashboard/account', icon: <User size={18} /> },
+  { id: 11, name: 'Profile', path: '/dashboard/profile', icon: <User size={18} /> },
+  { id: 12, name: 'Account', path: '/dashboard/account', icon: <User size={18} /> },
   { id: 21, name: 'User', path: '/dashboard/user', icon: <Users size={18} /> },
   { id: 22, name: 'My-class', path: '/dashboard/my-class', icon: <GraduationCap size={18} /> },
   { id: 3, name: 'Session', path: '/dashboard/session', icon: <FileText size={18} /> },
