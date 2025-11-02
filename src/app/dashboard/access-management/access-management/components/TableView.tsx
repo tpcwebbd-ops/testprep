@@ -25,7 +25,7 @@ import { cn } from '@/lib/utils';
 import { IAccessManagements } from '../store/data/data';
 import { pageLimitArr } from '../store/store-constant';
 import { useAccessManagementsStore } from '../store/store';
-import { useGetAccessManagementsQuery } from '@/redux/features/accessManagements/accessManagementsSlice';
+import { useGetAccessManagementsQuery } from '@/redux/features/accessManagements/accessmaMagementsSlice';
 import Pagination from './Pagination';
 import ExportDialog from './ExportDialog';
 

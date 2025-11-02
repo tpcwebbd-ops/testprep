@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { IAccessManagements } from '../store/data/data';
 import { useAccessManagementsStore } from '../store/store';
 import { accessManagementsSelectorArr } from '../store/store-constant';
-import { useBulkUpdateAccessManagementsMutation } from '@/redux/features/accessManagements/accessManagementsSlice';
+import { useBulkUpdateAccessManagementsMutation } from '@/redux/features/accessManagements/accessmaMagementsSlice';
 import { handleSuccess, handleError } from './utils';
 
 const BulkUpdateNextComponents: React.FC = () => {

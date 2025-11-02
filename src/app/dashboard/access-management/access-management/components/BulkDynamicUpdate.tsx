@@ -4,7 +4,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 import { useAccessManagementsStore } from '../store/store';
-import { useBulkUpdateAccessManagementsMutation } from '@/redux/features/accessManagements/accessManagementsSlice';
+import { useBulkUpdateAccessManagementsMutation } from '@/redux/features/accessManagements/accessmaMagementsSlice';
 import { handleSuccess, handleError } from './utils';
 import DynamicDataSelect from './DynamicDataSelect';
 

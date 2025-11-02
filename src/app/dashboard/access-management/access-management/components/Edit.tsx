@@ -13,7 +13,7 @@ import InputFieldForString from '@/components/dashboard-ui/InputFieldForString';
 
 import { IAccessManagements, defaultAccessManagements } from '../store/data/data';
 import { useAccessManagementsStore } from '../store/store';
-import { useUpdateAccessManagementsMutation } from '@/redux/features/accessManagements/accessManagementsSlice';
+import { useUpdateAccessManagementsMutation } from '@/redux/features/accessManagements/accessmaMagementsSlice';
 import { formatDuplicateKeyError, handleError, handleSuccess, isApiErrorResponse } from './utils';
 import { logger } from 'better-auth';
 

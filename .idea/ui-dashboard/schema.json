@@ -12,200 +12,200 @@
         "read": true,
         "update": false,
         "delete": false,
-        "dashboard-parsonal": true,
-        "dashboard-admin": true
+        "dashboard_parsonal": true,
+        "dashboard_admin": true
       },
       "website_setting": {
         "create": true,
         "read": true,
         "update": false,
         "delete": false,
-        "dashboard-parsonal": true,
-        "dashboard-admin": true
+        "dashboard_parsonal": true,
+        "dashboard_admin": true
       },
       "role_permission": {
         "create": true,
         "read": true,
         "update": false,
         "delete": false,
-        "dashboard-parsonal": true,
-        "dashboard-admin": true
+        "dashboard_parsonal": true,
+        "dashboard_admin": true
       },
       "access_management": {
         "create": true,
         "read": true,
         "update": false,
         "delete": false,
-        "dashboard-parsonal": true,
-        "dashboard-admin": true
+        "dashboard_parsonal": true,
+        "dashboard_admin": true
       },
       "course": {
         "create": true,
         "read": true,
         "update": false,
         "delete": false,
-        "dashboard-parsonal": true,
-        "dashboard-admin": true
+        "dashboard_parsonal": true,
+        "dashboard_admin": true
       },
       "review": {
         "create": true,
         "read": true,
         "update": false,
         "delete": false,
-        "dashboard-parsonal": true,
-        "dashboard-admin": true
+        "dashboard_parsonal": true,
+        "dashboard_admin": true
       },
       "lecture": {
         "create": true,
         "read": true,
         "update": false,
         "delete": false,
-        "dashboard-parsonal": true,
-        "dashboard-admin": true
+        "dashboard_parsonal": true,
+        "dashboard_admin": true
       },
       "batch": {
         "create": true,
         "read": true,
         "update": false,
         "delete": false,
-        "dashboard-parsonal": true,
-        "dashboard-admin": true
+        "dashboard_parsonal": true,
+        "dashboard_admin": true
       },
       "q_and_a": {
         "create": true,
         "read": true,
         "update": false,
         "delete": false,
-        "dashboard-parsonal": true,
-        "dashboard-admin": true
+        "dashboard_parsonal": true,
+        "dashboard_admin": true
       },
       "content_resource": {
         "create": true,
         "read": true,
         "update": false,
         "delete": false,
-        "dashboard-parsonal": true,
-        "dashboard-admin": true
+        "dashboard_parsonal": true,
+        "dashboard_admin": true
       },
       "assessment": {
         "create": true,
         "read": true,
         "update": false,
         "delete": false,
-        "dashboard-parsonal": true,
-        "dashboard-admin": true
+        "dashboard_parsonal": true,
+        "dashboard_admin": true
       },
       "payment": {
         "create": true,
         "read": true,
         "update": false,
         "delete": false,
-        "dashboard-parsonal": true,
-        "dashboard-admin": true
+        "dashboard_parsonal": true,
+        "dashboard_admin": true
       },
       "submissions": {
         "create": true,
         "read": true,
         "update": false,
         "delete": false,
-        "dashboard-parsonal": true,
-        "dashboard-admin": true
+        "dashboard_parsonal": true,
+        "dashboard_admin": true
       },
       "enrollment": {
         "create": true,
         "read": true,
         "update": false,
         "delete": false,
-        "dashboard-parsonal": true,
-        "dashboard-admin": true
+        "dashboard_parsonal": true,
+        "dashboard_admin": true
       },
       "marketing_lead": {
         "create": true,
         "read": true,
         "update": false,
         "delete": false,
-        "dashboard-parsonal": true,
-        "dashboard-admin": true
+        "dashboard_parsonal": true,
+        "dashboard_admin": true
       },
       "profile": {
         "create": true,
         "read": true,
         "update": false,
         "delete": false,
-        "dashboard-parsonal": true,
-        "dashboard-admin": true
+        "dashboard_parsonal": true,
+        "dashboard_admin": true
       },
       "message": {
         "create": true,
         "read": true,
         "update": false,
         "delete": false,
-        "dashboard-parsonal": true,
-        "dashboard-admin": true
+        "dashboard_parsonal": true,
+        "dashboard_admin": true
       },
       "media": {
         "create": true,
         "read": true,
         "update": false,
         "delete": false,
-        "dashboard-parsonal": true,
-        "dashboard-admin": true
+        "dashboard_parsonal": true,
+        "dashboard_admin": true
       },
       "follow_up": {
         "create": true,
         "read": true,
         "update": false,
         "delete": false,
-        "dashboard-parsonal": true,
-        "dashboard-admin": true
+        "dashboard_parsonal": true,
+        "dashboard_admin": true
       },
       "attendance": {
         "create": true,
         "read": true,
         "update": false,
         "delete": false,
-        "dashboard-parsonal": true,
-        "dashboard-admin": true
+        "dashboard_parsonal": true,
+        "dashboard_admin": true
       },
       "company_goal": {
         "create": true,
         "read": true,
         "update": false,
         "delete": false,
-        "dashboard-parsonal": true,
-        "dashboard-admin": true
+        "dashboard_parsonal": true,
+        "dashboard_admin": true
       },
       "support_ticket": {
         "create": true,
         "read": true,
         "update": false,
         "delete": false,
-        "dashboard-parsonal": true,
-        "dashboard-admin": true
+        "dashboard_parsonal": true,
+        "dashboard_admin": true
       },
       "post": {
         "create": true,
         "read": true,
         "update": false,
         "delete": false,
-        "dashboard-parsonal": true,
-        "dashboard-admin": true
+        "dashboard_parsonal": true,
+        "dashboard_admin": true
       },
       "reward": {
         "create": true,
         "read": true,
         "update": false,
         "delete": false,
-        "dashboard-parsonal": true,
-        "dashboard-admin": true
+        "dashboard_parsonal": true,
+        "dashboard_admin": true
       },
       "employee_task ": {
         "create": true,
         "read": true,
         "update": false,
         "delete": false,
-        "dashboard-parsonal": true,
-        "dashboard-admin": true
+        "dashboard_parsonal": true,
+        "dashboard_admin": true
       }
     }
   },

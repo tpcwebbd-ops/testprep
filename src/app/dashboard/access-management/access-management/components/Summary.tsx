@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Loader2, TrendingUp } from 'lucide-react';
 
 // Assuming your RTK API file is correctly set up
-import { useGetAccessManagementsSummaryQuery } from '@/redux/features/accessManagements/accessManagementsSlice';
+import { useGetAccessManagementsSummaryQuery } from '@/redux/features/accessManagements/accessmaMagementsSlice';
 
 // Import Shadcn UI Components
 import { Button } from '@/components/ui/button';
