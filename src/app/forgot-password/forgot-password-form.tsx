@@ -41,6 +41,14 @@ export default function ForgotPasswordForm() {
     setError('');
 
     try {
+      const response = await fetch('/api/send-code', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+      console.log(' response : ', response);
       await new Promise(resolve => setTimeout(resolve, 1000));
       setSuccess('Verification code sent to your email!');
       setStep('code');
@@ -61,7 +69,7 @@ export default function ForgotPasswordForm() {
     setError('');
 
     try {
-      const response = await fetch('/verify-code', {
+      const response = await fetch('/api/verify-code', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
