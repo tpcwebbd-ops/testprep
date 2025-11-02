@@ -298,3 +298,15 @@ const VerifyAccount = () => {
 };
 
 export default VerifyAccountPage;
+
+/*
+
+Now design a forgot-password page. it will do the following instruction. 
+
+1. it will check parems is there is email or not. if found then use it default email. then there is a field for email and a button for send a code. we will get a code (we will work on later in backend). 
+
+2. after sending code there is box for submit the code. after submiting the code it will fetch a post request to verify the code in url '/verify-code', if the code is valid then it will render a password setup component with New Password and confirm Password. else it will show an error.
+
+3. after setting new password, it will redirect to login page.
+
+*/ 

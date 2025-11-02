@@ -41,7 +41,7 @@ export async function POST(req: Request): Promise<NextResponse<IResponse>> {
 
     // Generate 6-digit code
     const code = Math.floor(100000 + Math.random() * 900000).toString();
-
+    console.log('email: code :', email, ' : ', code);
     // Delete existing previous codes
     await Verification.deleteMany({ email });
 
