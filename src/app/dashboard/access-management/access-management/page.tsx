@@ -23,7 +23,7 @@ import FilterDialog, { FilterPayload } from './components/FilterDialog';
 import Summary from './components/Summary';
 
 import { useAccessManagementsStore } from './store/store';
-import { useGetAccessManagementsQuery } from '@/redux/features/accessManagements/accessmaMagementsSlice';
+import { useGetAccessManagementsQuery } from '@/redux/features/accessManagements/accessManagementsSlice';
 import { handleSuccess } from './components/utils';
 import { logger } from 'better-auth';
 const MainNextPage: React.FC = () => {

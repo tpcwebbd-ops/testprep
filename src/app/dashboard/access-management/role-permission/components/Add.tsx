@@ -122,34 +122,18 @@ const AddNextComponents: React.FC = () => {
                 <table className="w-full text-sm text-left text-white/90">
                   <thead>
                     <tr className="border-b border-white/20">
-                      <th className="py-2 px-3 text-left" title="Module">
-                        Module
-                      </th>
-                      <th className="py-2 px-3 text-center" title="Create">
-                        Create
-                      </th>
-                      <th className="py-2 px-3 text-center" title="Read">
-                        Read
-                      </th>
-                      <th className="py-2 px-3 text-center" title="Update">
-                        Update
-                      </th>
-                      <th className="py-2 px-3 text-center" title="Delete">
-                        Delete
-                      </th>
-                      <th className="py-2 px-3 text-center" title="Dashboard Personal">
-                        D.Personal
-                      </th>
-                      <th className="py-2 px-3 text-center" title="Dashboard Admin">
-                        D.Admin
-                      </th>
+                      <th className="py-2 px-3 text-left">Module</th>
+                      <th className="py-2 px-3 text-center">Create</th>
+                      <th className="py-2 px-3 text-center">Read</th>
+                      <th className="py-2 px-3 text-center">Update</th>
+                      <th className="py-2 px-3 text-center">Delete</th>
                     </tr>
                   </thead>
                   <tbody>
                     {permissionKeys.map(module => (
                       <tr key={module} className="border-b border-white/10 hover:bg-white/10 transition-all duration-150">
                         <td className="py-2 px-3 capitalize">{module.replace(/_/g, ' ')}</td>
-                        {(['create', 'read', 'update', 'delete', 'dashboard_parsonal', 'dashboard_admin'] as const).map(permission => (
+                        {(['create', 'read', 'update', 'delete'] as const).map(permission => (
                           <td key={permission} className="py-2 px-3 text-center">
                             <Checkbox checked={newRole.role[module][permission]} onCheckedChange={() => handlePermissionChange(module, permission)} />
                           </td>

@@ -8,11 +8,11 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 import { useAccessManagementsStore } from '../store/store';
-import { useAddAccessManagementsMutation } from '@/redux/features/accessManagements/accessmaMagementsSlice';
 import { useGetUsersQuery } from '@/redux/features/user/userSlice';
 import { IAccessManagements, defaultAccessManagements } from '../store/data/data';
 import { formatDuplicateKeyError, handleError, handleSuccess, isApiErrorResponse } from './utils';
 import { authClient } from '@/lib/auth-client';
+import { useAddAccessManagementsMutation } from '@/redux/features/accessManagements/accessManagementsSlice';
 
 // 🕒 Debounce helper
 function useDebounce<T>(value: T, delay = 1000): T {

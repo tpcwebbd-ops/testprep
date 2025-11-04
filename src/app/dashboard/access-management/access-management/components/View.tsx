@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 
 import { IAccessManagements, defaultAccessManagements } from '../store/data/data';
 import { useAccessManagementsStore } from '../store/store';
-import { useGetAccessManagementsByIdQuery } from '@/redux/features/accessManagements/accessmaMagementsSlice';
+import { useGetAccessManagementsByIdQuery } from '@/redux/features/accessManagements/accessManagementsSlice';
 import { logger } from 'better-auth';
 
 const ViewNextComponents: React.FC = () => {

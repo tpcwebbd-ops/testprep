@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 
 import { IAccessManagements, defaultAccessManagements } from '../store/data/data';
 import { useAccessManagementsStore } from '../store/store';
-import { useDeleteAccessManagementsMutation } from '@/redux/features/accessManagements/accessmaMagementsSlice';
+import { useDeleteAccessManagementsMutation } from '@/redux/features/accessManagements/accessManagementsSlice';
 import { handleSuccess, handleError } from './utils';
 
 const DeleteNextComponents: React.FC = () => {
