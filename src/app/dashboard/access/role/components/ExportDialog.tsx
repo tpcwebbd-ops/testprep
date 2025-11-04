@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
-import { IERoles, IRoles } from '../store/data/data';
+import { IDashboardAccessData, IERoles, IRoles } from '../store/data/data';
 
 type HeaderItem = { key: string; label: string };
 
@@ -68,7 +68,7 @@ const ExportDialog: React.FC<ExportDialogProps> = ({ isOpen, onOpenChange, heade
       const newRow = {} as Partial<IRoles>;
       selectedKeys.forEach(key => {
         // Explicitly assert that both sides align on the same key type
-        newRow[key] = row[key] as string & IERoles & Date;
+        newRow[key] = row[key] as string & IERoles & IDashboardAccessData[] & Date;
       });
       return newRow as IRoles;
     });
