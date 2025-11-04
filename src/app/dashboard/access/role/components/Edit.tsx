@@ -26,9 +26,10 @@ const EditNextComponents: React.FC = () => {
 
   const sessionEmail = authClient.useSession().data?.user.email || '';
   useEffect(() => {
-    if (selectedRoles) {
-      setRole(selectedRoles);
-    }
+    console.log('selectedRoles', selectedRoles);
+    // if (selectedRoles) {
+    //   setRole(selectedRoles);
+    // }
   }, [selectedRoles]);
 
   const handleFieldChange = (name: string, value: unknown) => {

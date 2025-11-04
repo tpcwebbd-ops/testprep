@@ -51,7 +51,7 @@ const AddNextComponents: React.FC = () => {
   // Handle Add Role submit
   const handleAddRole = async () => {
     try {
-      let updateData = { ...newRole };
+      const updateData = { ...newRole };
       delete updateData._id;
       updateData.email = sessionEmail;
 

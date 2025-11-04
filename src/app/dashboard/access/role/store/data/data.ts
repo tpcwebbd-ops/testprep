@@ -391,7 +391,7 @@ export interface IRoles {
   note: string;
   description: string;
   role: IERoles;
-  dashboard_access: IDashboardAccessData[];
+  dashboard_access: IDashboardAccessData;
   createdAt: Date;
   updatedAt: Date;
   _id?: string;
