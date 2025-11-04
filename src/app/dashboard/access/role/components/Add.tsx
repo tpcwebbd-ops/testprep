@@ -51,10 +51,11 @@ const AddNextComponents: React.FC = () => {
   // Handle Add Role submit
   const handleAddRole = async () => {
     try {
-      const updateData = { ...newRole };
+      let updateData = { ...newRole };
       delete updateData._id;
       updateData.email = sessionEmail;
 
+      updateData.dashboard_access = updateData.dashboard_access.map(item => ({ ...item, list_id: item.id }));
       const addedRole = await addRoles(updateData).unwrap();
       setRoles([addedRole]);
       toggleAddModal(false);
