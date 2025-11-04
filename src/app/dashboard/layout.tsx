@@ -63,12 +63,12 @@ const dashboardSidebarData = [
   },
   {
     id: 6,
-    name: 'Access Management',
+    name: 'Access',
     path: '/dashboard',
     icon: <ShieldCheck size={18} />,
     childData: [
-      { id: 61, name: 'Access Management', path: '/dashboard/access-management/access-management', icon: <FolderKanban size={16} /> },
-      { id: 62, name: 'Role Permission', path: '/dashboard/access-management/role-permission', icon: <FileSignature size={16} /> },
+      { id: 61, name: 'Access', path: '/dashboard/access/access', icon: <FolderKanban size={16} /> },
+      { id: 62, name: 'Role', path: '/dashboard/access/role', icon: <FileSignature size={16} /> },
     ],
   },
 ];
