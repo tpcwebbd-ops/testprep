@@ -391,13 +391,13 @@ export interface IRoles {
   note: string;
   description: string;
   role: IERoles;
-  dashboard_access: IDashboardAccessData;
+  dashboard_access: IDashboardAccessData[];
   createdAt: Date;
   updatedAt: Date;
   _id?: string;
 }
 
-export const defaultRoles = {
+export const defaultRoles:IRoles = {
   name: '',
   email: '',
   role: defaulERoles,
