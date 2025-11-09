@@ -9,6 +9,9 @@ const sidebarData = [
   { id: 1, title: 'Admin', path: '/workshop/admin' },
   { id: 2, title: 'All Section', path: '/workshop/section' },
   { id: 3, title: 'Client', path: '/workshop' },
+  { id: 4, title: 'Video', path: '/workshop/video' },
+  { id: 5, title: 'PDF', path: '/workshop/pdf' },
+  { id: 6, title: 'Word Doc', path: '/workshop/doc' },
 ];
 
 interface RootLayoutProps {
