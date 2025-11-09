@@ -32,7 +32,7 @@ const initialSectionData: SectionData[] = [
     adminPath: <AdminSection2 />,
     clientPath: <ClientSection2 />,
     isActive: false,
-    picture: '/all-section/section-2/image.jpg',
+    picture: '/all-section/section-2.png',
   },
 ];
 
