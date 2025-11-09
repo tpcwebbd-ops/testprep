@@ -6,11 +6,16 @@ import { PlayCircle, CheckCircle } from 'lucide-react';
 
 const videoList = [
   { id: 1, title: 'Introduction to IELTS', url: 'https://www.youtube.com/embed/Ug2msKmnVW4?si=gQ8a9AerBS79puvm' },
-  { id: 2, title: 'IELTS Speaking Tips', url: 'https://www.youtube.com/embed/WHg2Jz9z6-c' },
-  { id: 3, title: 'Listening Practice Test', url: 'https://www.youtube.com/embed/M8Rzp2gzKX8' },
-  { id: 4, title: 'Writing Task 2 Guide', url: 'https://www.youtube.com/embed/vGYa1QH6fQw' },
-  { id: 5, title: 'Reading Skills Explained', url: 'https://www.youtube.com/embed/x1pHH3S7xz4' },
+  { id: 2, title: 'IELTS Speaking Tips', url: 'https://www.youtube.com/embed/WHg2Jz9z6-c?si=gQ8a9AerBS79puvm' },
+  { id: 3, title: 'Listening Practice Test', url: 'https://www.youtube.com/embed/M8Rzp2gzKX8?si=gQ8a9AerBS79puvm' },
+  { id: 4, title: 'Writing Task 2 Guide', url: 'https://www.youtube.com/embed/vGYa1QH6fQw?si=gQ8a9AerBS79puvm' },
+  { id: 5, title: 'Reading Skills Explained', url: 'https://www.youtube.com/embed/x1pHH3S7xz4?si=gQ8a9AerBS79puvm' },
 ];
+
+const lecture = [
+  {id:1, title: "Introduction to IELTS", contentType: "video", url: "https://www.youtube.com/embed/Ug2msKmnVW4?si=gQ8a9AerBS79puvm"}, 
+  {id:2, title: "Your Task", contentType: "pdf", url: "https://www.youtube.com/embed/Ug2msKmnVW4?si=gQ8a9AerBS79puvm"}
+]
 
 export default function ClassRoomPage() {
   const [selectedVideo, setSelectedVideo] = useState(videoList[0]);
@@ -51,7 +56,7 @@ export default function ClassRoomPage() {
         className="w-full md:w-80 rounded-2xl backdrop-blur-md bg-white/10 border border-white/20 p-4 flex flex-col justify-between shadow-lg"
       >
         <div>
-          <h3 className="text-xl font-semibold mb-4 text-center md:text-left">📺 Video List</h3>
+          <h3 className="text-xl font-semibold mb-4 text-center md:text-left">Todays Class</h3>
 
           <div className="space-y-2 overflow-y-auto max-h-[60vh] pr-2 scrollbar-thin scrollbar-thumb-white/20">
             {videoList.map(video => (
