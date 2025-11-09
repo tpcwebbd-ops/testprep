@@ -9,6 +9,7 @@ import AdminSection2 from './all-section/section-2/Admin';
 import ClientSection2 from './all-section/section-2/Client';
 import ClientSection3 from './all-section/section-3/Client';
 import AdminSection3 from './all-section/section-3/Admin';
+import AdminSection4 from './all-section/section-4/Admin';
 
 interface SectionData {
   id: number;
@@ -40,6 +41,14 @@ const initialSectionData: SectionData[] = [
     id: 3,
     title: 'Section 3',
     adminPath: <AdminSection3 />,
+    clientPath: <ClientSection3 />,
+    isActive: false,
+    picture: '/all-section/section-3.png',
+  },
+  {
+    id: 4,
+    title: 'Section 4',
+    adminPath: <AdminSection4 />,
     clientPath: <ClientSection3 />,
     isActive: false,
     picture: '/all-section/section-3.png',
