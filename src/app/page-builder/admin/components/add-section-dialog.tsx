@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
-import { initialSectionData, SectionData } from '../../all-section/data-index';
+import { initialSectionData, SectionData } from '../store/data-index';
 import { useSectionStore } from '../store/section-store';
 
 export const AddSectionDialog = () => {
@@ -15,6 +15,7 @@ export const AddSectionDialog = () => {
   const { addSection } = useSectionStore();
 
   const handleAddSection = (section: SectionData) => {
+    console.log('section : ', section);
     addSection(section);
     setOpen(false);
   };
@@ -22,7 +23,7 @@ export const AddSectionDialog = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="gap-2">
+        <Button className="gap-2" variant="outlineGlassy">
           <Plus className="h-4 w-4" />
           Add Section
         </Button>

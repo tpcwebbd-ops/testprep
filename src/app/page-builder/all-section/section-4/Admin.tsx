@@ -7,12 +7,12 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Save, Plus, Trash2 } from 'lucide-react';
 import ImageUploadFieldSingle from '@/components/dashboard-ui/ImageUploadFieldSingle';
-import { defaultData, Section4Props, SectionData } from './data';
+import { defaultData, Section4Props, ISectionData } from './data';
 
 const AdminSection4 = ({ data }: Section4Props) => {
-  const [formData, setFormData] = useState<SectionData>(data || defaultData);
+  const [formData, setFormData] = useState<ISectionData>(data || defaultData);
 
-  const handleFieldChange = (name: keyof SectionData, value: string | string[] | null) => {
+  const handleFieldChange = (name: keyof ISectionData, value: string | string[] | null) => {
     if (value !== null) {
       setFormData(prev => ({ ...prev, [name]: value }));
     }

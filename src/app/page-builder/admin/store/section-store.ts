@@ -1,14 +1,14 @@
 // store/section-store.ts
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { SectionData } from '../../all-section/data-index';
+import { SectionData } from './data-index';
 
 interface SectionStore {
   sectionList: SectionData[];
   addSection: (section: SectionData) => void;
-  removeSection: (id: number) => void;
-  updateSection: (id: number, updates: Partial<SectionData>) => void;
-  toggleActive: (id: number) => void;
+  removeSection: (id: string) => void;
+  updateSection: (id: string, updates: Partial<SectionData>) => void;
+  toggleActive: (id: string) => void;
   reorderSections: (startIndex: number, endIndex: number) => void;
 }
 
@@ -18,7 +18,7 @@ export const useSectionStore = create<SectionStore>()(
       sectionList: [],
       addSection: section =>
         set(state => ({
-          sectionList: [...state.sectionList, { ...section, id: Date.now() }],
+          sectionList: [...state.sectionList, { ...section, id: Date.now().toString() }],
         })),
       removeSection: id =>
         set(state => ({

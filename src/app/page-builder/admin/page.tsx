@@ -29,7 +29,9 @@ const Page = () => {
     }
   };
 
-  console.log('sectionList', sectionList);
+  const handleSaveToDB = () => {
+    console.log(' sectionList : ', sectionList);
+  };
   return (
     <main className="min-h-screen bg-transparent p-8">
       <div className="max-w-7xl mx-auto">
@@ -58,7 +60,9 @@ const Page = () => {
         )}
       </div>
       <div className="w-full flex items-center justify-center py-8">
-        <Button variant="outlineGlassy">Save Changes</Button>
+        <Button onClick={handleSaveToDB} variant="outlineGlassy">
+          Save Changes
+        </Button>
       </div>
     </main>
   );
@@ -72,4 +76,4 @@ Implement following instruction.
 
 
 
-*/ 
+*/

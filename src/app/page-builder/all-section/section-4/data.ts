@@ -1,7 +1,7 @@
 export interface Section4Props {
-  data?: SectionData;
+  data?: ISectionData;
 }
-export interface SectionData {
+export interface ISectionData {
   sectionUid: string;
   id: string;
   title: string;
@@ -20,7 +20,7 @@ export interface SectionData {
   highlights: string[];
 }
 
-export const defaultData: SectionData = {
+export const defaultData: ISectionData = {
   sectionUid: 'section-uid-4',
   id: 'event_section_003',
   title: 'Global Design Summit 2025',

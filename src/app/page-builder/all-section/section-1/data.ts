@@ -1,4 +1,4 @@
-export interface SectionData {
+export interface ISectionData {
   id: string;
   sectionUid: string;
   title: string;
@@ -13,10 +13,10 @@ export interface SectionData {
 }
 
 export interface Section1Props {
-  data?: SectionData;
+  data?: ISectionData;
 }
 
-export const defaultData: SectionData = {
+export const defaultData: ISectionData = {
   sectionUid: 'section-uid-1',
   id: 'adsfdsfdfdsaa',
   title: 'Most common Component',

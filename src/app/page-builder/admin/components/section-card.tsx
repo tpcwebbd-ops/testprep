@@ -7,6 +7,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,16 +19,41 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { GripVertical, Trash2, Edit } from 'lucide-react';
-import { SectionData } from '../../all-section/data-index';
+
+import { initialSectionData, SectionData } from '../store/data-index';
 import { useSectionStore } from '../store/section-store';
+
+// ✅ Import 6 Form Components (All accept SectionFormProps)
+import MutationSection1 from '../../all-section/section-1/Mutation';
+import MutationSection2 from '../../all-section/section-2/Mutation';
+import MutationSection3 from '../../all-section/section-3/Mutation';
+import MutationSection4 from '../../all-section/section-4/Mutation';
+import MutationSection5 from '../../all-section/section-5/Mutation';
+import MutationSection6 from '../../all-section/section-6/Mutation';
+
+import { ISectionData } from '../../all-section/section-1/data';
+import { ScrollArea } from '@/components/ui/scroll-area';
+
+export type SectionFormProps = {
+  data?: ISectionData;
+  onSubmit: (v: ISectionData) => void;
+};
 
 interface SectionCardProps {
   section: SectionData;
 }
 
+const SectionMutationRegistry: Record<string, React.FC<SectionFormProps>> = {
+  [initialSectionData[0].sectionUid]: MutationSection1,
+};
+
 export const SectionCard = ({ section }: SectionCardProps) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const { removeSection, toggleActive } = useSectionStore();
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [editComponent, setEditComponent] = useState<React.ReactNode>(null);
+
+  const { removeSection, toggleActive, updateSection } = useSectionStore();
+
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: section.id });
 
   const style = {
@@ -41,68 +67,81 @@ export const SectionCard = ({ section }: SectionCardProps) => {
     setShowDeleteDialog(false);
   };
 
+  const handleSectionEdit = (updatedValue: ISectionData) => {
+    updateSection(section.id, { ...section, content: updatedValue });
+    setShowEditDialog(false);
+  };
+
+  const handleEdit = () => {
+    const SectionForm = SectionMutationRegistry[section.sectionUid];
+
+    if (SectionForm) {
+      setEditComponent(<SectionForm data={section.content as ISectionData} onSubmit={handleSectionEdit} />);
+    } else {
+      setEditComponent(<div className="text-red-400 p-4">⚠ No Mutation Form Found for this Section</div>);
+    }
+
+    setShowEditDialog(true);
+  };
+
   return (
     <>
-      <div
-        ref={setNodeRef}
-        style={style}
-        className="group h-[300px] flex overflow-hidden rounded-xl border border-white/20 bg-transparent backdrop-blur-md shadow-sm hover:shadow-md transition-shadow"
-      >
-        <div className="w-[70%] relative h-full overflow-hidden">
+      {/* Card */}
+      <div ref={setNodeRef} style={style} className="group h-[300px] flex rounded-xl border border-white/20 backdrop-blur-md">
+        <div className="w-[70%] relative">
           <Image src={section.picture} alt={section.title} className="object-cover w-full h-full" width={1200} height={1200} />
         </div>
 
-        <div className="w-[30%] flex flex-col p-4 bg-transparent backdrop-blur-sm">
-          <div className="flex items-center justify-between gap-2 mb-4">
-            <button
-              className="cursor-grab active:cursor-grabbing p-1.5 hover:bg-white/10 rounded-md transition-colors flex-shrink-0"
-              {...attributes}
-              {...listeners}
-            >
+        <div className="w-[30%] flex flex-col p-4">
+          <div className="flex items-center justify-between mb-4">
+            <button {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing">
               <GripVertical className="h-4 w-4 text-white/70" />
             </button>
-            <Switch checked={section.isActive} onCheckedChange={() => toggleActive(section.id)} className="flex-shrink-0" />
+
+            <Switch checked={section.isActive} onCheckedChange={() => toggleActive(section.id)} />
           </div>
 
-          <h3 className="font-semibold text-sm mb-2 line-clamp-3 text-white">{section.title}</h3>
+          <h3 className="text-white text-sm mb-2 line-clamp-3">{section.title}</h3>
 
           <div className="flex-1" />
 
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${section.isActive ? 'bg-green-500' : 'bg-white/30'}`} />
-              <span className={`text-xs font-medium ${section.isActive ? 'text-green-400' : 'text-white/60'}`}>{section.isActive ? 'Active' : 'Inactive'}</span>
-            </div>
-            <div className="flex flex-col gap-2">
-              <Button variant="outline" size="sm" className="w-full h-9 gap-2 hover:bg-white/10 transition-colors bg-transparent border-white/20 text-white">
-                <Edit className="h-3.5 w-3.5" />
-                <span className="text-xs font-medium">Edit</span>
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full h-9 text-red-400 hover:text-red-300 hover:bg-red-500/10 border-red-400/30 gap-2 transition-colors bg-transparent"
-                onClick={() => setShowDeleteDialog(true)}
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-                <span className="text-xs font-medium">Delete</span>
-              </Button>
-            </div>
-          </div>
+          <Button variant="outline" size="sm" onClick={handleEdit}>
+            <Edit className="h-3.5 w-3.5" /> Edit
+          </Button>
+
+          <Button variant="outline" size="sm" className="mt-2 text-red-400 border-red-400/30" onClick={() => setShowDeleteDialog(true)}>
+            <Trash2 className="h-3.5 w-3.5" /> Delete
+          </Button>
         </div>
       </div>
 
+      {/* Edit Dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="bg-slate-900/95 text-white max-w-[700px]">
+          <DialogHeader>
+            <DialogTitle>Edit Section</DialogTitle>
+            <DialogDescription>Update the section data below</DialogDescription>
+          </DialogHeader>
+          <ScrollArea className="w-full h-[400px] pr-4">{editComponent}</ScrollArea>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowEditDialog(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Dialog */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent className="bg-transparent backdrop-blur-md border border-white/20">
+        <AlertDialogContent className="bg-slate-900/95 text-white">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-white">Delete Section</AlertDialogTitle>
-            <AlertDialogDescription className="text-white/70">
-              Are you sure you want to delete {section.title}? This action cannot be undone.
-            </AlertDialogDescription>
+            <AlertDialogTitle>Delete Section</AlertDialogTitle>
+            <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-transparent border-white/20 text-white hover:bg-white/10">Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700 text-white">
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction className="bg-red-600" onClick={handleDelete}>
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
