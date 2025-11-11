@@ -129,7 +129,7 @@ export const SectionCard = ({ section }: SectionCardProps) => {
           {/* Full-screen overlay: applies backdrop-filter blur(8px) to EVERYTHING behind */}
           <DialogOverlay className="fixed inset-0 z-[100] bg-slate-900/30 backdrop-blur-[8px] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0" />
 
-          <DialogContent className="z-[101] bg-slate-900/80 border border-white/15 text-white backdrop-blur-xl shadow-2xl w-[95vw] max-w-2xl">
+          <DialogContent className="z-[101] bg-slate-900/30 backdrop-blur-[8px] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0 text-slate-100 shadow-2xl w-[95vw] max-w-2xl">
             <DialogHeader>
               <DialogTitle>Edit Section</DialogTitle>
               <DialogDescription className="text-white/70">Update the section data below</DialogDescription>
