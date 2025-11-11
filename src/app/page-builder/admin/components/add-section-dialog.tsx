@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { initialSectionData, SectionData } from '../store/data-index';
 import { useSectionStore } from '../store/section-store';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 export const AddSectionDialog = () => {
   const [open, setOpen] = useState(false);
@@ -28,27 +29,29 @@ export const AddSectionDialog = () => {
           Add Section
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto bg-transparent backdrop-blur-md border border-white/20">
+      <DialogContent className="w-7xl min-w-6xl text-white h-[85vh] overflow-hidden bg-transparent backdrop-blur-md border border-white/20 mt-8">
         <DialogHeader>
           <DialogTitle className="text-white">Add New Section</DialogTitle>
         </DialogHeader>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
-          {initialSectionData.map(section => (
-            <button
-              key={section.id}
-              onClick={() => handleAddSection(section)}
-              className="group relative overflow-hidden rounded-lg border border-white/20 hover:border-primary transition-all hover:shadow-lg bg-transparent backdrop-blur-sm"
-            >
-              <div className="aspect-video relative">
-                <Image src={section.picture} alt={section.title} fill className="object-cover" />
-              </div>
-              <div className="p-4 bg-transparent backdrop-blur-md">
-                <h3 className="font-semibold text-lg text-white">{section.title}</h3>
-                <p className="text-sm text-white/70 mt-1">Click to add this section</p>
-              </div>
-            </button>
-          ))}
-        </div>
+        <ScrollArea className="w-full h-[80vh] pr-4 pb-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+            {initialSectionData.map(section => (
+              <button
+                key={section.id}
+                onClick={() => handleAddSection(section)}
+                className="group relative overflow-hidden rounded-lg border border-white/20 hover:border-primary transition-all hover:shadow-lg bg-transparent backdrop-blur-sm"
+              >
+                <div className="aspect-video relative">
+                  <Image src={section.picture} alt={section.title} fill className="object-cover" />
+                </div>
+                <div className="p-4 bg-transparent backdrop-blur-md">
+                  <h3 className="font-semibold text-lg text-white">{section.title}</h3>
+                  <p className="text-sm text-white/70 mt-1">Click to add this section</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );
