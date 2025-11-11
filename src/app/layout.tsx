@@ -5,7 +5,6 @@ import { ToastContainer } from 'react-toastify';
 import MenuComponentWithSession from '@/components/common/MenuWithSession';
 
 import './globals.css';
-import './glassy.css';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
