@@ -18,15 +18,23 @@ const sectionContentSchema = new Schema({
   highlights: [{ type: String }],
 });
 
-const sectionSchema = new Schema(
+const pageBuilderSchema = new Schema(
   {
-    title: { type: String },
-    sectionUid: { type: String },
-    content: { type: sectionContentSchema },
+    title: { type: String, default: 'Main Page' },
+    content: [
+      {
+        id: { type: String },
+        title: { type: String },
+        sectionUid: { type: String },
+        serialNumber: { type: Number },
+        content: { type: sectionContentSchema },
+        isActive: { type: Boolean, default: false },
+        picture: { type: String },
+      },
+    ],
     isActive: { type: Boolean, default: true },
-    picture: { type: String },
   },
   { timestamps: true },
 );
 
-export default mongoose.models.Section || mongoose.model('Section', sectionSchema);
+export default mongoose.models.PageBuilder || mongoose.model('PageBuilder', pageBuilderSchema);

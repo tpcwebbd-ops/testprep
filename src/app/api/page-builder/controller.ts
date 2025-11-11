@@ -14,7 +14,7 @@ export async function createSection(req: Request): Promise<IResponse> {
     } catch (error: unknown) {
       if ((error as { code?: number }).code === 11000) {
         const err = error as { keyValue?: Record<string, unknown> };
-        return formatResponse(null, `Duplicate key error: ${JSON.stringify(err.keyValue)}`, 400);
+        return formatResponse(null, `Duplicate key error: ${JSON.stringify(err.keyValue)}`, 409);
       }
       throw error;
     }
@@ -116,6 +116,11 @@ export async function updateSection(req: Request): Promise<IResponse> {
   return withDB(async () => {
     try {
       const { id, ...updateData } = await req.json();
+
+      if (!id) {
+        return formatResponse(null, 'Section ID is required', 400);
+      }
+
       const updatedSection = await Section.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
 
       if (!updatedSection) return formatResponse(null, 'Section not found', 404);
@@ -123,7 +128,7 @@ export async function updateSection(req: Request): Promise<IResponse> {
     } catch (error: unknown) {
       if ((error as { code?: number }).code === 11000) {
         const err = error as { keyValue?: Record<string, unknown> };
-        return formatResponse(null, `Duplicate key error: ${JSON.stringify(err.keyValue)}`, 400);
+        return formatResponse(null, `Duplicate key error: ${JSON.stringify(err.keyValue)}`, 409);
       }
       throw error;
     }
@@ -133,6 +138,11 @@ export async function updateSection(req: Request): Promise<IResponse> {
 export async function bulkUpdateSections(req: Request): Promise<IResponse> {
   return withDB(async () => {
     const updates: { id: string; updateData: Record<string, unknown> }[] = await req.json();
+
+    if (!Array.isArray(updates) || updates.length === 0) {
+      return formatResponse(null, 'Updates array is required and cannot be empty', 400);
+    }
+
     const results = await Promise.allSettled(
       updates.map(({ id, updateData }) =>
         Section.findByIdAndUpdate(id, updateData, {
@@ -148,13 +158,29 @@ export async function bulkUpdateSections(req: Request): Promise<IResponse> {
       .map((r, i) => (r.status === 'rejected' || !('value' in r && r.value) ? updates[i].id : null))
       .filter((id): id is string => id !== null);
 
-    return formatResponse({ updated: successfulUpdates, failed: failedUpdates }, 'Bulk update completed', 200);
+    const allFailed = successfulUpdates.length === 0 && failedUpdates.length > 0;
+    const partialSuccess = successfulUpdates.length > 0 && failedUpdates.length > 0;
+
+    if (allFailed) {
+      return formatResponse({ updated: successfulUpdates, failed: failedUpdates }, 'All bulk updates failed', 400);
+    }
+
+    if (partialSuccess) {
+      return formatResponse({ updated: successfulUpdates, failed: failedUpdates }, 'Bulk update partially completed', 207);
+    }
+
+    return formatResponse({ updated: successfulUpdates, failed: failedUpdates }, 'Bulk update completed successfully', 200);
   });
 }
 
 export async function deleteSection(req: Request): Promise<IResponse> {
   return withDB(async () => {
     const { id } = await req.json();
+
+    if (!id) {
+      return formatResponse(null, 'Section ID is required', 400);
+    }
+
     const deletedSection = await Section.findByIdAndDelete(id);
     if (!deletedSection) return formatResponse(null, 'Section not found', 404);
     return formatResponse({ deletedCount: 1 }, 'Section deleted successfully', 200);
@@ -164,6 +190,11 @@ export async function deleteSection(req: Request): Promise<IResponse> {
 export async function bulkDeleteSections(req: Request): Promise<IResponse> {
   return withDB(async () => {
     const { ids }: { ids: string[] } = await req.json();
+
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return formatResponse(null, 'IDs array is required and cannot be empty', 400);
+    }
+
     const deletedIds: string[] = [];
     const invalidIds: string[] = [];
 
@@ -183,6 +214,17 @@ export async function bulkDeleteSections(req: Request): Promise<IResponse> {
       }
     }
 
-    return formatResponse({ deleted: deletedIds.length, deletedIds, invalidIds }, 'Bulk delete operation completed', 200);
+    const allFailed = deletedIds.length === 0 && invalidIds.length > 0;
+    const partialSuccess = deletedIds.length > 0 && invalidIds.length > 0;
+
+    if (allFailed) {
+      return formatResponse({ deleted: 0, deletedIds, invalidIds }, 'All bulk deletes failed', 400);
+    }
+
+    if (partialSuccess) {
+      return formatResponse({ deleted: deletedIds.length, deletedIds, invalidIds }, 'Bulk delete partially completed', 207);
+    }
+
+    return formatResponse({ deleted: deletedIds.length, deletedIds, invalidIds }, 'Bulk delete completed successfully', 200);
   });
 }

@@ -1,3 +1,4 @@
+import { revalidatePath } from 'next/cache';
 import { handleRateLimit } from '@/app/api/utils/rate-limit';
 import { getSections, createSection, updateSection, deleteSection, getSectionById, bulkUpdateSections, bulkDeleteSections } from './controller';
 
@@ -17,6 +18,11 @@ export async function POST(req: Request) {
   if (rateLimitResponse) return rateLimitResponse;
 
   const result = await createSection(req);
+
+  if (result.status === 200 || result.status === 201) {
+    revalidatePath('/page-builder');
+  }
+
   return formatResponse(result.data, result.message, result.status);
 }
 
@@ -27,6 +33,10 @@ export async function PUT(req: Request) {
   const isBulk = new URL(req.url).searchParams.get('bulk') === 'true';
   const result = isBulk ? await bulkUpdateSections(req) : await updateSection(req);
 
+  if (result.status === 200) {
+    revalidatePath('/page-builder');
+  }
+
   return formatResponse(result.data, result.message, result.status);
 }
 
@@ -36,6 +46,10 @@ export async function DELETE(req: Request) {
 
   const isBulk = new URL(req.url).searchParams.get('bulk') === 'true';
   const result = isBulk ? await bulkDeleteSections(req) : await deleteSection(req);
+
+  if (result.status === 200) {
+    revalidatePath('/page-builder');
+  }
 
   return formatResponse(result.data, result.message, result.status);
 }
