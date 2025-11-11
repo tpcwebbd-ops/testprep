@@ -1,129 +1,33 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { Plus, Edit, Trash2, Eye, X, Sparkles } from 'lucide-react';
+import { Sparkles, X } from 'lucide-react';
 
-export interface ISectionData {
-  sectionUid: string;
-  id: string;
-  title: string;
-  image: string;
-  heading: string;
-  description: string;
-  featuredLabel: string;
-  buttonPrimary: string;
-  buttonSecondary: string;
-  studentCount: string;
-  enrollmentText: string;
-  secondaryImage: string;
-  subtitle: string;
-  additionalDescription: string;
-  ctaText: string;
-  highlights: string[];
+import type { ISectionData } from './data';
+import { defaultData } from './data';
+
+export interface SectionFormProps {
+  data?: ISectionData;
+  onSubmit: (values: ISectionData) => void;
 }
 
-export const defaultData: ISectionData = {
-  sectionUid: 'section-uid-6',
-  id: 'community_section_005',
-  title: 'Join the Developer Community',
-  image: 'https://i.ibb.co.com/PGXYXwTq/img.jpg',
-  heading: 'Growing Fast',
-  description:
-    'Connect with thousands of developers worldwide. Share knowledge, collaborate on projects, get mentorship, and grow your career in a supportive environment.',
-  featuredLabel: 'Global Network',
-  buttonPrimary: 'Join Community',
-  buttonSecondary: 'Explore Features',
-  studentCount: '50k+ Members',
-  enrollmentText: 'Active developers',
-  secondaryImage: 'https://i.ibb.co.com/PGXYXwTq/img.jpg',
-  subtitle: 'Learn. Build. Connect. Grow.',
-  additionalDescription:
-    'Our thriving community offers daily discussions, weekly webinars, monthly hackathons, and year-round mentorship programs. Whether you are just starting or are an experienced professional, you will find value.',
-  ctaText: 'Free forever - Premium features available',
-  highlights: ['Weekly webinars', 'Career resources', 'Open source projects'],
-};
-
-interface MutationProps {
-  params?: {
-    data?: ISectionData[];
-  };
-}
-
-const Mutation = ({ params }: MutationProps) => {
-  const initialData = params?.data && params.data.length > 0 ? params.data : [defaultData];
-  const isUsingDefaultData = !params?.data || params.data.length === 0;
-  const [sections, setSections] = useState<ISectionData[]>(initialData);
-  const [showDialog, setShowDialog] = useState(false);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [showPreviewDialog, setShowPreviewDialog] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [previewData, setPreviewData] = useState<ISectionData | null>(null);
-  const [formData, setFormData] = useState<ISectionData>(defaultData);
+const Mutation = ({ data, onSubmit }: SectionFormProps) => {
+  const [formData, setFormData] = useState<ISectionData>({ ...defaultData });
   const [highlightInput, setHighlightInput] = useState('');
 
+  useEffect(() => {
+    if (data) {
+      setFormData({ ...data });
+    }
+  }, [data]);
+
   const updateField = (field: keyof ISectionData, value: string | string[]) => {
-    setFormData({ ...formData, [field]: value });
-  };
-
-  const handleAdd = () => {
-    setEditingId(null);
-    setFormData({
-      ...defaultData,
-      id: `section-${Date.now()}`,
-      sectionUid: `section-uid-${Date.now()}`,
-    });
-    setShowDialog(true);
-  };
-
-  const handleEdit = (section: ISectionData) => {
-    setEditingId(section.id);
-    setFormData(section);
-    setShowDialog(true);
-  };
-
-  const handlePreview = (section: ISectionData) => {
-    setPreviewData(section);
-    setShowPreviewDialog(true);
-  };
-
-  const handleDelete = (id: string) => {
-    setDeletingId(id);
-    setShowDeleteDialog(true);
-  };
-
-  const confirmDelete = () => {
-    if (deletingId) {
-      setSections(sections.filter(s => s.id !== deletingId));
-      setShowDeleteDialog(false);
-      setDeletingId(null);
-    }
-  };
-
-  const handleSave = () => {
-    if (editingId) {
-      setSections(sections.map(s => (s.id === editingId ? formData : s)));
-    } else {
-      setSections([...sections, formData]);
-    }
-    setShowDialog(false);
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const addHighlight = () => {
@@ -140,118 +44,197 @@ const Mutation = ({ params }: MutationProps) => {
     );
   };
 
+  const handleSave = () => {
+    onSubmit(formData);
+  };
+
   return (
-    <main className="min-h-screen p-8 relative overflow-hidden">
-      {/* Background gradient effect */}
-      <div className="absolute inset-0 -z-10 bg-gradient-to-br from-indigo-950 via-purple-900 to-slate-900" />
+    <div className="space-y-6 p-1">
+      <div className="relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-pink-500/10 to-blue-500/10 rounded-2xl blur-xl" />
+        <div className="relative backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-6 shadow-2xl">
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">Section Mutation Form</h1>
+        </div>
+      </div>
 
-      <div className="max-w-7xl mx-auto space-y-10">
-        {/* Info Banner */}
-        {isUsingDefaultData && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="backdrop-blur-2xl bg-blue-500/10 border border-blue-400/30 rounded-2xl p-4 flex items-center gap-3 shadow-lg"
-          >
-            <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
-            <p className="text-blue-300 text-sm font-medium">No data provided — displaying default section data</p>
-          </motion.div>
-        )}
-
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="flex items-center justify-between glassy-card border border-white/10 p-6 rounded-2xl"
-        >
-          <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent drop-shadow-md">
-              Section Mutation
-            </h1>
-            <p className="text-white/70 mt-2">Manage sections with style ✨</p>
+      <div className="relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/50 via-purple-900/20 to-blue-900/30 rounded-2xl blur-2xl" />
+        <div className="relative backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-6 shadow-2xl space-y-4">
+          <div className="space-y-2">
+            <Label>Title</Label>
+            <Input
+              value={formData.title}
+              onChange={e => updateField('title', e.target.value)}
+              placeholder="Enter section title"
+              className="backdrop-blur-sm bg-white/10 border-white/20"
+            />
           </div>
 
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button onClick={handleAdd} className="glassy-button bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white gap-2 shadow-lg">
-              <Plus className="w-4 h-4" />
-              Add Section
-            </Button>
-          </motion.div>
-        </motion.div>
+          <div className="space-y-2">
+            <Label>Heading</Label>
+            <Input
+              value={formData.heading}
+              onChange={e => updateField('heading', e.target.value)}
+              placeholder="Lecture number, topic etc."
+              className="backdrop-blur-sm bg-white/10 border-white/20"
+            />
+          </div>
 
-        {/* Cards */}
-        <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <AnimatePresence>
-            {sections.map((section, index) => (
-              <motion.div
-                key={section.id}
-                initial={{ opacity: 0, scale: 0.9, y: 40 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.4, delay: index * 0.05 }}
-              >
-                <div className="relative backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-purple-400/50 transition-all duration-300 shadow-lg hover:shadow-purple-500/20 group">
-                  <div className="relative h-48 w-full overflow-hidden">
-                    <Image src={section.image} alt={section.title} fill className="object-cover transition-transform duration-500 group-hover:scale-110" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                    <div className="absolute top-2 right-2 bg-purple-600/90 backdrop-blur-md px-3 py-1 rounded-full text-xs text-white font-medium shadow-md">
-                      {section.featuredLabel}
-                    </div>
-                  </div>
+          <div className="space-y-2">
+            <Label>Subtitle</Label>
+            <Input
+              value={formData.subtitle}
+              onChange={e => updateField('subtitle', e.target.value)}
+              placeholder="Subtitle or tag line"
+              className="backdrop-blur-sm bg-white/10 border-white/20"
+            />
+          </div>
 
-                  <div className="p-5 space-y-3">
-                    <h3 className="text-white text-lg font-bold">{section.title}</h3>
-                    <p className="text-purple-300 text-sm">{section.subtitle}</p>
-                    <p className="text-white/70 text-sm line-clamp-2">{section.description}</p>
-                    <div className="flex gap-2 flex-wrap">
-                      {section.highlights.slice(0, 3).map((h, i) => (
-                        <span
-                          key={i}
-                          className="text-xs text-purple-300 bg-purple-500/20 border border-purple-400/30 px-2 py-1 rounded-md flex items-center gap-1"
-                        >
-                          <Sparkles className="w-3 h-3" />
-                          {h}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
+          <div className="space-y-2">
+            <Label>Primary Image URL</Label>
+            <Input
+              value={formData.image}
+              onChange={e => updateField('image', e.target.value)}
+              placeholder="https://..."
+              className="backdrop-blur-sm bg-white/10 border-white/20"
+            />
+          </div>
 
-                  <div className="flex p-4 gap-2 bg-white/5 border-t border-white/10">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handlePreview(section)}
-                      className="flex-1 bg-transparent border-white/20 text-white hover:bg-white/10 gap-2 transition-all"
-                    >
-                      <Eye className="w-3.5 h-3.5" />
-                      View
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={() => handleEdit(section)}
-                      className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:shadow-lg transition-all"
-                    >
-                      <Edit className="w-3.5 h-3.5" />
-                      Edit
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={() => handleDelete(section.id)}
-                      className="flex-1 bg-transparent border border-red-400/40 text-red-400 hover:bg-red-500/10 transition-all"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                      Delete
-                    </Button>
-                  </div>
+          <div className="space-y-2">
+            <Label>Secondary Image URL</Label>
+            <Input
+              value={formData.secondaryImage}
+              onChange={e => updateField('secondaryImage', e.target.value)}
+              placeholder="https://..."
+              className="backdrop-blur-sm bg-white/10 border-white/20"
+            />
+          </div>
+
+          {formData.image && (
+            <div className="grid grid-cols-2 gap-4">
+              <div className="relative w-full h-48 border border-white/20 rounded-lg overflow-hidden backdrop-blur-sm">
+                <Image src={formData.image} alt="Primary Preview" fill className="object-cover" />
+                <span className="absolute bottom-2 left-2 backdrop-blur-md bg-black/60 px-2 py-0.5 rounded text-xs">Primary</span>
+              </div>
+              {formData.secondaryImage && (
+                <div className="relative w-full h-48 border border-white/20 rounded-lg overflow-hidden backdrop-blur-sm">
+                  <Image src={formData.secondaryImage} alt="Secondary Preview" fill className="object-cover" />
+                  <span className="absolute bottom-2 left-2 backdrop-blur-md bg-black/60 px-2 py-0.5 rounded text-xs">Secondary</span>
                 </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </motion.div>
+              )}
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <Label>Description</Label>
+            <Textarea
+              value={formData.description}
+              onChange={e => updateField('description', e.target.value)}
+              placeholder="Write section description..."
+              className="min-h-[120px] backdrop-blur-sm bg-white/10 border-white/20"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Additional Description</Label>
+            <Textarea
+              value={formData.additionalDescription}
+              onChange={e => updateField('additionalDescription', e.target.value)}
+              placeholder="Additional details..."
+              className="min-h-[120px] backdrop-blur-sm bg-white/10 border-white/20"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Featured Label</Label>
+            <Input
+              value={formData.featuredLabel}
+              onChange={e => updateField('featuredLabel', e.target.value)}
+              className="backdrop-blur-sm bg-white/10 border-white/20"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Student Count</Label>
+            <Input
+              value={formData.studentCount}
+              onChange={e => updateField('studentCount', e.target.value)}
+              className="backdrop-blur-sm bg-white/10 border-white/20"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Highlights</Label>
+            <div className="flex gap-2">
+              <Input
+                value={highlightInput}
+                onChange={e => setHighlightInput(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addHighlight())}
+                placeholder="Add highlight and press Enter"
+                className="backdrop-blur-sm bg-white/10 border-white/20"
+              />
+              <Button onClick={addHighlight} className="backdrop-blur-sm bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white hover:opacity-90">
+                <Sparkles className="w-4 h-4" />
+              </Button>
+            </div>
+
+            {formData.highlights.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {formData.highlights.map((highlight, idx) => (
+                  <div key={idx} className="flex items-center gap-2 px-3 py-1 backdrop-blur-sm bg-purple-500/20 border border-purple-400/30 rounded-lg text-sm">
+                    <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+                    {highlight}
+                    <button onClick={() => removeHighlight(idx)} className="ml-1 hover:text-red-400 transition-colors">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Primary Button Text</Label>
+              <Input
+                value={formData.buttonPrimary}
+                onChange={e => updateField('buttonPrimary', e.target.value)}
+                className="backdrop-blur-sm bg-white/10 border-white/20"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Secondary Button Text</Label>
+              <Input
+                value={formData.buttonSecondary}
+                onChange={e => updateField('buttonSecondary', e.target.value)}
+                className="backdrop-blur-sm bg-white/10 border-white/20"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Enrollment Text</Label>
+            <Input
+              value={formData.enrollmentText}
+              onChange={e => updateField('enrollmentText', e.target.value)}
+              className="backdrop-blur-sm bg-white/10 border-white/20"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>CTA Text</Label>
+            <Input value={formData.ctaText} onChange={e => updateField('ctaText', e.target.value)} className="backdrop-blur-sm bg-white/10 border-white/20" />
+          </div>
+        </div>
       </div>
-    </main>
+
+      <Button onClick={handleSave} className="w-full bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white hover:opacity-90 backdrop-blur-sm">
+        Save Section
+      </Button>
+    </div>
   );
 };
 
 export default Mutation;
+  
