@@ -76,8 +76,8 @@ const Mutation = ({ data, onSubmit }: SectionFormProps) => {
   };
 
   return (
-    <main className="min-h-screen p-6 bg-gradient-to-br from-slate-900 via-slate-950 to-black text-white">
-      <div className="max-w-5xl mx-auto space-y-8">
+    <main className="min-h-screen p-6 bg-gradient-to-br from-slate-900 via-slate-950 to-black text-white w-full">
+      <div className="">
         {/* Info Banner */}
         {isUsingDefaultData && (
           <div className="outline-water rounded-2xl px-4 py-3 flex items-center gap-2">

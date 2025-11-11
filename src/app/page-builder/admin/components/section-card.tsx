@@ -7,7 +7,9 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogPortal, DialogOverlay } from '@/components/ui/dialog';
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,7 +19,10 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogPortal,
+  AlertDialogOverlay,
 } from '@/components/ui/alert-dialog';
+
 import { GripVertical, Trash2, Edit } from 'lucide-react';
 
 import { initialSectionData, SectioinDataType, SectionData } from '../store/data-index';
@@ -65,7 +70,7 @@ export const SectionCard = ({ section }: SectionCardProps) => {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
-  };
+  } as React.CSSProperties;
 
   const handleDelete = () => {
     removeSection(section.id);
@@ -79,22 +84,20 @@ export const SectionCard = ({ section }: SectionCardProps) => {
 
   const handleEdit = () => {
     const SectionForm = SectionMutationRegistry[section.sectionUid];
-
     if (SectionForm) {
       setEditComponent(<SectionForm data={section.content as ISectionData} onSubmit={handleSectionEdit} />);
     } else {
       setEditComponent(<div className="text-red-400 p-4">⚠ No Mutation Form Found for this Section</div>);
     }
-
     setShowEditDialog(true);
   };
 
   return (
     <>
       {/* Card */}
-      <div ref={setNodeRef} style={style} className="group h-[300px] flex rounded-xl border border-white/20 backdrop-blur-md">
+      <div ref={setNodeRef} style={style} className="group h-[300px] flex rounded-xl border border-white/20 bg-white/5 backdrop-blur-md">
         <div className="w-[70%] relative">
-          <Image src={section.picture} alt={section.title} className="object-cover w-full h-full" width={1200} height={1200} />
+          <Image src={section.picture} alt={section.title} className="object-cover w-full h-full rounded-l-xl" width={1200} height={1200} />
         </div>
 
         <div className="w-[30%] flex flex-col p-4">
@@ -122,46 +125,59 @@ export const SectionCard = ({ section }: SectionCardProps) => {
 
       {/* Edit Dialog */}
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-        <DialogContent className="bg-slate-900/95 text-white max-w-[700px]">
-          <DialogHeader>
-            <DialogTitle>Edit Section</DialogTitle>
-            <DialogDescription className="text-white/70">Update the section data below</DialogDescription>
-          </DialogHeader>
-          <ScrollArea className="w-full h-[400px] pr-4">{editComponent}</ScrollArea>
+        <DialogPortal>
+          {/* Full-screen overlay: applies backdrop-filter blur(8px) to EVERYTHING behind */}
+          <DialogOverlay className="fixed inset-0 z-[100] bg-slate-900/30 backdrop-blur-[8px] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0" />
 
-          <DialogFooter>
-            <Button variant="outlineGlassy" onClick={() => setShowEditDialog(false)}>
-              Close
-            </Button>
-          </DialogFooter>
-        </DialogContent>
+          <DialogContent className="z-[101] bg-slate-900/80 border border-white/15 text-white backdrop-blur-xl shadow-2xl w-[95vw] max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Edit Section</DialogTitle>
+              <DialogDescription className="text-white/70">Update the section data below</DialogDescription>
+            </DialogHeader>
+
+            <ScrollArea className="w-full h-[400px] pr-4">{editComponent}</ScrollArea>
+
+            <DialogFooter>
+              <Button variant="outlineGlassy" onClick={() => setShowEditDialog(false)}>
+                Close
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </DialogPortal>
       </Dialog>
 
       {/* Delete Dialog */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent className="bg-slate-900/95 text-white">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Section</AlertDialogTitle>
-            <AlertDialogDescription className="text-white/70">This action cannot be undone.</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel
-              className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-white/30 text-white backdrop-blur-xl shadow-lg shadow-blue-500/20
-           hover:from-blue-500/30 hover:to-purple-500/30 hover:border-white/50 hover:shadow-xl hover:shadow-purple-500/30 hover:scale-[1.02]
-           transition-all duration-300"
-            >
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction
-              className=" border border-rose-400/50 text-rose-100 bg-rose-400/20 backdrop-blur-md shadow-lg shadow-rose-500/20
-           hover:bg-rose-400/30 hover:border-rose-400/70 hover:shadow-xl hover:shadow-rose-500/30 hover:scale-[1.02]
-           transition-all duration-300"
-              onClick={handleDelete}
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
+        <AlertDialogPortal>
+          {/* Full-screen overlay for AlertDialog as well */}
+          <AlertDialogOverlay className="fixed inset-0 z-[100] bg-slate-900/30 backdrop-blur-[8px] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0" />
+
+          <AlertDialogContent className="z-[101] bg-slate-900/95 text-white border border-white/15 backdrop-blur-md">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Section</AlertDialogTitle>
+              <AlertDialogDescription className="text-white/70">This action cannot be undone.</AlertDialogDescription>
+            </AlertDialogHeader>
+
+            <AlertDialogFooter>
+              <AlertDialogCancel
+                className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-white/30 text-white backdrop-blur-xl shadow-lg shadow-blue-500/20
+                hover:from-blue-500/30 hover:to-purple-500/30 hover:border-white/50 hover:shadow-xl hover:shadow-purple-500/30 hover:scale-[1.02]
+                transition-all duration-300"
+              >
+                Cancel
+              </AlertDialogCancel>
+
+              <AlertDialogAction
+                className="border border-rose-400/50 text-rose-100 bg-rose-400/20 backdrop-blur-md shadow-lg shadow-rose-500/20
+                hover:bg-rose-400/30 hover:border-rose-400/70 hover:shadow-xl hover:shadow-rose-500/30 hover:scale-[1.02]
+                transition-all duration-300"
+                onClick={handleDelete}
+              >
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogPortal>
       </AlertDialog>
     </>
   );
