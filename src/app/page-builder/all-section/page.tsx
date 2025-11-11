@@ -39,12 +39,17 @@ const Page = () => {
     }
   };
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 items-center justify-center w-full pt-4 flex">
+    <div className="min-h-screen bg-transparent items-center justify-center w-full pt-4 flex">
       <main className="min-h-screen bg-transparent max-w-7xl flex flex-col gap-6">
         {allSections.length > 0 ? (
           <div className="w-full grid grid-cols-1 gap-6">
             {allSections.map(section => (
-              <div key={section.sectionUid}>{renderClientSection(section.sectionUid)}</div>
+              <div key={section.sectionUid}>
+                <div className="flex flex-col gap-2">
+                  <p className="text-slate-50 font-semibold"># {section.sectionUid}</p>
+                  {renderClientSection(section.sectionUid)}
+                </div>
+              </div>
             ))}
           </div>
         ) : (
