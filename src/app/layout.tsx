@@ -1,9 +1,11 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
-import './globals.css';
 import { ReduxProvider } from '@/redux/provider';
 import { ToastContainer } from 'react-toastify';
 import MenuComponentWithSession from '@/components/common/MenuWithSession';
+
+import './globals.css';
+import './glassy.css';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',

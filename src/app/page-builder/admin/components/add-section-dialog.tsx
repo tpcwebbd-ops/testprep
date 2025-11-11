@@ -32,7 +32,7 @@ export const AddSectionDialog = () => {
         <DialogHeader>
           <DialogTitle className="text-white">Add New Section</DialogTitle>
         </DialogHeader>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
           {initialSectionData.map(section => (
             <button
               key={section.id}

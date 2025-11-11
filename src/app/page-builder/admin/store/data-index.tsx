@@ -1,11 +1,11 @@
-import { defaultData as sectionData1, ISectionData as SectionData1 } from '../../all-section/section-1/data';
-import { defaultData as sectionData2, ISectionData as SectionData2 } from '../../all-section/section-2/data';
-import { defaultData as sectionData3, ISectionData as SectionData3 } from '../../all-section/section-3/data';
-import { defaultData as sectionData4, ISectionData as SectionData4 } from '../../all-section/section-4/data';
-import { defaultData as sectionData5, ISectionData as SectionData5 } from '../../all-section/section-5/data';
-import { defaultData as sectionData6, ISectionData as SectionData6 } from '../../all-section/section-6/data';
+import { defaultData as sectionData1, ISectionData as ISectionData1 } from '../../all-section/section-1/data';
+import { defaultData as sectionData2, ISectionData as ISectionData2 } from '../../all-section/section-2/data';
+import { defaultData as sectionData3, ISectionData as ISectionData3 } from '../../all-section/section-3/data';
+import { defaultData as sectionData4, ISectionData as ISectionData4 } from '../../all-section/section-4/data';
+import { defaultData as sectionData5, ISectionData as ISectionData5 } from '../../all-section/section-5/data';
+import { defaultData as sectionData6, ISectionData as ISectionData6 } from '../../all-section/section-6/data';
 
-type SectioinDataType = SectionData1 | SectionData2 | SectionData3 | SectionData4 | SectionData5 | SectionData6;
+export type SectioinDataType = ISectionData1 | ISectionData2 | ISectionData3 | ISectionData4 | ISectionData5 | ISectionData6;
 
 export interface SectionData {
   id: string;

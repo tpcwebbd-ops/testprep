@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { GripVertical, Trash2, Edit } from 'lucide-react';
 
-import { initialSectionData, SectionData } from '../store/data-index';
+import { initialSectionData, SectioinDataType, SectionData } from '../store/data-index';
 import { useSectionStore } from '../store/section-store';
 
 // ✅ Import 6 Form Components (All accept SectionFormProps)
@@ -31,20 +31,25 @@ import MutationSection4 from '../../all-section/section-4/Mutation';
 import MutationSection5 from '../../all-section/section-5/Mutation';
 import MutationSection6 from '../../all-section/section-6/Mutation';
 
-import { ISectionData } from '../../all-section/section-1/data';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { ISectionData } from '../../all-section/section-2/data';
 
 export type SectionFormProps = {
-  data?: ISectionData;
-  onSubmit: (v: ISectionData) => void;
+  data?: SectioinDataType;
+  onSubmit: (v: SectioinDataType) => void;
 };
 
 interface SectionCardProps {
   section: SectionData;
 }
 
-const SectionMutationRegistry: Record<string, React.FC<SectionFormProps>> = {
+const SectionMutationRegistry = {
   [initialSectionData[0].sectionUid]: MutationSection1,
+  [initialSectionData[1].sectionUid]: MutationSection2,
+  [initialSectionData[2].sectionUid]: MutationSection3,
+  [initialSectionData[3].sectionUid]: MutationSection4,
+  [initialSectionData[4].sectionUid]: MutationSection5,
+  [initialSectionData[5].sectionUid]: MutationSection6,
 };
 
 export const SectionCard = ({ section }: SectionCardProps) => {
@@ -67,7 +72,7 @@ export const SectionCard = ({ section }: SectionCardProps) => {
     setShowDeleteDialog(false);
   };
 
-  const handleSectionEdit = (updatedValue: ISectionData) => {
+  const handleSectionEdit = (updatedValue: SectioinDataType) => {
     updateSection(section.id, { ...section, content: updatedValue });
     setShowEditDialog(false);
   };
@@ -105,11 +110,11 @@ export const SectionCard = ({ section }: SectionCardProps) => {
 
           <div className="flex-1" />
 
-          <Button variant="outline" size="sm" onClick={handleEdit}>
+          <Button variant="outlineGlassy" size="sm" onClick={handleEdit}>
             <Edit className="h-3.5 w-3.5" /> Edit
           </Button>
 
-          <Button variant="outline" size="sm" className="mt-2 text-red-400 border-red-400/30" onClick={() => setShowDeleteDialog(true)}>
+          <Button variant="outlineGlassy" size="sm" className="mt-2 text-red-400 border-red-400/30" onClick={() => setShowDeleteDialog(true)}>
             <Trash2 className="h-3.5 w-3.5" /> Delete
           </Button>
         </div>
@@ -120,12 +125,12 @@ export const SectionCard = ({ section }: SectionCardProps) => {
         <DialogContent className="bg-slate-900/95 text-white max-w-[700px]">
           <DialogHeader>
             <DialogTitle>Edit Section</DialogTitle>
-            <DialogDescription>Update the section data below</DialogDescription>
+            <DialogDescription className="text-white/70">Update the section data below</DialogDescription>
           </DialogHeader>
           <ScrollArea className="w-full h-[400px] pr-4">{editComponent}</ScrollArea>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowEditDialog(false)}>
+            <Button variant="outlineGlassy" onClick={() => setShowEditDialog(false)}>
               Close
             </Button>
           </DialogFooter>
@@ -137,11 +142,22 @@ export const SectionCard = ({ section }: SectionCardProps) => {
         <AlertDialogContent className="bg-slate-900/95 text-white">
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Section</AlertDialogTitle>
-            <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+            <AlertDialogDescription className="text-white/70">This action cannot be undone.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction className="bg-red-600" onClick={handleDelete}>
+            <AlertDialogCancel
+              className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-white/30 text-white backdrop-blur-xl shadow-lg shadow-blue-500/20
+           hover:from-blue-500/30 hover:to-purple-500/30 hover:border-white/50 hover:shadow-xl hover:shadow-purple-500/30 hover:scale-[1.02]
+           transition-all duration-300"
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className=" border border-rose-400/50 text-rose-100 bg-rose-400/20 backdrop-blur-md shadow-lg shadow-rose-500/20
+           hover:bg-rose-400/30 hover:border-rose-400/70 hover:shadow-xl hover:shadow-rose-500/30 hover:scale-[1.02]
+           transition-all duration-300"
+              onClick={handleDelete}
+            >
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
