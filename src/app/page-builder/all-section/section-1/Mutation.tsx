@@ -6,7 +6,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,6 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 
 import type { ISectionData } from './data';
 import { defaultData } from './data';
+import ImageUploadManagerSingle from '@/components/dashboard-ui/ImageUploadManagerSingle';
 
 export interface SectionFormProps {
   data?: ISectionData;
@@ -30,7 +30,7 @@ const Mutation = ({ data, onSubmit }: SectionFormProps) => {
     }
   }, [data]);
 
-  const updateField = (field: keyof ISectionData, value: string) => {
+  const updateField = (field: keyof ISectionData, value: string | null) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -57,12 +57,13 @@ const Mutation = ({ data, onSubmit }: SectionFormProps) => {
           <Label>Image URL</Label>
           <Input value={formData.image} onChange={e => updateField('image', e.target.value)} placeholder="https://..." />
         </div>
-
+        {/* 
         {formData.image && (
           <div className="relative w-full h-48 border border-white/20 rounded-lg overflow-hidden">
             <Image src={formData.image} alt="Preview" fill className="object-cover" />
           </div>
-        )}
+        )} */}
+        <ImageUploadManagerSingle value={formData.image} onChange={url => updateField('image', url)} />
 
         <div className="space-y-2">
           <Label>Description</Label>

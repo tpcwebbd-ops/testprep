@@ -90,12 +90,7 @@ const Page = async () => {
           <div className="w-full grid grid-cols-1 gap-6">
             {allSections.map(section => (
               <div key={section.id}>
-                <div className="flex flex-col gap-2">
-                  <p className="text-slate-50 font-semibold">
-                    # {section.sectionUid} {section.serialNumber && `(Order: ${section.serialNumber})`}
-                  </p>
-                  {section.sectionUid && renderClientSection(section.sectionUid, section.content)}
-                </div>
+                <div className="flex flex-col gap-2">{section.sectionUid && renderClientSection(section.sectionUid, section.content)}</div>
               </div>
             ))}
           </div>

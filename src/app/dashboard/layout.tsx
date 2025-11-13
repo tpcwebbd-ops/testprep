@@ -26,6 +26,8 @@ import {
   GraduationCap,
   FolderKanban,
   FileSignature,
+  Image,
+  Trash,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -35,6 +37,16 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 const dashboardSidebarData = [
   { id: 11, name: 'Profile', path: '/dashboard/profile', icon: <User size={18} /> },
   { id: 12, name: 'Account', path: '/dashboard/account', icon: <User size={18} /> },
+  {
+    id: 13,
+    name: 'Media',
+    path: '/dashboard/media/all',
+    icon: <Image size={18} />,
+    childData: [
+      { id: 1331, name: 'Active', path: '/dashboard/media/all', icon: <Image size={16} /> },
+      { id: 1332, name: 'Media Trash', path: '/dashboard/media/trash', icon: <Trash size={16} /> },
+    ],
+  },
   { id: 21, name: 'User', path: '/dashboard/user', icon: <Users size={18} /> },
   { id: 22, name: 'My-class', path: '/dashboard/my-class', icon: <GraduationCap size={18} /> },
   { id: 3, name: 'Session', path: '/dashboard/session', icon: <FileText size={18} /> },

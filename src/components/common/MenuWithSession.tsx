@@ -13,6 +13,7 @@ const MenuComponentWithSession = () => {
   const logInMenuData = [
     { id: 1, name: 'About', path: '/about' },
     { id: 2, name: 'Course', path: '/course' },
+    { id: 21, name: 'Image', path: '/image' },
     { id: 3, name: 'Contact', path: '/contact' },
     { id: 4, name: 'Service', path: '/service' },
     { id: 5, name: 'Dashboard', path: '/dashboard' },
@@ -21,6 +22,7 @@ const MenuComponentWithSession = () => {
   const notLogInMenuData = [
     { id: 1, name: 'About', path: '/about' },
     { id: 2, name: 'Course', path: '/course' },
+    { id: 21, name: 'Image', path: '/image' },
     { id: 3, name: 'Contact', path: '/contact' },
     { id: 4, name: 'Service', path: '/service' },
     { id: 5, name: 'Login', path: '/login' },
