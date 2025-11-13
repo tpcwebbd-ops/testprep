@@ -9,13 +9,22 @@ import { useSectionStore } from './store/section-store';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'react-toastify';
+import {
+  useGetPageBuilderQuery,
+  useAddPageBuilderMutation,
+  useUpdatePageBuilderMutation,
+} from '@/app/workshop/page-builder/redux/features/page-builder/pageBuilderSlice';
 
 const Page = () => {
   const { sectionList, setSections, reorderSections } = useSectionStore();
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
   const [hasExistingData, setHasExistingData] = useState(false);
   const [existingId, setExistingId] = useState<string | null>(null);
+
+  const { data: getResponseData, isLoading } = useGetPageBuilderQuery({ q: '', page: 1, limit: 100 });
+  const [addPageBuilder, { isLoading: isAdding }] = useAddPageBuilderMutation();
+  const [updatePageBuilder, { isLoading: isUpdating }] = useUpdatePageBuilderMutation();
+
+  const isSaving = isAdding || isUpdating;
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -25,39 +34,18 @@ const Page = () => {
   );
 
   useEffect(() => {
-    fetchSections();
-  }, []);
+    if (getResponseData?.data?.sections && getResponseData.data.sections.length > 0) {
+      const firstSection = getResponseData.data.sections[0];
+      setHasExistingData(true);
+      setExistingId(firstSection._id);
 
-  const fetchSections = async () => {
-    try {
-      setIsLoading(true);
-      const response = await fetch('/api/page-builder/');
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch sections');
+      if (firstSection.content && Array.isArray(firstSection.content)) {
+        setSections(firstSection.content);
       }
-
-      const result = await response.json();
-
-      if (result.data && result.data.sections && result.data.sections.length > 0) {
-        const firstSection = result.data.sections[0];
-        setHasExistingData(true);
-        setExistingId(firstSection._id);
-
-        if (firstSection.content && Array.isArray(firstSection.content)) {
-          setSections(firstSection.content);
-        }
-      } else {
-        setHasExistingData(false);
-      }
-    } catch (error) {
-      console.error('Error fetching sections:', error);
-      toast.error('Failed to load sections');
+    } else {
       setHasExistingData(false);
-    } finally {
-      setIsLoading(false);
     }
-  };
+  }, [getResponseData, setSections]);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -71,53 +59,35 @@ const Page = () => {
 
   const handleSaveToDB = async () => {
     try {
-      setIsSaving(true);
-
       const sectionsWithSerial = sectionList.map((section, index) => ({
         ...section,
         serialNumber: index + 1,
       }));
 
-      const payload =
-        hasExistingData && existingId
-          ? {
-              id: existingId,
-              content: sectionsWithSerial,
-            }
-          : {
-              title: 'Main Page',
-              content: sectionsWithSerial,
-              isActive: true,
-            };
+      if (hasExistingData && existingId) {
+        await updatePageBuilder({
+          id: existingId,
+          content: sectionsWithSerial,
+        }).unwrap();
+      } else {
+        const result = await addPageBuilder({
+          title: 'Main Page',
+          path: '/',
+          iconName: 'Home',
+          content: sectionsWithSerial,
+          isActive: true,
+        }).unwrap();
 
-      const url = '/api/page-builder/';
-      const method = hasExistingData ? 'PUT' : 'POST';
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to save sections');
-      }
-
-      const result = await response.json();
-
-      if (!hasExistingData && result.data) {
-        setHasExistingData(true);
-        setExistingId(result.data._id);
+        if (result.data) {
+          setHasExistingData(true);
+          setExistingId(result.data._id);
+        }
       }
 
       toast.success('Changes saved successfully!');
     } catch (error) {
       console.error('Error saving sections:', error);
       toast.error('Failed to save changes');
-    } finally {
-      setIsSaving(false);
     }
   };
 

@@ -6,7 +6,7 @@ import { ReactNode, useState, useMemo } from 'react';
 import { Home, Shield, Layers, Sparkles, ChevronRight, Plus, X } from 'lucide-react';
 import * as Icons from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
-import { useGetPageBuilderQuery, useAddPageBuilderMutation } from '@/redux/features/page-builder/pageBuilderSlice';
+import { useGetPageBuilderQuery, useAddPageBuilderMutation } from '@/app/workshop/page-builder/redux/features/page-builder/pageBuilderSlice';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -23,11 +23,12 @@ interface RootLayoutProps {
   children: ReactNode;
 }
 
-interface DynamicPage {
-  id: string;
-  name: string;
+// NOTE: This interface was missing in the original code, added for type safety.
+interface Page {
+  _id: string;
+  title: string;
   path: string;
-  icon: LucideIcon;
+  iconName: string;
 }
 
 const iconOptions: string[] = [
@@ -60,7 +61,7 @@ export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
 
   const { data: getResponseData } = useGetPageBuilderQuery({ q: '', page: 1, limit: 100 });
   const [addPageBuilder, { isLoading: isAdding }] = useAddPageBuilderMutation();
-  const parentData = getResponseData?.data?.sections;
+  const parentData: Page[] = getResponseData?.data?.sections || [];
 
   const dynamicLayout = useMemo(() => {
     if (!parentData || !Array.isArray(parentData)) return [];
@@ -74,7 +75,9 @@ export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
   }, [parentData]);
 
   const combinedMenu = useMemo(() => {
-    return [...defaultlayoutMenu, ...dynamicLayout];
+    // Ensure defaultlayoutMenu items have unique keys if there's an overlap with dynamicLayout ids.
+    const mappedDefaultMenu = defaultlayoutMenu.map(item => ({ ...item, id: `default-${item.id}` }));
+    return [...mappedDefaultMenu, ...dynamicLayout];
   }, [dynamicLayout]);
 
   const toggleSidebar = () => setIsOpen(!isOpen);
@@ -96,6 +99,16 @@ export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
     }
   };
 
+  // **FIX APPLIED HERE**
+  // This function ensures the sidebar closes on mobile before opening the dialog.
+  // This prevents the sidebar overlay from blocking the main content after the dialog is closed.
+  const handleOpenDialog = () => {
+    if (window.innerWidth < 768 && isOpen) {
+      setIsOpen(false);
+    }
+    setDialogOpen(true);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900 relative overflow-hidden">
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxNCAwIDYgMi42ODYgNiA2cy0yLjY4NiA2LTYgNi02LTIuNjg2LTYtNiAyLjY4Ni02IDYtNnoiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwwLjAzKSIgc3Ryb2tlLXdpZHRoPSIyIi8+PC9nPjwvc3ZnPg==')] opacity-40"></div>
@@ -103,9 +116,9 @@ export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
       <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
       <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
 
-      {isOpen && <div onClick={toggleSidebar} className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-300 md:hidden"></div>}
+      {isOpen && <div onClick={toggleSidebar} className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30 transition-opacity duration-300 md:hidden"></div>}
 
-      <aside className={`fixed left-0 top-0 h-full z-50 transition-all duration-300 ease-in-out ${isOpen ? 'w-64' : 'w-20'}`}>
+      <aside className={`fixed left-0 top-0 h-full z-40 transition-all duration-300 ease-in-out ${isOpen ? 'w-64' : 'w-20'}`}>
         <div className="h-full backdrop-blur-xl bg-white/5 border-r border-white/10 shadow-2xl flex flex-col">
           <div className="flex items-center justify-between p-4 border-b border-white/10">
             <div className={`flex items-center space-x-3 group transition-all duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden'}`}>
@@ -174,17 +187,18 @@ export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
           </nav>
 
           <div className="p-4 border-t border-white/10 space-y-3">
+            {/* The Dialog component now controls its state via `open` and `onOpenChange` */}
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-              <DialogTrigger asChild>
-                <Button
-                  className={`w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white transition-all duration-300 ${
-                    isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-                  }`}
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Page
-                </Button>
-              </DialogTrigger>
+              {/* The trigger does not need to be a `DialogTrigger`. A simple button that calls our new handler is better. */}
+              <Button
+                onClick={handleOpenDialog} // **FIX APPLIED HERE**
+                className={`w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white transition-all duration-300 ${
+                  isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                }`}
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Add Page
+              </Button>
               <DialogContent className="bg-slate-900 border-purple-500/30">
                 <DialogHeader>
                   <DialogTitle className="text-white">Add New Page</DialogTitle>
@@ -250,6 +264,15 @@ export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
                 </div>
               </DialogContent>
             </Dialog>
+
+            <div
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl backdrop-blur-xl bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-500/30 transition-all duration-300 ${
+                isOpen ? 'opacity-100' : 'opacity-0'
+              }`}
+            >
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span className="text-sm text-gray-300 whitespace-nowrap">System Active</span>
+            </div>
           </div>
         </div>
       </aside>
@@ -261,7 +284,7 @@ export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
         <ChevronRight className={`w-6 h-6 text-white drop-shadow-lg group-hover:scale-110 transition-all duration-300 ${isOpen ? 'rotate-180' : 'rotate-0'}`} />
       </div>
 
-      <main className={`transition-all duration-300 min-h-screen pt-20 pb-10 ${isOpen ? 'ml-60' : 'ml-16'}`}>
+      <main className={`transition-all duration-300 min-h-screen pt-20 pb-10 relative z-50 ${isOpen ? 'ml-64' : 'ml-20'}`}>
         <div className="container mx-auto px-4">{children}</div>
       </main>
 
