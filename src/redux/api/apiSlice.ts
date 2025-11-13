@@ -25,6 +25,7 @@ export const apiSlice = createApi({
     'tagTypeFinance',
     'tagTypeRoles',
     'tagTypeAccessManagements',
+    'tagTypePageBuilder',
   ],
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({

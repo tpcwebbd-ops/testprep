@@ -42,7 +42,7 @@ interface Section {
 const fetchPageData = async (): Promise<Section[]> => {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-    const response = await fetch(`${baseUrl}/api/page-builder/`);
+    const response = await fetch(`${baseUrl}/api/page-builder/v1`);
 
     if (!response.ok) {
       throw new Error('Failed to fetch page data');

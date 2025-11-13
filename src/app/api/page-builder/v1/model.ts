@@ -21,6 +21,8 @@ const sectionContentSchema = new Schema({
 const pageBuilderSchema = new Schema(
   {
     title: { type: String, default: 'Main Page' },
+    path: { type: String, default: '/' },
+    iconName: { type: String, default: 'Layers' },
     content: [
       {
         id: { type: String },

@@ -2,10 +2,18 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ReactNode, useState } from 'react';
-import { Home, Shield, Layers, Sparkles, ChevronRight } from 'lucide-react';
+import { ReactNode, useState, useMemo } from 'react';
+import { Home, Shield, Layers, Sparkles, ChevronRight, Plus, X } from 'lucide-react';
+import * as Icons from 'lucide-react';
+import { LucideIcon } from 'lucide-react';
+import { useGetPageBuilderQuery } from '@/redux/features/page-builder/pageBuilderSlice';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-const layoutMenu = [
+const defaultlayoutMenu = [
   { id: 1, name: 'Home', path: '/page-builder', icon: Home },
   { id: 2, name: 'Admin', path: '/page-builder/admin', icon: Shield },
   { id: 3, name: 'All section', path: '/page-builder/all-section', icon: Layers },
@@ -15,25 +23,84 @@ interface RootLayoutProps {
   children: ReactNode;
 }
 
+interface DynamicPage {
+  id: string;
+  name: string;
+  path: string;
+  icon: LucideIcon;
+}
+
+const iconOptions: string[] = [
+  'Home',
+  'Shield',
+  'Layers',
+  'Sparkles',
+  'FileText',
+  'Settings',
+  'Users',
+  'Package',
+  'Globe',
+  'Database',
+  'Code',
+  'Zap',
+  'Target',
+  'TrendingUp',
+  'Activity',
+];
+
 export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
   const pathname = usePathname();
-  const [isHovered, setIsHovered] = useState(false);
-  const [isPinned, setIsPinned] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [newPage, setNewPage] = useState({
+    name: '',
+    path: '/',
+    icon: 'Home',
+  });
 
-  const isOpen = isHovered || isPinned;
+  const { data: getResponseData } = useGetPageBuilderQuery({ q: '', page: 1, limit: 100 });
+  const parentData = getResponseData?.data?.sections;
+  console.log('parentData : ', parentData);
+  console.log('getResponseData : ', getResponseData);
+  const dynamicLayout = useMemo(() => {
+    if (!parentData || !Array.isArray(parentData)) return [];
+
+    return parentData.map(page => ({
+      id: page._id,
+      name: page.title || 'Untitled Page',
+      path: page.path || '/',
+      icon: (Icons[page.iconName as keyof typeof Icons] || Icons.Home) as LucideIcon,
+    }));
+  }, [parentData]);
+
+  const combinedMenu = useMemo(() => {
+    return [...defaultlayoutMenu, ...dynamicLayout];
+  }, [dynamicLayout]);
+
+  const toggleSidebar = () => setIsOpen(!isOpen);
+
+  const handleAddPage = () => {
+    if (!newPage.name || !newPage.path) return;
+
+    console.log('Adding new page:', {
+      ...newPage,
+      id: `page-${Date.now()}`,
+    });
+
+    setNewPage({ name: '', path: '/', icon: 'Home' });
+    setDialogOpen(false);
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900 relative overflow-hidden py-[65px]">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900 relative overflow-hidden">
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxNCAwIDYgMi42ODYgNiA2cy0yLjY4NiA2LTYgNi02LTIuNjg2LTYtNiAyLjY4Ni02IDYtNnoiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwwLjAzKSIgc3Ryb2tlLXdpZHRoPSIyIi8+PC9nPjwvc3ZnPg==')] opacity-40"></div>
 
       <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
       <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
 
-      <aside
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        className={`fixed left-0 top-0 h-full z-50 transition-all duration-300 ease-in-out ${isOpen ? 'w-64' : 'w-20'}`}
-      >
+      {isOpen && <div onClick={toggleSidebar} className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-300 md:hidden"></div>}
+
+      <aside className={`fixed left-0 top-0 h-full z-50 transition-all duration-300 ease-in-out ${isOpen ? 'w-64' : 'w-20'}`}>
         <div className="h-full backdrop-blur-xl bg-white/5 border-r border-white/10 shadow-2xl flex flex-col">
           <div className="flex items-center justify-between p-4 border-b border-white/10">
             <div className={`flex items-center space-x-3 group transition-all duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden'}`}>
@@ -52,26 +119,23 @@ export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
                 <div className="absolute inset-0 bg-purple-500/30 rounded-full blur-xl"></div>
               </div>
             )}
-
-            <button
-              onClick={() => setIsPinned(!isPinned)}
-              className={`p-1.5 rounded-lg backdrop-blur-xl bg-white/10 hover:bg-white/20 transition-all duration-300 border border-white/10 ${
-                isOpen ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden'
-              }`}
-            >
-              <ChevronRight className={`w-4 h-4 text-white transition-transform duration-300 ${isPinned ? 'rotate-180' : ''}`} />
-            </button>
           </div>
 
-          <nav className="flex-1 p-4 space-y-2">
-            {layoutMenu.map(item => {
+          <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+            {combinedMenu.map(item => {
               const isActive = pathname === item.path;
               const Icon = item.icon;
+              const validPath = item.path || '/';
 
               return (
                 <Link
                   key={item.id}
-                  href={item.path}
+                  href={validPath}
+                  onClick={() => {
+                    if (window.innerWidth < 768) {
+                      setIsOpen(false);
+                    }
+                  }}
                   className={`relative flex items-center gap-4 px-4 py-3 rounded-xl font-medium transition-all duration-300 overflow-hidden group ${
                     isActive ? 'text-white' : 'text-gray-300 hover:text-white'
                   }`}
@@ -104,7 +168,83 @@ export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
             })}
           </nav>
 
-          <div className="p-4 border-t border-white/10">
+          <div className="p-4 border-t border-white/10 space-y-3">
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  className={`w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white transition-all duration-300 ${
+                    isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                  }`}
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Page
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="bg-slate-900 border-purple-500/30">
+                <DialogHeader>
+                  <DialogTitle className="text-white">Add New Page</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="pageName" className="text-gray-300">
+                      Page Name
+                    </Label>
+                    <Input
+                      id="pageName"
+                      value={newPage.name}
+                      onChange={e => setNewPage({ ...newPage, name: e.target.value })}
+                      placeholder="e.g., Dashboard"
+                      className="bg-slate-800 border-purple-500/30 text-white placeholder:text-gray-500"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="pagePath" className="text-gray-300">
+                      Path
+                    </Label>
+                    <Input
+                      id="pagePath"
+                      value={newPage.path}
+                      onChange={e => setNewPage({ ...newPage, path: e.target.value })}
+                      placeholder="e.g., /dashboard"
+                      className="bg-slate-800 border-purple-500/30 text-white placeholder:text-gray-500"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="pageIcon" className="text-gray-300">
+                      Icon
+                    </Label>
+                    <Select value={newPage.icon} onValueChange={value => setNewPage({ ...newPage, icon: value })}>
+                      <SelectTrigger className="bg-slate-800 border-purple-500/30 text-white">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-slate-800 border-purple-500/30">
+                        {iconOptions.map(iconName => {
+                          const IconComponent = Icons[iconName as keyof typeof Icons] as LucideIcon;
+                          return (
+                            <SelectItem key={iconName} value={iconName} className="text-white hover:bg-slate-700">
+                              <div className="flex items-center gap-2">
+                                <IconComponent className="w-4 h-4" />
+                                <span>{iconName}</span>
+                              </div>
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <Button
+                    onClick={handleAddPage}
+                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                  >
+                    Create Page
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+
             <div
               className={`flex items-center gap-3 px-4 py-3 rounded-xl backdrop-blur-xl bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-500/30 transition-all duration-300 ${
                 isOpen ? 'opacity-100' : 'opacity-0'
@@ -117,7 +257,16 @@ export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
         </div>
       </aside>
 
-      <main className={`transition-all duration-300 ${isOpen ? 'ml-64' : 'ml-20'}`}>{children}</main>
+      <div
+        onClick={toggleSidebar}
+        className={`fixed top-[80px] z-[60] rounded-full bg-blue-500/50 border-slate-200/50 border-1 transition-all duration-300 cursor-pointer group ${isOpen ? 'left-[243px]' : 'left-[70px]'}`}
+      >
+        <ChevronRight className={`w-6 h-6 text-white drop-shadow-lg group-hover:scale-110 transition-all duration-300 ${isOpen ? 'rotate-180' : 'rotate-0'}`} />
+      </div>
+
+      <main className={`transition-all duration-300 min-h-screen pt-20 pb-10 ${isOpen ? 'ml-60' : 'ml-16'}`}>
+        <div className="container mx-auto px-4">{children}</div>
+      </main>
 
       <style jsx global>{`
         @keyframes gradient-x {
