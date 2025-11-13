@@ -6,7 +6,7 @@ import { ReactNode, useState, useMemo } from 'react';
 import { Home, Shield, Layers, Sparkles, ChevronRight, Plus, X } from 'lucide-react';
 import * as Icons from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
-import { useGetPageBuilderQuery } from '@/redux/features/page-builder/pageBuilderSlice';
+import { useGetPageBuilderQuery, useAddPageBuilderMutation } from '@/redux/features/page-builder/pageBuilderSlice';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -59,9 +59,9 @@ export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
   });
 
   const { data: getResponseData } = useGetPageBuilderQuery({ q: '', page: 1, limit: 100 });
+  const [addPageBuilder, { isLoading: isAdding }] = useAddPageBuilderMutation();
   const parentData = getResponseData?.data?.sections;
-  console.log('parentData : ', parentData);
-  console.log('getResponseData : ', getResponseData);
+
   const dynamicLayout = useMemo(() => {
     if (!parentData || !Array.isArray(parentData)) return [];
 
@@ -79,16 +79,21 @@ export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
 
   const toggleSidebar = () => setIsOpen(!isOpen);
 
-  const handleAddPage = () => {
+  const handleAddPage = async () => {
     if (!newPage.name || !newPage.path) return;
 
-    console.log('Adding new page:', {
-      ...newPage,
-      id: `page-${Date.now()}`,
-    });
+    try {
+      await addPageBuilder({
+        title: newPage.name,
+        path: newPage.path,
+        iconName: newPage.icon,
+      }).unwrap();
 
-    setNewPage({ name: '', path: '/', icon: 'Home' });
-    setDialogOpen(false);
+      setNewPage({ name: '', path: '/', icon: 'Home' });
+      setDialogOpen(false);
+    } catch (error) {
+      console.error('Failed to add page:', error);
+    }
   };
 
   return (
@@ -237,22 +242,14 @@ export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
 
                   <Button
                     onClick={handleAddPage}
-                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                    disabled={isAdding}
+                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Create Page
+                    {isAdding ? 'Creating...' : 'Create Page'}
                   </Button>
                 </div>
               </DialogContent>
             </Dialog>
-
-            <div
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl backdrop-blur-xl bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-500/30 transition-all duration-300 ${
-                isOpen ? 'opacity-100' : 'opacity-0'
-              }`}
-            >
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              <span className="text-sm text-gray-300 whitespace-nowrap">System Active</span>
-            </div>
           </div>
         </div>
       </aside>
