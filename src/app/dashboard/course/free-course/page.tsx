@@ -107,10 +107,10 @@ const CourseBuilderPage = () => {
   };
 
   const handleOpenEditDialog = (course: ICourse) => {
-    const num = course.courseDay.replace(/\D/g, '');
-    setSelectedDayNum(parseInt(num).toString());
-    setSelectedCourseToEdit(course);
-    setIsEditDialogOpen(true);
+    const { courseDay, courseName } = course || {};
+    console.log('courseDay : ', courseDay.replaceAll(' ', '-'));
+    console.log('courseName : ', courseName);
+    window.open(`/dashboard/course/${courseName}/edit?courseDay=${courseDay.replaceAll(' ', '-')}&courseName=${courseName}`, '_blank');
   };
 
   const handleSaveDay = async () => {
@@ -359,54 +359,24 @@ const CourseBuilderPage = () => {
                   {/* Actions Footer */}
                   <div className="p-3 bg-white/5 border-t border-white/5 flex items-center justify-between gap-2">
                     <div className="flex gap-1">
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="h-8 w-8 text-slate-400 hover:text-white hover:bg-white/10"
-                        onClick={() => handleOpenEditDialog(course)}
-                        title="Edit Day"
-                      >
+                      <Button size="sm" className="min-w-1" variant="outlineGlassy" onClick={() => handleOpenEditDialog(course)} title="Edit Day">
                         <Edit className="h-4 w-4" />
                       </Button>
 
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="h-8 w-8 text-slate-400 hover:text-blue-400 hover:bg-blue-500/10"
-                        onClick={() => handleEdit(course._id)}
-                        title="Build Content"
-                      >
+                      <Button size="sm" className="min-w-1" variant="outlineGlassy" onClick={() => handleEdit(course._id)} title="Build Content">
                         <BookOpen className="h-4 w-4" />
                       </Button>
 
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="h-8 w-8 text-slate-400 hover:text-emerald-400 hover:bg-emerald-500/10"
-                        onClick={() => handlePreview(course._id)}
-                        title="Preview"
-                      >
+                      <Button size="sm" className="min-w-1" variant="outlineGlassy" onClick={() => handlePreview(course._id)} title="Preview">
                         <Eye className="h-4 w-4" />
                       </Button>
 
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="h-8 w-8 text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10"
-                        onClick={() => handleLiveLink(course.courseDay)}
-                        title="Visit Live"
-                      >
+                      <Button size="sm" className="min-w-1" variant="outlineGlassy" onClick={() => handleLiveLink(course.courseDay)} title="Visit Live">
                         <ExternalLink className="h-4 w-4" />
                       </Button>
                     </div>
 
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-8 w-8 text-slate-500 hover:text-red-400 hover:bg-red-500/10"
-                      onClick={() => initiateDelete(course)}
-                      title="Delete Day"
-                    >
+                    <Button size="sm" className="min-w-1" variant="outlineGlassy" onClick={() => initiateDelete(course)} title="Delete Day">
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
