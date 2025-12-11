@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
 
 interface ContinueWithGoogleButtonProps {
   onClick?: () => void;
@@ -9,12 +9,7 @@ interface ContinueWithGoogleButtonProps {
 
 const ContinueWithGoogleButton: React.FC<ContinueWithGoogleButtonProps> = ({ onClick }) => {
   return (
-    <motion.button
-      whileHover={{ scale: 1.03 }}
-      whileTap={{ scale: 0.97 }}
-      onClick={onClick}
-      className="flex items-center justify-center gap-3 w-full sm:w-auto px-6 py-2 rounded-full bg-white text-gray-800 font-medium border border-gray-300 shadow-md hover:shadow-lg transition-all duration-300"
-    >
+    <Button onClick={onClick} variant="outlineGlassy" className="rounded-full overflow-hidden border border-slate-100/50 w-3/4">
       {/* Inline Google SVG */}
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="22" height="22">
         <path
@@ -29,7 +24,7 @@ const ContinueWithGoogleButton: React.FC<ContinueWithGoogleButtonProps> = ({ onC
         <path fill="#FBBC05" d="M11.7 28.48c-.48-1.4-.75-2.9-.75-4.48s.27-3.08.75-4.48l-7-5.4C3.94 17.2 3 20.74 3 24s.94 6.8 2.7 9.88l6-4.4z" />
       </svg>
       Continue with Google
-    </motion.button>
+    </Button>
   );
 };
 

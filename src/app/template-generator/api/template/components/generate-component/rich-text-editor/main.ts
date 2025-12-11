@@ -17,20 +17,20 @@ const generateRichTextEditorMain = async (data: string) => {
     if (isUseGenerateFolder) {
         writeInFile(
             richTextEditorIndexTemplate,
-            `src/app/generate/${folderName}/all/components/rich-text-editor/index.tsx`
+            `src/app/generate/${folderName}/components/rich-text-editor/index.tsx`
         )
         writeInFile(
             richTextEditorMenuBarTemplate,
-            `src/app/generate/${folderName}/all/components/rich-text-editor/menu-bar.tsx`
+            `src/app/generate/${folderName}/components/rich-text-editor/menu-bar.tsx`
         )
     } else {
         writeInFile(
             richTextEditorIndexTemplate,
-            `src/app/dashboard/${folderName}/all/components/rich-text-editor/index.tsx`
+            `src/app/dashboard/${folderName}/components/rich-text-editor/index.tsx`
         )
         writeInFile(
             richTextEditorMenuBarTemplate,
-            `src/app/dashboard/${folderName}/all/components/rich-text-editor/menu-bar.tsx`
+            `src/app/dashboard/${folderName}/components/rich-text-editor/menu-bar.tsx`
         )
     }
 }

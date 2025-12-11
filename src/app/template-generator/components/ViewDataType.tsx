@@ -430,7 +430,7 @@ const ViewDataType = () => {
     <div className="  bg-gradient-to-br from-slate-900 via-purple-900 to-slate-800 rounded-lg">
       {/* Trigger Button */}
       <Button onClick={() => setIsDialogOpen(true)} variant="outlineGlassy">
-        {/* <div className="absolute inset-0 bg-gradient-to-r from-blue-600/30 to-purple-600/30 opacity-0 transition-opacity duration-300 group-hover:opacity-100" /> */}
+        {/* <div className="absolute inset-0 bg-linear-to-r from-blue-600/30 to-purple-600/30 opacity-0 transition-opacity duration-300 group-hover:opacity-100" /> */}
         <span className="relative flex items-center gap-2">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
@@ -451,7 +451,7 @@ const ViewDataType = () => {
           <div className="relative w-full max-w-2xl max-h-[85vh] bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between p-2 py-6 border-b border-white/10">
-              <h2 className="text-2xl font-bold bg-gradient-to-r pl-2 from-blue-400 to-purple-400 bg-clip-text text-transparent">Data Types Overview</h2>
+              <h2 className="text-2xl font-bold bg-linear-to-r pl-2 from-blue-400 to-purple-400 bg-clip-text text-transparent">Data Types Overview</h2>
               <Button onClick={() => setIsDialogOpen(false)} className="min-w-[6px] bg-transparent">
                 <svg className="w-5 h-5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -465,9 +465,9 @@ const ViewDataType = () => {
                 {allDataType.map((curr, index) => (
                   <div
                     key={curr.name}
-                    className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-sm border border-white/10 p-1 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:border-white/20"
+                    className="group relative overflow-hidden rounded-xl bg-linear-to-r from-white/5 to-white/10 backdrop-blur-sm border border-white/10 p-1 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:border-white/20"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                    <div className="absolute inset-0 bg-linear-to-r from-blue-500/10 to-purple-500/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                     <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                       <div className="flex items-center gap-3">
                         <div className="w-6 h-6 flex items-center justify-center text-sm font-bold text-white">{index + 1}</div>
@@ -501,18 +501,18 @@ const ViewDataType = () => {
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-white/10">
               <h2 className="text-2xl font-bold text-white">
-                Details: <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">{currentPreviewItem.name}</span>
+                Details: <span className="bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">{currentPreviewItem.name}</span>
               </h2>
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => copyToClipboard(currentPreviewItem.mongooseSchema, 'schema')}
-                  className="px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500/20 to-blue-600/20 border border-blue-400/20 text-blue-300 text-sm font-medium transition-all duration-300 hover:scale-105"
+                  className="px-4 py-2 rounded-lg bg-linear-to-r from-blue-500/20 to-blue-600/20 border border-blue-400/20 text-blue-300 text-sm font-medium transition-all duration-300 hover:scale-105"
                 >
                   Copy Schema
                 </button>
                 <button
                   onClick={() => copyToClipboard(currentPreviewItem.ui, 'ui')}
-                  className="px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 border border-emerald-400/20 text-emerald-300 text-sm font-medium transition-all duration-300 hover:scale-105"
+                  className="px-4 py-2 rounded-lg bg-linear-to-r from-emerald-500/20 to-emerald-600/20 border border-emerald-400/20 text-emerald-300 text-sm font-medium transition-all duration-300 hover:scale-105"
                 >
                   Copy UI
                 </button>
@@ -537,7 +537,7 @@ const ViewDataType = () => {
                     onClick={() => setActiveTab(tab.id)}
                     className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all duration-300 ${
                       activeTab === tab.id
-                        ? 'bg-gradient-to-r from-blue-500/30 to-purple-500/30 text-white shadow-lg'
+                        ? 'bg-linear-to-r from-blue-500/30 to-purple-500/30 text-white shadow-lg'
                         : 'text-white/60 hover:text-white hover:bg-white/10'
                     }`}
                   >

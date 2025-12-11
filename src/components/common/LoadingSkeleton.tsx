@@ -4,7 +4,7 @@ import React from 'react';
 const Skeleton = ({ className = '' }) => {
   return (
     <div
-      className={`animate-pulse bg-gradient-to-r from-slate-200 via-slate-100 to-slate-200 bg-[length:400%_100%] ${className}`}
+      className={`animate-pulse bg-linear-to-r from-slate-200 via-slate-100 to-slate-200 bg-[length:400%_100%] ${className}`}
       style={{
         animation: 'shimmer 2s ease-in-out infinite',
         backgroundImage: 'linear-gradient(90deg, #f1f5f9 0%, #e2e8f0 50%, #f1f5f9 100%)',

@@ -75,12 +75,20 @@ const ImageDialog = ({
                     throw new Error('Failed to fetch images');
                 }
                 const data = await response.json()
-                const lstImage: string[] = data?.data.map(
+
+                // Handle cases where data.data is not an array or is empty
+                if (!data?.data || !Array.isArray(data.data)) {
+                    setAllImages([])
+                    return
+                }
+
+                const lstImage: string[] = data.data.map(
                     (i: { url: string }) => i.url
                 )
                 setAllImages(lstImage)
             } catch (error) {
                 console.error('Failed to fetch images:', error)
+                setAllImages([])
             }
         }
         fetchImages()

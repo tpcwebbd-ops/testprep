@@ -2,92 +2,127 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  X,
-  Home,
-  Settings,
-  MessageCircle,
-  ChevronDown,
-  ChevronRight,
-  ChevronLeft,
-  LogOut,
-  FileText,
-  Info,
-  Wrench,
-  Phone,
-  HelpCircle,
-  Menu,
-  Lock,
-  ScrollText,
-  FileBadge,
-  ShieldCheck,
-  User,
-  Users,
-  GraduationCap,
-  FolderKanban,
-  FileSignature,
-  Image,
-  Trash,
-} from 'lucide-react';
+import { Home, Settings, ChevronDown, ChevronRight, ChevronLeft, LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { signOut, useSession } from '@/lib/auth-client';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Separator } from '@/components/ui/separator';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { useFetchSidebar } from './useFetchSidebar';
+import { IDefaultSidebarItem } from './default-items';
+import HasAccess from './hasAccess';
 
-const dashboardSidebarData = [
-  { id: 11, name: 'Profile', path: '/dashboard/profile', icon: <User size={18} /> },
-  { id: 12, name: 'Account', path: '/dashboard/account', icon: <User size={18} /> },
-  {
-    id: 13,
-    name: 'Media',
-    path: '/dashboard/media/all',
-    icon: <Image size={18} />,
-    childData: [
-      { id: 1331, name: 'Active', path: '/dashboard/media/all', icon: <Image size={16} /> },
-      { id: 1332, name: 'Media Trash', path: '/dashboard/media/trash', icon: <Trash size={16} /> },
-    ],
-  },
-  { id: 21, name: 'User', path: '/dashboard/user', icon: <Users size={18} /> },
-  { id: 22, name: 'My-class', path: '/dashboard/my-class', icon: <GraduationCap size={18} /> },
-  { id: 3, name: 'Session', path: '/dashboard/session', icon: <FileText size={18} /> },
-  {
-    id: 4,
-    name: 'Verification',
-    path: '/dashboard/verification',
-    icon: <ShieldCheck size={18} />,
-  },
-  {
-    id: 5,
-    name: 'Site Setting',
-    path: '/dashboard/site-setting',
-    icon: <Settings size={18} />,
-    childData: [
-      { id: 51, name: 'Publish', path: '/dashboard/site-setting/publish', icon: <FileText size={16} /> },
-      { id: 52, name: 'About', path: '/dashboard/site-setting/about', icon: <Info size={16} /> },
-      { id: 53, name: 'Service', path: '/dashboard/site-setting/service', icon: <Wrench size={16} /> },
-      { id: 54, name: 'Contact', path: '/dashboard/site-setting/contact', icon: <Phone size={16} /> },
-      { id: 55, name: 'FAQ', path: '/dashboard/site-setting/Frequently-ask-question', icon: <HelpCircle size={16} /> },
-      { id: 56, name: 'Menu', path: '/dashboard/site-setting/menu', icon: <Menu size={16} /> },
-      { id: 57, name: 'Privacy & Policy', path: '/dashboard/site-setting/privacy-and-policy', icon: <Lock size={16} /> },
-      { id: 58, name: 'Terms & Condition', path: '/dashboard/site-setting/terms-and-condition', icon: <ScrollText size={16} /> },
-      { id: 59, name: 'Footer', path: '/dashboard/site-setting/footer', icon: <FileBadge size={16} /> },
-    ],
-  },
-  {
-    id: 6,
-    name: 'Access',
-    path: '/dashboard',
-    icon: <ShieldCheck size={18} />,
-    childData: [
-      { id: 61, name: 'Access', path: '/dashboard/access/access', icon: <FolderKanban size={16} /> },
-      { id: 62, name: 'Role', path: '/dashboard/access/role', icon: <FileSignature size={16} /> },
-    ],
-  },
-];
+// --- Components ---
+
+const LoadingOverlay = () => (
+  <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden">
+    <div className="fixed inset-0 bg-linear-to-br from-indigo-500 via-purple-500 to-blue-500 blur-sm" />
+    <motion.div
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.8 }}
+      className="relative z-10 flex flex-col items-center justify-center gap-4 p-8 bg-white/10 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-2xl"
+    >
+      <div className="relative">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+          className="w-16 h-16 rounded-full border-4 border-white/30 border-t-white"
+        />
+        <motion.div
+          animate={{ rotate: -360 }}
+          transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
+          className="absolute inset-2 w-12 h-12 rounded-full border-4 border-transparent border-b-purple-200"
+        />
+      </div>
+      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="text-white font-medium tracking-wider">
+        Authenticating...
+      </motion.p>
+    </motion.div>
+  </div>
+);
+
+const SidebarMenuButton = ({
+  item,
+  isCollapsed,
+  isExpanded,
+  onExpand,
+  pathname,
+}: {
+  item: IDefaultSidebarItem;
+  isCollapsed: boolean;
+  isExpanded: boolean;
+  onExpand: (id: number) => void;
+  pathname: string;
+}) => {
+  const isActive = pathname === item.path;
+
+  const buttonContent = (
+    <button
+      onClick={() => item.children && onExpand(item.id)}
+      className={`w-full bg-glass flex items-center justify-between px-3 py-2 rounded-lg transition ${isActive ? 'bg-white/20' : ''}`}
+    >
+      <div className="flex items-center gap-3 justify-start w-full">
+        <span className="text-white shrink-0">{item.icon}</span>
+        {!isCollapsed && <span className="text-sm font-medium">{item.name}</span>}
+      </div>
+      {!isCollapsed && item.children && (
+        <motion.div animate={{ rotate: isExpanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
+          <ChevronDown size={16} />
+        </motion.div>
+      )}
+    </button>
+  );
+
+  if (isCollapsed && item.children) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>{buttonContent}</TooltipTrigger>
+        <TooltipContent side="right" align="start" className="bg-white/20 border border-white/30 text-white shadow-xl p-2 max-w-xs">
+          <div className="flex flex-col gap-1">
+            {item.children.map(child => (
+              <Link
+                key={child.id}
+                href={child.path}
+                className={`flex items-center gap-2 px-2 py-1 rounded text-xs whitespace-nowrap transition ${
+                  pathname === child.path ? 'bg-white/30 text-white' : 'text-white/80 hover:text-white hover:bg-white/20'
+                }`}
+              >
+                {child.icon}
+                {child.name}
+              </Link>
+            ))}
+          </div>
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  return buttonContent;
+};
+
+const SidebarChild = ({ child, pathname, onClick }: { child: IDefaultSidebarItem; pathname: string; onClick?: () => void }) => {
+  const isActive = pathname === child.path;
+
+  return (
+    <Link
+      href={child.path}
+      onClick={onClick}
+      className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition ${
+        isActive ? 'bg-white/20 text-white' : 'text-white/70 hover:text-white hover:bg-white/10'
+      }`}
+    >
+      {child.icon}
+      {child.name}
+    </Link>
+  );
+};
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [expandedItem, setExpandedItem] = useState<number | null>(null);
   const [loadingLogout, setLoadingLogout] = useState(false);
 
@@ -95,12 +130,21 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const session = useSession();
 
-  // Redirect if not logged in
+  const isPending = session?.isPending;
+  const isAuthenticated = !!session?.data?.session;
+  const user = session?.data?.user;
+  const email = user?.email || '';
+
+  // Handle Authentication Redirects
   useEffect(() => {
-    //  if (!session?.data?.session && !session?.isPending) {
-    //    router.push('/login');
-    //  }
-  }, [session, router]);
+    // Only redirect if explicitly not pending and no session exists
+    if (!isPending && !isAuthenticated) {
+      router.push('/login');
+    }
+  }, [isPending, isAuthenticated, router]);
+
+  // Use the hook - it is safe now as layout handles protection
+  const sidebarItems = useFetchSidebar(email);
 
   const toggleExpand = (id: number) => {
     setExpandedItem(expandedItem === id ? null : id);
@@ -109,195 +153,184 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const handleLogout = async () => {
     setLoadingLogout(true);
     await signOut();
+    router.push('/login');
   };
 
-  const user = session?.data?.user;
+  // 1. Loading State
+  if (isPending) {
+    return <LoadingOverlay />;
+  }
 
+  // 2. Unauthenticated State (Waiting for redirect or null)
+  if (!isAuthenticated) {
+    return null; // or <LoadingOverlay /> if you want to keep the loader until route change completes
+  }
+
+  // 3. Authenticated Dashboard State
   return (
     <div className="fixed flex max-h-[calc(100vh-65px)] w-full pt-[65px]">
-      <div className="fixed inset-0 bg-gradient-to-br from-indigo-500 via-purple-500 to-blue-500 -z-10" />
+      <div className="fixed inset-0 bg-linear-to-br from-indigo-500 via-purple-500 to-blue-500 -z-10" />
 
-      {/* ===== Desktop Sidebar ===== */}
+      {/* Desktop Sidebar */}
       <motion.aside
-        animate={{ width: isCollapsed ? '80px' : '250px' }}
-        transition={{ duration: 0.3 }}
-        className="hidden md:flex flex-col backdrop-blur-xl bg-white/10 border-r border-white/20 text-white p-3 space-y-4 relative"
+        animate={{ width: isCollapsed ? '80px' : '280px' }}
+        transition={{ duration: 0.3, type: 'spring', stiffness: 300, damping: 30 }}
+        className="hidden md:flex flex-col backdrop-blur-xl bg-white/10 border-r border-white/20 text-white p-4 relative h-screen overflow-visible"
       >
-        {/* Toggle Button */}
-        <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="absolute -right-3 top-6 bg-white/20 hover:bg-white/30 p-1 rounded-full text-white transition"
-        >
-          {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-        </button>
-
-        {/* Logo / Title */}
-        <div className={`transition-all duration-300 ${isCollapsed ? 'text-center' : 'pl-2'}`}>
-          <h1 className="text-lg font-bold">{isCollapsed ? 'DB' : 'Dashboard'}</h1>
+        <div className="absolute -right-4 top-6 z-10">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="rounded-full bg-white/20 min-w-1 hover:bg-white/30 text-white border-0"
+          >
+            {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+          </Button>
         </div>
 
-        {/* Sidebar Menu */}
-        <nav className="flex-1 flex flex-col space-y-2 overflow-y-auto mt-4">
-          {dashboardSidebarData.map(item => (
-            <div key={item.id}>
-              <button
-                onClick={() => item.childData && toggleExpand(item.id)}
-                className={`w-full flex items-center justify-between px-2 py-2 rounded-lg hover:bg-white/20 transition ${
-                  pathname === item.path ? 'bg-white/20' : ''
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  {item.icon}
-                  {!isCollapsed && <Link href={item.path}>{item.name}</Link>}
-                </div>
-                {!isCollapsed && item.childData && <span>{expandedItem === item.id ? <ChevronDown size={16} /> : <ChevronRight size={16} />}</span>}
-              </button>
+        <div className={`transition-all duration-300 mb-6 ${isCollapsed ? 'text-center' : ''}`}>
+          <h1 className="text-xl font-bold text-white tracking-tight">{isCollapsed ? 'DB' : 'Dashboard'}</h1>
+        </div>
 
-              {/* Accordion */}
-              <AnimatePresence>
-                {!isCollapsed && expandedItem === item.id && item.childData && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="ml-6 mt-2 flex flex-col space-y-1"
-                  >
-                    {item.childData.map(child => (
-                      <Link
-                        key={child.id}
-                        href={child.path}
-                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-white/20 text-sm ${pathname === child.path ? 'bg-white/20' : ''}`}
-                      >
-                        {child.icon}
-                        {child.name}
-                      </Link>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          ))}
-        </nav>
+        <Separator className="bg-white/10 mb-4" />
 
-        {/* Logout Button */}
-        {!isCollapsed && user && (
-          <div className="mt-auto border-t border-white/20 pt-3">
-            <button
-              onClick={handleLogout}
-              disabled={loadingLogout}
-              className="w-full flex items-center justify-center gap-2 py-2 rounded-lg bg-white/20 hover:bg-white/30 transition font-medium text-sm"
-            >
-              <LogOut size={18} />
-              {loadingLogout ? 'Logging out...' : 'Log out'}
-            </button>
-          </div>
-        )}
-      </motion.aside>
-
-      {/* ===== Main Content ===== */}
-      <motion.main initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="flex-1 lg:p-10 text-white">
-        <ScrollArea className="w-full h-[calc(100vh-65px)] pb-12">{children}</ScrollArea>
-      </motion.main>
-
-      {/* ===== Mobile Bottom Navigation ===== */}
-      <div className="md:hidden fixed bottom-0 left-0 w-full bg-white/10 backdrop-blur-xl border-t border-white/20 flex justify-around items-center py-2 text-white">
-        <Link href="/dashboard">
-          <Home size={24} />
-        </Link>
-        <a href="https://wa.me/" target="_blank" rel="noopener noreferrer">
-          <MessageCircle size={24} />
-        </a>
-        <button onClick={() => setMobileSidebarOpen(true)}>
-          <Settings size={24} />
-        </button>
-      </div>
-
-      {/* ===== Mobile Sidebar ===== */}
-      <AnimatePresence>
-        {mobileSidebarOpen && (
-          <motion.div
-            initial={{ x: '-100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '-100%' }}
-            transition={{ duration: 0.4 }}
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex pt-14"
-          >
-            <motion.aside
-              initial={{ x: -200 }}
-              animate={{ x: 0 }}
-              exit={{ x: -200 }}
-              transition={{ duration: 0.4 }}
-              className="w-64 bg-white/10 backdrop-blur-xl text-white p-4 overflow-y-auto flex flex-col"
-            >
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold">Menu</h2>
-                <button onClick={() => setMobileSidebarOpen(false)}>
-                  <X size={22} />
-                </button>
-              </div>
-
-              <nav className="flex-1 flex flex-col space-y-2">
-                {dashboardSidebarData.map(item => (
-                  <div key={item.id}>
-                    <button
-                      onClick={() => item.childData && toggleExpand(item.id)}
-                      className="w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-white/20 transition"
-                    >
-                      <div className="flex items-center gap-2">
-                        {item.icon}
-                        <Link href={item.path}>{item.name}</Link>
-                      </div>
-                      {item.childData && <span>{expandedItem === item.id ? <ChevronDown size={16} /> : <ChevronRight size={16} />}</span>}
-                    </button>
-
-                    {/* Accordion (mobile) */}
+        <ScrollArea className="w-full h-[70vh]">
+          <nav className="flex flex-col space-y-2 pr-3 overflow-visible pb-4">
+            {sidebarItems.map(item => (
+              <div key={item.id}>
+                {item.children ? (
+                  <>
+                    <SidebarMenuButton
+                      item={item}
+                      isCollapsed={isCollapsed}
+                      isExpanded={expandedItem === item.id}
+                      onExpand={toggleExpand}
+                      pathname={pathname}
+                    />
                     <AnimatePresence>
-                      {expandedItem === item.id && item.childData && (
+                      {!isCollapsed && expandedItem === item.id && (
                         <motion.div
                           initial={{ height: 0, opacity: 0 }}
                           animate={{ height: 'auto', opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.3 }}
-                          className="ml-6 mt-2 flex flex-col space-y-1"
+                          transition={{ duration: 0.2 }}
+                          className="ml-6 mt-1 flex flex-col space-y-1 overflow-hidden"
                         >
-                          {item.childData.map(child => (
-                            <Link
-                              key={child.id}
-                              href={child.path}
-                              onClick={() => setMobileSidebarOpen(false)}
-                              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-white/20 text-sm ${
-                                pathname === child.path ? 'bg-white/20' : ''
-                              }`}
-                            >
-                              {child.icon}
-                              {child.name}
-                            </Link>
+                          {item.children.map(child => (
+                            <SidebarChild key={child.id} child={child} pathname={pathname} />
                           ))}
                         </motion.div>
                       )}
                     </AnimatePresence>
+                  </>
+                ) : (
+                  <Link href={item.path} className="w-full">
+                    <SidebarMenuButton item={item} isCollapsed={isCollapsed} isExpanded={false} onExpand={() => {}} pathname={pathname} />
+                  </Link>
+                )}
+              </div>
+            ))}
+          </nav>
+        </ScrollArea>
+
+        {user && (
+          <div className="absolute bottom-[60px] left-0 right-0 p-4 border-t border-white/20 bg-white/5">
+            <Separator className="bg-white/10" />
+            {isCollapsed ? (
+              <Button onClick={handleLogout} disabled={loadingLogout} variant="destructive" className="min-w-12 justify-center gap-2">
+                <LogOut size={18} />
+              </Button>
+            ) : (
+              <Button onClick={handleLogout} disabled={loadingLogout} variant="destructive" className="w-full justify-center gap-2">
+                <LogOut size={18} />
+                {loadingLogout ? 'Logging out...' : 'Log out'}
+              </Button>
+            )}
+          </div>
+        )}
+      </motion.aside>
+
+      {/* Main Content */}
+      <motion.main initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="flex-1 md:pb-0 pb-20 text-white">
+        <ScrollArea className="w-full h-[calc(100vh-65px)]">
+          <div className="lg:p-10 p-4 pb-12">
+            <HasAccess>{children}</HasAccess>
+          </div>
+        </ScrollArea>
+      </motion.main>
+
+      {/* Mobile Bottom Navigation */}
+      <div className="md:hidden fixed bottom-0 left-0 w-full bg-white/10 backdrop-blur-xl border-t border-white/20 flex justify-between items-center px-4 py-3 text-white z-40">
+        <Link href="/dashboard" className="flex items-center justify-center p-2 hover:bg-white/10 rounded-lg transition">
+          <Home size={24} />
+        </Link>
+
+        <div className="flex gap-3 items-center">
+          <Button variant="ghost" size="icon" className="text-white hover:bg-white/20 h-10 w-10">
+            <span className="text-xl font-bold">B1</span>
+          </Button>
+          <Button variant="ghost" size="icon" className="text-white hover:bg-white/20 h-10 w-10">
+            <span className="text-xl font-bold">B2</span>
+          </Button>
+        </div>
+
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="icon" className="text-white hover:bg-white/20">
+              <Settings size={24} />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="bg-white/10 backdrop-blur-xl border-white/20 text-white p-0 w-72 mt-[60px]">
+            <SheetHeader className="p-4 border-b border-white/20">
+              <SheetTitle className="text-white">Menu</SheetTitle>
+            </SheetHeader>
+            <ScrollArea className="h-[calc(100vh-80px)]">
+              <nav className="flex flex-col space-y-1 p-4">
+                {sidebarItems.map(item => (
+                  <div key={item.id}>
+                    {item.children ? (
+                      <>
+                        <SidebarMenuButton item={item} isCollapsed={false} isExpanded={expandedItem === item.id} onExpand={toggleExpand} pathname={pathname} />
+                        <AnimatePresence>
+                          {expandedItem === item.id && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.2 }}
+                              className="ml-6 mt-1 flex flex-col space-y-1 overflow-hidden"
+                            >
+                              {item.children.map(child => (
+                                <SheetTrigger asChild key={child.id}>
+                                  <SidebarChild child={child} pathname={pathname} />
+                                </SheetTrigger>
+                              ))}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </>
+                    ) : (
+                      <SheetTrigger asChild>
+                        <Link href={item.path}>
+                          <SidebarMenuButton item={item} isCollapsed={false} isExpanded={false} onExpand={() => {}} pathname={pathname} />
+                        </Link>
+                      </SheetTrigger>
+                    )}
                   </div>
                 ))}
               </nav>
-
-              {/* Logout button (mobile) */}
-              {user && (
-                <div className="border-t border-white/20 pt-3 mt-3">
-                  <button
-                    onClick={handleLogout}
-                    disabled={loadingLogout}
-                    className="w-full flex items-center justify-center gap-2 py-2 rounded-lg bg-white/20 hover:bg-white/30 transition font-medium text-sm"
-                  >
-                    <LogOut size={18} />
-                    {loadingLogout ? 'Logging out...' : 'Log out'}
-                  </button>
-                </div>
-              )}
-            </motion.aside>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </ScrollArea>
+            {user && (
+              <div className="absolute bottom-[60px] left-0 right-0 p-4 border-t border-white/20 bg-white/5">
+                <Button onClick={handleLogout} disabled={loadingLogout} variant="destructive" className="w-full justify-center gap-2">
+                  <LogOut size={18} />
+                  {loadingLogout ? 'Logging out...' : 'Log out'}
+                </Button>
+              </div>
+            )}
+          </SheetContent>
+        </Sheet>
+      </div>
     </div>
   );
 };

@@ -65,6 +65,7 @@ const initialJsonTemplate: JsonTemplate = {
   schema: {
     title: 'STRING',
     email: 'EMAIL',
+    'author-email': 'EMAIL#readonly',
     password: 'PASSWORD',
     passcode: 'PASSCODE',
     area: 'SELECT#Bangladesh, India, Pakistan, Canada',
@@ -296,8 +297,11 @@ const JsonEditor: React.FC = () => {
         {/* ✅ Path Action Buttons */}
         {pathButton && (
           <div className="flex flex-wrap items-center justify-center gap-3">
-            <Link href={`${pathButton}/all`} target="_blank" className={customBtn}>
-              Dashboard
+            <Link href={`${pathButton}/personal`} target="_blank" className={customBtn}>
+              Personal
+            </Link>
+            <Link href={`${pathButton}/admin`} target="_blank" className={customBtn}>
+              Admin
             </Link>
 
             <Link href={`${pathButton}/ssr-view`} target="_blank" className={customBtn}>
@@ -318,7 +322,7 @@ const JsonEditor: React.FC = () => {
           <div className="flex justify-between items-center mb-4">
             <h2
               className="text-2xl font-bold bg-clip-text text-transparent 
-                        bg-gradient-to-r from-white to-blue-100 drop-shadow-md"
+                        bg-linear-to-r from-white to-blue-100 drop-shadow-md"
             >
               JSON Editor
             </h2>
@@ -371,7 +375,7 @@ const JsonEditor: React.FC = () => {
           <div className="flex justify-between items-center mb-6">
             <h3
               className="text-lg font-semibold bg-clip-text text-transparent
-                        bg-gradient-to-r from-white to-blue-200 drop-shadow-md"
+                        bg-linear-to-r from-white to-blue-200 drop-shadow-md"
             >
               Saved Items ({items.length})
             </h3>

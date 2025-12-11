@@ -217,7 +217,7 @@ const ViewNextComponents: React.FC = () => {
     <Dialog open={isViewModalOpen} onOpenChange={toggleViewModal}>
       <DialogContent className="sm:max-w-2xl mt-8 rounded-xl bg-white/10 backdrop-blur-2xl border border-white/20 text-white">
         <DialogHeader>
-          <DialogTitle className="bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-200">
+          <DialogTitle className="bg-clip-text text-transparent bg-linear-to-r from-white to-blue-200">
             ${pluralPascalCase} Details
           </DialogTitle>
         </DialogHeader>

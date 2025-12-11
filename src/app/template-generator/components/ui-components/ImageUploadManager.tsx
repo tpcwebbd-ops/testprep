@@ -80,13 +80,24 @@ const InternalImageDialog = ({
 
     useEffect(() => {
         const fetchImages = async () => {
-            const response = await fetch('/api/media')
-            const data = await response.json()
+            try {
+                const response = await fetch('/api/media')
+                const data = await response.json()
 
-            const lstImage: string[] = data?.data.map(
-                (i: { url: string }) => i.url
-            )
-            setAllAvailableImages(lstImage)
+                // Handle cases where data.data is not an array or is empty
+                if (!data?.data || !Array.isArray(data.data)) {
+                    setAllAvailableImages([])
+                    return
+                }
+
+                const lstImage: string[] = data.data.map(
+                    (i: { url: string }) => i.url
+                )
+                setAllAvailableImages(lstImage)
+            } catch (error) {
+                console.error('Error fetching images:', error)
+                setAllAvailableImages([])
+            }
         }
         fetchImages()
     }, [])

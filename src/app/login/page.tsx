@@ -3,9 +3,12 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { Loader2, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Loader2, Eye, EyeOff, AlertCircle, Sparkles } from 'lucide-react';
 import ContinueWithGoogleButton from '@/components/common/GoogleButton';
 import { signIn } from '@/lib/auth-client';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 const LoginPage = () => {
   const router = useRouter();
@@ -14,9 +17,12 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [emailFocused, setEmailFocused] = useState(false);
+  const [passwordFocused, setPasswordFocused] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!email || !password) return;
 
     setLoading(true);
@@ -44,27 +50,44 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-500 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-500 via-purple-500 to-indigo-500 p-4 relative overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-linear-to-br from-cyan-400/20 to-transparent rounded-full blur-3xl animate-pulse" />
+        <div
+          className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-linear-to-tl from-pink-400/20 to-transparent rounded-full blur-3xl animate-pulse"
+          style={{ animationDelay: '1s' }}
+        />
+      </div>
+
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
-        className="flex flex-col md:flex-row backdrop-blur-xl bg-white/10 rounded-2xl shadow-2xl overflow-hidden w-full max-w-4xl border border-white/20"
+        className="flex flex-col md:flex-row backdrop-blur-xl bg-white/10 rounded-2xl shadow-2xl overflow-hidden w-full max-w-4xl border border-white/20 relative z-10"
       >
-        {/* ===== Left Side (Visual Section) ===== */}
         <div className="flex-1 flex flex-col items-center justify-center text-white p-8 relative">
           <motion.div
-            animate={{ y: [0, -10, 0] }}
-            transition={{ repeat: Infinity, duration: 3 }}
-            className="text-6xl font-extrabold tracking-tight drop-shadow-md"
+            animate={{
+              y: [0, -10, 0],
+              rotate: [0, 5, -5, 0],
+            }}
+            transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
+            className="text-6xl font-extrabold tracking-tight drop-shadow-md relative"
           >
             🔐
+            <motion.div
+              animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
+              transition={{ repeat: Infinity, duration: 2 }}
+              className="absolute -top-2 -right-2"
+            >
+              <Sparkles className="w-8 h-8 text-yellow-300" />
+            </motion.div>
           </motion.div>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.6 }}
-            className="text-3xl md:text-4xl font-semibold mt-4 text-center"
+            className="text-3xl md:text-4xl font-semibold mt-4 text-center bg-linear-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent"
           >
             Welcome Back
           </motion.h2>
@@ -73,93 +96,161 @@ const LoginPage = () => {
           </p>
         </div>
 
-        {/* ===== Right Side (Form Section) ===== */}
         <div className="flex-1 bg-white/10 backdrop-blur-lg p-8 flex flex-col justify-center text-white">
           <h2 className="text-2xl md:text-3xl font-semibold text-center mb-6">Login to Your Account</h2>
 
-          <form className="flex flex-col space-y-4">
-            <div>
-              <label htmlFor="email" className="block mb-1 text-sm">
+          <form onSubmit={handleLogin} className="flex flex-col space-y-6">
+            <div className="relative">
+              <label htmlFor="email" className="block mb-2 text-sm font-medium">
                 Email Address
               </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                required
-                className="w-full px-4 py-2 rounded-lg bg-white/20 border border-white/30 focus:outline-none focus:ring-2 focus:ring-blue-300 placeholder-white/60"
-                placeholder="Enter your email"
-              />
-            </div>
-
-            {/* === Password Input with Toggle === */}
-            <label htmlFor="password" className="block mb-1 text-sm">
-              Password
-            </label>
-            <div className="relative">
-              <input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                required
-                className="w-full px-4 py-2 rounded-lg bg-white/20 border border-white/30 focus:outline-none focus:ring-2 focus:ring-purple-300 placeholder-white/60 pr-10"
-                placeholder="Enter your password"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-3 flex items-center text-white/70 hover:text-white"
-                aria-label="Toggle password visibility"
+              <motion.div
+                animate={{
+                  scale: emailFocused ? 1.02 : 1,
+                }}
+                transition={{ duration: 0.2 }}
+                className="relative"
               >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  onFocus={() => setEmailFocused(true)}
+                  onBlur={() => setEmailFocused(false)}
+                  required
+                  placeholder="Enter your email"
+                />
+                {emailFocused && (
+                  <motion.div
+                    layoutId="inputGlow"
+                    className="absolute inset-0 rounded-xl bg-linear-to-r from-blue-400/30 to-purple-400/30 blur-xl -z-10"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  />
+                )}
+              </motion.div>
             </div>
 
-            {/* === Forgot Password Link === */}
-            <div className="text-right mt-1">
-              <a href="/forgot-password" className="text-sm text-blue-300 hover:underline">
-                Forgot Password?
-              </a>
+            <div className="relative">
+              <label htmlFor="password" className="block mb-2 text-sm font-medium">
+                Password
+              </label>
+              <motion.div
+                animate={{
+                  scale: passwordFocused ? 1.02 : 1,
+                }}
+                transition={{ duration: 0.2 }}
+                className="relative"
+              >
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  onFocus={() => setPasswordFocused(true)}
+                  onBlur={() => setPasswordFocused(false)}
+                  required
+                  placeholder="Enter your password"
+                />
+                <Button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 -right-1 flex items-center min-w-1 bg-transparent"
+                  aria-label="Toggle password visibility"
+                >
+                  <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </motion.div>
+                </Button>
+                {passwordFocused && (
+                  <motion.div
+                    layoutId="inputGlow"
+                    className="absolute inset-0 rounded-xl bg-linear-to-r from-purple-400/30 to-pink-400/30 blur-xl -z-10"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  />
+                )}
+              </motion.div>
             </div>
 
-            {/* --- Error Message --- */}
+            <Link href="/forgot-password" className="w-full text-right text-xs hover:underline -mt-3.5 ">
+              Forgot Password?
+            </Link>
+
             {error && (
-              <div className="flex items-center text-red-600 bg-red-50 border border-red-400 rounded-lg p-2 mt-2 text-sm">
-                <AlertCircle className="mr-2" size={16} />
-                {error}
-              </div>
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center text-red-100 bg-red-500/20 border border-red-400/50 rounded-xl p-3 text-sm backdrop-blur-sm"
+              >
+                <AlertCircle className="mr-2 shrink-0" size={16} />
+                <span>{error}</span>
+              </motion.div>
             )}
 
-            {/* --- Login Button --- */}
-            <button
+            <motion.button
               type="submit"
               disabled={loading || !email || !password}
-              onClick={handleLogin}
-              className={`w-full py-2 mt-4 rounded-lg font-medium flex justify-center items-center gap-2 transition-all ${
-                loading || !email || !password ? 'bg-gray-400 cursor-not-allowed' : 'bg-gradient-to-r from-indigo-500 to-blue-500 hover:opacity-90'
+              whileHover={{ scale: loading || !email || !password ? 1 : 1.02 }}
+              whileTap={{ scale: loading || !email || !password ? 1 : 0.98 }}
+              className={`relative cursor-pointer w-full py-3 rounded-xl font-semibold flex justify-center items-center gap-2 transition-all duration-300 overflow-hidden ${
+                loading || !email || !password
+                  ? 'bg-gray-500/50 cursor-not-allowed'
+                  : 'bg-linear-to-r from-blue-500 via-purple-500 to-indigo-500 hover:shadow-[0_0_30px_rgba(139,92,246,0.5)] shadow-lg'
               }`}
             >
-              {loading ? (
+              {!loading && !(!email || !password) && (
                 <>
-                  <Loader2 className="animate-spin" size={18} />
-                  Logging in...
+                  <motion.div
+                    className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent"
+                    animate={{
+                      x: ['-100%', '100%'],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: 'linear',
+                    }}
+                  />
+                  <motion.div
+                    className="absolute inset-0"
+                    animate={{
+                      background: [
+                        'radial-linear(circle at 0% 0%, rgba(255,255,255,0.1) 0%, transparent 50%)',
+                        'radial-linear(circle at 100% 100%, rgba(255,255,255,0.1) 0%, transparent 50%)',
+                        'radial-linear(circle at 0% 0%, rgba(255,255,255,0.1) 0%, transparent 50%)',
+                      ],
+                    }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: 'linear',
+                    }}
+                  />
                 </>
-              ) : (
-                'Login'
               )}
-            </button>
+              <span className="relative z-10 flex items-center gap-2">
+                {loading ? (
+                  <>
+                    <Loader2 className="animate-spin" size={18} />
+                    Logging in...
+                  </>
+                ) : (
+                  'Login'
+                )}
+              </span>
+            </motion.button>
           </form>
 
-          {/* --- OR Divider --- */}
           <div className="flex items-center justify-center my-6">
-            <div className="w-1/5 border-t border-white/30"></div>
-            <span className="mx-3 text-sm text-white/70">OR</span>
-            <div className="w-1/5 border-t border-white/30"></div>
+            <div className="flex-1 border-t border-white/30" />
+            <span className="mx-4 text-sm text-white/70 font-medium">OR</span>
+            <div className="flex-1 border-t border-white/30" />
           </div>
 
-          {/* --- Google Login Button --- */}
           <div className="flex justify-center">
             <ContinueWithGoogleButton
               onClick={async () => {
@@ -183,12 +274,11 @@ const LoginPage = () => {
             />
           </div>
 
-          {/* --- Redirect to Sign Up --- */}
           <p className="text-center text-sm mt-6 text-white/80">
-            Don’t have an account?{' '}
-            <a href="/registration" className="text-blue-300 hover:underline">
+            Don&apos;t have an account?{' '}
+            <motion.a href="/registration" whileHover={{ scale: 1.05 }} className="text-blue-600 hover:underline font-semibold transition-colors">
               Sign Up
-            </a>
+            </motion.a>
           </p>
         </div>
       </motion.div>

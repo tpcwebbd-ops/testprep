@@ -78,7 +78,7 @@ const BulkUpdate${pluralPascalCase}: React.FC = () => {
     <Dialog open={isBulkUpdateModalOpen} onOpenChange={toggleBulkUpdateModal}>
       <DialogContent className="sm:max-w-lg rounded-xl border border-white/20 bg-white/10 backdrop-blur-2xl shadow-xl transition-all text-white">
         <DialogHeader>
-          <DialogTitle className="bg-clip-text bg-gradient-to-r from-white to-blue-200 text-white">
+          <DialogTitle className="bg-clip-text bg-linear-to-r from-white to-blue-200 text-white">
             Confirm Bulk Update
           </DialogTitle>
         </DialogHeader>

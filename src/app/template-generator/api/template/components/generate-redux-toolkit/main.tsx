@@ -1,6 +1,7 @@
 import writeInFile from '../create-and-write'
 import generateRtkApiFile from './generate-toolkit'
 import generateRtkApiFileSlice from './generate-toolkitSlice'
+import generatePersonalRtkApiFileSlice from './generate-personal-toolkitSlice'
 
 const generateRtk = async (data: string) => {
     let folderName = 'example'
@@ -19,8 +20,13 @@ const generateRtk = async (data: string) => {
         )
     } else {
         const rtkApiTemplateSlice = generateRtkApiFileSlice(data)
+        const rtkApiTemplateSlicePersonal = generatePersonalRtkApiFileSlice(data)
         writeInFile(
             rtkApiTemplateSlice,
+            `src/redux/features/${folderName}/${folderName}Slice.ts`
+        )
+        writeInFile(
+            rtkApiTemplateSlicePersonal,
             `src/redux/features/${folderName}/${folderName}Slice.ts`
         )
     }

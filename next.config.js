@@ -16,6 +16,13 @@ const nextConfig = {
     ];
   },
   reactStrictMode: true,
+  typescript: {
+    ignoreBuildErrors: false,
+  },
+  eslint: {
+    ignoreDuringBuilds: false,
+  },
+  output: 'standalone',
   images: {
     remotePatterns: [
       {
@@ -45,6 +52,10 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'images.seeklogo.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
       },
     ],
   },

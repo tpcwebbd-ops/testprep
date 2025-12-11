@@ -85,7 +85,7 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px] rounded-xl border border-white/20 bg-white/10 text-white backdrop-blur-2xl shadow-xl transition-all">
         <DialogHeader>
-          <DialogTitle className="bg-clip-text bg-gradient-to-r from-white to-blue-200 text-white">
+          <DialogTitle className="bg-clip-text bg-linear-to-r from-white to-blue-200 text-white">
             Customize Your Export
           </DialogTitle>
           <DialogDescription className="text-white/70">

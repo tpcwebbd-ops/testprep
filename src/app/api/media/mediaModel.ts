@@ -14,6 +14,10 @@ const mediaSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    author_email: {
+      type: String,
+      trim: true,
+    },
     status: {
       type: String,
       enum: ['active', 'trash'],

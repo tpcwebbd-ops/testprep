@@ -58,7 +58,7 @@ const BulkDeleteNextComponents: React.FC = () => {
         className="sm:max-w-md rounded-xl border border-white/20 bg-white/10 backdrop-blur-2xl shadow-xl text-white"
       >
         <DialogHeader>
-          <DialogTitle className="text-white bg-clip-text bg-gradient-to-r from-white to-red-200">
+          <DialogTitle className="text-white bg-clip-text bg-linear-to-r from-white to-red-200">
             Confirm Deletion
           </DialogTitle>
         </DialogHeader>

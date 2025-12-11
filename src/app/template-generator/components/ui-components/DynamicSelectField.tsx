@@ -33,6 +33,20 @@ const DynamicSelectField = () => {
                     throw new Error(`Failed to fetch data: ${response.status}`)
                 }
                 const json = await response.json()
+
+                // Handle cases where json is not an array or is empty
+                if (!Array.isArray(json)) {
+                    setError('Invalid data format received')
+                    setAvailableData([])
+                    return
+                }
+
+                if (json.length === 0) {
+                    setAvailableData([])
+                    setError(null)
+                    return
+                }
+
                 const names = json.map((item: IResponseData) => item.name)
                 setAvailableData(names)
                 setError(null)

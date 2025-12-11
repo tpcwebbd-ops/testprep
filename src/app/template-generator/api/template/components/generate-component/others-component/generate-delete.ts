@@ -63,7 +63,7 @@ const DeleteNextComponents: React.FC = () => {
     <Dialog open={isDeleteModalOpen} onOpenChange={toggleDeleteModal}>
       <DialogContent className="sm:max-w-md rounded-xl border border-white/20 bg-white/10 backdrop-blur-2xl shadow-xl text-white">
         <DialogHeader>
-          <DialogTitle className="bg-clip-text text-transparent bg-gradient-to-r from-white to-red-200">
+          <DialogTitle className="bg-clip-text text-transparent bg-linear-to-r from-white to-red-200">
             Confirm Deletion
           </DialogTitle>
         </DialogHeader>

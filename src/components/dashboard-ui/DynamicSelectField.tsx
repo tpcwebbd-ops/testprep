@@ -2,10 +2,11 @@
 'use client';
 
 import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
-import { X, ChevronDown, Search, Check, Loader2, AlertCircle } from 'lucide-react';
+import { X, ChevronDown, Search, Check, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
+import { logger } from 'better-auth';
 
 export interface DynamicSelectFieldProps {
   id?: string;
@@ -21,6 +22,11 @@ export interface DynamicSelectFieldProps {
 interface IResponseData {
   id: number;
   name: string;
+}
+
+interface CachedData {
+  data: string[];
+  timestamp: number;
 }
 
 const MAX_RETRIES = 5;
@@ -42,39 +48,102 @@ export default function DynamicSelectField({
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeIndex, setActiveIndex] = useState(-1);
+
+  // New state for tracking fetch time
+  const [lastFetchTime, setLastFetchTime] = useState<number | null>(null);
+
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const safeValue = value ?? [];
 
-  const fetchData = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
+  const safeValue = useMemo(() => value ?? [], [value]);
 
-    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-      try {
-        const response = await fetch(apiUrl);
-        if (!response.ok) throw new Error(`API Error: ${response.status}`);
-        const json = await response.json();
+  // Create a unique key for local storage based on the API URL
+  const storageKey = useMemo(() => `dynamic-select-cache-${apiUrl}`, [apiUrl]);
 
-        const mapped = json.map(dataMapper);
-        setAvailableData(Array.from(new Set(mapped)));
-        setIsLoading(false);
-        return;
-      } catch (err) {
-        if (attempt === MAX_RETRIES) {
-          setError('Failed to load options. Try again.');
-          setIsLoading(false);
-        } else {
-          await new Promise(res => setTimeout(res, RETRY_DELAY));
+  const fetchData = useCallback(
+    async (forceUpdate = false) => {
+      setIsLoading(true);
+      setError(null);
+
+      // 1. Check Local Storage (if not forcing an update)
+      if (!forceUpdate) {
+        try {
+          const cachedItem = localStorage.getItem(storageKey);
+          if (cachedItem) {
+            const parsed: CachedData = JSON.parse(cachedItem);
+            if (Array.isArray(parsed.data)) {
+              setAvailableData(parsed.data);
+              setLastFetchTime(parsed.timestamp);
+              setIsLoading(false);
+              return; // Exit early, do not fetch
+            }
+          }
+        } catch (e) {
+          console.warn('Error reading from local storage', e);
+          // Fall through to fetch if cache read fails
         }
       }
-    }
-  }, [apiUrl, dataMapper]);
 
+      // 2. Fetch from API
+      for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+        try {
+          const response = await fetch(apiUrl);
+          if (!response.ok) throw new Error(`API Error: ${response.status}`);
+          const json = await response.json();
+
+          if (!Array.isArray(json)) {
+            logger.error('API response is not an array');
+            setError('Invalid data format received');
+            setIsLoading(false);
+            return;
+          }
+
+          if (json.length === 0) {
+            setAvailableData([]);
+            setIsLoading(false);
+            return;
+          }
+
+          const mapped = json.map(dataMapper);
+          const uniqueData = Array.from(new Set(mapped));
+
+          const timestamp = Date.now();
+          setAvailableData(uniqueData);
+          setLastFetchTime(timestamp);
+
+          // Save to Local Storage
+          try {
+            localStorage.setItem(
+              storageKey,
+              JSON.stringify({
+                data: uniqueData,
+                timestamp: timestamp,
+              }),
+            );
+          } catch (storageErr) {
+            console.error('Failed to save to localStorage', storageErr);
+          }
+
+          setIsLoading(false);
+          return;
+        } catch (err) {
+          logger.error(JSON.stringify(err));
+          if (attempt === MAX_RETRIES) {
+            setError('Failed to load options. Try again.');
+            setIsLoading(false);
+          } else {
+            await new Promise(res => setTimeout(res, RETRY_DELAY));
+          }
+        }
+      }
+    },
+    [apiUrl, dataMapper, storageKey],
+  );
+
+  // Initial load
   useEffect(() => {
-    fetchData();
-  }, []);
+    fetchData(false);
+  }, [fetchData]);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
@@ -109,6 +178,11 @@ export default function DynamicSelectField({
     onChange(safeValue.filter(i => i !== item));
   };
 
+  const handleReload = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent dropdown toggle if clicked inside the wrapper area
+    fetchData(true);
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!isOpen) return;
     if (e.key === 'ArrowDown') {
@@ -125,19 +199,40 @@ export default function DynamicSelectField({
     }
   };
 
+  const formatLastUpdated = (timestamp: number) => {
+    return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
   return (
     <div className={cn('relative space-y-1.5 w-full max-w-2xl', isOpen && 'mb-64')} ref={wrapperRef}>
-      {label && (
-        <Label htmlFor={id} className="text-white">
-          {label}
-        </Label>
-      )}
+      {/* Header with Label and Refresh Controls */}
+      <div className="flex items-center justify-between">
+        {label && (
+          <Label htmlFor={id} className="text-white">
+            {label}
+          </Label>
+        )}
 
-      {/* --- Select Trigger Box --- */}
+        <div className="flex items-center gap-2">
+          {lastFetchTime && <span className="text-[10px] text-white/50">Updated: {formatLastUpdated(lastFetchTime)}</span>}
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-6 px-2 text-xs text-white/70 hover:text-white hover:bg-white/10"
+            onClick={handleReload}
+            disabled={isLoading || readOnly}
+          >
+            <RefreshCw className={cn('h-3 w-3 mr-1', isLoading && 'animate-spin')} />
+            Reload
+          </Button>
+        </div>
+      </div>
+
       <div
         id={id}
         className={cn(
-          'relative flex items-center min-h-[44px] w-full rounded-lg border border-white/20 px-3 py-2 text-sm backdrop-blur-lg bg-white/10 text-white transition-all',
+          'relative flex items-center min-h-11 w-full rounded-lg border border-white/20 px-3 py-2 text-sm backdrop-blur-lg bg-white/10 text-white transition-all',
           readOnly ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
           isOpen && 'ring-2 ring-white/40 shadow-lg',
         )}
@@ -150,10 +245,8 @@ export default function DynamicSelectField({
         {!isLoading && !error && <ChevronDown className={cn('h-4 w-4 transition-transform', isOpen && 'rotate-180')} />}
       </div>
 
-      {/* --- Dropdown --- */}
       {isOpen && (
         <div className="absolute left-0 right-0 mt-2 z-50 bg-white/10 backdrop-blur-xl shadow-xl rounded-lg border border-white/20 text-white animate-in fade-in-0 zoom-in-95">
-          {/* Search field */}
           <div className="p-2 border-b border-white/10">
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/70" />
@@ -168,14 +261,12 @@ export default function DynamicSelectField({
               />
             </div>
           </div>
-
-          {/* Options */}
-          <div className="max-h-60 overflow-y-auto p-1">
+          <div className="max-h-[200px] overflow-y-auto p-1 pb-2">
             {error ? (
               <div className="text-center text-sm text-rose-300 py-3 space-y-2">
                 <AlertCircle className="w-5 h-5 mx-auto" />
                 <span>{error}</span>
-                <Button variant="outlineWater" size="sm" onClick={fetchData}>
+                <Button variant="outline" size="sm" onClick={() => fetchData(true)} className="bg-white/10 border-white/20 hover:bg-white/20 text-white">
                   Retry
                 </Button>
               </div>
@@ -203,7 +294,6 @@ export default function DynamicSelectField({
         </div>
       )}
 
-      {/* --- Selected Tags --- */}
       {safeValue.length > 0 && !isOpen && (
         <div className="flex flex-wrap gap-2 pt-2">
           {safeValue.map((item, i) => (

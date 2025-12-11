@@ -14,23 +14,19 @@ const AnimatedCircle: React.FC<{
   transition: object;
 }> = ({ className, style, animate, transition }) => <motion.div className={className} style={style} animate={animate} transition={transition} />;
 
-const LoadingComponent: React.FC<FullPageLoaderProps> = ({
-  accentColor = '#10b981', // emerald green stays same
-  message = 'Please wait...',
-}) => {
+const LoadingComponent: React.FC<FullPageLoaderProps> = ({ accentColor = '#10b981', message = 'Please wait...' }) => {
   const circleStyle = { borderColor: accentColor };
   const dotStyle = { backgroundColor: accentColor };
 
   return (
-    <div className="min-h-screen w-full fixed top-0 left-0 inset-0 flex flex-col items-center justify-center z-[1000] pointer-events-none">
+    <div className="min-h-screen bg-blue-600/20 w-full fixed top-0 left-0 inset-0 flex flex-col items-center justify-center z-[1000] backdrop-blur-[8px]">
       <motion.div
-        className="p-8 rounded-lg backdrop-blur-[2px] bg-white/10 flex flex-col items-center border border-white/20" // ✅ Blur set to 2px
+        className="p-8 rounded-2xl backdrop-blur-xl bg-white/10 flex flex-col items-center border border-white/20 shadow-2xl"
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.3, ease: 'easeOut' }}
       >
         <div className="relative h-24 w-24">
-          {/* Outer rotating ring */}
           <AnimatedCircle
             className="absolute inset-0 rounded-full border-t-4 border-b-4"
             style={circleStyle}
@@ -38,7 +34,6 @@ const LoadingComponent: React.FC<FullPageLoaderProps> = ({
             transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
           />
 
-          {/* Inner counter-rotating ring */}
           <AnimatedCircle
             className="absolute inset-2 rounded-full border-r-4 border-l-4"
             style={circleStyle}
@@ -46,7 +41,6 @@ const LoadingComponent: React.FC<FullPageLoaderProps> = ({
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
           />
 
-          {/* Subtle background glow effect */}
           <motion.div
             className="absolute inset-0 rounded-full"
             style={{ backgroundColor: accentColor, opacity: 0.1 }}
@@ -54,7 +48,6 @@ const LoadingComponent: React.FC<FullPageLoaderProps> = ({
             transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
           />
 
-          {/* Center pulsing dot */}
           <motion.div
             className="absolute inset-0 flex items-center justify-center"
             animate={{ scale: [0.8, 1.1, 0.8] }}
@@ -63,7 +56,6 @@ const LoadingComponent: React.FC<FullPageLoaderProps> = ({
             <div className="h-4 w-4 rounded-full" style={dotStyle} />
           </motion.div>
 
-          {/* Orbiting mini dots */}
           <motion.div className="absolute inset-0" animate={{ rotate: 360 }} transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}>
             <div className="absolute w-2 h-2 rounded-full -top-1 left-1/2 transform -translate-x-1/2" style={{ backgroundColor: accentColor, opacity: 0.6 }} />
             <div
@@ -82,7 +74,6 @@ const LoadingComponent: React.FC<FullPageLoaderProps> = ({
           {message}
         </motion.p>
 
-        {/* Progress bar remains untouched */}
         <motion.div
           className="mt-4 w-32 h-1 rounded-full overflow-hidden bg-white/20"
           initial={{ width: 0 }}

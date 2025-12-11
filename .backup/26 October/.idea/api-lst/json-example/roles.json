@@ -1,5 +1,0 @@
-{
-  "role_name": "Instructor",
-  "description": "Responsible for conducting lectures, creating and grading assessments, providing feedback to students, and managing course content for assigned batches at TestPrep Center.",
-  "assign_access": "{\"dashboard_access\": true, \"manage_courses\": true, \"view_students\": true, \"create_assessments\": true, \"grade_submissions\": true, \"post_announcements\": false, \"view_financials\": false}"
-}

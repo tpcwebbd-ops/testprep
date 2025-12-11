@@ -263,3 +263,9 @@
   background: transparent;
   color: white;
 }
+
+@layer components {
+  .bg-glass {
+    @apply bg-linear-to-r from-blue-500/20 to-purple-500/20 border border-white/30 text-white backdrop-blur-xl shadow-lg shadow-blue-500/20 hover:from-blue-500/30 hover:to-purple-500/30 hover:border-white/50 hover:shadow-xl hover:shadow-purple-500/30 hover:scale-[1.02] transition-all duration-300;
+  }
+}

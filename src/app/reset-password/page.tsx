@@ -6,6 +6,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2, CheckCircle, AlertCircle, Eye, EyeOff, Lock } from 'lucide-react';
 import { authClient } from '@/lib/auth-client';
 import { toast } from 'sonner';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 const ResetPasswordPage = () => {
   return (
@@ -16,7 +18,7 @@ const ResetPasswordPage = () => {
 };
 
 const LoadingScreen = () => (
-  <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-violet-500 via-purple-500 to-fuchsia-500 text-white">
+  <div className="min-h-screen flex flex-col items-center justify-center bg-linear-to-br from-violet-500 via-purple-500 to-fuchsia-500 text-white">
     <Loader2 className="animate-spin mb-4" size={40} />
     <p>Loading...</p>
   </div>
@@ -83,7 +85,7 @@ const ResetPassword = () => {
 
     try {
       console.log('token : ', token);
-      const { data, error } = await authClient.resetPassword({
+      const { error } = await authClient.resetPassword({
         newPassword,
         token,
       });
@@ -114,7 +116,7 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-violet-500 via-purple-500 to-fuchsia-500 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-violet-500 via-purple-500 to-fuchsia-500 p-4">
       <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-20"></div>
 
       <motion.div
@@ -134,12 +136,9 @@ const ResetPassword = () => {
               <AlertCircle className="text-red-400 mb-4" size={64} />
               <h3 className="text-xl font-semibold mb-2 text-white">Invalid Reset Link</h3>
               <p className="text-white/80 mb-6">{errorMessage}</p>
-              <button
-                onClick={() => router.push('/request-password-reset')}
-                className="px-6 py-2 bg-white text-purple-600 hover:bg-white/90 rounded-lg font-semibold"
-              >
+              <Button onClick={() => router.push('/forgot-password')} variant="outlineGlassy">
                 Request New Link
-              </button>
+              </Button>
             </motion.div>
           )}
 
@@ -157,7 +156,7 @@ const ResetPassword = () => {
                     New Password
                   </label>
                   <div className="relative">
-                    <input
+                    <Input
                       id="newPassword"
                       type={showNewPassword ? 'text' : 'password'}
                       value={newPassword}
@@ -170,13 +169,13 @@ const ResetPassword = () => {
                       } text-white placeholder:text-white/50 focus:bg-white/25 focus:border-white/50 backdrop-blur-sm rounded-lg`}
                       placeholder="Enter new password"
                     />
-                    <button
+                    <Button
                       type="button"
                       onClick={() => setShowNewPassword(!showNewPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-white/70 hover:text-white"
+                      className="absolute right-0 top-1/2 -translate-y-1/2 bg-transparent min-w-1"
                     >
                       {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                    </button>
+                    </Button>
                   </div>
                 </div>
 
@@ -185,7 +184,7 @@ const ResetPassword = () => {
                     Confirm Password
                   </label>
                   <div className="relative">
-                    <input
+                    <Input
                       id="confirmPassword"
                       type={showConfirmPassword ? 'text' : 'password'}
                       value={confirmPassword}
@@ -198,13 +197,13 @@ const ResetPassword = () => {
                       } text-white placeholder:text-white/50 focus:bg-white/25 focus:border-white/50 backdrop-blur-sm rounded-lg`}
                       placeholder="Confirm new password"
                     />
-                    <button
+                    <Button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-white/70 hover:text-white"
+                      className="absolute right-0 top-1/2 -translate-y-1/2 bg-transparent min-w-1"
                     >
                       {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                    </button>
+                    </Button>
                   </div>
                   {passwordError && (
                     <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-red-300 text-sm flex items-center gap-1">
@@ -214,11 +213,7 @@ const ResetPassword = () => {
                   )}
                 </div>
 
-                <button
-                  type="submit"
-                  disabled={loading || !!passwordError}
-                  className="w-full py-2.5 bg-white text-purple-600 hover:bg-white/90 font-semibold rounded-lg shadow-lg flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
+                <Button type="submit" disabled={loading || !!passwordError} variant="outlineGlassy" className="w-full border border-slate-100/50">
                   {loading ? (
                     <>
                       <Loader2 className="animate-spin" size={18} />
@@ -227,7 +222,7 @@ const ResetPassword = () => {
                   ) : (
                     'Reset Password'
                   )}
-                </button>
+                </Button>
               </form>
             </motion.div>
           )}

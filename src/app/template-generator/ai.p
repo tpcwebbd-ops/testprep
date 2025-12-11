@@ -206,7 +206,7 @@ const JsonEditor: React.FC = () => {
     // --- END: MODIFIED handleGenerate FUNCTION ---
 
     const customBtn =
-        'px-6 py-2 mb-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white font-medium rounded-lg hover:from-purple-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg'
+        'px-6 py-2 mb-2 bg-linear-to-r from-purple-600 to-purple-700 text-white font-medium rounded-lg hover:from-purple-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg'
     return (
         <>
             <SuccessPopup
@@ -244,7 +244,7 @@ const JsonEditor: React.FC = () => {
                 </div>
                 <div className="rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-6 bg-white dark:bg-gray-800 transition-all duration-300 hover:shadow-xl">
                     <div className="w-full flex items-center justify-between">
-                        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text">
+                        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4 bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text">
                             JSON Editor
                         </h2>
                         <ViewDataType />
@@ -307,7 +307,7 @@ const JsonEditor: React.FC = () => {
                             <Button
                                 onClick={handleSave}
                                 disabled={isLoading || !jsonInput.trim()}
-                                className="px-6 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
+                                className="px-6 py-2 bg-linear-to-r from-blue-600 to-blue-700 text-white font-medium rounded-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
                             >
                                 {isLoading ? (
                                     <div className="flex items-center space-x-2">
@@ -336,7 +336,7 @@ const JsonEditor: React.FC = () => {
 
                             <Button
                                 onClick={handleFormat}
-                                className="px-6 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white font-medium rounded-lg hover:from-green-700 hover:to-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
+                                className="px-6 py-2 bg-linear-to-r from-green-600 to-green-700 text-white font-medium rounded-lg hover:from-green-700 hover:to-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
                             >
                                 <div className="flex items-center space-x-2">
                                     <svg
@@ -359,7 +359,7 @@ const JsonEditor: React.FC = () => {
                             <Button
                                 disabled={isGenerating || !jsonInput.trim()}
                                 onClick={handleGenerate}
-                                className="px-6 py-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white font-medium rounded-lg hover:from-purple-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
+                                className="px-6 py-2 bg-linear-to-r from-purple-600 to-purple-700 text-white font-medium rounded-lg hover:from-purple-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
                             >
                                 {isGenerating ? (
                                     <div className="flex items-center space-x-2">
@@ -410,7 +410,7 @@ const JsonEditor: React.FC = () => {
                         </h3>
                         {items.length > 0 && (
                             <AlertDialog>
-                                <AlertDialogTrigger className="px-4 py-2 cursor-pointer bg-gradient-to-r from-red-600 to-red-700 text-white text-sm font-medium rounded-lg hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg">
+                                <AlertDialogTrigger className="px-4 py-2 cursor-pointer bg-linear-to-r from-red-600 to-red-700 text-white text-sm font-medium rounded-lg hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg">
                                     <div className="flex items-center space-x-2">
                                         <svg
                                             className="w-4 h-4"
@@ -444,7 +444,7 @@ const JsonEditor: React.FC = () => {
                                             Cancel
                                         </AlertDialogCancel>
                                         <AlertDialogAction
-                                            className="px-4 py-2 cursor-pointer bg-gradient-to-r from-red-600 to-red-700 text-white text-sm font-medium rounded-md hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200"
+                                            className="px-4 py-2 cursor-pointer bg-linear-to-r from-red-600 to-red-700 text-white text-sm font-medium rounded-md hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200"
                                             onClick={clearItems}
                                         >
                                             Clear All

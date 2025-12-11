@@ -6,6 +6,9 @@ import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react';
 import ContinueWithGoogleButton from '@/components/common/GoogleButton';
 import { signUp, signIn } from '@/lib/auth-client';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 const RegistrationPage = () => {
   const router = useRouter();
@@ -53,7 +56,7 @@ const RegistrationPage = () => {
           email,
           password,
           name,
-          callbackURL: '/email-send',
+          callbackURL: `/verify-success`,
         },
         {
           onRequest: () => setLoading(true),
@@ -64,7 +67,7 @@ const RegistrationPage = () => {
       if (res?.error) {
         setError(res.error.message || 'Registration failed. Please try again.');
       } else {
-        router.push('/email-send');
+        router.push(`/email-conformation?email=${email}`);
       }
     } catch (err: unknown) {
       console.error(err);
@@ -78,7 +81,7 @@ const RegistrationPage = () => {
   const isFormInvalid = !name || !email || !password || !confirmPassword || password !== confirmPassword;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 via-purple-600 to-blue-500 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-indigo-600 via-purple-600 to-blue-500 p-4 pt-[65px]">
       <motion.div
         initial={{ opacity: 0, y: 60 }}
         animate={{ opacity: 1, y: 0 }}
@@ -115,16 +118,7 @@ const RegistrationPage = () => {
               <label htmlFor="name" className="block mb-1 text-sm">
                 Full Name
               </label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                value={name}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 rounded-lg bg-white/20 border border-white/30 focus:outline-none focus:ring-2 focus:ring-purple-300 placeholder-white/60"
-                placeholder="Enter your name"
-              />
+              <Input id="name" name="name" type="text" value={name} onChange={handleChange} required placeholder="Enter your name" />
             </div>
 
             {/* Email */}
@@ -132,16 +126,7 @@ const RegistrationPage = () => {
               <label htmlFor="email" className="block mb-1 text-sm">
                 Email Address
               </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                value={email}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 rounded-lg bg-white/20 border border-white/30 focus:outline-none focus:ring-2 focus:ring-purple-300 placeholder-white/60"
-                placeholder="Enter your email"
-              />
+              <Input id="email" name="email" type="email" value={email} onChange={handleChange} required placeholder="Enter your email" />
             </div>
 
             {/* Password */}
@@ -150,23 +135,22 @@ const RegistrationPage = () => {
                 Password
               </label>
               <div className="relative">
-                <input
+                <Input
                   id="password"
                   name="password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-2 rounded-lg bg-white/20 border border-white/30 focus:outline-none focus:ring-2 focus:ring-purple-300 placeholder-white/60 pr-10"
                   placeholder="Enter password"
                 />
-                <button
+                <Button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-3 flex items-center text-white/70 hover:text-white"
+                  className="absolute inset-y-0 -right-1 flex items-center min-w-1 bg-transparent"
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
+                </Button>
               </div>
             </div>
 
@@ -209,22 +193,58 @@ const RegistrationPage = () => {
             )}
 
             {/* --- Register Button --- */}
-            <button
+            <motion.button
               type="submit"
-              disabled={loading || isFormInvalid}
-              className={`w-full py-2 mt-4 rounded-lg font-medium flex justify-center items-center gap-2 transition-all ${
-                loading || isFormInvalid ? 'bg-gray-400 cursor-not-allowed' : 'bg-gradient-to-r from-purple-500 to-blue-500 hover:opacity-90'
+              disabled={loading || !email || !password}
+              whileHover={{ scale: loading || !email || !password ? 1 : 1.02 }}
+              whileTap={{ scale: loading || !email || !password ? 1 : 0.98 }}
+              className={`relative cursor-pointer w-full py-3 rounded-xl font-semibold flex justify-center items-center gap-2 transition-all duration-300 overflow-hidden ${
+                loading || !email || !password
+                  ? 'bg-gray-500/50 cursor-not-allowed'
+                  : 'bg-linear-to-r from-blue-500 via-purple-500 to-indigo-500 hover:shadow-[0_0_30px_rgba(139,92,246,0.5)] shadow-lg'
               }`}
             >
-              {loading ? (
+              {!loading && isFormInvalid && (
                 <>
-                  <Loader2 className="animate-spin" size={18} />
-                  Creating Account...
+                  <motion.div
+                    className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent"
+                    animate={{
+                      x: ['-100%', '100%'],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: 'linear',
+                    }}
+                  />
+                  <motion.div
+                    className="absolute inset-0"
+                    animate={{
+                      background: [
+                        'radial-linear(circle at 0% 0%, rgba(255,255,255,0.1) 0%, transparent 50%)',
+                        'radial-linear(circle at 100% 100%, rgba(255,255,255,0.1) 0%, transparent 50%)',
+                        'radial-linear(circle at 0% 0%, rgba(255,255,255,0.1) 0%, transparent 50%)',
+                      ],
+                    }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: 'linear',
+                    }}
+                  />
                 </>
-              ) : (
-                'Register'
               )}
-            </button>
+              <span className="relative z-10 flex items-center gap-2">
+                {loading ? (
+                  <>
+                    <Loader2 className="animate-spin" size={18} />
+                    Loading...
+                  </>
+                ) : (
+                  'Register'
+                )}
+              </span>
+            </motion.button>
           </form>
 
           {/* --- OR Divider --- */}
@@ -261,9 +281,9 @@ const RegistrationPage = () => {
           {/* --- Login Redirect --- */}
           <p className="text-center text-sm mt-6 text-white/80">
             Already have an account?{' '}
-            <a href="/login" className="text-blue-300 hover:underline">
+            <Link href="/login" className="text-blue-600 font-bold hover:underline">
               Login
-            </a>
+            </Link>
           </p>
         </div>
       </motion.div>

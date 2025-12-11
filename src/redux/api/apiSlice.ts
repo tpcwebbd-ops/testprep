@@ -25,17 +25,24 @@ export const apiSlice = createApi({
     'tagTypeFinance',
     'tagTypeRoles',
     'tagTypeAccessManagements',
+    'tagTypeAccounts',
+    'tagTypeVerifications',
+    'tagTypeSessions',
+    'FooterSettings',
+    'tagTypeSidebars',
+    'tagTypeProfile',
     'tagTypePageBuilder',
+    'tagTypeFormActions',
+    'Footer',
+    'tagTypeFormSubmission',
   ],
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.NODE_ENV === 'production' ? process.env.baseLiveURL : process.env.baseLocalURL,
     credentials: 'include', // Include credentials for cross-origin requests
     prepareHeaders: async (headers, {}) => {
-      const tokenFromSessionStorage = sessionStorage.getItem(process.env.NEXTAUTH_SECRET || '_');
-      const token = tokenFromSessionStorage?.replaceAll('"', '');
       const localStorageToken = localStorage.getItem('token')?.replaceAll('"', '');
-      const finalToken = localStorageToken || token;
+      const finalToken = localStorageToken;
       if (finalToken) {
         headers.set('authorization', `Bearer ${finalToken}`);
       }

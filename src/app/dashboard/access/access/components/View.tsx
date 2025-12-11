@@ -41,9 +41,9 @@ const ViewNextComponents: React.FC = () => {
     label: string;
     value: React.ReactNode;
   }> = ({ label, value }) => (
-    <div className="grid grid-cols-3 gap-2 py-2 border-b">
-      <div className="font-semibold text-sm text-gray-600 dark:text-gray-300">{label}</div>
-      <div className="col-span-2 text-sm text-gray-800 dark:text-gray-100">{value || 'N/A'}</div>
+    <div className="grid grid-cols-3 gap-2 py-2 border-b border-white/10">
+      <div className="font-semibold text-sm text-white/70">{label}</div>
+      <div className="col-span-2 text-sm text-white/90">{value || 'N/A'}</div>
     </div>
   );
 
@@ -54,12 +54,12 @@ const ViewNextComponents: React.FC = () => {
 
   return (
     <Dialog open={isViewModalOpen} onOpenChange={toggleViewModal}>
-      <DialogContent className="sm:max-w-[625px]">
-        <DialogHeader>
-          <DialogTitle>AccessManagements Details</DialogTitle>
+      <DialogContent className="sm:max-w-[625px] bg-white/10 backdrop-blur-xl border border-white/20 text-white shadow-lg rounded-2xl">
+        <DialogHeader className="border-b border-white/10 pb-3">
+          <DialogTitle className="text-lg font-semibold tracking-wide text-white/90">AccessManagements Details</DialogTitle>
         </DialogHeader>
         {selectedAccessManagements && (
-          <ScrollArea className="h-[500px] w-full rounded-md border p-4">
+          <ScrollArea className="h-[500px] w-full rounded-md border border-white/10 p-4 bg-white/5 backdrop-blur-md shadow-inner">
             <div className="grid gap-1">
               <DetailRow label="User_name" value={selectedAccessManagements['user_name']} />
               <DetailRow label="User_email" value={selectedAccessManagements['user_email']} />
@@ -70,9 +70,9 @@ const ViewNextComponents: React.FC = () => {
             </div>
           </ScrollArea>
         )}
-        <DialogFooter>
+        <DialogFooter className="border-t border-white/10 pt-3">
           <Button
-            variant="outline"
+            variant="outlineDefault"
             onClick={() => {
               toggleViewModal(false);
               setSelectedAccessManagements(defaultAccessManagements as IAccessManagements);

@@ -2,9 +2,10 @@
 |-----------------------------------------
 | setting up Page for the App
 | @author: Toufiquer Rahman<toufiquer.0@gmail.com>
-| @copyright: testprep-webapp, August, 2025
+| @copyright: TestPrep Center-webapp, August, 2025
 |-----------------------------------------
 */
+import Link from 'next/link';
 import React from 'react'; // Import React to use its types
 
 const UnauthorizedPage = () => {
@@ -72,14 +73,14 @@ const UnauthorizedPage = () => {
         <p style={textStyle}>
           To gain access to the dashboard and other protected resources, please contact the site administrator to have your permissions updated.
         </p>
-        <a href="mailto:admin@example.com" style={ctaButtonStyle}>
+        <Link href="mailto:admin@example.com" style={ctaButtonStyle}>
           Contact Admin
-        </a>
+        </Link>
         <p style={{ marginTop: '24px', fontSize: '0.875rem' }}>
           If you believe you are seeing this in error, please reach out to our{' '}
-          <a href="/support" style={contactLinkStyle}>
+          <Link href="/support" style={contactLinkStyle}>
             support team
-          </a>
+          </Link>
         </p>
       </div>
     </main>

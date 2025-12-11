@@ -101,7 +101,7 @@ const ${pluralPascalCase}Summary = () => {
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border-white/30 text-white hover:from-blue-500/30 hover:to-purple-500/30 hover:border-white/50 transition-all duration-300">
+        <Button variant="outlineGlassy" size="sm" >
           <TrendingUp className="mr-2 h-4 w-4" />
           Summary
         </Button>
@@ -109,7 +109,7 @@ const ${pluralPascalCase}Summary = () => {
 
       <DialogContent className="sm:max-w-7xl max-h-[90vh] mt-4 overflow-y-auto rounded-2xl border border-white/20 bg-gradient-to-br from-slate-900/95 via-blue-900/90 to-purple-900/95 backdrop-blur-3xl shadow-2xl text-white">
         <DialogHeader className="space-y-3 pb-4 border-b border-white/10">
-          <DialogTitle className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+          <DialogTitle className="text-3xl font-bold bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
             ${pluralPascalCase} Analytics Dashboard
           </DialogTitle>
           <DialogDescription className="text-white/60 text-base">
@@ -332,7 +332,7 @@ const ${pluralPascalCase}Summary = () => {
                     {viewMode === 'table' && (
                       <div className="rounded-xl border border-white/20 bg-white/5 backdrop-blur-xl overflow-hidden">
                         <Table className="text-white">
-                          <TableHeader className="bg-gradient-to-r from-blue-500/20 to-purple-500/20">
+                          <TableHeader className="bg-linear-to-r from-blue-500/20 to-purple-500/20">
                             <TableRow className="border-white/10 hover:bg-transparent">
                               {tableHeaders.map(header => (
                                 <TableHead key={header} className="text-white font-semibold whitespace-nowrap">

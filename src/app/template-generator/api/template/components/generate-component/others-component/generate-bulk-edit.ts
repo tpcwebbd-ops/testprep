@@ -98,7 +98,7 @@ const BulkEditNextComponents: React.FC = () => {
     <Dialog open={isBulkEditModalOpen} onOpenChange={toggleBulkEditModal}>
       <DialogContent className="sm:max-w-xl rounded-xl border border-white/20 bg-white/10 backdrop-blur-2xl shadow-xl text-white">
         <DialogHeader>
-          <DialogTitle className="bg-clip-text bg-gradient-to-r from-white to-blue-200 text-white">Bulk Edit ${pluralPascalCase}</DialogTitle>
+          <DialogTitle className="bg-clip-text bg-linear-to-r from-white to-blue-200 text-white">Bulk Edit ${pluralPascalCase}</DialogTitle>
         </DialogHeader>
 
         {bulkData.length > 0 && (

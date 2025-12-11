@@ -111,9 +111,7 @@ const ErrorMessageComponent: React.FC<ErrorMessageProps> = ({
   };
 
   const displayMessage = getDisplayMessage(message);
-  if (displayMessage.includes('432') || displayMessage.includes('token is expire')) {
-    sessionStorage.removeItem(process.env.NEXTAUTH_SECRET || '_');
-  }
+
   return (
     <AnimatePresence>
       {isVisible && (

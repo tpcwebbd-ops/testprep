@@ -52,10 +52,14 @@ export async function getAccessManagements(req: Request): Promise<IResponse> {
     const limit = parseInt(url.searchParams.get('limit') || '10', 10);
     const skip = (page - 1) * limit;
     const searchQuery = url.searchParams.get('q');
+    const searchQueryByEmail = url.searchParams.get('user_email');
 
     let searchFilter: FilterQuery<unknown> = {};
 
-    if (searchQuery) {
+    // If explicit email filter provided, use exact match on user_email
+    if (searchQueryByEmail) {
+      searchFilter = { user_email: searchQueryByEmail };
+    } else if (searchQuery) {
       // Check for date range filter format first
       if (searchQuery.startsWith('createdAt:range:')) {
         const datePart = searchQuery.split(':')[2];

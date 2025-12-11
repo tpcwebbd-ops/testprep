@@ -1,1 +1,0 @@
-{"uid":"_Attendance","templateName":"Attendance Template ","schema":{"user_id":"STRING","date":"DATE","time":"TIME","notes":"URL","status":"SELECT#Present, Parmit_Leave, Absent"},"namingConvention":{"Users_1_000___":"Attendance_s","users_2_000___":"attendance_s","User_3_000___":"Attendance","user_4_000___":"attendance","ISelect_6_000___":"ISelect_n","select_5_000___":"select_n"}}

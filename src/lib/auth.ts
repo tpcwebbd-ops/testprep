@@ -14,8 +14,8 @@ export const auth = betterAuth({
     requireEmailVerification: true,
 
     allowLinking: true,
-    sendResetPassword: async ({ user, url, token }, request) => {
-      await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/request-reset-password`, {
+    sendResetPassword: async ({ user, url, token }) => {
+      await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/auth-utils/request-reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -25,14 +25,14 @@ export const auth = betterAuth({
         }),
       });
     },
-    onPasswordReset: async ({ user }, request) => {
+    onPasswordReset: async ({ user }) => {
       // your logic here
       console.log(`Password for user ${user.email} has been reset.`);
     },
   },
   emailVerification: {
-    sendVerificationEmail: async ({ user, url, token }, request) => {
-      await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/send-verification`, {
+    sendVerificationEmail: async ({ user, url, token }) => {
+      await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/auth-utils/send-verification-link`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -31,35 +31,35 @@ const BulkEditNextComponents: React.FC = () => {
 
   return (
     <Dialog open={isBulkEditModalOpen} onOpenChange={toggleBulkEditModal}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Confirm Bulk Update</DialogTitle>
+      <DialogContent className="bg-white/10 backdrop-blur-xl border border-white/20 text-white shadow-xl rounded-2xl">
+        <DialogHeader className="border-b border-white/10 pb-3">
+          <DialogTitle className="text-lg font-semibold tracking-wide text-white/90">Confirm Bulk Update</DialogTitle>
         </DialogHeader>
         {bulkData.length > 0 && (
-          <p className="pt-4">
-            You are about to update <span className="font-semibold">({bulkData.length})</span> roles.
+          <p className="pt-4 text-white/80">
+            You are about to update <span className="font-semibold text-white/90">({bulkData.length})</span> roles.
           </p>
         )}
-        <ScrollArea className="h-[400px] w-full rounded-md border p-4">
+        <ScrollArea className="h-[400px] w-full rounded-md border border-white/10 p-4 bg-white/5 backdrop-blur-md shadow-inner">
           <div className="flex flex-col gap-2">
             {bulkData.map((role, idx) => (
-              <div key={(role._id as string) || idx} className="flex items-center justify-between">
-                <span>
+              <div key={(role._id as string) || idx} className="flex items-center justify-between p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-all">
+                <span className="text-white/90">
                   {idx + 1}. {(role['name'] as string) || ''}
                 </span>
               </div>
             ))}
           </div>
         </ScrollArea>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => toggleBulkEditModal(false)} className="cursor-pointer border-slate-400 hover:border-slate-500">
+        <DialogFooter className="border-t border-white/10 pt-3">
+          <Button variant="outlineDefault" onClick={() => toggleBulkEditModal(false)} className="cursor-pointer">
             Cancel
           </Button>
           <Button
             disabled={isLoading}
-            variant="outline"
+            variant="outlineWater"
             onClick={handleBulkEditRoles}
-            className="text-green-500 hover:text-green-600 cursor-pointer bg-green-100 hover:bg-green-200 border border-green-300 hover:border-green-400"
+            className="cursor-pointer"
           >
             {isLoading ? 'Updating...' : 'Update Selected'}
           </Button>

@@ -1,6 +1,6 @@
 {
-  "name": "TestPrep",
-  "short_name": "TestPrep",
+  "name": "TestPrep Center",
+  "short_name": "TestPrep Center",
   "description": "Achieve your desired IELTS band score",
   "start_url": "/",
   "display": "standalone",

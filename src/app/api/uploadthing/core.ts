@@ -1,3 +1,4 @@
+import { logger } from 'better-auth';
 import { createUploadthing, type FileRouter } from 'uploadthing/next';
 import { UploadThingError } from 'uploadthing/server';
 
@@ -5,6 +6,7 @@ const f = createUploadthing();
 
 // --- Simulated auth function (replace with your real one) ---
 const auth = async (req: Request) => {
+  logger.info(JSON.stringify(req));
   // Replace with your actual auth/session logic
   return { id: 'fakeUserId' };
 };
@@ -12,51 +14,24 @@ const auth = async (req: Request) => {
 // --- FILE ROUTER DEFINITION ---
 export const ourFileRouter = {
   /* =======================
-   * 📄 Document Uploader (.doc / .docx)
+   * 📂 Universal Document Uploader
+   * Supports: Image, PDF, DOC, DOCX
    * ======================= */
   documentUploader: f({
-    blob: {
-      maxFileSize: '1GB',
-      maxFileCount: 3,
+    // 1. Images (jpg, jpeg, png, webp, ico)
+    image: {
+      maxFileSize: '8MB',
+      maxFileCount: 1,
     },
-  })
-    .middleware(async ({ req }) => {
-      const user = await auth(req);
-      if (!user) throw new UploadThingError('Unauthorized');
-      return { userId: user.id };
-    })
-    .onUploadComplete(async ({ metadata, file }) => {
-      console.log('📝 Document upload complete for:', metadata.userId);
-      console.log('📄 File:', file.name, '| URL:', file.ufsUrl);
-
-      // Save to DB (example)
-      // await db.upload.create({
-      //   data: {
-      //     userId: metadata.userId,
-      //     category: "document",
-      //     fileUrl: file.ufsUrl,
-      //     fileKey: file.fileKey,
-      //     fileType: file.type,
-      //     fileName: file.name,
-      //     fileSize: file.size,
-      //   },
-      // });
-
-      return {
-        uploadedBy: metadata.userId,
-        fileUrl: file.ufsUrl,
-        fileName: file.name,
-        fileType: file.type,
-      };
-    }),
-
-  /* =======================
-   * 🧾 PDF Uploader (.pdf)
-   * ======================= */
-  pdfUploader: f({
+    // 2. PDFs
     pdf: {
-      maxFileSize: '1GB',
-      maxFileCount: 3,
+      maxFileSize: '16MB',
+      maxFileCount: 1,
+    },
+    // 3. Blobs (Catches .doc, .docx, and others)
+    blob: {
+      maxFileSize: '32MB',
+      maxFileCount: 1,
     },
   })
     .middleware(async ({ req }) => {
@@ -65,21 +40,8 @@ export const ourFileRouter = {
       return { userId: user.id };
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      console.log('📚 PDF upload complete for:', metadata.userId);
-      console.log('🧾 File URL:', file.ufsUrl);
-
-      // Example DB save
-      // await db.upload.create({
-      //   data: {
-      //     userId: metadata.userId,
-      //     category: "pdf",
-      //     fileUrl: file.ufsUrl,
-      //     fileKey: file.fileKey,
-      //     fileType: file.type,
-      //     fileName: file.name,
-      //     fileSize: file.size,
-      //   },
-      // });
+      console.log('📝 Universal upload complete for:', metadata.userId);
+      console.log('📂 File:', file.name, '| Type:', file.type, '| URL:', file.ufsUrl);
 
       return {
         uploadedBy: metadata.userId,
@@ -91,10 +53,11 @@ export const ourFileRouter = {
 
   /* =======================
    * 🎥 Video Uploader (.mp4 / .mov / etc.)
+   * Kept separate for specialized video handling
    * ======================= */
   videoUploader: f({
     video: {
-      maxFileSize: '1GB',
+      maxFileSize: '256MB', // Increased slightly for videos
       maxFileCount: 1,
     },
   })
@@ -106,19 +69,6 @@ export const ourFileRouter = {
     .onUploadComplete(async ({ metadata, file }) => {
       console.log('🎥 Video upload complete for:', metadata.userId);
       console.log('📹 File URL:', file.ufsUrl);
-
-      // Example DB save
-      // await db.upload.create({
-      //   data: {
-      //     userId: metadata.userId,
-      //     category: "video",
-      //     fileUrl: file.ufsUrl,
-      //     fileKey: file.fileKey,
-      //     fileType: file.type,
-      //     fileName: file.name,
-      //     fileSize: file.size,
-      //   },
-      // });
 
       return {
         uploadedBy: metadata.userId,

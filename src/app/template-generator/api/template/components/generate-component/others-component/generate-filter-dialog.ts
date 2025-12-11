@@ -139,7 +139,7 @@ const FilterDialog: React.FC<FilterDialogProps> = ({ isOpen, onOpenChange, onApp
       <Dialog open={isOpen} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-[425px] rounded-xl border border-white/20 bg-white/10 backdrop-blur-2xl shadow-xl transition-all text-white">
           <DialogHeader className="pb-3">
-            <DialogTitle className="text-white bg-clip-text bg-gradient-to-r from-white to-blue-200">Filter ${pluralPascalCase}</DialogTitle>
+            <DialogTitle className="text-white bg-clip-text bg-linear-to-r from-white to-blue-200">Filter ${pluralPascalCase}</DialogTitle>
             <DialogDescription className="text-white/70">Select a filter option to narrow down data.</DialogDescription>
           </DialogHeader>
 
@@ -176,10 +176,7 @@ const FilterDialog: React.FC<FilterDialogProps> = ({ isOpen, onOpenChange, onApp
                 <Label className="text-white">Select Date Range</Label>
                 <Button
                   id="date"
-                  variant="outlineGarden"
-                  className={cn('w-full justify-start text-left font-normal backdrop-blur-lg border-white/20 text-white bg-white/5', {
-                    'text-white/60': !dateRange?.from && !dateRange?.to,
-                  })}
+                  variant="outlineGlassy"
                   onClick={() => setIsCalendarOpen(true)}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
@@ -200,8 +197,8 @@ const FilterDialog: React.FC<FilterDialogProps> = ({ isOpen, onOpenChange, onApp
           </Tabs>
 
           <DialogFooter className="mt-2 gap-2">
-            <Button variant="outlineFire" onClick={handleClear}>Clear Filter</Button>
-            <Button variant="outlineGarden" disabled={isApplyDisabled} onClick={handleApply}>Apply Filter</Button>
+            <Button size="sm" variant="outlineFire" onClick={handleClear}>Clear Filter</Button>
+            <Button size="sm" variant="outlineGarden" disabled={isApplyDisabled} onClick={handleApply}>Apply Filter</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -1,6 +1,6 @@
-/*
+﻿/*
 |-----------------------------------------
-| English Centre - Main Footer
+| English  - Main Footer
 | Author: Toufiquer Rahman <toufiquer.0@gmail.com>
 |-----------------------------------------
 */
@@ -12,22 +12,96 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { BiLogoFacebookCircle, BiLogoLinkedin } from 'react-icons/bi';
 import { BsTwitter } from 'react-icons/bs';
+import { useEffect, useState } from 'react';
+
+interface QuickLink {
+  id: number;
+  title: string;
+  link: string;
+}
+
+interface SocialLink {
+  id: number;
+  platform: string;
+  link: string;
+}
+
+interface ContactInfo {
+  address: string;
+  phone: string;
+  email: string;
+}
+
+interface FooterSettings {
+  brandName: string;
+  logoUrl: string;
+  logoWidth: number;
+  tagline: string;
+  quickLinks: QuickLink[];
+  contactInfo: ContactInfo;
+  socialLinks: SocialLink[];
+  copyrightText: string;
+  designerName: string;
+}
 
 const MainFooter = () => {
-  const quickLinks = [
-    { id: 1, title: 'About Us', link: '/about' },
-    { id: 2, title: 'Our Services', link: '/service' },
-    { id: 3, title: 'Contact', link: '/contact' },
-    { id: 4, title: 'FAQ', link: '/faq' },
-    { id: 5, title: 'Privacy Policy', link: '/privacy-and-policy' },
-    { id: 6, title: 'Terms & Conditions', link: '/terms-and-condition' },
-  ];
+  const [settings, setSettings] = useState<FooterSettings>({
+    brandName: 'English',
+    logoUrl: 'https://i.ibb.co.com/2mc3j65/l.jpg',
+    logoWidth: 40,
+    tagline: 'Empowering learners with strong English communication skills for global success. Our commitment is to excellence, growth, and confidence.',
+    quickLinks: [
+      { id: 1, title: 'About Us', link: '/about' },
+      { id: 2, title: 'Our Services', link: '/service' },
+      { id: 3, title: 'Contact', link: '/contact' },
+      { id: 4, title: 'FAQ', link: '/faq' },
+      { id: 5, title: 'Privacy Policy', link: '/privacy-and-policy' },
+      { id: 6, title: 'Terms & Conditions', link: '/terms-and-condition' },
+    ],
+    contactInfo: {
+      address: 'English, 2nd Floor, Green Plaza, Dhanmondi, Dhaka  1209',
+      phone: '+880 1700-123456',
+      email: 'info@english.com',
+    },
+    socialLinks: [
+      { id: 1, platform: 'Facebook', link: '#' },
+      { id: 2, platform: 'Twitter', link: '#' },
+      { id: 3, platform: 'LinkedIn', link: '#' },
+    ],
+    copyrightText: 'English. All rights reserved.',
+    designerName: 'Toufiquer',
+  });
 
-  const socialLinks = [
-    { id: 1, icon: <BiLogoFacebookCircle size={22} />, link: '#' },
-    { id: 2, icon: <BsTwitter size={20} />, link: '#' },
-    { id: 3, icon: <BiLogoLinkedin size={22} />, link: '#' },
-  ];
+  useEffect(() => {
+    // Fetch footer settings from API
+    const loadSettings = async () => {
+      try {
+        const res = await fetch('/api/footer-settings');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.settings) {
+            setSettings(data.settings);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading footer settings:', error);
+      }
+    };
+
+    loadSettings();
+  }, []);
+
+  const getSocialIcon = (platform: string) => {
+    const platformLower = platform.toLowerCase();
+    if (platformLower.includes('facebook')) {
+      return <BiLogoFacebookCircle size={22} />;
+    } else if (platformLower.includes('twitter')) {
+      return <BsTwitter size={20} />;
+    } else if (platformLower.includes('linkedin')) {
+      return <BiLogoLinkedin size={22} />;
+    }
+    return <BiLogoFacebookCircle size={22} />;
+  };
 
   return (
     <footer className="relative mt-16 bg-gradient-to-br from-blue-100/40 via-purple-100/40 to-white/30 backdrop-blur-2xl border-t border-white/40 text-gray-700 overflow-hidden">
@@ -43,19 +117,23 @@ const MainFooter = () => {
           {/* Logo & Info */}
           <div>
             <Link href="/" className="flex items-center gap-2">
-              <Image src="https://i.ibb.co/pzsn8MG/english-logo.png" alt="English Centre Logo" width={40} height={40} className="rounded-lg shadow-sm" />
-              <span className="text-xl font-semibold text-blue-700">English Centre</span>
+              <Image
+                src={settings.logoUrl}
+                alt={settings.brandName + ' Logo'}
+                width={settings.logoWidth}
+                height={settings.logoWidth}
+                className="rounded-lg shadow-sm"
+              />
+              <span className="text-xl font-semibold text-blue-700">{settings.brandName}</span>
             </Link>
-            <p className="mt-4 text-sm text-gray-600 leading-relaxed">
-              Empowering learners with strong English communication skills for global success. Our commitment is to excellence, growth, and confidence.
-            </p>
+            <p className="mt-4 text-sm text-gray-600 leading-relaxed">{settings.tagline}</p>
           </div>
 
           {/* Quick Links */}
           <div>
             <h3 className="text-lg font-semibold text-blue-700 mb-3">Quick Links</h3>
             <ul className="space-y-2">
-              {quickLinks.map(link => (
+              {settings.quickLinks.map(link => (
                 <motion.li key={link.id} whileHover={{ x: 4 }} transition={{ type: 'spring', stiffness: 200 }}>
                   <Link href={link.link} className="text-gray-700 hover:text-blue-600 transition-colors text-sm">
                     {link.title}
@@ -69,9 +147,9 @@ const MainFooter = () => {
           <div>
             <h3 className="text-lg font-semibold text-blue-700 mb-3">Contact Info</h3>
             <ul className="space-y-2 text-sm text-gray-700">
-              <li>📍 English Centre, 2nd Floor, Green Plaza, Dhanmondi, Dhaka – 1209</li>
-              <li>📞 +880 1700-123456</li>
-              <li>✉️ info@englishcentre.com</li>
+              <li> {settings.contactInfo.address}</li>
+              <li> {settings.contactInfo.phone}</li>
+              <li> {settings.contactInfo.email}</li>
             </ul>
           </div>
 
@@ -79,14 +157,15 @@ const MainFooter = () => {
           <div>
             <h3 className="text-lg font-semibold text-blue-700 mb-3">Follow Us</h3>
             <div className="flex items-center gap-4">
-              {socialLinks.map(social => (
+              {settings.socialLinks.map(social => (
                 <Link
                   key={social.id}
                   href={social.link}
                   target="_blank"
                   className="p-2 rounded-full bg-white/40 backdrop-blur-md border border-white/30 hover:bg-blue-100 transition"
+                  aria-label={social.platform}
                 >
-                  {social.icon}
+                  {getSocialIcon(social.platform)}
                 </Link>
               ))}
             </div>
@@ -98,9 +177,11 @@ const MainFooter = () => {
 
         {/* Bottom Section */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs md:text-sm text-gray-600">
-          <p>&copy; {new Date().getFullYear()} English Centre. All rights reserved.</p>
+          <p>
+            &copy; {new Date().getFullYear()} {settings.copyrightText}
+          </p>
           <p className="text-gray-500">
-            Designed with ❤️ by <span className="text-blue-600 font-semibold">Toufiquer</span>
+            Designed with by <span className="text-blue-600 font-semibold">{settings.designerName}</span>
           </p>
         </div>
       </motion.div>

@@ -14,14 +14,22 @@ import {
   //    handleTokenVerify,
   IResponse,
 } from '@/app/api/utils/jwt-verify';
+import { isUserHasAccess, IWantAccess } from '../../utils/is-user-has-access';
 
 // GET all AccessManagements
 export async function GET(req: Request) {
   const rateLimitResponse = handleRateLimit(req);
   if (rateLimitResponse) return rateLimitResponse;
 
-  //    const tokenResponse = handleTokenVerify(req);
-  //   if (tokenResponse) return tokenResponse;
+  const is_IS_ACTIVE_AUTHORIZATION = process.env.IS_ACTIVE_AUTHORIZATION;
+  if (is_IS_ACTIVE_AUTHORIZATION) {
+    const wantToAccess: IWantAccess = {
+      db_name: 'access_management',
+      access: 'read',
+    };
+    const isAccess = await isUserHasAccess(wantToAccess);
+    if (isAccess) return isAccess;
+  }
 
   const id = new URL(req.url).searchParams.get('id');
   const result: IResponse = id ? await getAccessManagementById(req) : await getAccessManagements(req);
@@ -33,8 +41,15 @@ export async function POST(req: Request) {
   const rateLimitResponse = handleRateLimit(req);
   if (rateLimitResponse) return rateLimitResponse;
 
-  //    const tokenResponse = handleTokenVerify(req);
-  //    if (tokenResponse) return tokenResponse;
+  const is_IS_ACTIVE_AUTHORIZATION = process.env.IS_ACTIVE_AUTHORIZATION;
+  if (is_IS_ACTIVE_AUTHORIZATION) {
+    const wantToAccess: IWantAccess = {
+      db_name: 'access_management',
+      access: 'create',
+    };
+    const isAccess = await isUserHasAccess(wantToAccess);
+    if (isAccess) return isAccess;
+  }
 
   const result = await createAccessManagement(req);
   return formatResponse(result.data, result.message, result.status);
@@ -45,8 +60,15 @@ export async function PUT(req: Request) {
   const rateLimitResponse = handleRateLimit(req);
   if (rateLimitResponse) return rateLimitResponse;
 
-  //    const tokenResponse = handleTokenVerify(req);
-  //    if (tokenResponse) return tokenResponse;
+  const is_IS_ACTIVE_AUTHORIZATION = process.env.IS_ACTIVE_AUTHORIZATION;
+  if (is_IS_ACTIVE_AUTHORIZATION) {
+    const wantToAccess: IWantAccess = {
+      db_name: 'access_management',
+      access: 'update',
+    };
+    const isAccess = await isUserHasAccess(wantToAccess);
+    if (isAccess) return isAccess;
+  }
 
   const isBulk = new URL(req.url).searchParams.get('bulk') === 'true';
   const result = isBulk ? await bulkUpdateAccessManagements(req) : await updateAccessManagement(req);
@@ -59,8 +81,15 @@ export async function DELETE(req: Request) {
   const rateLimitResponse = handleRateLimit(req);
   if (rateLimitResponse) return rateLimitResponse;
 
-  //    const tokenResponse = handleTokenVerify(req);
-  //    if (tokenResponse) return tokenResponse;
+  const is_IS_ACTIVE_AUTHORIZATION = process.env.IS_ACTIVE_AUTHORIZATION;
+  if (is_IS_ACTIVE_AUTHORIZATION) {
+    const wantToAccess: IWantAccess = {
+      db_name: 'access_management',
+      access: 'delete',
+    };
+    const isAccess = await isUserHasAccess(wantToAccess);
+    if (isAccess) return isAccess;
+  }
 
   const isBulk = new URL(req.url).searchParams.get('bulk') === 'true';
   const result = isBulk ? await bulkDeleteAccessManagements(req) : await deleteAccessManagement(req);

@@ -18,6 +18,6 @@ const InputFieldForString = ({
     const value = e.target.value;
     onChange(value);
   };
-  return <Input id={id} value={value} onChange={handleValueChange} placeholder={placeholder} className={className} />;
+  return <Input id={id} value={value || ''} onChange={handleValueChange} placeholder={placeholder} className={className} />;
 };
 export default InputFieldForString;
