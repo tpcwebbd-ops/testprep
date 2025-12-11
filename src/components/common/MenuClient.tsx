@@ -23,8 +23,10 @@ import {
 import { useSession } from '@/lib/auth-client';
 import Image from 'next/image';
 
-type BrandFontSize = 'text-lg' | 'text-xl' | 'text-2xl' | 'text-3xl';
-type BrandFontFamily = 'font-sans' | 'font-serif' | 'font-mono';
+// --- Types ---
+
+type BrandFontSize = 'text-lg' | 'text-xl' | 'text-2xl' | 'text-3xl' | string;
+type BrandFontFamily = 'font-sans' | 'font-serif' | 'font-mono' | string;
 
 interface MenuItem {
   id: number;
@@ -50,6 +52,8 @@ interface MenuClientProps {
   initialBrandConfig: BrandConfiguration;
   initialMenuItems: MenuItem[];
 }
+
+// --- Components ---
 
 const IconMapper = ({ name, className }: { name?: string; className?: string }) => {
   const iconMap: { [key: string]: LucideIcon } = {
@@ -77,7 +81,7 @@ const DesktopMenuItem = ({ item, isActive, depth = 0 }: { item: MenuItem; isActi
   const showIcon = !isRoot && item.iconName && item.isIconPublish !== false;
 
   return (
-    <div className="relative z-50" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
+    <div className="relative z-50 h-full flex items-center" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
       <Link
         href={item.path}
         className={`
@@ -87,7 +91,7 @@ const DesktopMenuItem = ({ item, isActive, depth = 0 }: { item: MenuItem; isActi
               ? 'text-sky-200 bg-sky-500/10 shadow-[0_0_15px_rgba(56,189,248,0.2)] border border-sky-500/30'
               : 'text-sky-100/80 hover:text-sky-50 hover:bg-sky-500/5 border border-transparent hover:border-sky-500/20'
           }
-          ${!isRoot && 'justify-between w-full rounded-lg hover:bg-sky-500/10'}
+          ${!isRoot && 'justify-between w-full rounded-lg hover:bg-sky-500/10 h-auto'}
         `}
       >
         <div className="flex items-center gap-3">
@@ -117,20 +121,22 @@ const DesktopMenuItem = ({ item, isActive, depth = 0 }: { item: MenuItem; isActi
       <AnimatePresence>
         {isHovered && hasChildren && (
           <motion.div
-            initial={{ opacity: 0, y: 8, scale: 0.98 }}
+            initial={{ opacity: 0, y: 15, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 8, scale: 0.98 }}
+            exit={{ opacity: 0, y: 15, scale: 0.95 }}
             transition={{ duration: 0.2, ease: 'circOut' }}
             className={`
               absolute p-2 min-w-[240px]
               bg-[#0a1224]/95 backdrop-blur-2xl
               border border-sky-500/20
-              rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.8)]
+              rounded-xl shadow-[0_20px_50px_-10px_rgba(0,0,0,0.8)]
               box-border
-              ${isRoot ? 'top-full left-0 mt-2' : 'left-full top-0 ml-2'}
+              ${isRoot ? 'top-full left-0 mt-1' : 'left-full top-0 ml-2'}
             `}
           >
-            <div className="absolute inset-0 rounded-xl bg-gradient-to-b from-sky-500/5 to-transparent pointer-events-none" />
+            {/* Glossy overlay effect */}
+            <div className="absolute inset-0 rounded-xl bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
+
             <div className="relative z-10 flex flex-col gap-1">
               {item.children?.map(child => (
                 <DesktopMenuItem key={child._id || child.id} item={child} isActive={isActive} depth={depth + 1} />
@@ -231,15 +237,25 @@ const MenuClient: React.FC<MenuClientProps> = ({ initialBrandConfig, initialMenu
         const response = await fetch('/api/brand-settings', { cache: 'no-store' });
         if (response.ok) {
           const data = await response.json();
-          if (data) setBrandConfig(data);
+          if (data) {
+            // Mapping API response to our State Interface if needed
+            // The API response matches closely, so direct assignment is mostly safe
+            setBrandConfig(prev => ({
+              ...prev,
+              ...data,
+            }));
+          }
         }
       } catch (error) {
         console.error('Update fetch error', error);
       }
     };
+
     const handleUpdate = () => fetchBrandSettings();
     if (typeof window !== 'undefined') {
       window.addEventListener('brand-settings-updated', handleUpdate);
+      // Initial fetch to ensure up-to-date data on mount
+      fetchBrandSettings();
     }
     return () => {
       if (typeof window !== 'undefined') {
@@ -250,10 +266,14 @@ const MenuClient: React.FC<MenuClientProps> = ({ initialBrandConfig, initialMenu
 
   const isActive = (path: string) => pathname === path;
 
+  // Helper to determine if we should fallback to default gradient
+  const hasCustomColor = brandConfig.textColor && brandConfig.textColor !== '#000000';
+
   return (
-    <nav className="fixed top-0 left-0 w-full z-[100] bg-gradient-to-r from-blue-950/80 via-sky-900/60 to-blue-950/80 backdrop-blur-xl border-b border-sky-400/20 shadow-[0_4px_30px_rgba(56,189,248,0.15)]">
+    <nav className="fixed top-0 left-0 w-full z-[100] bg-gradient-to-r from-blue-950/90 via-sky-900/80 to-blue-950/90 backdrop-blur-xl border-b border-sky-400/20 shadow-[0_4px_30px_rgba(56,189,248,0.15)]">
       <div className="container mx-auto px-4 lg:px-8">
         <div className="flex justify-between items-center h-16 lg:h-20">
+          {/* --- Brand Logo & Name Area --- */}
           <Link href="/" className="group relative flex items-center gap-3 z-50">
             {brandConfig.logoUrl ? (
               <motion.div
@@ -267,7 +287,7 @@ const MenuClient: React.FC<MenuClientProps> = ({ initialBrandConfig, initialMenu
                   alt={brandConfig.brandName}
                   width={120}
                   height={60}
-                  className="h-full w-auto object-contain drop-shadow-[0_0_10px_rgba(56,189,248,0.5)]"
+                  className="h-full w-auto object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]"
                   priority
                 />
               </motion.div>
@@ -287,15 +307,23 @@ const MenuClient: React.FC<MenuClientProps> = ({ initialBrandConfig, initialMenu
                 animate={{ opacity: 1, x: 0 }}
                 className={`
                   ${brandConfig.fontSize} ${brandConfig.fontFamily}
-                  font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-sky-100 via-sky-300 to-sky-100 drop-shadow-sm
+                  font-extrabold tracking-tight drop-shadow-sm transition-colors duration-500
+                  ${!hasCustomColor ? 'text-transparent bg-clip-text bg-gradient-to-r from-sky-100 via-sky-300 to-sky-100' : ''}
                 `}
+                style={{
+                  color: hasCustomColor ? brandConfig.textColor : undefined,
+                  // If a custom color is set, we add a colored glow matching the brand color
+                  // This ensures visibility against the dark background while looking "stunning"
+                  textShadow: hasCustomColor ? `0 0 30px ${brandConfig.textColor}90` : undefined,
+                }}
               >
                 {brandConfig.brandName}
               </motion.span>
             </div>
           </Link>
+          {/* --------------------------- */}
 
-          <div className="hidden lg:flex items-center gap-1">
+          <div className="hidden lg:flex items-center gap-1 h-full">
             {menuItems.map(item => (
               <DesktopMenuItem key={item._id || item.id} item={item} isActive={isActive} />
             ))}
