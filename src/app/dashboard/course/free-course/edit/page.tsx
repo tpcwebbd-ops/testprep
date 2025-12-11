@@ -9,23 +9,22 @@ import {
   Save,
   Trash2,
   AlertTriangle,
-  Eye,
   ArrowUp,
   ArrowDown,
-  Type,
-  Layers,
   ChevronDown,
   RefreshCw,
   ChevronLeft,
   ChevronRight,
   BookOpen,
+  GraduationCap,
+  Layers,
 } from 'lucide-react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent, DragOverlay, DragStartEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-import { AllSections, AllSectionsKeys, allSectionCagegory } from '@/components/all-section/all-section-index/all-sections';
-import { AllForms, AllFormsKeys } from '@/components/all-form/all-form-index/all-form';
+// --- IMPORT ONLY ASSIGNMENTS ---
+import { AllAssignments, AllAssignmentsKeys } from '@/components/course/assignment/all-assignment-index/all-assignment-index';
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -36,7 +35,7 @@ import { useGetCoursesQuery, useUpdateCourseMutation } from '@/redux/features/co
 
 // --- Types & Interfaces ---
 
-type ItemType = 'section' | 'form';
+type ItemType = 'assignment';
 
 interface CourseContent {
   id: string;
@@ -56,55 +55,26 @@ interface ICourse {
   isActive: boolean;
 }
 
-interface SectionConfig {
-  category: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  mutation: React.ComponentType<any>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  query: React.ComponentType<any>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: any;
-}
-
-const TypedAllSections = AllSections as unknown as Record<string, SectionConfig>;
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const COMPONENT_MAP: Record<string, { collection: any; keys: string[]; label: string; icon: any; color: string }> = {
-  form: {
-    collection: AllForms,
-    keys: AllFormsKeys,
-    label: 'Quiz / Form',
-    icon: Type,
-    color: 'text-blue-400 from-cyan-500 to-blue-500',
-  },
-  section: {
-    collection: AllSections,
-    keys: AllSectionsKeys,
-    label: 'Learning Block',
-    icon: Layers,
-    color: 'text-indigo-400 from-indigo-500 to-purple-500',
+  assignment: {
+    collection: AllAssignments,
+    keys: AllAssignmentsKeys,
+    label: 'Assignment',
+    icon: GraduationCap,
+    color: 'text-emerald-400 from-emerald-500 to-green-500',
   },
 };
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const getTypeStyles = (type: ItemType) => {
-  switch (type) {
-    case 'form':
-      return {
-        border: 'border-blue-500/30 hover:border-blue-400/60',
-        bg: 'bg-slate-900/60',
-        badge: 'bg-blue-500/10 text-blue-300 border-blue-500/20',
-        icon: 'text-blue-400',
-        glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(59,130,246,0.3)]',
-      };
-    default:
-      return {
-        border: 'border-indigo-500/30 hover:border-indigo-400/60',
-        bg: 'bg-slate-900/40',
-        badge: 'bg-indigo-500/10 text-indigo-300 border-indigo-500/20',
-        icon: 'text-indigo-400',
-        glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(99,102,241,0.3)]',
-      };
-  }
+  // Defaulting to Assignment Style
+  return {
+    border: 'border-emerald-500/30 hover:border-emerald-400/60',
+    bg: 'bg-slate-900/40',
+    badge: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20',
+    icon: 'text-emerald-400',
+    glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(16,185,129,0.3)]',
+  };
 };
 
 // --- Sortable Item Component ---
@@ -112,13 +82,11 @@ const getTypeStyles = (type: ItemType) => {
 interface SortableItemProps {
   item: CourseContent;
   onEdit: (item: CourseContent) => void;
-  onPreview: (item: CourseContent) => void;
   onDelete: (item: CourseContent) => void;
-  onInlineUpdate: (item: CourseContent, newData: unknown) => void;
   onOpenMoveDialog: (item: CourseContent) => void;
 }
 
-const SortableItem = ({ item, onEdit, onPreview, onDelete, onInlineUpdate, onOpenMoveDialog }: SortableItemProps) => {
+const SortableItem = ({ item, onEdit, onDelete, onOpenMoveDialog }: SortableItemProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id });
 
   const style = {
@@ -143,14 +111,9 @@ const SortableItem = ({ item, onEdit, onPreview, onDelete, onInlineUpdate, onOpe
     );
   }
 
-  let ComponentToRender;
-  if (item.type === 'form') {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ComponentToRender = (config as any).FormField;
-  } else {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ComponentToRender = (config as any).query;
-  }
+  // Render the "Query" component as a preview in the list
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ComponentToRender = (config as any).query;
 
   const styles = getTypeStyles(item.type);
 
@@ -189,23 +152,13 @@ const SortableItem = ({ item, onEdit, onPreview, onDelete, onInlineUpdate, onOpe
             </div>
 
             <div className="flex items-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity duration-300">
-              {item.type !== 'form' ? (
-                <Button
-                  onClick={() => onEdit(item)}
-                  size="sm"
-                  className="min-w-1 h-8 w-8 p-0 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border-none"
-                >
-                  <Edit className="h-4 w-4" />
-                </Button>
-              ) : (
-                <Button
-                  onClick={() => onPreview(item)}
-                  size="sm"
-                  className="min-w-1 h-8 w-8 p-0 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border-none"
-                >
-                  <Eye className="h-4 w-4" />
-                </Button>
-              )}
+              <Button
+                onClick={() => onEdit(item)}
+                size="sm"
+                className="min-w-1 h-8 w-8 p-0 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border-none"
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
 
               <Button
                 onClick={() => onDelete(item)}
@@ -218,15 +171,11 @@ const SortableItem = ({ item, onEdit, onPreview, onDelete, onInlineUpdate, onOpe
           </div>
 
           <div className="p-6 pt-16 text-slate-300 min-h-[100px]">
-            <div className="z-10 pointer-events-none select-none opacity-90 group-hover:opacity-100 transition-opacity">
-              {ComponentToRender &&
-                (item.type !== 'form' ? (
-                  <ComponentToRender data={JSON.stringify(item.data)} />
-                ) : (
-                  <div className="pointer-events-auto">
-                    <ComponentToRender data={item.data} onSubmit={(newData: unknown) => onInlineUpdate(item, newData)} />
-                  </div>
-                ))}
+            {/* Render Preview (Query) with pointer-events disabled for list view interaction */}
+            <div className="z-10 pointer-events-none select-none opacity-90 group-hover:opacity-100 transition-opacity relative">
+              {/* Overlay to prevent interaction with quiz elements in list view */}
+              <div className="absolute inset-0 z-50 bg-transparent" />
+              {ComponentToRender && <ComponentToRender data={JSON.stringify(item.data)} />}
             </div>
           </div>
         </div>
@@ -274,21 +223,17 @@ function EditCourseContent() {
 
   // UI States
   const [editingItem, setEditingItem] = useState<CourseContent | null>(null);
-  const [previewingItem, setPreviewingItem] = useState<CourseContent | null>(null);
   const [deletingItem, setDeletingItem] = useState<CourseContent | null>(null);
   const [movingItem, setMovingItem] = useState<CourseContent | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
 
-  // "Add Task" Popup State
-  const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
-  const [activeAddType, setActiveAddType] = useState<ItemType | null>(null);
+  // Modal State for Adding
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   // Task Bar Visibility
   const [isDockExpanded, setIsDockExpanded] = useState(true);
 
-  // Pagination & Filters
-  const [selectedSectionCategory, setSelectedSectionCategory] = useState<string>('All');
-  const [sectionPreviewKey, setSectionPreviewKey] = useState<string | null>(null);
+  // Pagination
   const [paginationPage, setPaginationPage] = useState(1);
   const ITEMS_PER_PAGE = 8;
 
@@ -302,7 +247,7 @@ function EditCourseContent() {
   // Reset pagination
   useEffect(() => {
     setPaginationPage(1);
-  }, [activeAddType, selectedSectionCategory]);
+  }, [isAddModalOpen]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -337,7 +282,8 @@ function EditCourseContent() {
     if (index < items.length - 1) setItems(prevItems => arrayMove(prevItems, index, index + 1));
   };
 
-  const handleAddItem = (type: ItemType, key: string) => {
+  const handleAddItem = (key: string) => {
+    const type: ItemType = 'assignment';
     const mapEntry = COMPONENT_MAP[type];
     const config = mapEntry.collection[key];
 
@@ -346,27 +292,21 @@ function EditCourseContent() {
       key: key,
       name: config.name || `${mapEntry.label} ${key}`,
       type: type,
-      heading: `${mapEntry.label} - ${key.replace(/-/g, ' ')}`,
+      heading: `${mapEntry.label}: ${key.replace(/-/g, ' ')}`,
       data: config.data,
     };
 
     setItems([...items, newItem]);
-    toast.success('Task added to list');
+    toast.success('Assignment added');
 
     setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 100);
-
-    setSectionPreviewKey(null);
-    if (type !== 'section') setActiveAddType(null);
-    setIsAddTaskOpen(false);
+    setIsAddModalOpen(false);
   };
 
   const onSubmitEdit = (updatedData: unknown) => {
     if (editingItem) setItems(items.map(item => (item.id === editingItem.id ? { ...item, data: updatedData } : item)));
     setEditingItem(null);
-  };
-
-  const handleInlineUpdate = (targetItem: CourseContent, updatedData: unknown) => {
-    setItems(prevItems => prevItems.map(item => (item.id === targetItem.id ? { ...item, data: updatedData } : item)));
+    toast.success('Assignment updated locally');
   };
 
   const handleConfirmDelete = () => {
@@ -377,7 +317,6 @@ function EditCourseContent() {
   };
 
   const handleSubmitAll = async () => {
-    // Check if course exists
     if (!currentCourse?._id) {
       toast.error('Course context lost. Please reload.');
       return;
@@ -385,33 +324,15 @@ function EditCourseContent() {
 
     try {
       await updateCourse({
-        // Assert _id exists because of the check above
-        id: currentCourse!._id,
+        id: currentCourse._id,
         content: items,
       }).unwrap();
-      toast.success('Changes saved successfully!');
+      toast.success('All changes saved successfully!');
     } catch (err) {
       toast.error('Failed to save changes');
       console.error(err);
     }
   };
-
-  const handleAddTaskClick = () => {
-    setIsAddTaskOpen(true);
-  };
-
-  // --- Helpers for Modal Data ---
-
-  const sectionCategories = useMemo(() => ['All', ...allSectionCagegory], []);
-
-  const filteredSectionKeys = useMemo(() => {
-    if (activeAddType !== 'section') return [];
-    if (selectedSectionCategory === 'All') return AllSectionsKeys;
-    return AllSectionsKeys.filter(key => {
-      const section = TypedAllSections[key];
-      return section?.category === selectedSectionCategory;
-    });
-  }, [activeAddType, selectedSectionCategory]);
 
   // --- Render Loading / Not Found ---
 
@@ -427,7 +348,6 @@ function EditCourseContent() {
     );
   }
 
-  // 6.2 If not found then render there is not data found.
   if (error || (!isLoading && !currentCourse)) {
     return (
       <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4">
@@ -450,13 +370,13 @@ function EditCourseContent() {
     );
   }
 
-  // 6.1 If found data in database then render it.
+  // --- Main Render ---
   return (
     <main className="min-h-screen bg-slate-950 overflow-x-hidden selection:bg-indigo-500/30 font-sans pb-32">
       {/* Background Ambience */}
       <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-indigo-900/10 blur-[120px]" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-blue-900/10 blur-[120px]" />
+        <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-emerald-900/10 blur-[120px]" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-indigo-900/10 blur-[120px]" />
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-soft-light" />
       </div>
 
@@ -469,8 +389,7 @@ function EditCourseContent() {
             </Button>
             <div>
               <h1 className="text-lg font-bold text-white flex items-center gap-2">
-                {/* Use Optional Chaining Here to fix TS Error */}
-                <span className="text-indigo-400">{currentCourse?.courseDay}</span>
+                <span className="text-emerald-400">{currentCourse?.courseDay}</span>
                 <span className="text-slate-600">/</span>
                 <span>{currentCourse?.courseName}</span>
               </h1>
@@ -478,44 +397,36 @@ function EditCourseContent() {
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="text-xs text-slate-500 font-mono hidden md:block">{items.length} Tasks</div>
+            <div className="text-xs text-slate-500 font-mono hidden md:block">{items.length} Assignments</div>
           </div>
         </div>
       </div>
 
-      {/* 6.5 implement drug and drop features. */}
+      {/* Drag & Drop List */}
       <div className="relative z-10 container mx-auto px-4 py-8 max-w-4xl">
         {items.length === 0 ? (
           <div className="animate-in zoom-in-95 duration-700 fade-in flex flex-col items-center justify-center min-h-[40vh] border-2 border-dashed border-white/10 rounded-3xl bg-white/5 backdrop-blur-sm p-8 mt-10">
-            <div className="w-16 h-16 rounded-full bg-indigo-500/20 flex items-center justify-center mb-4 text-indigo-400">
+            <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center mb-4 text-emerald-400">
               <BookOpen className="h-8 w-8" />
             </div>
-            <h2 className="text-2xl font-bold text-white mb-2 text-center">No Tasks Yet</h2>
-            <p className="text-slate-400 text-center max-w-md mb-8">This day has no content. Click &quot;Add Task&quot; below to start building.</p>
+            <h2 className="text-2xl font-bold text-white mb-2 text-center">No Assignments Yet</h2>
+            <p className="text-slate-400 text-center max-w-md mb-8">This day has no content. Click &quot;Add Assignment&quot; below to start.</p>
           </div>
         ) : (
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             <SortableContext items={items.map(s => s.id)} strategy={verticalListSortingStrategy}>
               <div className="flex flex-col gap-5">
                 {items.map(item => (
-                  <SortableItem
-                    key={item.id}
-                    item={item}
-                    onEdit={setEditingItem}
-                    onPreview={setPreviewingItem}
-                    onDelete={setDeletingItem}
-                    onInlineUpdate={handleInlineUpdate}
-                    onOpenMoveDialog={setMovingItem}
-                  />
+                  <SortableItem key={item.id} item={item} onEdit={setEditingItem} onDelete={setDeletingItem} onOpenMoveDialog={setMovingItem} />
                 ))}
               </div>
             </SortableContext>
 
             <DragOverlay>
               {activeId ? (
-                <div className="backdrop-blur-xl shadow-2xl rounded-xl border border-indigo-500/30 bg-slate-900/90 p-4 flex items-center gap-4 transform scale-105 cursor-grabbing">
-                  <GripVertical className="h-6 w-6 text-indigo-400" />
-                  <span className="text-white font-medium text-lg">Moving Task...</span>
+                <div className="backdrop-blur-xl shadow-2xl rounded-xl border border-emerald-500/30 bg-slate-900/90 p-4 flex items-center gap-4 transform scale-105 cursor-grabbing">
+                  <GripVertical className="h-6 w-6 text-emerald-400" />
+                  <span className="text-white font-medium text-lg">Moving Assignment...</span>
                 </div>
               ) : null}
             </DragOverlay>
@@ -523,280 +434,224 @@ function EditCourseContent() {
         )}
       </div>
 
-      {/* 6.3 Task Bar (Bottom) */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 flex flex-col items-center pointer-events-none">
-        {/* Hide/View Toggle */}
-        <button
-          onClick={() => setIsDockExpanded(!isDockExpanded)}
-          className={`
-            pointer-events-auto mb-2 flex items-center justify-center w-10 h-6 rounded-full 
-            bg-slate-900 border border-white/10 shadow-lg text-slate-400 hover:text-white transition-all
-            ${!isDockExpanded ? 'animate-bounce' : ''}
-          `}
-        >
-          {isDockExpanded ? <ChevronDown className="h-3 w-3" /> : <ArrowUp className="h-3 w-3" />}
-        </button>
+      {/* Task Bar (Floating Dock) */}
+      <div className="fixed bottom-6 left-0 right-0 z-50 flex justify-center pointer-events-none px-4">
+        <div className="w-full max-w-4xl flex flex-col items-center relative">
+          {/* Toggle Button */}
+          <button
+            onClick={() => setIsDockExpanded(!isDockExpanded)}
+            className={`
+              pointer-events-auto relative z-20 flex items-center justify-center gap-2 px-5 py-2 rounded-full 
+              font-medium text-sm transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]
+              ${
+                isDockExpanded
+                  ? 'mb-[-20px] bg-slate-800 text-slate-400 opacity-0 translate-y-4'
+                  : 'bg-slate-900 border border-white/10 text-slate-200 shadow-xl hover:scale-105 hover:bg-slate-800 hover:text-white translate-y-0'
+              }
+            `}
+          >
+            <Layers className="h-4 w-4 text-emerald-400" />
+            <span>Open Tools</span>
+            <ArrowUp className="h-3 w-3" />
+          </button>
 
-        {/* The Bar */}
-        <div
-          className={`
-            w-full bg-slate-950/90 backdrop-blur-xl border-t border-white/10 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] 
-            transition-all duration-300 ease-in-out origin-bottom
-            ${isDockExpanded ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}
-          `}
-        >
-          <div className="pointer-events-auto container mx-auto px-4 h-20 flex items-center justify-between">
-            {/* 6.4 Left Side: Add Task Button */}
-            <div className="flex items-center gap-4">
-              <Button
-                onClick={handleAddTaskClick}
-                className="h-12 bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/20 px-6 rounded-xl font-semibold gap-2 transition-transform active:scale-95"
-              >
-                <Plus className="h-5 w-5" />
-                Add Task
-              </Button>
+          {/* The Dock Bar */}
+          <div
+            className={`
+              pointer-events-auto w-full relative z-10 overflow-hidden
+              bg-slate-900/80 backdrop-blur-2xl border border-white/10 
+              shadow-[0_0_50px_-12px_rgba(16,185,129,0.3)]
+              rounded-2xl
+              transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]
+              ${isDockExpanded ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-10 scale-95 pointer-events-none h-0'}
+            `}
+          >
+            {/* Close Handle */}
+            <div
+              onClick={() => setIsDockExpanded(false)}
+              className="absolute top-0 left-0 right-0 h-4 flex items-center justify-center cursor-pointer hover:bg-white/5 transition-colors group"
+            >
+              <div className="w-12 h-1 rounded-full bg-slate-700 group-hover:bg-slate-500 transition-colors" />
             </div>
 
-            {/* Center Info (Optional) */}
-            <div className="hidden md:flex flex-col items-center opacity-50">
-              <span className="text-xs font-mono uppercase tracking-widest text-slate-400">Editor Mode</span>
+            <div className="flex items-center justify-between p-4 pt-6 h-24">
+              {/* Add Button */}
+              <div className="flex items-center gap-4">
+                <Button
+                  onClick={() => setIsAddModalOpen(true)}
+                  className="h-12 bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 px-6 rounded-xl font-semibold gap-2 transition-transform active:scale-95 group"
+                >
+                  <div className="p-1 rounded-full bg-white/20 group-hover:rotate-90 transition-transform duration-300">
+                    <Plus className="h-4 w-4" />
+                  </div>
+                  Add Assignment
+                </Button>
+
+                <div className="h-8 w-px bg-white/10 hidden sm:block" />
+
+                <div className="hidden sm:flex flex-col">
+                  <span className="text-xs text-slate-400 font-medium uppercase tracking-wider">Status</span>
+                  <span className="text-xs text-emerald-400 font-mono flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    Editing
+                  </span>
+                </div>
+              </div>
+
+              {/* Save Controls */}
+              <div className="flex items-center gap-3">
+                <Button
+                  onClick={() => setIsDockExpanded(false)}
+                  variant="ghost"
+                  size="icon"
+                  className="h-12 w-12 rounded-xl text-slate-400 hover:text-white hover:bg-white/5"
+                >
+                  <ChevronDown className="h-5 w-5" />
+                </Button>
+
+                <Button
+                  onClick={handleSubmitAll}
+                  disabled={isUpdating}
+                  className={`
+                    h-12 px-6 rounded-xl font-medium gap-2 transition-all border
+                    ${
+                      isUpdating
+                        ? 'bg-amber-500/10 text-amber-500 border-amber-500/20'
+                        : 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20 hover:bg-indigo-500/20 hover:border-indigo-500/30'
+                    }
+                  `}
+                >
+                  {isUpdating ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                  <span className="hidden sm:inline">{isUpdating ? 'Saving...' : 'Save Changes'}</span>
+                </Button>
+              </div>
             </div>
 
-            {/* 6.5 Right Side: Save Changes */}
-            <div className="flex items-center gap-4">
-              <Button
-                onClick={handleSubmitAll}
-                disabled={isUpdating}
-                className="h-12 bg-white/10 hover:bg-white/20 text-white border border-white/5 px-6 rounded-xl font-medium gap-2 transition-all"
-              >
-                {isUpdating ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                {isUpdating ? 'Saving...' : 'Save Changes'}
-              </Button>
-            </div>
+            <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
           </div>
         </div>
       </div>
 
-      {/* --- ADD TASK SELECTION POPUP --- */}
-      <Dialog open={isAddTaskOpen} onOpenChange={setIsAddTaskOpen}>
-        <DialogContent className="bg-slate-950 border-white/10 text-white max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Add New Task</DialogTitle>
-          </DialogHeader>
-          <div className="grid grid-cols-2 gap-4 py-4">
-            <button
-              onClick={() => {
-                setActiveAddType('section');
-                setIsAddTaskOpen(false);
-              }}
-              className="flex flex-col items-center justify-center p-6 rounded-xl bg-slate-900 border border-white/10 hover:border-indigo-500/50 hover:bg-indigo-500/10 transition-all gap-3 group"
-            >
-              <div className="p-3 rounded-full bg-indigo-500/20 text-indigo-400 group-hover:scale-110 transition-transform">
-                <Layers className="h-6 w-6" />
-              </div>
-              <span className="font-semibold text-sm">Learning Block</span>
-            </button>
-
-            <button
-              onClick={() => {
-                setActiveAddType('form');
-                setIsAddTaskOpen(false);
-              }}
-              className="flex flex-col items-center justify-center p-6 rounded-xl bg-slate-900 border border-white/10 hover:border-blue-500/50 hover:bg-blue-500/10 transition-all gap-3 group"
-            >
-              <div className="p-3 rounded-full bg-blue-500/20 text-blue-400 group-hover:scale-110 transition-transform">
-                <Type className="h-6 w-6" />
-              </div>
-              <span className="font-semibold text-sm">Quiz / Form</span>
-            </button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* --- DETAILED COMPONENT SELECTION MODAL --- */}
-      <Dialog open={!!activeAddType} onOpenChange={() => setActiveAddType(null)}>
+      {/* --- ASSIGNMENT SELECTION MODAL --- */}
+      <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
         <DialogContent className="p-0 overflow-hidden bg-slate-950/95 backdrop-blur-3xl border-white/10 shadow-2xl text-white gap-0 flex flex-col max-w-[90vw] min-w-[90vw] h-[85vh] mt-10">
-          {activeAddType &&
-            (() => {
-              const meta = COMPONENT_MAP[activeAddType];
-              const isSectionMode = activeAddType === 'section';
+          {(() => {
+            const meta = COMPONENT_MAP.assignment;
+            const dataSource = meta.keys;
+            const totalItems = dataSource.length;
+            const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+            const paginatedItems = dataSource.slice((paginationPage - 1) * ITEMS_PER_PAGE, paginationPage * ITEMS_PER_PAGE);
 
-              // Pagination Logic
-              const dataSource = isSectionMode ? filteredSectionKeys : meta.keys;
-              const totalItems = dataSource.length;
-              const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
-              const paginatedItems = dataSource.slice((paginationPage - 1) * ITEMS_PER_PAGE, paginationPage * ITEMS_PER_PAGE);
-
-              return (
-                <>
-                  <div className="shrink-0 flex flex-col bg-white/5 border-b border-white/10">
-                    <div className="flex items-center justify-between p-6 pb-4">
-                      <div className="flex items-center gap-4">
-                        <div className={`p-3 rounded-xl bg-gradient-to-br ${meta.color} shadow-lg`}>
-                          <meta.icon className="h-6 w-6 text-white" />
-                        </div>
-                        <div>
-                          <DialogTitle className="text-2xl font-bold text-white flex items-center gap-3">Select {meta.label}</DialogTitle>
-                          <p className="text-slate-400 text-sm mt-1">Choose a component to add to your task list.</p>
-                        </div>
+            return (
+              <>
+                <div className="shrink-0 flex flex-col bg-white/5 border-b border-white/10">
+                  <div className="flex items-center justify-between p-6 pb-6">
+                    <div className="flex items-center gap-4">
+                      <div className={`p-3 rounded-xl bg-gradient-to-br ${meta.color} shadow-lg`}>
+                        <meta.icon className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <DialogTitle className="text-2xl font-bold text-white flex items-center gap-3">Select {meta.label}</DialogTitle>
+                        <p className="text-slate-400 text-sm mt-1">Choose a template to add to your course day.</p>
                       </div>
                     </div>
-
-                    {isSectionMode && (
-                      <div className="px-6 pb-0 flex overflow-x-auto no-scrollbar gap-2">
-                        {sectionCategories.map(cat => (
-                          <button
-                            key={cat}
-                            onClick={() => setSelectedSectionCategory(cat)}
-                            className={`
-                              relative px-4 py-3 text-sm font-medium transition-colors whitespace-nowrap
-                              ${selectedSectionCategory === cat ? 'text-white' : 'text-slate-500 hover:text-slate-300'}
-                            `}
-                          >
-                            {cat}
-                            {selectedSectionCategory === cat && (
-                              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]" />
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                    )}
                   </div>
+                </div>
 
-                  <ScrollArea className="flex-1 min-h-0 w-full bg-black/20">
-                    <div className="p-6">
-                      {isSectionMode ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-20">
-                          {paginatedItems.map(key => {
-                            const config = TypedAllSections[key];
-                            const PreviewComp = config.query;
+                <ScrollArea className="flex-1 min-h-0 w-full bg-black/20">
+                  <div className="p-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-20">
+                      {paginatedItems.map(key => {
+                        const config = meta.collection[key];
+                        // Use Query component for preview
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        const PreviewComp = (config as any).query;
 
-                            return (
-                              <div
-                                key={key}
-                                className="group relative bg-slate-900 border border-white/10 rounded-2xl overflow-hidden hover:border-indigo-500/50 hover:shadow-2xl transition-all duration-300 flex flex-col h-[280px]"
-                              >
-                                <div className="relative flex-1 bg-black/40 overflow-hidden">
-                                  <div className="absolute inset-0 flex items-center justify-center p-4">
-                                    <div className="w-[200%] h-[200%] origin-center scale-[0.4] pointer-events-none select-none flex items-start justify-center pt-10">
-                                      {PreviewComp ? <PreviewComp data={JSON.stringify(config.data)} /> : <div className="text-slate-600">No Preview</div>}
-                                    </div>
-                                  </div>
-                                  <div className="absolute top-3 left-3">
-                                    <span className="bg-black/60 backdrop-blur text-[10px] text-white/80 px-2 py-1 rounded border border-white/5">
-                                      {config.category}
-                                    </span>
-                                  </div>
-                                </div>
-
-                                <div className="p-3 bg-white/5 border-t border-white/5 flex items-center justify-between gap-2 relative z-10">
-                                  <h4 className="text-xs font-bold text-slate-200 truncate flex-1">{key}</h4>
-                                  <div className="flex gap-1">
-                                    <Button
-                                      onClick={() => setSectionPreviewKey(key)}
-                                      size="icon"
-                                      variant="ghost"
-                                      className="h-7 w-7 text-slate-400 hover:text-white"
-                                    >
-                                      <Eye className="h-3.5 w-3.5" />
-                                    </Button>
-                                    <Button onClick={() => handleAddItem('section', key)} size="sm" className="h-7 text-xs bg-indigo-600 hover:bg-indigo-500">
-                                      <Plus className="mr-1 h-3 w-3" /> Add
-                                    </Button>
-                                  </div>
+                        return (
+                          <div
+                            key={key}
+                            className="group relative bg-slate-900 border border-white/10 rounded-2xl overflow-hidden hover:border-emerald-500/50 hover:shadow-2xl transition-all duration-300 flex flex-col h-[300px]"
+                          >
+                            {/* Preview Area */}
+                            <div className="relative flex-1 bg-black/40 overflow-hidden">
+                              <div className="absolute inset-0 flex items-center justify-center p-4">
+                                {/* Scaled down preview */}
+                                <div className="w-[200%] h-[200%] origin-center scale-[0.4] pointer-events-none select-none flex items-start justify-center pt-10">
+                                  {PreviewComp ? <PreviewComp data={JSON.stringify(config.data)} /> : <div className="text-slate-600">No Preview</div>}
                                 </div>
                               </div>
-                            );
-                          })}
-                        </div>
-                      ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-10">
-                          {paginatedItems.map(key => {
-                            const config = meta.collection[key];
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            const DisplayComponent = activeAddType === 'form' ? (config as any).preview : (config as any).query;
+                            </div>
 
-                            return (
-                              <div
-                                key={key}
-                                onClick={() => handleAddItem(activeAddType, key)}
-                                className="group cursor-pointer rounded-2xl border border-white/10 bg-black/20 overflow-hidden hover:border-white/30 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
-                              >
-                                <div className="h-[160px] bg-slate-900/50 relative overflow-hidden p-4 flex items-center justify-center border-b border-white/5">
-                                  <div className="scale-[0.6] w-full h-full origin-center flex items-center justify-center pointer-events-none">
-                                    {DisplayComponent ? <DisplayComponent /> : <span className="text-slate-500">Preview</span>}
-                                  </div>
-                                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
-                                    <div className="bg-white text-black px-4 py-2 rounded-full font-semibold flex items-center gap-2">
-                                      <Plus className="h-4 w-4" /> Add
-                                    </div>
-                                  </div>
-                                </div>
-                                <div className="p-4 bg-white/5 flex justify-between items-center">
-                                  <span className="font-semibold text-slate-200 text-sm">{key}</span>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
+                            {/* Action Area */}
+                            <div className="p-4 bg-white/5 border-t border-white/5 flex items-center justify-between gap-2 relative z-10">
+                              <h4 className="text-sm font-bold text-slate-200 truncate flex-1">{key}</h4>
+                              <Button onClick={() => handleAddItem(key)} size="sm" className="h-8 bg-emerald-600 hover:bg-emerald-500 text-white">
+                                <Plus className="mr-1 h-3 w-3" /> Add
+                              </Button>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
-                  </ScrollArea>
+                  </div>
+                </ScrollArea>
 
-                  {totalPages > 1 && (
-                    <div className="shrink-0 p-4 border-t border-white/10 bg-slate-900/50 backdrop-blur-md flex items-center justify-center gap-4 z-20">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setPaginationPage(p => Math.max(1, p - 1))}
-                        disabled={paginationPage === 1}
-                        className="rounded-full text-slate-400 hover:text-white"
-                      >
-                        <ChevronLeft className="h-5 w-5" />
-                      </Button>
-                      <span className="text-sm font-mono text-slate-300">
-                        {paginationPage} / {totalPages}
-                      </span>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setPaginationPage(p => Math.min(totalPages, p + 1))}
-                        disabled={paginationPage === totalPages}
-                        className="rounded-full text-slate-400 hover:text-white"
-                      >
-                        <ChevronRight className="h-5 w-5" />
-                      </Button>
-                    </div>
-                  )}
-                </>
-              );
-            })()}
+                {totalPages > 1 && (
+                  <div className="shrink-0 p-4 border-t border-white/10 bg-slate-900/50 backdrop-blur-md flex items-center justify-center gap-4 z-20">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setPaginationPage(p => Math.max(1, p - 1))}
+                      disabled={paginationPage === 1}
+                      className="rounded-full text-slate-400 hover:text-white"
+                    >
+                      <ChevronLeft className="h-5 w-5" />
+                    </Button>
+                    <span className="text-sm font-mono text-slate-300">
+                      {paginationPage} / {totalPages}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setPaginationPage(p => Math.min(totalPages, p + 1))}
+                      disabled={paginationPage === totalPages}
+                      className="rounded-full text-slate-400 hover:text-white"
+                    >
+                      <ChevronRight className="h-5 w-5" />
+                    </Button>
+                  </div>
+                )}
+              </>
+            );
+          })()}
         </DialogContent>
       </Dialog>
 
+      {/* Move Dialog */}
       <Dialog open={!!movingItem} onOpenChange={() => setMovingItem(null)}>
         <DialogContent className="bg-slate-900 border-white/10 text-white w-full max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-center">Move Item</DialogTitle>
+            <DialogTitle className="text-center">Move Assignment</DialogTitle>
           </DialogHeader>
           <div className="flex flex-col gap-3 py-4">
             <Button onClick={handleMoveUp} className="h-12 text-lg bg-slate-800 hover:bg-slate-700 justify-start px-6">
-              <ArrowUp className="mr-3 h-5 w-5 text-indigo-400" /> Move Up
+              <ArrowUp className="mr-3 h-5 w-5 text-emerald-400" /> Move Up
             </Button>
             <Button onClick={handleMoveDown} className="h-12 text-lg bg-slate-800 hover:bg-slate-700 justify-start px-6">
-              <ArrowDown className="mr-3 h-5 w-5 text-indigo-400" /> Move Down
+              <ArrowDown className="mr-3 h-5 w-5 text-emerald-400" /> Move Down
             </Button>
           </div>
         </DialogContent>
       </Dialog>
 
+      {/* Delete Confirmation */}
       <Dialog open={!!deletingItem} onOpenChange={() => setDeletingItem(null)}>
         <DialogContent className="bg-slate-900 border-white/10 text-white max-w-sm">
           <div className="flex flex-col items-center text-center p-2">
             <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
               <AlertTriangle className="h-8 w-8 text-red-500" />
             </div>
-            <DialogTitle className="text-xl font-bold mb-2">Remove Content?</DialogTitle>
+            <DialogTitle className="text-xl font-bold mb-2">Remove Assignment?</DialogTitle>
             <p className="text-slate-400 mb-6 text-sm">
               Are you sure you want to remove <span className="text-white font-medium">{deletingItem?.heading}</span>?
             </p>
@@ -812,11 +667,12 @@ function EditCourseContent() {
         </DialogContent>
       </Dialog>
 
+      {/* Edit Content Modal */}
       <Dialog open={!!editingItem} onOpenChange={() => setEditingItem(null)}>
         <DialogContent className="max-w-6xl h-[85vh] mt-10 p-0 bg-slate-900/95 backdrop-blur-xl border-white/10 text-white flex flex-col">
           <DialogHeader className="p-4 border-b border-white/10 bg-white/5 shrink-0">
             <DialogTitle className="flex items-center gap-2">
-              <Edit className="h-5 w-5 text-indigo-400" /> Edit Content
+              <Edit className="h-5 w-5 text-emerald-400" /> Edit Assignment
             </DialogTitle>
           </DialogHeader>
           <ScrollArea className="flex-1 w-full bg-black/20">
@@ -827,69 +683,14 @@ function EditCourseContent() {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const Mutation = (config as any).mutation;
                 return Mutation ? (
-                  <Mutation data={editingItem.data} onSubmit={onSubmitEdit} />
+                  // Pass stringified data to match typical mutation component expectation from previous examples
+                  // And handle onSave which mirrors onSubmitEdit
+                  <Mutation data={JSON.stringify(editingItem.data)} onSave={onSubmitEdit} />
                 ) : (
                   <div className="p-20 text-center text-slate-500">No settings available.</div>
                 );
               })()}
           </ScrollArea>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={!!previewingItem} onOpenChange={() => setPreviewingItem(null)}>
-        <DialogContent className="max-w-4xl h-[85vh] mt-10 p-0 bg-slate-900/95 backdrop-blur-xl border-white/10 text-white flex flex-col">
-          <DialogHeader className="p-6 border-b border-white/10 bg-white/5 shrink-0">
-            <DialogTitle className="flex items-center gap-2">
-              <Eye className="h-5 w-5 text-cyan-400" /> Preview
-            </DialogTitle>
-          </DialogHeader>
-          <ScrollArea className="flex-1 w-full bg-black/20">
-            <div className="p-8 flex justify-center">
-              <div className="w-full max-w-3xl">
-                {previewingItem &&
-                  (() => {
-                    const meta = COMPONENT_MAP[previewingItem.type];
-                    const config = meta.collection[previewingItem.key];
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    const Preview = (config as any).preview;
-                    return Preview ? <Preview data={JSON.stringify(previewingItem.data)} /> : null;
-                  })()}
-              </div>
-            </div>
-          </ScrollArea>
-        </DialogContent>
-      </Dialog>
-
-      {/* Section Preview Modal */}
-      <Dialog open={!!sectionPreviewKey} onOpenChange={() => setSectionPreviewKey(null)}>
-        <DialogContent className="max-w-[90vw] p-0 bg-slate-950 border-white/10 flex flex-col min-w-[90vw] h-[80vh] mt-10 text-white">
-          {sectionPreviewKey &&
-            (() => {
-              const config = TypedAllSections[sectionPreviewKey];
-              const QueryComp = config.query;
-              return (
-                <>
-                  <div className="flex items-center justify-between p-4 border-b border-white/10 bg-white/5">
-                    <h3 className="text-white font-bold">{sectionPreviewKey}</h3>
-                    <Button
-                      onClick={() => {
-                        handleAddItem('section', sectionPreviewKey);
-                        setSectionPreviewKey(null);
-                        setActiveAddType(null);
-                      }}
-                      className="bg-indigo-600"
-                    >
-                      <Plus className="mr-2 h-4 w-4" /> Add Section
-                    </Button>
-                  </div>
-                  <ScrollArea className="h-full w-full bg-black">
-                    <div className="min-h-full flex flex-col">
-                      {QueryComp ? <QueryComp data={JSON.stringify(config.data)} /> : <div className="p-20 text-center">No Preview</div>}
-                    </div>
-                  </ScrollArea>
-                </>
-              );
-            })()}
         </DialogContent>
       </Dialog>
     </main>
@@ -902,7 +703,7 @@ export default function EditCourseDayPage() {
       fallback={
         <div className="min-h-screen bg-slate-950 flex items-center justify-center">
           <div className="flex flex-col items-center gap-4">
-            <div className="w-12 h-12 rounded-full border-4 border-indigo-500/30 border-t-indigo-500 animate-spin" />
+            <div className="w-12 h-12 rounded-full border-4 border-emerald-500/30 border-t-emerald-500 animate-spin" />
           </div>
         </div>
       }
