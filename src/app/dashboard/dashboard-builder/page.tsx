@@ -1,8 +1,22 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
-import { Plus, Edit, Trash2, Eye, ExternalLink, LayoutDashboard, X, AlertTriangle, RefreshCw, LayoutTemplate, Activity, MousePointer2 } from 'lucide-react';
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Eye,
+  ExternalLink,
+  LayoutDashboard,
+  X,
+  AlertTriangle,
+  RefreshCw,
+  LayoutTemplate,
+  Activity,
+  MousePointer2,
+  Search,
+  Filter,
+} from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -23,16 +37,10 @@ interface IDashboard {
 }
 
 const DashboardBuilderPage = () => {
-  const pathname = usePathname();
+  // Local state for client-side search/filter if needed
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const dashboardCategory = useMemo(() => {
-    return pathname?.split('/').pop() || '';
-  }, [pathname]);
-
-  const formattedCategoryTitle = useMemo(() => {
-    return dashboardCategory.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-  }, [dashboardCategory]);
-
+  // Fetch ALL dashboards (q='' ensures backend returns everything)
   const {
     data: dashboardsData,
     isLoading,
@@ -41,46 +49,55 @@ const DashboardBuilderPage = () => {
   } = useGetDashboardsQuery({
     page: 1,
     limit: 1000,
-    q: dashboardCategory,
+    q: '',
   });
 
   const [addDashboard, { isLoading: isAdding }] = useAddDashboardMutation();
   const [updateDashboard] = useUpdateDashboardMutation();
   const [deleteDashboard] = useDeleteDashboardMutation();
 
+  // Process and sort data
   const dashboards = useMemo(() => {
     const rawDashboards = dashboardsData?.dashboards || [];
 
+    // 1. Map to Interface
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const filtered = rawDashboards.filter((item: any) => (item.dashboardName || '').toLowerCase().includes(dashboardCategory.toLowerCase()));
+    let processed = rawDashboards.map((item: any) => ({
+      ...item,
+      _id: item._id,
+      isActive: item.isActive ?? true,
+      dashboardName: item.dashboardName,
+      dashboardPath: item.dashboardPath || '/',
+    }));
 
-    return (
-      filtered
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .map((item: any) => ({
-          ...item,
-          _id: item._id,
-          isActive: item.isActive ?? true,
-          dashboardName: item.dashboardName,
-          dashboardPath: item.dashboardPath || '/',
-        }))
-        .sort((a: IDashboard, b: IDashboard) => a.dashboardPath.localeCompare(b.dashboardPath))
-    );
-  }, [dashboardsData, dashboardCategory]);
+    // 2. Client-side Search (Optional, for instant feedback)
+    if (searchTerm.trim()) {
+      const lowerTerm = searchTerm.toLowerCase();
+      processed = processed.filter((d: IDashboard) => d.dashboardName.toLowerCase().includes(lowerTerm) || d.dashboardPath.toLowerCase().includes(lowerTerm));
+    }
 
+    // 3. Sort by Name
+    return processed.sort((a: IDashboard, b: IDashboard) => a.dashboardName.localeCompare(b.dashboardName));
+  }, [dashboardsData, searchTerm]);
+
+  // Modal States
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
+  // Selection States
   const [selectedDashboardToEdit, setSelectedDashboardToEdit] = useState<IDashboard | null>(null);
   const [dashboardToDelete, setDashboardToDelete] = useState<IDashboard | null>(null);
 
+  // Form Inputs
   const [pathInput, setPathInput] = useState<string>('');
   const [nameInput, setNameInput] = useState<string>('');
 
+  // --- Handlers ---
+
   const handleOpenAddDialog = () => {
     setPathInput('');
-    setNameInput(formattedCategoryTitle);
+    setNameInput('');
     setIsAddDialogOpen(true);
   };
 
@@ -97,9 +114,10 @@ const DashboardBuilderPage = () => {
       return;
     }
 
-    const exists = dashboards.some((d: IDashboard) => d.dashboardPath === pathInput && d.dashboardName === nameInput);
+    // Check duplicates locally
+    const exists = dashboards.some((d: IDashboard) => d.dashboardPath === pathInput);
     if (exists) {
-      toast.error(`Path ${pathInput} already exists in this dashboard group!`);
+      toast.error(`Path ${pathInput} already exists!`);
       return;
     }
 
@@ -111,7 +129,7 @@ const DashboardBuilderPage = () => {
         content: [],
       }).unwrap();
 
-      toast.success(`Dashboard ${nameInput} created`);
+      toast.success(`Dashboard "${nameInput}" created`);
       setIsAddDialogOpen(false);
       setPathInput('');
       setNameInput('');
@@ -166,6 +184,7 @@ const DashboardBuilderPage = () => {
     if (!dashboard._id) return;
     try {
       const updatedStatus = !dashboard.isActive;
+      // Optimistic update handled by refetch for now
       await updateDashboard({ id: dashboard._id, isActive: updatedStatus }).unwrap();
       refetch();
       toast.success(`Dashboard ${updatedStatus ? 'activated' : 'deactivated'}`);
@@ -176,7 +195,9 @@ const DashboardBuilderPage = () => {
   };
 
   const handleEdit = (id: string, name: string, path: string) => {
-    window.open(`/dashboard/dashboard-builder/edit?dashboardName=${name}&dashboardPath=${path.replaceAll('/', '-')}`, '_blank');
+    // Navigate to the builder/editor for this dashboard
+    const encodedPath = path.replaceAll('/', '-');
+    window.open(`/dashboard/dashboard-builder/edit?dashboardName=${encodeURIComponent(name)}&dashboardPath=${encodedPath}`, '_blank');
   };
 
   const handlePreview = (id: string) => {
@@ -186,6 +207,8 @@ const DashboardBuilderPage = () => {
   const handleLiveLink = (path: string) => {
     window.open(`${path}`, '_blank');
   };
+
+  // --- Rendering ---
 
   if (isLoading) {
     return (
@@ -220,27 +243,38 @@ const DashboardBuilderPage = () => {
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-950 pt-[90px] pb-20 px-4 md:px-8">
       <div className="max-w-7xl mx-auto space-y-8">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6 animate-in slide-in-from-top-4 duration-500">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-6 animate-in slide-in-from-top-4 duration-500">
           <div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 mb-2">
               <div className="p-2 bg-indigo-500/20 rounded-lg">
-                <LayoutDashboard className="h-6 w-6 text-indigo-400" />
+                <LayoutDashboard className="h-8 w-8 text-indigo-400" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-white tracking-tight">{formattedCategoryTitle || 'Dashboard Builder'}</h1>
-                <p className="text-slate-400 text-sm flex items-center gap-2">
-                  <span className="bg-indigo-500/10 text-indigo-300 px-2 py-0.5 rounded text-xs font-mono">{dashboardCategory || 'General'}</span>
-                  <span>• Manage your dashboard views</span>
-                </p>
+                <h1 className="text-3xl font-bold text-white tracking-tight">Dashboard Builder</h1>
+                <p className="text-slate-400 text-sm">Create and manage your application&apos;s dashboard layouts.</p>
               </div>
             </div>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search className="h-4 w-4 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
+              </div>
+              <input
+                type="text"
+                placeholder="Search views..."
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                className="pl-9 pr-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:border-indigo-500/50 focus:bg-white/10 transition-all w-48 md:w-64"
+              />
+            </div>
             <Button
               onClick={() => refetch()}
               variant="outline"
               size="icon"
               className="bg-white/5 border-white/10 text-slate-300 hover:text-white hover:bg-white/10 transition-transform active:scale-95"
+              title="Refresh Data"
             >
               <RefreshCw className="h-4 w-4" />
             </Button>
@@ -254,27 +288,37 @@ const DashboardBuilderPage = () => {
           </div>
         </div>
 
+        {/* Content Area */}
         {dashboards.length === 0 ? (
-          <div className="animate-in fade-in zoom-in-95 duration-700 flex flex-col items-center justify-center min-h-[40vh] border-2 border-dashed border-white/10 rounded-2xl bg-white/5 backdrop-blur-sm p-12">
-            <div className="w-20 h-20 rounded-full bg-slate-900/50 flex items-center justify-center mb-6 ring-4 ring-indigo-500/20">
-              <LayoutTemplate className="h-10 w-10 text-slate-400" />
+          <div className="animate-in fade-in zoom-in-95 duration-700 flex flex-col items-center justify-center min-h-[40vh] border-2 border-dashed border-white/10 rounded-3xl bg-white/5 backdrop-blur-sm p-12">
+            <div className="w-24 h-24 rounded-full bg-slate-900/50 flex items-center justify-center mb-6 ring-4 ring-indigo-500/20 relative">
+              <div className="absolute inset-0 bg-indigo-500/20 blur-xl rounded-full" />
+              <LayoutTemplate className="h-12 w-12 text-indigo-400 relative z-10" />
             </div>
-            <h2 className="text-2xl font-bold text-white mb-2">No Dashboards Yet</h2>
-            <p className="text-slate-400 mb-8 text-center max-w-sm">Start building your analytics interface by adding a new view.</p>
+            <h2 className="text-2xl font-bold text-white mb-2">No Dashboards Found</h2>
+            <p className="text-slate-400 mb-8 text-center max-w-sm">
+              {searchTerm ? 'No results match your search.' : 'Start building your analytics interface by adding a new view.'}
+            </p>
             <Button onClick={handleOpenAddDialog} variant="secondary" size="lg" className="gap-2">
-              <Plus className="h-4 w-4" /> Create First View
+              <Plus className="h-4 w-4" /> {searchTerm ? 'Create New View' : 'Create First View'}
             </Button>
           </div>
         ) : (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex items-center justify-between mb-6">
+            {/* Stats Bar */}
+            <div className="flex items-center justify-between mb-6 px-1">
               <div className="flex items-center gap-2 text-slate-300">
                 <Activity className="h-5 w-5 text-indigo-400" />
-                <h2 className="text-lg font-semibold">Active Views</h2>
+                <h2 className="text-lg font-semibold">All Views</h2>
                 <span className="text-xs bg-white/10 px-2.5 py-0.5 rounded-full text-white font-mono">{dashboards.length}</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-slate-500">
+                <Filter className="h-3 w-3" />
+                <span>Sorted by Name</span>
               </div>
             </div>
 
+            {/* Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {dashboards.map((dashboard: IDashboard) => (
                 <div
@@ -288,23 +332,28 @@ const DashboardBuilderPage = () => {
                     }
                   `}
                 >
+                  {/* Decorative Top Bar */}
                   <div
-                    className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500 transition-opacity duration-300 ${dashboard.isActive ? 'opacity-100' : 'opacity-30'}`}
+                    className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 transition-opacity duration-300 ${dashboard.isActive ? 'opacity-100' : 'opacity-30'}`}
                   />
 
                   <div className="p-5 flex-1 flex flex-col gap-4">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-3 overflow-hidden">
                         <div
-                          className={`h-10 w-10 shrink-0 rounded-lg flex items-center justify-center font-bold text-lg shadow-inner ${dashboard.isActive ? 'bg-indigo-500/20 text-indigo-400' : 'bg-slate-800 text-slate-500'}`}
+                          className={`h-12 w-12 shrink-0 rounded-xl flex items-center justify-center font-bold text-lg shadow-inner transition-colors ${dashboard.isActive ? 'bg-indigo-500/20 text-indigo-400' : 'bg-slate-800 text-slate-500'}`}
                         >
-                          <LayoutTemplate className="h-5 w-5" />
+                          <LayoutTemplate className="h-6 w-6" />
                         </div>
                         <div className="min-w-0">
-                          <h3 className="font-bold text-slate-100 truncate text-lg leading-tight" title={dashboard.dashboardName}>
+                          <h3
+                            className="font-bold text-slate-100 truncate text-lg leading-tight group-hover:text-indigo-200 transition-colors"
+                            title={dashboard.dashboardName}
+                          >
                             {dashboard.dashboardName}
                           </h3>
-                          <p className="text-xs text-slate-500 font-mono mt-0.5 truncate" title={dashboard.dashboardPath}>
+                          <p className="text-xs text-slate-500 font-mono mt-1 truncate flex items-center gap-1" title={dashboard.dashboardPath}>
+                            <span className="w-1.5 h-1.5 rounded-full bg-slate-600"></span>
                             {dashboard.dashboardPath}
                           </p>
                         </div>
@@ -317,9 +366,10 @@ const DashboardBuilderPage = () => {
                     </div>
                   </div>
 
+                  {/* Action Footer */}
                   <div className="p-3 bg-white/5 border-t border-white/5 flex items-center justify-between gap-2">
                     <div className="flex gap-1">
-                      <Button size="sm" className="min-w-1" variant="outlineGlassy" onClick={() => handleOpenEditDialog(dashboard)} title="Edit Settings">
+                      <Button className="min-w-1" size="sm" variant="outlineGlassy" onClick={() => handleOpenEditDialog(dashboard)} title="Edit Settings">
                         <Edit className="h-4 w-4" />
                       </Button>
 
@@ -333,16 +383,16 @@ const DashboardBuilderPage = () => {
                         <MousePointer2 className="h-4 w-4" />
                       </Button>
 
-                      <Button size="sm" className="min-w-1" variant="outlineGlassy" onClick={() => handlePreview(dashboard._id)} title="Preview">
+                      <Button className="min-w-1" size="sm" variant="outlineGlassy" onClick={() => handlePreview(dashboard._id)} title="Preview">
                         <Eye className="h-4 w-4" />
                       </Button>
 
-                      <Button size="sm" className="min-w-1" variant="outlineGlassy" onClick={() => handleLiveLink(dashboard.dashboardPath)} title="Visit Live">
+                      <Button className="min-w-1" size="sm" variant="outlineGlassy" onClick={() => handleLiveLink(dashboard.dashboardPath)} title="Visit Live">
                         <ExternalLink className="h-4 w-4" />
                       </Button>
                     </div>
 
-                    <Button size="sm" className="min-w-1" variant="outlineGlassy" onClick={() => initiateDelete(dashboard)} title="Delete View">
+                    <Button size="sm" variant="outlineGlassy" onClick={() => initiateDelete(dashboard)} title="Delete View" className="min-w-1">
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
@@ -353,6 +403,7 @@ const DashboardBuilderPage = () => {
         )}
       </div>
 
+      {/* --- ADD DIALOG --- */}
       {isAddDialogOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-slate-900 border border-white/10 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200">
@@ -375,20 +426,22 @@ const DashboardBuilderPage = () => {
               <div className="space-y-2">
                 <Label className="text-slate-300">Dashboard Name</Label>
                 <input
-                  className="w-full bg-slate-950 border border-white/10 rounded-lg px-3 py-2.5 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+                  className="w-full bg-slate-950 border border-white/10 rounded-lg px-3 py-2.5 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all placeholder:text-slate-600"
                   value={nameInput}
                   onChange={e => setNameInput(e.target.value)}
-                  placeholder="e.g. Sales Overview"
+                  placeholder="e.g. Analytics Overview"
+                  autoFocus
                 />
               </div>
               <div className="space-y-2">
                 <Label className="text-slate-300">Route Path</Label>
                 <input
-                  className="w-full bg-slate-950 border border-white/10 rounded-lg px-3 py-2.5 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all font-mono text-sm"
+                  className="w-full bg-slate-950 border border-white/10 rounded-lg px-3 py-2.5 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all font-mono text-sm placeholder:text-slate-600"
                   value={pathInput}
                   onChange={e => setPathInput(e.target.value)}
-                  placeholder="/dashboard/sales"
+                  placeholder="/dashboard/analytics"
                 />
+                <p className="text-xs text-slate-500">The URL path where this dashboard will be accessible.</p>
               </div>
             </div>
 
@@ -408,6 +461,7 @@ const DashboardBuilderPage = () => {
         </div>
       )}
 
+      {/* --- EDIT DIALOG --- */}
       {isEditDialogOpen && selectedDashboardToEdit && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-slate-900 border border-white/10 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200">
@@ -457,6 +511,7 @@ const DashboardBuilderPage = () => {
         </div>
       )}
 
+      {/* --- DELETE DIALOG --- */}
       {isDeleteDialogOpen && dashboardToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-slate-900 border border-red-500/20 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200">
@@ -465,12 +520,7 @@ const DashboardBuilderPage = () => {
                 <AlertTriangle className="h-5 w-5" />
                 <h2 className="text-lg font-semibold">Delete View?</h2>
               </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsDeleteDialogOpen(false)}
-                className="h-8 w-8 rounded-full hover:bg-white/10 text-slate-400 hover:text-white"
-              >
+              <Button variant="ghost" size="icon" onClick={() => setIsDeleteDialogOpen(false)}>
                 <X className="h-4 w-4" />
               </Button>
             </div>
