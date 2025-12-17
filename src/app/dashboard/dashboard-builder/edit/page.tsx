@@ -168,7 +168,8 @@ const SortableItem = ({ item, onEdit, onDelete, onOpenMoveDialog }: SortableItem
           <div className="p-6 pt-16 text-slate-300 min-h-[150px]">
             <div className="z-10 pointer-events-none select-none opacity-90 group-hover:opacity-100 transition-opacity relative">
               <div className="absolute inset-0 z-50 bg-transparent" />
-              {ComponentToRender && <ComponentToRender data={JSON.stringify(item.data)} />}
+              {/* {ComponentToRender && <ComponentToRender data={JSON.stringify(item.data)} />} */}
+              <p>{item.name}</p>
             </div>
           </div>
         </div>
