@@ -136,8 +136,8 @@ const HasAccess = ({ children }: { children: React.ReactNode }) => {
       }
     });
 
-    console.log('currentPath', currentPath);
-    console.log('allowedPaths', allowedPaths);
+    // console.log('currentPath', currentPath);
+    // console.log('allowedPaths', allowedPaths);
 
     // 4. CHECK PERMISSION Logic (Exact Match OR Sub-path Match)
 
