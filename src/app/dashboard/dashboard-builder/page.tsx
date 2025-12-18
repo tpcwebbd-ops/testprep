@@ -207,7 +207,7 @@ const DashboardBuilderPage = () => {
   const handleLiveLink = (path: string) => {
     window.open(`${path}`, '_blank');
   };
-
+  console.log('dashboardsData', dashboardsData);
   // --- Rendering ---
 
   if (isLoading) {
@@ -319,7 +319,7 @@ const DashboardBuilderPage = () => {
             </div>
 
             {/* Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {dashboards.map((dashboard: IDashboard) => (
                 <div
                   key={dashboard._id}

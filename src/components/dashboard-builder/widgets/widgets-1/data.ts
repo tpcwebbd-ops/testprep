@@ -1,4 +1,4 @@
-export interface IAssignment1 {
+export interface IMockWidgets1 {
   uid: string;
   name: string;
   description: string;
@@ -15,7 +15,7 @@ export interface IAssignment1 {
   }[];
 }
 
-export const mockAssignments1: IAssignment1[] = [
+export const mockWidgets1: IMockWidgets1[] = [
   {
     uid: 'assign-ielts-001',
     name: 'IELTS Reading: Environmental Impacts',
