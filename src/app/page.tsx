@@ -5,7 +5,7 @@
 | @description: Renders the homepage content (path: "/")
 |-----------------------------------------
 */
-// New commet line
+
 import { notFound } from 'next/navigation';
 import { cache } from 'react';
 import { Type, Layers } from 'lucide-react';
