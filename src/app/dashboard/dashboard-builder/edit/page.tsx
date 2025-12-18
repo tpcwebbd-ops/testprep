@@ -107,8 +107,8 @@ const SortableItem = ({ item, onEdit, onDelete, onOpenMoveDialog }: SortableItem
     );
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const ComponentToRender = (config as any).query;
+  // eslint -disable-next-line @typescript-eslint/no-explicit-any
+  // const ComponentToRender = (config as any).query;
 
   const styles = getTypeStyles(item.type);
 
