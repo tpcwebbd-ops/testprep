@@ -6,13 +6,14 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './accordion';
 
 import InputFieldForString from '@/components/dashboard-ui/InputFieldForString';
 import RichTextEditorField from '@/components/dashboard-ui/RichTextEditorField';
 
 import { useRolesStore } from '../store/store';
 import { useAddRolesMutation } from '@/redux/features/roles/rolesSlice';
-import { IRoles, IERoles, defaultRoles, defaulERoles } from '../store/data/data';
+import { IRoles, defaultRoles, defaultCURD } from '../store/data/data';
 import { formatDuplicateKeyError, handleError, handleSuccess, isApiErrorResponse } from './utils';
 import { authClient } from '@/lib/auth-client';
 import { Input } from '@/components/ui/input';
@@ -44,19 +45,6 @@ const AddNextComponents: React.FC = () => {
 
   const handleFieldChange = (name: string, value: unknown) => {
     setNewRole(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handlePermissionChange = (module: keyof IERoles, permission: keyof IERoles[keyof IERoles]) => {
-    setNewRole(prev => ({
-      ...prev,
-      role: {
-        ...prev.role,
-        [module]: {
-          ...prev.role[module],
-          [permission]: !prev.role[module][permission],
-        },
-      },
-    }));
   };
 
   const handleDashboardAccessChange = (name: string, path: string, checked: boolean) => {
@@ -103,11 +91,9 @@ const AddNextComponents: React.FC = () => {
     }
   };
 
-  const permissionKeys = Object.keys(defaulERoles) as (keyof IERoles)[];
-
   return (
     <Dialog open={isAddModalOpen} onOpenChange={toggleAddModal}>
-      <DialogContent className="sm:max-w-[900px] rounded-2xl backdrop-blur-xl bg-white/10 border border-white/20 shadow-xl text-white">
+      <DialogContent className="sm:max-w-[900px] rounded-2xl backdrop-blur-xl bg-white/10 border border-white/20 shadow-xl text-white mt-10">
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold text-white/90">Add New Role</DialogTitle>
         </DialogHeader>
@@ -161,78 +147,80 @@ const AddNextComponents: React.FC = () => {
                 ) : sidebarItems.length === 0 ? (
                   <div className="text-center py-4 text-white/70">No sidebar items available</div>
                 ) : (
-                  <div className="space-y-3">
-                    {sidebarItems.map(item => (
-                      <div key={item.sl_no} className="space-y-2">
-                        <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-all">
-                          <Checkbox
-                            checked={isChecked(item.name, item.path)}
-                            onCheckedChange={checked => handleDashboardAccessChange(item.name, item.path, checked as boolean)}
-                          />
-                          <div className="flex items-center gap-2 flex-1">
-                            <div className="p-1.5 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-lg">{item.icon}</div>
-                            <div className="flex flex-col">
-                              <span className="font-medium text-sm text-white">{item.name}</span>
-                              <span className="text-xs text-white/60 font-mono">{item.path}</span>
+                  <Accordion type="multiple" className="w-full">
+                    {sidebarItems.map((item, parentIdx) => {
+                      const hasChildren = item.children && item.children.length > 0;
+
+                      const RowContent = (
+                        <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-all w-full text-left">
+                          <div onClick={e => e.stopPropagation()} className="flex items-center gap-3 flex-1">
+                            <Checkbox
+                              checked={isChecked(item.name, item.path)}
+                              onCheckedChange={checked => handleDashboardAccessChange(item.name, item.path, checked as boolean)}
+                            />
+                            <div className="flex items-center gap-2 flex-1">
+                              <div className="p-1.5 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-lg">{item.icon}</div>
+                              <div className="flex flex-col">
+                                <span className="font-medium text-sm text-white">{item.name}</span>
+                                <span className="text-xs text-white/60 font-mono">{item.path}</span>
+                              </div>
                             </div>
                           </div>
-                        </div>
-
-                        {item.children && item.children.length > 0 && (
-                          <div className="ml-8 space-y-2 border-l-2 border-white/10 pl-4">
-                            {item.children.map(child => (
-                              <div key={child.sl_no} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-all">
-                                <Checkbox
-                                  checked={isChecked(child.name, child.path)}
-                                  onCheckedChange={checked => handleDashboardAccessChange(child.name, child.path, checked as boolean)}
-                                />
-                                <div className="flex items-center gap-2 flex-1">
-                                  <div className="p-1.5 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-lg">{child.icon}</div>
-                                  <div className="flex flex-col">
-                                    <span className="font-medium text-sm text-white">{child.name}</span>
-                                    <span className="text-xs text-white/60 font-mono">{child.path}</span>
-                                  </div>
-                                </div>
-                              </div>
+                          <div className="gap-2 flex items-center justify-end pr-4" onClick={e => e.stopPropagation()}>
+                            {Object.keys(defaultCURD).map(key => (
+                              <Checkbox key={key} title={key} checked={false} onCheckedChange={() => ''} />
                             ))}
                           </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
+                        </div>
+                      );
+
+                      if (hasChildren) {
+                        return (
+                          <AccordionItem
+                            key={item.sl_no}
+                            value={`item-${item.sl_no}`}
+                            className={`border-none mb-1 rounded-lg ${parentIdx % 2 ? ' bg-slate-200/20 ' : ' bg-slate-200/10 '}`}
+                          >
+                            <AccordionTrigger className="hover:no-underline p-0 pr-4">{RowContent}</AccordionTrigger>
+                            <AccordionContent className="pb-2">
+                              <div className="ml-8 border-l-2 border-white/10 pl-4 space-y-1">
+                                {item.children?.map((child, childIdx) => (
+                                  <div
+                                    key={child.sl_no}
+                                    className={`flex items-center gap-3 p-2 transition-all rounded-md ${childIdx % 2 ? ' bg-slate-200/20 ' : ' bg-slate-200/10 '} `}
+                                  >
+                                    <Checkbox
+                                      checked={isChecked(child.name, child.path)}
+                                      onCheckedChange={checked => handleDashboardAccessChange(child.name, child.path, checked as boolean)}
+                                    />
+                                    <div className="flex items-center gap-2 flex-1">
+                                      <div className="p-1.5 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-lg">{child.icon}</div>
+                                      <div className="flex flex-col">
+                                        <span className="font-medium text-sm text-white">{child.name}</span>
+                                        <span className="text-xs text-white/60 font-mono">{child.path}</span>
+                                      </div>
+                                    </div>
+                                    <div className="gap-2 flex items-center justify-end">
+                                      {Object.keys(defaultCURD).map(key => (
+                                        <Checkbox key={key} title={key} checked={false} onCheckedChange={() => ''} />
+                                      ))}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </AccordionContent>
+                          </AccordionItem>
+                        );
+                      }
+
+                      return (
+                        <div key={item.sl_no} className={`space-y-2 mb-1 rounded-lg ${parentIdx % 2 ? ' bg-slate-200/20 ' : ' bg-slate-200/10 '} `}>
+                          {RowContent}
+                        </div>
+                      );
+                    })}
+                  </Accordion>
                 )}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 items-start gap-4 pr-1">
-              <Label htmlFor="role" className="text-right text-white/80 pt-3">
-                Role Permissions
-              </Label>
-
-              <div className="col-span-3 overflow-x-auto rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-md p-4">
-                <table className="w-full text-sm text-left text-white/90">
-                  <thead>
-                    <tr className="border-b border-white/20">
-                      <th className="py-2 px-3 text-left">Module</th>
-                      <th className="py-2 px-3 text-center">Create</th>
-                      <th className="py-2 px-3 text-center">Read</th>
-                      <th className="py-2 px-3 text-center">Update</th>
-                      <th className="py-2 px-3 text-center">Delete</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {permissionKeys.map(module => (
-                      <tr key={module} className="border-b border-white/10 hover:bg-white/10 transition-all duration-150">
-                        <td className="py-2 px-3 capitalize">{module.replace(/_/g, ' ')}</td>
-                        {(['create', 'read', 'update', 'delete'] as const).map(permission => (
-                          <td key={permission} className="py-2 px-3 text-center">
-                            <Checkbox checked={newRole.role[module][permission]} onCheckedChange={() => handlePermissionChange(module, permission)} />
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
               </div>
             </div>
           </div>
