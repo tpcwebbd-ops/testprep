@@ -155,12 +155,12 @@ const AddNextComponents: React.FC = () => {
 
   return (
     <Dialog open={isAddModalOpen} onOpenChange={toggleAddModal}>
-      <DialogContent className="sm:max-w-[95vw] md:max-w-[850px] lg:max-w-[1000px] rounded-2xl backdrop-blur-2xl bg-white/10 border border-white/20 shadow-2xl text-white overflow-hidden p-0">
-        <DialogHeader className="p-6 border-b border-white/10">
+      <DialogContent className="sm:max-w-[95vw] md:max-w-[850px] mt-12 lg:max-w-[1000px] rounded-2xl backdrop-blur-2xl bg-white/10 border border-white/20 shadow-2xl text-white overflow-hidden p-0">
+        <DialogHeader className="p-6 py-2 border-b border-white/10">
           <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">Create System Role</DialogTitle>
         </DialogHeader>
 
-        <ScrollArea className="max-h-[70vh] w-full p-6">
+        <ScrollArea className="max-h-[70vh] w-full px-6">
           <div className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
@@ -288,7 +288,7 @@ const AddNextComponents: React.FC = () => {
           </div>
         </ScrollArea>
 
-        <DialogFooter className="p-6 bg-black/20 border-t border-white/10 flex items-center justify-end gap-2">
+        <DialogFooter className="p-6 py-2 bg-black/20 border-t border-white/10 flex items-center justify-end gap-2">
           <Button variant="outlineGlassy" onClick={() => toggleAddModal(false)} size="sm">
             Discard
           </Button>

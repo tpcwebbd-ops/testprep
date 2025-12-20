@@ -155,8 +155,8 @@ const EditNextComponents: React.FC = () => {
 
   return (
     <Dialog open={isEditModalOpen} onOpenChange={toggleEditModal}>
-      <DialogContent className="sm:max-w-[95vw] md:max-w-[850px] lg:max-w-[1000px] rounded-2xl backdrop-blur-2xl bg-white/10 border border-white/20 shadow-2xl text-white overflow-hidden p-0">
-        <DialogHeader className="p-6 border-b border-white/10">
+      <DialogContent className="sm:max-w-[95vw] mt-12 md:max-w-[850px] lg:max-w-[1000px] rounded-2xl backdrop-blur-2xl bg-white/10 border border-white/20 shadow-2xl text-white overflow-hidden p-0">
+        <DialogHeader className="p-6 py-2 border-b border-white/10">
           <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-white bg-clip-text text-transparent">Update System Role</DialogTitle>
         </DialogHeader>
 
@@ -281,22 +281,18 @@ const EditNextComponents: React.FC = () => {
           </div>
         </ScrollArea>
 
-        <DialogFooter className="p-6 bg-black/20 border-t border-white/10 gap-3 sm:gap-0">
+        <DialogFooter className="p-6 py-2 bg-black/20 border-t border-white/10 gap-2">
           <Button
-            variant="outline"
+            variant="outlineGlassy"
+            size="sm"
             onClick={() => {
               toggleEditModal(false);
               setSelectedRoles(null);
             }}
-            className="rounded-xl px-8 border-white/10 text-white/60 hover:bg-white/5 hover:text-white transition-all"
           >
             Cancel Changes
           </Button>
-          <Button
-            disabled={isLoading}
-            onClick={handleEditRole}
-            className="rounded-xl px-10 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold shadow-lg shadow-blue-500/20 transition-all active:scale-95 disabled:opacity-50"
-          >
+          <Button disabled={isLoading} onClick={handleEditRole} variant="outlineGlassy" size="sm">
             {isLoading ? 'Updating...' : 'Save Permissions'}
           </Button>
         </DialogFooter>
