@@ -20,14 +20,14 @@ function AccordionTrigger({ className, children, ...props }: React.ComponentProp
       <AccordionPrimitive.Trigger
         data-slot="accordion-trigger"
         className={cn(
-          'focus-visible:border-ring focus-visible:ring-ring/50 flex flex-1 items-start justify-between gap-4 rounded-md py-4 text-left text-sm font-medium transition-all outline-none hover:underline focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]_svg]:rotate-180',
+          'group focus-visible:border-ring focus-visible:ring-ring/50 flex flex-1 items-start justify-between gap-4 rounded-md py-4 text-left text-sm font-medium transition-all outline-none hover:underline focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50',
           className,
         )}
         {...props}
       >
         {children}
         <div className="pt-0 flex items-center justify-center w-6 h-full hover:cursor-pointer ml-auto">
-          <ChevronDownIcon className="text-white/40 pointer-events-none size-4 shrink-0 transition-transform duration-300 ease-in-out" />
+          <ChevronDownIcon className="text-white/40 pointer-events-none size-4 shrink-0 transition-transform duration-300 ease-in-out group-data-[state=open]:rotate-180" />
         </div>
       </AccordionPrimitive.Trigger>
     </AccordionPrimitive.Header>

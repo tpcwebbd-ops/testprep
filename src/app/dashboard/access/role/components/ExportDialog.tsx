@@ -2,12 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Download, FileSpreadsheet, Check, X, Columns } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
-import { IERoles, IRoles } from '../store/data/data';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { IRoles } from '../store/data/data';
 
 type HeaderItem = { key: string; label: string };
 
@@ -19,19 +21,44 @@ interface ExportDialogProps {
   fileName: string;
 }
 
-// Utility function to handle XLSX file download
-const downloadFile = (data: IRoles[], fileName: string) => {
-  const workbook = XLSX.utils.book_new();
+const formatValueForExport = (value: unknown): string | number | boolean => {
+  if (value instanceof Date) return value.toLocaleString();
+  if (Array.isArray(value)) {
+    return value
+      .map(item => {
+        if (typeof item === 'object' && item !== null && 'name' in item) {
+          return (item as { name: string }).name;
+        }
+        return String(item);
+      })
+      .join(', ');
+  }
+  if (typeof value === 'object' && value !== null) {
+    return JSON.stringify(value);
+  }
+  return value as string | number | boolean;
+};
+
+const downloadFile = (data: Record<string, unknown>[], fileName: string) => {
   const worksheet = XLSX.utils.json_to_sheet(data);
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'Data');
-  XLSX.writeFile(workbook, fileName);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Roles Data');
+
+  const maxWidths = data.reduce((acc: Record<string, number>, row) => {
+    Object.keys(row).forEach(key => {
+      const val = String(row[key] || '');
+      acc[key] = Math.max(acc[key] || 10, val.length + 2);
+    });
+    return acc;
+  }, {});
+
+  worksheet['!cols'] = Object.values(maxWidths).map(w => ({ wch: w }));
+  XLSX.writeFile(workbook, fileName.endsWith('.xlsx') ? fileName : `${fileName}.xlsx`);
 };
 
 const ExportDialog: React.FC<ExportDialogProps> = ({ isOpen, onOpenChange, headers, data, fileName }) => {
-  // State to manage which columns are checked, initialized to all checked
   const [selectedColumns, setSelectedColumns] = useState<Record<string, boolean>>({});
 
-  // Reset the selected columns to all 'true' whenever the dialog is opened
   useEffect(() => {
     if (isOpen) {
       const allSelected = headers.reduce(
@@ -46,12 +73,8 @@ const ExportDialog: React.FC<ExportDialogProps> = ({ isOpen, onOpenChange, heade
   }, [isOpen, headers]);
 
   const handleCheckedChange = (key: string, isChecked: boolean) => {
-    // Enforce the rule: at least one checkbox must remain checked.
     const currentlyCheckedCount = Object.values(selectedColumns).filter(Boolean).length;
-    if (currentlyCheckedCount === 1 && !isChecked) {
-      // If only one is left and the user is trying to uncheck it, do nothing.
-      return;
-    }
+    if (currentlyCheckedCount === 1 && !isChecked) return;
 
     setSelectedColumns(prev => ({
       ...prev,
@@ -60,52 +83,118 @@ const ExportDialog: React.FC<ExportDialogProps> = ({ isOpen, onOpenChange, heade
   };
 
   const handleExport = () => {
-    // 1. Get only checked column keys and assert they are keyof IRoles
-    const selectedKeys = Object.keys(selectedColumns).filter(key => selectedColumns[key]) as (keyof IRoles)[];
+    const activeHeaders = headers.filter(h => selectedColumns[h.key]);
 
-    // 2. Process the data safely
     const processedData = data.map(row => {
-      const newRow = {} as Partial<IRoles>;
-      selectedKeys.forEach(key => {
-        // Explicitly assert that both sides align on the same key type
-        newRow[key] = row[key] as (string & IERoles & { name: string; path: string }[] & Date) | undefined;
+      const exportRow: Record<string, unknown> = {};
+      activeHeaders.forEach(header => {
+        const value = row[header.key as keyof IRoles];
+        exportRow[header.label] = formatValueForExport(value);
       });
-      return newRow as IRoles;
+      return exportRow;
     });
 
-    // 3. Trigger XLSX download
     downloadFile(processedData, fileName);
     onOpenChange(false);
   };
 
+  const toggleAll = (checked: boolean) => {
+    const newState = headers.reduce(
+      (acc, h) => {
+        acc[h.key] = checked;
+        return acc;
+      },
+      {} as Record<string, boolean>,
+    );
+    setSelectedColumns(newState);
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Customize Your Export</DialogTitle>
-          <DialogDescription>Select the columns you want to include in the XLSX file.</DialogDescription>
+      <DialogContent className="sm:max-w-[500px] bg-[#0f172a]/95 backdrop-blur-2xl border border-white/10 text-white rounded-3xl shadow-2xl overflow-hidden p-0">
+        <DialogHeader className="p-6 bg-gradient-to-b from-white/5 to-transparent border-b border-white/5">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-emerald-500/20 rounded-2xl border border-emerald-500/30">
+              <FileSpreadsheet className="w-6 h-6 text-emerald-400" />
+            </div>
+            <div>
+              <DialogTitle className="text-xl font-bold text-white">Export Configuration</DialogTitle>
+              <DialogDescription className="text-white/40 text-xs">Refine the data structure for your XLSX report</DialogDescription>
+            </div>
+          </div>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4 max-h-60 overflow-y-auto pr-2">
-          {headers.map(header => (
-            <div key={header.key} className="flex items-center space-x-2">
-              <Checkbox
-                id={`col-${header.key}`}
-                checked={!!selectedColumns[header.key]}
-                onCheckedChange={checked => handleCheckedChange(header.key, !!checked)}
-              />
-              <Label htmlFor={`col-${header.key}`} className="font-normal">
-                {header.label}
-              </Label>
+        <div className="p-6 space-y-4">
+          <div className="flex items-center justify-between px-2 mb-2">
+            <div className="flex items-center gap-2 text-white/60">
+              <Columns size={14} />
+              <span className="text-[10px] font-black uppercase tracking-widest">Select Columns</span>
             </div>
-          ))}
+            <div className="flex gap-4">
+              <button
+                onClick={() => toggleAll(true)}
+                className="text-[10px] font-bold text-blue-400 hover:text-blue-300 transition-colors uppercase tracking-tighter"
+              >
+                Select All
+              </button>
+              <button
+                onClick={() => toggleAll(false)}
+                className="text-[10px] font-bold text-rose-400 hover:text-rose-300 transition-colors uppercase tracking-tighter"
+              >
+                Clear All
+              </button>
+            </div>
+          </div>
+
+          <ScrollArea className="h-[280px] pr-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <AnimatePresence mode="popLayout">
+                {headers.map(header => {
+                  const isSelected = !!selectedColumns[header.key];
+                  return (
+                    <motion.div
+                      key={header.key}
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className={`relative flex items-center group p-3 rounded-xl border transition-all duration-300 cursor-pointer ${
+                        isSelected ? 'bg-blue-500/10 border-blue-500/30 text-white' : 'bg-white/5 border-white/5 text-white/40 hover:bg-white/10'
+                      }`}
+                      onClick={() => handleCheckedChange(header.key, !isSelected)}
+                    >
+                      <div className="flex items-center gap-3 w-full">
+                        <div
+                          className={`w-5 h-5 rounded-md flex items-center justify-center border transition-all ${
+                            isSelected ? 'bg-blue-500 border-blue-400' : 'bg-transparent border-white/20'
+                          }`}
+                        >
+                          {isSelected && <Check size={12} strokeWidth={4} className="text-white" />}
+                        </div>
+                        <Label className="text-sm font-medium cursor-pointer truncate flex-1">{header.label}</Label>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
+            </div>
+          </ScrollArea>
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+        <DialogFooter className="p-6 bg-black/40 border-t border-white/5 flex flex-col sm:flex-row gap-3">
+          <Button
+            variant="ghost"
+            onClick={() => onOpenChange(false)}
+            className="flex-1 rounded-xl text-white/40 hover:text-white hover:bg-white/5 font-bold transition-all"
+          >
+            <X className="mr-2 w-4 h-4" />
+            Discard
           </Button>
-          <Button onClick={handleExport}>Export Data</Button>
+          <Button
+            onClick={handleExport}
+            className="flex-1 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
+          >
+            <Download className="mr-2 w-4 h-4" />
+            Generate Report
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

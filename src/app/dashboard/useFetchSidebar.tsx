@@ -15,6 +15,7 @@ type APISidebarItem = {
 };
 
 export const useFetchSidebar = (email: string | null | undefined) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [sidebarData, setSidebarData] = useState<IDefaultSidebarItem[]>([]);
 
   // Queries

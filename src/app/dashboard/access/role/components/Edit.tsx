@@ -6,19 +6,22 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './accordion';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 import InputFieldForString from '@/components/dashboard-ui/InputFieldForString';
 import RichTextEditorField from '@/components/dashboard-ui/RichTextEditorField';
 
-import { IRoles, IERoles, defaultRoles, defaulERoles, ICURD, defaultCURD } from '../store/data/data';
+import { IRoles, defaultRoles, ICURD, defaultCURD } from '../store/data/data';
 import { useRolesStore } from '../store/store';
 import { useUpdateRolesMutation } from '@/redux/features/roles/rolesSlice';
 import { formatDuplicateKeyError, handleError, handleSuccess, isApiErrorResponse } from './utils';
-import { logger } from 'better-auth';
 import { Input } from '@/components/ui/input';
 import { authClient } from '@/lib/auth-client';
 import { useGetSidebarsQuery } from '@/redux/features/sidebars/sidebarsSlice';
 import { iconMap, SidebarItem } from '../../sidebar/utils';
+
+type PermissionKey = keyof ICURD;
 
 const EditNextComponents: React.FC = () => {
   const { toggleEditModal, isEditModalOpen, selectedRoles, setSelectedRoles } = useRolesStore();
@@ -27,83 +30,93 @@ const EditNextComponents: React.FC = () => {
   const { data: sidebarData, isLoading: sidebarIsLoading } = useGetSidebarsQuery({ page: 1, limit: 100 });
   const [sidebarItems, setSidebarItems] = useState<SidebarItem[]>([]);
 
-  const sessionEmail = authClient.useSession().data?.user.email || '';
+  const session = authClient.useSession();
+  const sessionEmail = session.data?.user.email || '';
 
   useEffect(() => {
     if (selectedRoles) {
       setRole(selectedRoles);
     }
-  }, [selectedRoles]);
+  }, [selectedRoles, isEditModalOpen]);
 
   useEffect(() => {
     if (sidebarData?.data?.sidebars) {
       const formattedData = sidebarData.data.sidebars.map((item: SidebarItem) => ({
         ...item,
-        icon: iconMap[item.iconName || 'Menu'] || iconMap.Menu,
+        icon: iconMap[(item.iconName as keyof typeof iconMap) || 'Menu'] || iconMap.Menu,
         children: item.children?.map(child => ({
           ...child,
-          icon: iconMap[child.iconName || 'Menu'] || iconMap.Menu,
+          icon: iconMap[(child.iconName as keyof typeof iconMap) || 'Menu'] || iconMap.Menu,
         })),
       }));
       setSidebarItems(formattedData);
     }
   }, [sidebarData]);
 
-  const handleFieldChange = (name: string, value: unknown) => {
+  const handleFieldChange = (name: keyof IRoles, value: unknown) => {
     setRole(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handlePermissionChange = (module: keyof IERoles, permission: keyof IERoles[keyof IERoles]) => {
-    setRole(prev => ({
-      ...prev,
-      role: {
-        ...prev.role,
-        [module]: {
-          ...prev.role[module],
-          [permission]: !prev.role[module][permission],
-        },
-      },
-    }));
   };
 
   const handleDashboardAccessChange = (name: string, path: string, checked: boolean) => {
     setRole(prev => {
       const currentAccess = prev.dashboard_access_ui || [];
-
       if (checked) {
         return {
           ...prev,
-          dashboard_access_ui: [...currentAccess, { name, path }],
+          dashboard_access_ui: [...currentAccess, { name, path, userAccess: { ...defaultCURD } }],
         };
       } else {
         return {
           ...prev,
-          dashboard_access_ui: currentAccess.filter(item => !(item.name === name && item.path === path)),
+          dashboard_access_ui: currentAccess.filter(item => item.path !== path),
         };
       }
     });
   };
 
-  const isChecked = (name: string, path: string): boolean => {
-    return (editedRole.dashboard_access_ui || []).some(item => item.name === name && item.path === path);
+  const handlePermissionChange = (path: string, permission: PermissionKey, checked: boolean) => {
+    setRole(prev => {
+      const currentAccess = [...(prev.dashboard_access_ui || [])];
+      const index = currentAccess.findIndex(item => item.path === path);
+      if (index > -1) {
+        currentAccess[index] = {
+          ...currentAccess[index],
+          userAccess: {
+            ...currentAccess[index].userAccess,
+            [permission]: checked,
+          },
+        };
+      }
+      return { ...prev, dashboard_access_ui: currentAccess };
+    });
+  };
+
+  const isRowChecked = (path: string): boolean => {
+    return (editedRole.dashboard_access_ui || []).some(item => item.path === path);
+  };
+
+  const getPermissionValue = (path: string, permission: PermissionKey): boolean => {
+    const item = (editedRole.dashboard_access_ui || []).find(i => i.path === path);
+    if (!item || !item.userAccess) return false;
+    return item.userAccess[permission];
   };
 
   const handleEditRole = async () => {
-    if (!selectedRoles) return;
+    if (!selectedRoles?._id) return;
     try {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { _id, createdAt, updatedAt, ...updateData } = editedRole;
-      logger.info(JSON.stringify({ _id, createdAt, updatedAt }));
-      updateData.email = sessionEmail;
-      await updateRoles({
+      const finalPayload = {
         id: selectedRoles._id,
         ...updateData,
-      }).unwrap();
+        email: sessionEmail || editedRole.email,
+      };
 
+      await updateRoles(finalPayload).unwrap();
+      handleSuccess('Update Successful');
       toggleEditModal(false);
       setSelectedRoles(null);
-      handleSuccess('Edit Successful');
     } catch (error: unknown) {
-      console.error('Failed to update record:', error);
       let errMessage = 'An unknown error occurred.';
       if (isApiErrorResponse(error)) {
         errMessage = formatDuplicateKeyError(error.data.message) || 'An API error occurred.';
@@ -114,154 +127,177 @@ const EditNextComponents: React.FC = () => {
     }
   };
 
-  const permissionKeys = Object.keys(defaulERoles) as (keyof IERoles)[];
-  const curdKeys = Object.keys(defaultCURD) as (keyof ICURD)[];
+  const PermissionCheckboxes = ({ item }: { item: SidebarItem }) => (
+    <div className="flex items-center gap-3 sm:gap-4 ml-auto" onClick={e => e.stopPropagation()}>
+      {(Object.keys(defaultCURD) as PermissionKey[]).map(key => {
+        const isActive = isRowChecked(item.path);
+        return (
+          <TooltipProvider key={key}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex flex-col items-center gap-1">
+                  <Checkbox
+                    disabled={!isActive}
+                    checked={getPermissionValue(item.path, key)}
+                    onCheckedChange={checked => handlePermissionChange(item.path, key, checked as boolean)}
+                    className={`transition-all duration-300 ${!isActive ? 'opacity-20' : 'opacity-100 hover:scale-110'}`}
+                  />
+                  <span className="text-[8px] uppercase font-bold text-white/40 sm:hidden">{key[0]}</span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent className="bg-slate-900 border-white/20 text-white text-xs capitalize">{key} Permission</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        );
+      })}
+    </div>
+  );
+
   return (
     <Dialog open={isEditModalOpen} onOpenChange={toggleEditModal}>
-      <DialogContent className="sm:max-w-[900px] rounded-2xl backdrop-blur-xl bg-white/10 border border-white/20 shadow-xl text-white">
-        <DialogHeader>
-          <DialogTitle className="text-lg font-semibold text-white/90">Edit Role</DialogTitle>
+      <DialogContent className="sm:max-w-[95vw] md:max-w-[850px] lg:max-w-[1000px] rounded-2xl backdrop-blur-2xl bg-white/10 border border-white/20 shadow-2xl text-white overflow-hidden p-0">
+        <DialogHeader className="p-6 border-b border-white/10">
+          <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-white bg-clip-text text-transparent">Update System Role</DialogTitle>
         </DialogHeader>
 
-        <ScrollArea className="h-[500px] w-full rounded-md border border-white/10 p-4">
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
-              <Label htmlFor="name" className="text-right text-white/80">
-                Role Name
-              </Label>
-              <div className="col-span-3">
-                <InputFieldForString id="name" placeholder="Admin" value={editedRole.name} onChange={value => handleFieldChange('name', value as string)} />
+        <ScrollArea className="max-h-[70vh] w-full p-6">
+          <div className="space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-sm font-medium text-white/70 ml-1">
+                  Role Name
+                </Label>
+                <InputFieldForString
+                  id="name"
+                  placeholder="e.g. Admin"
+                  value={editedRole.name}
+                  onChange={value => handleFieldChange('name', value as string)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-sm font-medium text-white/70 ml-1">
+                  Account Holder
+                </Label>
+                <Input id="email" readOnly className="bg-white/5 border-white/10 focus:ring-blue-500/50 text-white/50" value={editedRole.email} />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 items-start gap-4 pr-1">
-              <Label htmlFor="note" className="text-right text-white/80 pt-3">
-                Note
-              </Label>
-              <div className="col-span-3">
+            <div className="grid grid-cols-1 gap-6">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-white/70 ml-1">Admin Notes</Label>
                 <RichTextEditorField id="note" value={editedRole.note} onChange={value => handleFieldChange('note', value)} />
               </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-4 items-start gap-4 pr-1">
-              <Label htmlFor="description" className="text-right text-white/80 pt-3">
-                Description
-              </Label>
-              <div className="col-span-3">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-white/70 ml-1">Permissions Description</Label>
                 <RichTextEditorField id="description" value={editedRole.description} onChange={value => handleFieldChange('description', value)} />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
-              <Label htmlFor="email" className="text-right text-white/80">
-                Email
-              </Label>
-              <div className="col-span-3">
-                <Input id="email" readOnly value={authClient.useSession().data?.user.email || editedRole.email} />
+            <div className="space-y-4">
+              <div className="flex items-center justify-between px-1">
+                <Label className="text-lg font-semibold text-white/90">Access Control List</Label>
+                <div className="hidden sm:flex gap-8 text-[10px] uppercase tracking-widest font-bold text-white/40 mr-4">
+                  <span>Create</span>
+                  <span>Read</span>
+                  <span>Update</span>
+                  <span>Delete</span>
+                </div>
               </div>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 items-start gap-4 pr-1">
-              <Label htmlFor="dashboard-access" className="text-right text-white/80 pt-3">
-                Dashboard Access
-              </Label>
-
-              <div className="col-span-3 overflow-x-auto rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-md p-4">
+              <div className="rounded-2xl bg-black/20 border border-white/10 p-2 sm:p-4">
                 {sidebarIsLoading ? (
-                  <div className="text-center py-4 text-white/70">Loading sidebar data...</div>
-                ) : sidebarItems.length === 0 ? (
-                  <div className="text-center py-4 text-white/70">No sidebar items available</div>
+                  <div className="flex flex-col items-center justify-center py-12 gap-3">
+                    <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                    <span className="text-white/40 text-sm">Synchronizing Schema...</span>
+                  </div>
                 ) : (
-                  <div className="space-y-3">
-                    {sidebarItems.map(item => (
-                      <div key={item.sl_no} className="space-y-2">
-                        <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-all">
-                          <Checkbox
-                            checked={isChecked(item.name, item.path)}
-                            onCheckedChange={checked => handleDashboardAccessChange(item.name, item.path, checked as boolean)}
-                          />
-                          <div className="flex items-center gap-2 flex-1">
-                            <div className="p-1.5 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-lg">{item.icon}</div>
-                            <div className="flex flex-col">
-                              <span className="font-medium text-sm text-white">{item.name}</span>
-                              <span className="text-xs text-white/60 font-mono">{item.path}</span>
+                  <Accordion type="multiple" className="space-y-3">
+                    {sidebarItems.map(item => {
+                      const hasChildren = item.children && item.children.length > 0;
+                      const activeRow = isRowChecked(item.path);
+
+                      const RowContent = (
+                        <div className="flex items-center gap-3 p-3 rounded-xl transition-all w-full group">
+                          <div className="flex items-center gap-4 flex-1 overflow-hidden">
+                            <Checkbox
+                              checked={activeRow}
+                              onCheckedChange={checked => handleDashboardAccessChange(item.name, item.path, checked as boolean)}
+                              className="border-white/30 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
+                            />
+                            <div className="flex items-center gap-3 min-w-0">
+                              <div className="p-2 bg-white/5 rounded-lg text-blue-400 group-hover:scale-110 transition-transform">{item.icon}</div>
+                              <div className="flex flex-col text-left truncate">
+                                <span className={`text-sm font-semibold transition-colors ${activeRow ? 'text-white' : 'text-white/40'}`}>{item.name}</span>
+                                <span className="text-[10px] font-mono text-white/20 truncate">{item.path}</span>
+                              </div>
                             </div>
                           </div>
+                          <PermissionCheckboxes item={item} />
                         </div>
+                      );
 
-                        {item.children && item.children.length > 0 && (
-                          <div className="ml-8 space-y-2 border-l-2 border-white/10 pl-4">
-                            {item.children.map(child => (
-                              <div key={child.sl_no} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-all">
-                                <Checkbox
-                                  checked={isChecked(child.name, child.path)}
-                                  onCheckedChange={checked => handleDashboardAccessChange(child.name, child.path, checked as boolean)}
-                                />
-                                <div className="flex items-center gap-2 flex-1">
-                                  <div className="p-1.5 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-lg">{child.icon}</div>
-                                  <div className="flex flex-col">
-                                    <span className="font-medium text-sm text-white">{child.name}</span>
-                                    <span className="text-xs text-white/60 font-mono">{child.path}</span>
+                      if (hasChildren) {
+                        return (
+                          <AccordionItem key={item.sl_no} value={`item-${item.sl_no}`} className="border border-white/5 rounded-xl bg-white/5 overflow-hidden">
+                            <AccordionTrigger className="hover:no-underline hover:bg-white/5 px-2 py-0">{RowContent}</AccordionTrigger>
+                            <AccordionContent className="p-0 border-t border-white/5">
+                              <div className="bg-black/20 space-y-1 p-2">
+                                {item.children?.map(child => (
+                                  <div key={child.sl_no} className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 transition-all">
+                                    <div className="flex items-center gap-4 flex-1">
+                                      <Checkbox
+                                        checked={isRowChecked(child.path)}
+                                        onCheckedChange={checked => handleDashboardAccessChange(child.name, child.path, checked as boolean)}
+                                        className="border-white/20 ml-4"
+                                      />
+                                      <div className="flex items-center gap-3">
+                                        <div className="p-1.5 bg-white/5 rounded text-cyan-400">{child.icon}</div>
+                                        <div className="flex flex-col">
+                                          <span className={`text-xs font-medium ${isRowChecked(child.path) ? 'text-white/80' : 'text-white/30'}`}>
+                                            {child.name}
+                                          </span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <PermissionCheckboxes item={child} />
                                   </div>
-                                </div>
+                                ))}
                               </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
+                            </AccordionContent>
+                          </AccordionItem>
+                        );
+                      }
+
+                      return (
+                        <div key={item.sl_no} className="border border-white/5 rounded-xl bg-white/5">
+                          {RowContent}
+                        </div>
+                      );
+                    })}
+                  </Accordion>
                 )}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-4 items-start gap-4 pr-1">
-              <Label htmlFor="role" className="text-right text-white/80 pt-3">
-                Role Permissions
-              </Label>
-
-              <div className="col-span-3 overflow-x-auto rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-md p-4">
-                <table className="w-full text-sm text-left text-white/90">
-                  <thead>
-                    <tr className="border-b border-white/20">
-                      <th className="py-2 px-3 text-left">Module</th>
-                      <th className="py-2 px-3 text-center">Create</th>
-                      <th className="py-2 px-3 text-center">Read</th>
-                      <th className="py-2 px-3 text-center">Update</th>
-                      <th className="py-2 px-3 text-center">Delete</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {permissionKeys.map(module => (
-                      <tr key={module} className="border-b border-white/10 hover:bg-white/10 transition-all duration-150">
-                        <td className="py-2 px-3 capitalize">{module.replace(/_/g, ' ')}</td>
-                        {curdKeys.map(permission => (
-                          <td key={permission} className="py-2 px-3 text-center">
-                            {<Checkbox checked={editedRole.role[module][permission]} onCheckedChange={() => handlePermissionChange(module, permission)} />}
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
               </div>
             </div>
           </div>
         </ScrollArea>
 
-        <DialogFooter className="flex justify-end gap-2 mt-4">
+        <DialogFooter className="p-6 bg-black/20 border-t border-white/10 gap-3 sm:gap-0">
           <Button
             variant="outline"
             onClick={() => {
               toggleEditModal(false);
               setSelectedRoles(null);
             }}
-            className="bg-transparent border-white/20 text-white/80 hover:bg-white/20"
+            className="rounded-xl px-8 border-white/10 text-white/60 hover:bg-white/5 hover:text-white transition-all"
           >
-            Cancel
+            Cancel Changes
           </Button>
-          <Button disabled={isLoading} onClick={handleEditRole} className="bg-white/20 backdrop-blur-lg hover:bg-white/30 text-white transition-all">
-            {isLoading ? 'Saving...' : 'Save Changes'}
+          <Button
+            disabled={isLoading}
+            onClick={handleEditRole}
+            className="rounded-xl px-10 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold shadow-lg shadow-blue-500/20 transition-all active:scale-95 disabled:opacity-50"
+          >
+            {isLoading ? 'Updating...' : 'Save Permissions'}
           </Button>
         </DialogFooter>
       </DialogContent>
