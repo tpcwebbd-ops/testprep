@@ -14,8 +14,10 @@ import {
   Users,
   FolderKanban,
   FileSignature,
+  Sidebar,
   User2,
 } from 'lucide-react';
+import { BsEnvelopeArrowUp } from 'react-icons/bs';
 
 export const getIconByIconName = (iName: string) => {
   if (!iName) return null;
@@ -57,5 +59,35 @@ export const defaultDashboardSidebarData: IDefaultSidebarItem[] = [
     name: 'Profile',
     path: '/dashboard/profile',
     icon: <User2 size={18} />,
+  },
+  {
+    id: 2,
+    name: 'Message',
+    path: '/dashboard/Message',
+    icon: <BsEnvelopeArrowUp size={18} />,
+  },
+];
+export const defaultDashboardSidebarFullData: IDefaultSidebarItem[] = [
+  {
+    id: 1,
+    name: 'Access',
+    path: '/dashboard/access',
+    icon: <ShieldCheck size={18} />,
+    children: [
+      { id: 11, name: 'Access', path: '/dashboard/access/access', icon: <FolderKanban size={16} /> },
+      { id: 12, name: 'Role', path: '/dashboard/access/role', icon: <FileSignature size={16} /> },
+      { id: 122, name: 'Sidebar', path: '/dashboard/access/sidebar', icon: <Sidebar size={16} /> },
+      { id: 123, name: 'Menu Editor', path: '/dashboard/access/menu-editor', icon: <Menu size={16} /> },
+      { id: 13, name: 'Account', path: '/dashboard/access/account', icon: <User size={16} /> },
+      { id: 14, name: 'Users', path: '/dashboard/access/user', icon: <Users size={16} /> },
+      { id: 15, name: 'Session', path: '/dashboard/access/session', icon: <FileText size={16} /> },
+      { id: 16, name: 'Verification', path: '/dashboard/access/verification', icon: <ShieldCheck size={16} /> },
+    ],
+  },
+  {
+    id: 2,
+    name: 'Page Builder',
+    path: '/dashboard/page-builder',
+    icon: <Settings size={18} />,
   },
 ];

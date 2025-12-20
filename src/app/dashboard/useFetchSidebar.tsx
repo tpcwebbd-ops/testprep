@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { defaultDashboardSidebarData, IDefaultSidebarItem } from './default-items';
+import { defaultDashboardSidebarData, defaultDashboardSidebarFullData, IDefaultSidebarItem } from './default-items';
 import { useGetSidebarsQuery } from '@/redux/features/sidebars/sidebarsSlice';
 import { useGetAccessManagementsQuery } from '@/redux/features/accessManagements/accessManagementsSlice';
 import { useGetRolesQuery } from '@/redux/features/roles/rolesSlice';
@@ -106,10 +106,12 @@ export const useFetchSidebar = (email: string | null | undefined) => {
 
     // Filter the master list based on permissions
     const finalFilteredSidebar = filterSidebarItems(masterSidebarList);
+    // const finalFilteredSidebar = defaultDashboardSidebarData;
 
     // Set data (or default if filter results in empty list)
     setSidebarData(finalFilteredSidebar.length > 0 ? finalFilteredSidebar : defaultDashboardSidebarData);
   }, [email, allSidebarsQuery, userAccessManagementQuery, allRolesQuery, convertAPISidebarItemsToIDefaultSidebarItems]);
 
-  return [...sidebarData];
+  //   return [...sidebarData];
+  return [...defaultDashboardSidebarFullData];
 };
