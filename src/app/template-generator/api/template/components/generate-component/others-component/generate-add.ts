@@ -53,12 +53,12 @@ ${optionsArray.map(opt => `        { label: '${opt.label}', value: '${opt.value}
 
   const generateFormFieldJsx = (key: string, type: string): string => {
     const label = key.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-    let [typeName, optionsString] = ["", ""];
-     [typeName, optionsString] = type.split('#');
-    
+    let [typeName, optionsString] = ['', ''];
+    [typeName, optionsString] = type.split('#');
+
     // Treat EMAIL#readonly as a distinct type for switch case
     if (type === 'EMAIL#readonly') {
-        typeName = 'EMAIL#readonly';
+      typeName = 'EMAIL#readonly';
     }
 
     const formFieldWrapper = (label: string, componentJsx: string, alignTop: boolean = false): string => `
@@ -148,7 +148,7 @@ ${optionsArray.map(opt => `        { label: '${opt.label}', value: '${opt.value}
         break;
       }
       case 'DYNAMICSELECT':
-        isTallComponent = true; 
+        isTallComponent = true;
         componentJsx = `<DynamicSelectField value={new${singularPascalCase}['${key}']} apiUrl='https://jsonplaceholder.typicode.com/users' onChange={(values) => handleFieldChange('${key}', values)} />`;
         break;
       case 'IMAGE':
@@ -262,10 +262,14 @@ const AddNextComponents: React.FC = () => {
     const [add${pluralPascalCase}, { isLoading }] = useAdd${pluralPascalCase}Mutation()
     const [new${singularPascalCase}, setNew${singularPascalCase}] = useState<${interfaceName}>(${defaultInstanceName})
 
-    ${hasReadonlyEmail ? `
+    ${
+      hasReadonlyEmail
+        ? `
     const session = useSession();
     const author_email = session?.data?.user?.email || "---";
-    ` : ''}
+    `
+        : ''
+    }
 
     const handleFieldChange = (name: string, value: unknown) => {
         setNew${singularPascalCase}(prev => ({ ...prev, [name]: value }))
@@ -302,10 +306,10 @@ const AddNextComponents: React.FC = () => {
 
 ${dynamicVariablesContent}
   useEffect(() => {
-    const updateDefaultData = { ...defaultPosts };
-    // updateDefaultData.area = areaOptions[0].value;
-    setNewPost(updateDefaultData);
-  }, [defaultPosts]);
+    const updateDefaultData = { ...${defaultInstanceName} };
+     updateDefaultData.area = areaOptions[0].value;
+         setNew${singularPascalCase}(updateDefaultData)
+  }, [${defaultInstanceName}]);
 
     return (
         <Dialog open={isAddModalOpen} onOpenChange={toggleAddModal}>
