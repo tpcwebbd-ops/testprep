@@ -1,149 +1,156 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label'
+import { Button } from '@/components/ui/button'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import {
+    Dialog,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog'
 
-import AutocompleteField from '@/components/dashboard-ui/AutocompleteField';
-import ColorPickerField from '@/components/dashboard-ui/ColorPickerField';
-import DateRangePickerField from '@/components/dashboard-ui/DateRangePickerField';
-import DynamicSelectField from '@/components/dashboard-ui/DynamicSelectField';
-import ImageUploadManagerSingle from '@/components/dashboard-ui/ImageUploadManagerSingle';
-import ImageUploadManager from '@/components/dashboard-ui/ImageUploadManager';
-import InputFieldForEmail from '@/components/dashboard-ui/InputFieldForEmail';
-import InputFieldForPasscode from '@/components/dashboard-ui/InputFieldForPasscode';
-import InputFieldForPassword from '@/components/dashboard-ui/InputFieldForPassword';
-import InputFieldForString from '@/components/dashboard-ui/InputFieldForString';
-import JsonTextareaField from '@/components/dashboard-ui/JsonTextareaField';
-import MultiCheckboxGroupField from '@/components/dashboard-ui/MultiCheckboxGroupField';
-import MultiOptionsField from '@/components/dashboard-ui/MultiOptionsField';
-import NumberInputFieldFloat from '@/components/dashboard-ui/NumberInputFieldFloat';
-import NumberInputFieldInteger from '@/components/dashboard-ui/NumberInputFieldInteger';
-import PhoneInputField from '@/components/dashboard-ui/PhoneInputField';
-import RichTextEditorField from '@/components/dashboard-ui/RichTextEditorField';
-import TextareaFieldForDescription from '@/components/dashboard-ui/TextareaFieldForDescription';
-import TimeField from '@/components/dashboard-ui/TimeField';
-import TimeRangePickerField from '@/components/dashboard-ui/TimeRangePickerField';
-import UrlInputField from '@/components/dashboard-ui/UrlInputField';
-import { BooleanInputField } from '@/components/dashboard-ui/BooleanInputField';
-import { CheckboxField } from '@/components/dashboard-ui/CheckboxField';
-import { DateField } from '@/components/dashboard-ui/DateField';
-import { RadioButtonGroupField } from '@/components/dashboard-ui/RadioButtonGroupField';
-import { SelectField } from '@/components/dashboard-ui/SelectField';
+import AutocompleteField from '@/components/dashboard-ui/AutocompleteField'
+import ColorPickerField from '@/components/dashboard-ui/ColorPickerField'
+import DateRangePickerField from '@/components/dashboard-ui/DateRangePickerField'
+import DynamicSelectField from '@/components/dashboard-ui/DynamicSelectField'
+import ImageUploadManagerSingle from '@/components/dashboard-ui/ImageUploadManagerSingle'
+import ImageUploadManager from '@/components/dashboard-ui/ImageUploadManager'
+import InputFieldForEmail from '@/components/dashboard-ui/InputFieldForEmail'
+import InputFieldForPasscode from '@/components/dashboard-ui/InputFieldForPasscode'
+import InputFieldForPassword from '@/components/dashboard-ui/InputFieldForPassword'
+import InputFieldForString from '@/components/dashboard-ui/InputFieldForString'
+import JsonTextareaField from '@/components/dashboard-ui/JsonTextareaField'
+import MultiCheckboxGroupField from '@/components/dashboard-ui/MultiCheckboxGroupField'
+import MultiOptionsField from '@/components/dashboard-ui/MultiOptionsField'
+import NumberInputFieldFloat from '@/components/dashboard-ui/NumberInputFieldFloat'
+import NumberInputFieldInteger from '@/components/dashboard-ui/NumberInputFieldInteger'
+import PhoneInputField from '@/components/dashboard-ui/PhoneInputField'
+import RichTextEditorField from '@/components/dashboard-ui/RichTextEditorField'
+import TextareaFieldForDescription from '@/components/dashboard-ui/TextareaFieldForDescription'
+import TimeField from '@/components/dashboard-ui/TimeField'
+import TimeRangePickerField from '@/components/dashboard-ui/TimeRangePickerField'
+import UrlInputField from '@/components/dashboard-ui/UrlInputField'
+import { BooleanInputField } from '@/components/dashboard-ui/BooleanInputField'
+import { CheckboxField } from '@/components/dashboard-ui/CheckboxField'
+import { DateField } from '@/components/dashboard-ui/DateField'
+import { RadioButtonGroupField } from '@/components/dashboard-ui/RadioButtonGroupField'
+import { SelectField } from '@/components/dashboard-ui/SelectField'
 
-import StringArrayField from './others-field-type/StringArrayField';
+import StringArrayField from './others-field-type/StringArrayField'
 import { StringArrayData } from './others-field-type/types';
 
-import { IPosts, defaultPosts } from '../store/data/data';
-import { usePostsStore } from '../store/store';
-import { useUpdatePostsMutation } from '@/redux/features/posts/postsSlice';
-import { formatDuplicateKeyError, handleError, handleSuccess, isApiErrorResponse } from './utils';
+
+import { IPosts, defaultPosts } from '../store/data/data'
+import { usePostsStore } from '../store/store'
+import { useUpdatePostsMutation } from '@/redux/features/posts/postsSlice'
+import { formatDuplicateKeyError, handleError, handleSuccess, isApiErrorResponse } from './utils'
 
 const EditNextComponents: React.FC = () => {
-  const { toggleEditModal, isEditModalOpen, selectedPosts, setSelectedPosts } = usePostsStore();
+    const {
+        toggleEditModal,
+        isEditModalOpen,
+        selectedPosts,
+        setSelectedPosts,
+    } = usePostsStore()
 
-  const [updatePosts, { isLoading }] = useUpdatePostsMutation();
-  const [editedPost, setPost] = useState<IPosts>(defaultPosts);
+    const [updatePosts, { isLoading }] = useUpdatePostsMutation()
+    const [editedPost, setPost] = useState<IPosts>(defaultPosts)
 
-  useEffect(() => {
-    if (selectedPosts) {
-      setPost(selectedPosts);
+    useEffect(() => {
+        if (selectedPosts) {
+            setPost(selectedPosts)
+        }
+    }, [selectedPosts])
+
+    const handleFieldChange = (name: string, value: unknown) => {
+        setPost(prev => ({ ...prev, [name]: value }))
     }
-  }, [selectedPosts]);
 
-  const handleFieldChange = (name: string, value: unknown) => {
-    setPost(prev => ({ ...prev, [name]: value }));
-  };
+    const handleEditPost = async () => {
+        if (!selectedPosts) return
 
-  const handleEditPost = async () => {
-    if (!selectedPosts) return;
+        try {
+            const updateData = { ...editedPost }
+            // Strip server-only fields
+            delete updateData._id
+            delete updateData.createdAt
+            delete updateData.updatedAt
 
-    try {
-      const updateData = { ...editedPost };
-      // Strip server-only fields
-      delete updateData._id;
-      delete updateData.createdAt;
-      delete updateData.updatedAt;
+            // Normalize StringArray items (remove nested _id)
+            // if (updateData.students) {
+            //     updateData.students = updateData.students.map((i: StringArrayData) => {
+            //         const r = { ...i }
+            //         delete r._id
+            //         return r
+            //     })
+            // }
 
-      // Normalize StringArray items (remove nested _id)
-      if (updateData.students) {
-        updateData.students = updateData.students.map((i: StringArrayData) => {
-          const r = { ...i };
-          delete r._id;
-          return r;
-        });
-      }
+            await updatePosts({
+                id: selectedPosts._id,
+                ...updateData,
+            }).unwrap()
 
-      await updatePosts({
-        id: selectedPosts._id,
-        ...updateData,
-      }).unwrap();
-
-      toggleEditModal(false);
-      handleSuccess('Edit Successful');
-    } catch (error: unknown) {
-      console.error('Failed to update record:', error);
-      let errMessage: string = 'An unknown error occurred.';
-      if (isApiErrorResponse(error)) {
-        errMessage = formatDuplicateKeyError(error.data.message) || 'An API error occurred.';
-      } else if (error instanceof Error) {
-        errMessage = error.message;
-      }
-      handleError(errMessage);
+            toggleEditModal(false)
+            handleSuccess('Edit Successful')
+        } catch (error: unknown) {
+            console.error('Failed to update record:', error)
+            let errMessage: string = 'An unknown error occurred.'
+            if (isApiErrorResponse(error)) {
+                errMessage = formatDuplicateKeyError(error.data.message) || 'An API error occurred.'
+            } else if (error instanceof Error) {
+                errMessage = error.message
+            }
+            handleError(errMessage)
+        }
     }
-  };
 
-  const areaOptions = [
-    { label: 'Bangladesh', value: 'Bangladesh' },
-    { label: 'India', value: 'India' },
-    { label: 'Pakistan', value: 'Pakistan' },
-    { label: 'Canada', value: 'Canada' },
-  ];
+    const areaOptions = [
+        { label: 'Bangladesh', value: 'Bangladesh' },
+        { label: 'India', value: 'India' },
+        { label: 'Pakistan', value: 'Pakistan' },
+        { label: 'Canada', value: 'Canada' }
+    ];
 
-  const ideasOptions = [
-    { label: 'O 1', value: 'O 1' },
-    { label: 'O 2', value: 'O 2' },
-    { label: 'O 3', value: 'O 3' },
-    { label: 'O 4', value: 'O 4' },
-  ];
+    const ideasOptions = [
+        { label: 'O 1', value: 'O 1' },
+        { label: 'O 2', value: 'O 2' },
+        { label: 'O 3', value: 'O 3' },
+        { label: 'O 4', value: 'O 4' }
+    ];
 
-  const shiftOptions = [
-    { label: 'OP 1', value: 'OP 1' },
-    { label: 'OP 2', value: 'OP 2' },
-    { label: 'OP 3', value: 'OP 3' },
-    { label: 'OP 4', value: 'OP 4' },
-  ];
+    const shiftOptions = [
+        { label: 'OP 1', value: 'OP 1' },
+        { label: 'OP 2', value: 'OP 2' },
+        { label: 'OP 3', value: 'OP 3' },
+        { label: 'OP 4', value: 'OP 4' }
+    ];
 
-  return (
-    <Dialog open={isEditModalOpen} onOpenChange={toggleEditModal}>
-      <DialogContent
-        className="sm:max-w-[825px] rounded-xl border mt-[35px] border-white/20 bg-white/10
+    return (
+        <Dialog open={isEditModalOpen} onOpenChange={toggleEditModal}>
+            <DialogContent
+                className="sm:max-w-[825px] rounded-xl border mt-[35px] border-white/20 bg-white/10
                            backdrop-blur-2xl shadow-2xl overflow-hidden transition-all duration-300 p-0"
-      >
-        <ScrollArea className="h-[75vh] max-h-[calc(100vh-2rem)] rounded-xl">
-          <DialogHeader className="p-6 pb-3">
-            <DialogTitle
-              className="text-xl font-semibold bg-clip-text text-transparent
-                                       bg-linear-to-r from-white to-blue-200 drop-shadow-md"
             >
-              Edit Post
-            </DialogTitle>
-          </DialogHeader>
+                <ScrollArea className="h-[75vh] max-h-[calc(100vh-2rem)] rounded-xl">
+                    <DialogHeader className="p-6 pb-3">
+                        <DialogTitle
+                            className="text-xl font-semibold bg-clip-text text-transparent
+                                       bg-linear-to-r from-white to-blue-200 drop-shadow-md"
+                        >
+                            Edit Post
+                        </DialogTitle>
+                    </DialogHeader>
 
-          <div className="grid gap-4 py-4 px-6 text-white">
+                    <div className="grid gap-4 py-4 px-6 text-white">
+                        
             <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
               <Label htmlFor="title" className="text-right ">
                 Title
               </Label>
               <div className="col-span-3">
-                <InputFieldForString
-                  className="text-white"
-                  id="title"
-                  placeholder="Title"
-                  value={editedPost['title']}
-                  onChange={value => handleFieldChange('title', value as string)}
-                />
+                <InputFieldForString className="text-white" id="title" placeholder="Title" value={editedPost['title']} onChange={(value) => handleFieldChange('title', value as string)} />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
@@ -151,12 +158,7 @@ const EditNextComponents: React.FC = () => {
                 Email
               </Label>
               <div className="col-span-3">
-                <InputFieldForEmail
-                  className="text-white"
-                  id="email"
-                  value={editedPost['email']}
-                  onChange={value => handleFieldChange('email', value as string)}
-                />
+                <InputFieldForEmail className="text-white" id="email" value={editedPost['email']} onChange={(value) => handleFieldChange('email', value as string)} />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
@@ -164,13 +166,7 @@ const EditNextComponents: React.FC = () => {
                 Author Email
               </Label>
               <div className="col-span-3">
-                <InputFieldForEmail
-                  readonly
-                  className="text-white"
-                  id="author-email"
-                  value={editedPost['author-email']}
-                  onChange={value => handleFieldChange('author-email', value as string)}
-                />
+                <InputFieldForEmail readonly className="text-white" id="author-email" value={editedPost['author-email']} onChange={(value) => handleFieldChange('author-email', value as string)} />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
@@ -178,7 +174,7 @@ const EditNextComponents: React.FC = () => {
                 Password
               </Label>
               <div className="col-span-3">
-                <InputFieldForPassword id="password" value={editedPost['password']} onChange={value => handleFieldChange('password', value as string)} />
+                <InputFieldForPassword id="password" value={editedPost['password']} onChange={(value) => handleFieldChange('password', value as string)} />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
@@ -186,7 +182,7 @@ const EditNextComponents: React.FC = () => {
                 Passcode
               </Label>
               <div className="col-span-3">
-                <InputFieldForPasscode id="passcode" value={editedPost['passcode']} onChange={value => handleFieldChange('passcode', value as string)} />
+                <InputFieldForPasscode id="passcode" value={editedPost['passcode']} onChange={(value) => handleFieldChange('passcode', value as string)} />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
@@ -194,7 +190,7 @@ const EditNextComponents: React.FC = () => {
                 Area
               </Label>
               <div className="col-span-3">
-                <SelectField options={areaOptions} value={editedPost['area']} onValueChange={value => handleFieldChange('area', value)} />
+                <SelectField options={areaOptions} value={editedPost['area']} onValueChange={(value) => handleFieldChange('area', value)} />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 items-start gap-4 pr-1">
@@ -202,11 +198,7 @@ const EditNextComponents: React.FC = () => {
                 Sub Area
               </Label>
               <div className="col-span-3">
-                <DynamicSelectField
-                  value={editedPost['sub-area']}
-                  apiUrl="https://jsonplaceholder.typicode.com/users"
-                  onChange={values => handleFieldChange('sub-area', values)}
-                />
+                <DynamicSelectField value={editedPost['sub-area']} apiUrl='https://jsonplaceholder.typicode.com/users' onChange={(values) => handleFieldChange('sub-area', values)} />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
@@ -214,7 +206,7 @@ const EditNextComponents: React.FC = () => {
                 Products Images
               </Label>
               <div className="col-span-3">
-                <ImageUploadManager value={editedPost['products-images']} onChange={urls => handleFieldChange('products-images', urls)} />
+                <ImageUploadManager value={editedPost['products-images']} onChange={(urls) => handleFieldChange('products-images', urls)} />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
@@ -222,7 +214,7 @@ const EditNextComponents: React.FC = () => {
                 Personal Image
               </Label>
               <div className="col-span-3">
-                <ImageUploadManagerSingle value={editedPost['personal-image']} onChange={url => handleFieldChange('personal-image', url)} />
+                <ImageUploadManagerSingle value={editedPost['personal-image']} onChange={(url) => handleFieldChange('personal-image', url)} />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 items-start gap-4 pr-1">
@@ -230,12 +222,7 @@ const EditNextComponents: React.FC = () => {
                 Description
               </Label>
               <div className="col-span-3">
-                <TextareaFieldForDescription
-                  className="text-white"
-                  id="description"
-                  value={editedPost['description']}
-                  onChange={e => handleFieldChange('description', e.target.value)}
-                />
+                <TextareaFieldForDescription className="text-white" id="description" value={editedPost['description']} onChange={(e) => handleFieldChange('description', e.target.value)} />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
@@ -243,7 +230,7 @@ const EditNextComponents: React.FC = () => {
                 Age
               </Label>
               <div className="col-span-3">
-                <NumberInputFieldInteger id="age" value={editedPost['age']} onChange={value => handleFieldChange('age', value as number)} />
+                <NumberInputFieldInteger id="age" value={editedPost['age']} onChange={(value) => handleFieldChange('age', value as number)} />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
@@ -251,7 +238,7 @@ const EditNextComponents: React.FC = () => {
                 Amount
               </Label>
               <div className="col-span-3">
-                <NumberInputFieldFloat id="amount" value={editedPost['amount']} onChange={value => handleFieldChange('amount', value as number)} />
+                <NumberInputFieldFloat id="amount" value={editedPost['amount']} onChange={(value) => handleFieldChange('amount', value as number)} />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
@@ -259,7 +246,7 @@ const EditNextComponents: React.FC = () => {
                 IsActive
               </Label>
               <div className="col-span-3">
-                <BooleanInputField id="isActive" checked={editedPost['isActive']} onCheckedChange={checked => handleFieldChange('isActive', checked)} />
+                <BooleanInputField id="isActive" checked={editedPost['isActive']} onCheckedChange={(checked) => handleFieldChange('isActive', checked)} />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
@@ -267,7 +254,7 @@ const EditNextComponents: React.FC = () => {
                 Start Date
               </Label>
               <div className="col-span-3">
-                <DateField id="start-date" value={editedPost['start-date']} onChange={date => handleFieldChange('start-date', date)} />
+                <DateField id="start-date" value={editedPost['start-date']} onChange={(date) => handleFieldChange('start-date', date)} />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
@@ -275,7 +262,7 @@ const EditNextComponents: React.FC = () => {
                 Start Time
               </Label>
               <div className="col-span-3">
-                <TimeField id="start-time" value={editedPost['start-time']} onChange={time => handleFieldChange('start-time', time)} />
+                <TimeField id="start-time" value={editedPost['start-time']} onChange={(time) => handleFieldChange('start-time', time)} />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
@@ -283,7 +270,7 @@ const EditNextComponents: React.FC = () => {
                 Schedule Date
               </Label>
               <div className="col-span-3">
-                <DateRangePickerField id="schedule-date" value={editedPost['schedule-date']} onChange={range => handleFieldChange('schedule-date', range)} />
+                <DateRangePickerField id="schedule-date" value={editedPost['schedule-date']} onChange={(range) => handleFieldChange('schedule-date', range)} />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
@@ -291,7 +278,7 @@ const EditNextComponents: React.FC = () => {
                 Schedule Time
               </Label>
               <div className="col-span-3">
-                <TimeRangePickerField id="schedule-time" value={editedPost['schedule-time']} onChange={range => handleFieldChange('schedule-time', range)} />
+                <TimeRangePickerField id="schedule-time" value={editedPost['schedule-time']} onChange={(range) => handleFieldChange('schedule-time', range)} />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
@@ -299,11 +286,7 @@ const EditNextComponents: React.FC = () => {
                 Favorite Color
               </Label>
               <div className="col-span-3">
-                <ColorPickerField
-                  id="favorite-color"
-                  value={editedPost['favorite-color']}
-                  onChange={value => handleFieldChange('favorite-color', value as string)}
-                />
+                <ColorPickerField id="favorite-color" value={editedPost['favorite-color']} onChange={(value) => handleFieldChange('favorite-color', value as string)} />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
@@ -311,7 +294,7 @@ const EditNextComponents: React.FC = () => {
                 Number
               </Label>
               <div className="col-span-3">
-                <PhoneInputField id="number" value={editedPost['number']} onChange={value => handleFieldChange('number', value)} />
+                <PhoneInputField id="number" value={editedPost['number']} onChange={(value) => handleFieldChange('number', value)} />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
@@ -319,7 +302,7 @@ const EditNextComponents: React.FC = () => {
                 Profile
               </Label>
               <div className="col-span-3">
-                <UrlInputField id="profile" value={editedPost['profile']} onChange={value => handleFieldChange('profile', value as string)} />
+                <UrlInputField id="profile" value={editedPost['profile']} onChange={(value) => handleFieldChange('profile', value as string)} />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 items-start gap-4 pr-1">
@@ -327,7 +310,7 @@ const EditNextComponents: React.FC = () => {
                 Test
               </Label>
               <div className="col-span-3">
-                <RichTextEditorField id="test" value={editedPost['test']} onChange={value => handleFieldChange('test', value)} />
+                <RichTextEditorField id="test" value={editedPost['test']} onChange={(value) => handleFieldChange('test', value)} />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
@@ -343,7 +326,7 @@ const EditNextComponents: React.FC = () => {
                 Shift
               </Label>
               <div className="col-span-3">
-                <RadioButtonGroupField options={shiftOptions} value={editedPost['shift']} onChange={value => handleFieldChange('shift', value)} />
+                <RadioButtonGroupField options={shiftOptions} value={editedPost['shift']} onChange={(value) => handleFieldChange('shift', value)} />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
@@ -351,7 +334,7 @@ const EditNextComponents: React.FC = () => {
                 Policy
               </Label>
               <div className="col-span-3">
-                <CheckboxField id="policy" checked={editedPost['policy']} onCheckedChange={checked => handleFieldChange('policy', checked)} />
+                <CheckboxField id="policy" checked={editedPost['policy']} onCheckedChange={(checked) => handleFieldChange('policy', checked)} />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 items-start gap-4 pr-1">
@@ -359,7 +342,7 @@ const EditNextComponents: React.FC = () => {
                 Hobbies
               </Label>
               <div className="col-span-3">
-                <MultiCheckboxGroupField value={editedPost['hobbies']} onChange={values => handleFieldChange('hobbies', values)} />
+                <MultiCheckboxGroupField value={editedPost['hobbies']} onChange={(values) => handleFieldChange('hobbies', values)} />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
@@ -367,7 +350,7 @@ const EditNextComponents: React.FC = () => {
                 Ideas
               </Label>
               <div className="col-span-3">
-                <MultiOptionsField options={ideasOptions} value={editedPost['ideas']} onChange={values => handleFieldChange('ideas', values)} />
+                <MultiOptionsField options={ideasOptions} value={editedPost['ideas']} onChange={(values) => handleFieldChange('ideas', values)} />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 items-start gap-4 pr-1">
@@ -375,7 +358,7 @@ const EditNextComponents: React.FC = () => {
                 Students
               </Label>
               <div className="col-span-3">
-                <StringArrayField value={editedPost['students']} onChange={value => handleFieldChange('students', value)} />
+                <StringArrayField value={editedPost['students']} onChange={(value) => handleFieldChange('students', value)} />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 items-start gap-4 pr-1">
@@ -383,36 +366,35 @@ const EditNextComponents: React.FC = () => {
                 ComplexValue
               </Label>
               <div className="col-span-3">
-                <JsonTextareaField
-                  id="complexValue"
-                  value={JSON.stringify(editedPost['complexValue'], null, 2) || ''}
-                  onChange={value => {
-                    handleFieldChange('complexValue', value);
-                  }}
-                />
+                <JsonTextareaField id="complexValue" value={JSON.stringify(editedPost['complexValue'], null, 2) || ''} onChange={(value) => { handleFieldChange('complexValue', value); }} />
               </div>
             </div>
-          </div>
-        </ScrollArea>
+                    </div>
+                </ScrollArea>
 
-        <DialogFooter className="p-6 pt-4 gap-3">
-          <Button
-            variant="outlineWater"
-            onClick={() => {
-              toggleEditModal(false);
-              setSelectedPosts(null);
-            }}
-            size="sm"
-          >
-            Cancel
-          </Button>
-          <Button disabled={isLoading} onClick={handleEditPost} variant="outlineGarden" size="sm">
-            {isLoading ? 'Saving...' : 'Save Changes'}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-};
+                <DialogFooter className="p-6 pt-4 gap-3">
+                    <Button
+                        variant="outlineWater"
+                        onClick={() => {
+                            toggleEditModal(false)
+                            setSelectedPosts(null)
+                        }}
+                        size="sm"
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        disabled={isLoading}
+                        onClick={handleEditPost}
+                        variant="outlineGarden"
+                        size="sm"
+                    >
+                        {isLoading ? 'Saving...' : 'Save Changes'}
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    )
+}
 
-export default EditNextComponents;
+export default EditNextComponents

@@ -5,6 +5,7 @@ import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
 
+
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
@@ -12,7 +13,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 
-export type FilterPayload = { type: 'month'; value: { start: string; end: string } } | { type: 'range'; value: { start: string; end: string } };
+export type FilterPayload = 
+  | { type: 'month'; value: { start: string; end: string } } 
+  | { type: 'range'; value: { start: string; end: string } };
 
 interface FilterDialogProps {
   isOpen: boolean;
@@ -50,7 +53,7 @@ const FilterDialog: React.FC<FilterDialogProps> = ({ isOpen, onOpenChange, onApp
       }
       setTempDateRange(dateRange);
     }
-  }, [initialFilter, isOpen, dateRange]);
+  }, [initialFilter, isOpen,dateRange]);
 
   useEffect(() => {
     if (isCalendarOpen) {
@@ -113,7 +116,8 @@ const FilterDialog: React.FC<FilterDialogProps> = ({ isOpen, onOpenChange, onApp
     setIsCalendarOpen(false);
   };
 
-  const isApplyDisabled = (activeTab === 'month' && !selectedMonth) || (activeTab === 'range' && (!dateRange?.from || !dateRange?.to));
+  const isApplyDisabled = (activeTab === 'month' && !selectedMonth)
+    || (activeTab === 'range' && (!dateRange?.from || !dateRange?.to));
   const isCalendarUpdateDisabled = !tempDateRange?.from || !tempDateRange?.to;
 
   return (
@@ -127,7 +131,7 @@ const FilterDialog: React.FC<FilterDialogProps> = ({ isOpen, onOpenChange, onApp
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2 bg-white/10 backdrop-blur-lg rounded-lg text-white border border-white/20">
-              <TabsTrigger value="month" className="data-[state=active]:bg-white/20 data-[state=active]:shadow-none text-white">
+            <TabsTrigger value="month" className="data-[state=active]:bg-white/20 data-[state=active]:shadow-none text-white">
                 By Month
               </TabsTrigger>
               <TabsTrigger value="range" className="data-[state=active]:bg-white/20 data-[state=active]:shadow-none text-white">
@@ -137,15 +141,13 @@ const FilterDialog: React.FC<FilterDialogProps> = ({ isOpen, onOpenChange, onApp
 
             <TabsContent value="month" className="py-4">
               <div className="grid gap-2">
-                <Label htmlFor="month-select" className="text-white">
-                  Select Month
-                </Label>
+                <Label htmlFor="month-select" className="text-white">Select Month</Label>
                 <Select value={selectedMonth} onValueChange={setSelectedMonth}>
                   <SelectTrigger id="month-select" className="text-white border border-white/20 bg-white/5">
                     <SelectValue placeholder="Choose a month" />
                   </SelectTrigger>
                   <SelectContent className="bg-white/20 backdrop-blur-xl text-white border border-white/20">
-                    {monthOptions.map(option => (
+                    {monthOptions.map((option) => (
                       <SelectItem key={option.value} value={option.value} className="focus:bg-white/30">
                         {option.label}
                       </SelectItem>
@@ -158,7 +160,11 @@ const FilterDialog: React.FC<FilterDialogProps> = ({ isOpen, onOpenChange, onApp
             <TabsContent value="range" className="py-4">
               <div className="grid gap-2">
                 <Label className="text-white">Select Date Range</Label>
-                <Button id="date" variant="outlineGlassy" onClick={() => setIsCalendarOpen(true)}>
+                <Button
+                  id="date"
+                  variant="outlineGlassy"
+                  onClick={() => setIsCalendarOpen(true)}
+                >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {dateRange?.from ? (
                     dateRange.to ? (
@@ -177,12 +183,8 @@ const FilterDialog: React.FC<FilterDialogProps> = ({ isOpen, onOpenChange, onApp
           </Tabs>
 
           <DialogFooter className="mt-2 gap-2">
-            <Button size="sm" variant="outlineFire" onClick={handleClear}>
-              Clear Filter
-            </Button>
-            <Button size="sm" variant="outlineGarden" disabled={isApplyDisabled} onClick={handleApply}>
-              Apply Filter
-            </Button>
+            <Button size="sm" variant="outlineFire" onClick={handleClear}>Clear Filter</Button>
+            <Button size="sm" variant="outlineGarden" disabled={isApplyDisabled} onClick={handleApply}>Apply Filter</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -190,15 +192,16 @@ const FilterDialog: React.FC<FilterDialogProps> = ({ isOpen, onOpenChange, onApp
       <Dialog open={isCalendarOpen} onOpenChange={handleCalendarClose}>
         <DialogContent className="p-2 rounded-xl border border-white/20 bg-white/10 backdrop-blur-xl shadow-lg md:p-4 max-w-[608px] min-w-[608px] w-[608px] text-white">
           <DialogTitle className="text-white">Select Date Range</DialogTitle>
-          <Calendar mode="range" selected={tempDateRange} onSelect={setTempDateRange} numberOfMonths={2} />
+          <Calendar 
+            mode="range" 
+            selected={tempDateRange} 
+            onSelect={setTempDateRange} 
+            numberOfMonths={2} 
+          />
 
           <DialogFooter className="mt-4 flex justify-end gap-2">
-            <Button variant="outlineWater" size="sm" onClick={handleCalendarClose}>
-              Close
-            </Button>
-            <Button variant="outlineGarden" size="sm" disabled={isCalendarUpdateDisabled} onClick={handleCalendarUpdate}>
-              Update
-            </Button>
+            <Button variant="outlineWater" size="sm" onClick={handleCalendarClose}>Close</Button>
+            <Button variant="outlineGarden" size="sm" disabled={isCalendarUpdateDisabled} onClick={handleCalendarUpdate}>Update</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
