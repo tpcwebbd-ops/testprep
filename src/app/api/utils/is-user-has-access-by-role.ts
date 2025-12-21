@@ -56,7 +56,6 @@ export const isUserHasAccessByRole = async (arg: IWantAccess): Promise<NextRespo
   }
 
   const userRoles = await getRoleNamesByEmail(email);
-
   if (userRoles.length === 0) {
     return NextResponse.json({ data: null, message: 'Access denied: No roles assigned', status: 403 }, { status: 403 });
   }

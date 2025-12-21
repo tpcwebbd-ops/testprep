@@ -12,3 +12,11 @@ export const formatResponse = (data: unknown, message: string, status: number): 
   status,
   ok: status > 209 ? false : true,
 });
+
+export interface CustomApiError {
+  data?: {
+    message?: string;
+  };
+  status?: number;
+  message?: string;
+}

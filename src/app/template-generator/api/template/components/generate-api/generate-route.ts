@@ -1,31 +1,31 @@
-
 interface NamingConvention {
-    Users_1_000___: string
-    User_3_000___: string
+  Users_1_000___: string;
+  User_3_000___: string;
 }
 
-
 interface InputConfig {
-    namingConvention: NamingConvention
+  namingConvention: NamingConvention;
 }
 
 export function generateRoute(inputJsonString: string): string {
-    const config: InputConfig = JSON.parse(inputJsonString)
-    const { namingConvention } = config
+  const config: InputConfig = JSON.parse(inputJsonString);
+  const { namingConvention } = config;
 
-    const pluralName = namingConvention.Users_1_000___ 
-    const singularName = namingConvention.User_3_000___ 
+  const pluralName = namingConvention.Users_1_000___;
+  const singularName = namingConvention.User_3_000___;
 
-    const getPlural = `get${pluralName}`
-    const createSingular = `create${singularName}`
-    const updateSingular = `update${singularName}`
-    const deleteSingular = `delete${singularName}`
-    const getSingularById = `get${singularName}ById`
-    const bulkUpdatePlural = `bulkUpdate${pluralName}`
-    const bulkDeletePlural = `bulkDelete${pluralName}`
+  const getPlural = `get${pluralName}`;
+  const createSingular = `create${singularName}`;
+  const updateSingular = `update${singularName}`;
+  const deleteSingular = `delete${singularName}`;
+  const getSingularById = `get${singularName}ById`;
+  const bulkUpdatePlural = `bulkUpdate${pluralName}`;
+  const bulkDeletePlural = `bulkDelete${pluralName}`;
 
-    const routeTemplate = `
+  const routeTemplate = `
 import { handleRateLimit } from '@/app/api/utils/rate-limit';
+
+import { isUserHasAccessByRole, IWantAccess } from '@/app/api/utils/is-user-has-access-by-role';
 import {
     ${getPlural},
     ${createSingular},
@@ -50,6 +50,13 @@ export async function GET(req: Request) {
 //    const tokenResponse = handleTokenVerify(req);
 //   if (tokenResponse) return tokenResponse;
 
+  const wantToAccess: IWantAccess = {
+    db_name: '${pluralName}',
+    access: 'read',
+  };
+  const isAccess = await isUserHasAccessByRole(wantToAccess);
+  if (isAccess) return isAccess;
+  
     const id = new URL(req.url).searchParams.get('id');
     const result: IResponse = id
         ? await ${getSingularById}(req)
@@ -65,6 +72,13 @@ export async function POST(req: Request) {
 //    const tokenResponse = handleTokenVerify(req);
 //    if (tokenResponse) return tokenResponse;
 
+  const wantToAccess: IWantAccess = {
+    db_name: '${pluralName}',
+    access: 'create',
+  };
+  const isAccess = await isUserHasAccessByRole(wantToAccess);
+  if (isAccess) return isAccess;
+
     const result = await ${createSingular}(req);
     return formatResponse(result.data, result.message, result.status);
 }
@@ -76,6 +90,13 @@ export async function PUT(req: Request) {
 
 //    const tokenResponse = handleTokenVerify(req);
 //    if (tokenResponse) return tokenResponse;
+
+  const wantToAccess: IWantAccess = {
+    db_name: '${pluralName}',
+    access: 'update',
+  };
+  const isAccess = await isUserHasAccessByRole(wantToAccess);
+  if (isAccess) return isAccess;
 
     const isBulk = new URL(req.url).searchParams.get('bulk') === 'true';
     const result = isBulk
@@ -93,6 +114,14 @@ export async function DELETE(req: Request) {
 //    const tokenResponse = handleTokenVerify(req);
 //    if (tokenResponse) return tokenResponse;
 
+
+  const wantToAccess: IWantAccess = {
+    db_name: '${pluralName}',
+    access: 'delete',
+  };
+  const isAccess = await isUserHasAccessByRole(wantToAccess);
+  if (isAccess) return isAccess;
+
     const isBulk = new URL(req.url).searchParams.get('bulk') === 'true';
     const result = isBulk
         ? await ${bulkDeletePlural}(req)
@@ -100,6 +129,6 @@ export async function DELETE(req: Request) {
 
     return formatResponse(result.data, result.message, result.status);
 }
-`
-    return routeTemplate.trim()
+`;
+  return routeTemplate.trim();
 }

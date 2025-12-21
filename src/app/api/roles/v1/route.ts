@@ -6,7 +6,7 @@ import {
   //    handleTokenVerify,
   IResponse,
 } from '@/app/api/utils/jwt-verify';
-import { isUserHasAccessByRole, IWantAccess } from '../../utils/is-user-has-access-by-role';
+import { isUserHasAccessByRole, IWantAccess } from '@/app/api/utils/is-user-has-access-by-role';
 
 // GET all Roles
 export async function GET(req: Request) {
