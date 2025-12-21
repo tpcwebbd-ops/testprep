@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useJsonStore, JsonTemplateItem } from '../store/jsonStore'; // Import JsonTemplateItem
+import { useJsonStore, JsonTemplateItem } from '../store/jsonStore';
 import JsonEditorSingleItem from './JsonEditorSingleItem';
 
 import {
@@ -19,11 +19,11 @@ import {
 import { Button } from '@/components/ui/button';
 import ViewDataType, { allDataType } from './ViewDataType';
 import Link from 'next/link';
-import { v4 as uuidv4 } from 'uuid'; // Import uuidv4
+import { v4 as uuidv4 } from 'uuid';
 
 // Recursive type for schema definitions
 export type JsonSchema = {
-  [key: string]: string | JsonSchema; // allows nested schema objects
+  [key: string]: string | JsonSchema;
 };
 
 // Define naming convention structure
@@ -57,8 +57,7 @@ const SuccessPopup = ({ isVisible, message }: { isVisible: boolean; message: str
   );
 };
 
-// --- START: PROGRAMMATIC AND READABLE INITIAL STATE ---
-// Construct the initial template object.
+// --- INITIAL STATE ---
 const initialJsonTemplate: JsonTemplate = {
   uid: '000',
   templateName: 'Basic Template',
@@ -112,12 +111,10 @@ const initialJsonTemplate: JsonTemplate = {
     users_2_000___: 'posts',
     User_3_000___: 'Post',
     user_4_000___: 'post',
-
     use_generate_folder: false,
     bulk_action: ['title', 'area'],
   },
 };
-// --- END: PROGRAMMATIC AND READABLE INITIAL STATE ---
 
 const JsonEditor: React.FC = () => {
   const [pathButton, setPathButton] = useState<string>('');
@@ -141,10 +138,8 @@ const JsonEditor: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // Validate JSON and parse it into the JsonTemplate type
       const parsedJson: JsonTemplate = JSON.parse(jsonInput);
 
-      // --- START: MODIFIED VALIDATION LOGIC ---
       const schema = parsedJson.schema;
       if (!schema || typeof schema !== 'object') {
         setError('Validation Error: The JSON must include a "schema" object.');
@@ -154,32 +149,21 @@ const JsonEditor: React.FC = () => {
 
       const validDataTypes = new Set(allDataType.map(item => item.name.trim()));
 
-      // Recursive function to validate schema types
-      // currentSchema is now typed as JsonSchema
-      const validateSchemaTypes = (
-        currentSchema: JsonSchema, // Changed from 'any' to 'JsonSchema'
-        path: string = '',
-      ): { isValid: boolean; error?: string } => {
+      const validateSchemaTypes = (currentSchema: JsonSchema, path: string = ''): { isValid: boolean; error?: string } => {
         for (const key in currentSchema) {
           if (Object.prototype.hasOwnProperty.call(currentSchema, key)) {
             const value = currentSchema[key];
             const currentPath = path ? `${path}.${key}` : key;
 
             if (typeof value === 'object' && value !== null) {
-              // If it's an object, recurse
-              const result = validateSchemaTypes(
-                value as JsonSchema, // Explicitly cast to JsonSchema for recursion
-                currentPath,
-              );
-              if (!result.isValid) {
-                return result; // Pass the error up
-              }
+              const result = validateSchemaTypes(value as JsonSchema, currentPath);
+              if (!result.isValid) return result;
             } else if (typeof value === 'string') {
               const baseType = value.split('#')[0];
               if (!validDataTypes.has(baseType)) {
                 return {
                   isValid: false,
-                  error: `Validation Error: The type "${baseType}" for field "${currentPath}" is invalid. Please ensure the base type is a valid, case-sensitive name from the DataType Library.`,
+                  error: `Validation Error: The type "${baseType}" for field "${currentPath}" is invalid.`,
                 };
               }
             }
@@ -189,20 +173,30 @@ const JsonEditor: React.FC = () => {
       };
 
       const schemaValidationResult = validateSchemaTypes(schema);
-
       if (!schemaValidationResult.isValid) {
         setError(schemaValidationResult.error!);
         setIsLoading(false);
         return;
       }
-      // --- END: MODIFIED VALIDATION LOGIC ---
+
+      // Also run Naming Convention Check during save
+      const naming = parsedJson.namingConvention;
+      const keysToCheck = ['Users_1_000___', 'users_2_000___', 'User_3_000___', 'user_4_000___'];
+      for (const key of keysToCheck) {
+        const val = naming[key];
+        if (typeof val === 'string' && val.length > 1 && /[A-Z]/.test(val.substring(1))) {
+          setError(`Naming Error: "${key}" must be lowercase after the first letter.`);
+          setIsLoading(false);
+          return;
+        }
+      }
 
       if (parsedJson.uid === '000' || !parsedJson.uid) {
         parsedJson.uid = uuidv4();
       }
 
       const existingItem = items.find(
-        (i): i is JsonTemplateItem => typeof i.data === 'object' && i.data !== null && 'uid' in i.data && (i.data as JsonTemplate).uid === parsedJson.uid, // Type assertion for i // Cast i.data to JsonTemplate for uid access
+        (i): i is JsonTemplateItem => typeof i.data === 'object' && i.data !== null && 'uid' in i.data && (i.data as JsonTemplate).uid === parsedJson.uid,
       );
 
       if (existingItem) {
@@ -215,7 +209,7 @@ const JsonEditor: React.FC = () => {
         showSuccess('JSON saved successfully!');
       }
     } catch (err: unknown) {
-      setError(`Invalid JSON format. Please check your syntax. ${(err as Error).message}`);
+      setError(`Invalid JSON format. ${(err as Error).message}`);
     } finally {
       setIsLoading(false);
     }
@@ -228,13 +222,33 @@ const JsonEditor: React.FC = () => {
 
   const handleFormat = (): string | null => {
     try {
-      const parsedJson: JsonTemplate = JSON.parse(jsonInput); // Ensure consistent typing
+      const parsedJson: JsonTemplate = JSON.parse(jsonInput);
+
+      // --- START: NAMING CONVENTION VALIDATION ---
+      const naming = parsedJson.namingConvention;
+      const keysToValidate = ['Users_1_000___', 'users_2_000___', 'User_3_000___', 'user_4_000___'];
+
+      for (const key of keysToValidate) {
+        const value = naming[key];
+
+        // Check if value exists and is a string
+        if (typeof value === 'string' && value.length > 1) {
+          const remainingPart = value.substring(1);
+
+          // If any uppercase letter is found in the remaining part, throw error
+          if (/[A-Z]/.test(remainingPart)) {
+            throw new Error(`Naming Convention Error: In "${key}", the value "${value}" is invalid. All characters after the first letter must be lowercase.`);
+          }
+        }
+      }
+      // --- END: NAMING CONVENTION VALIDATION ---
+
       const formattedJson = JSON.stringify(parsedJson, null, 2);
       setJsonInput(formattedJson);
-      showSuccess('JSON formatted successfully!');
+      showSuccess('JSON formatted and validated successfully!');
       return formattedJson;
-    } catch (error) {
-      setError('Invalid JSON input: ' + (error as Error).message);
+    } catch (err) {
+      setError('Error: ' + (err as Error).message);
       return null;
     }
   };
@@ -253,33 +267,17 @@ const JsonEditor: React.FC = () => {
     try {
       const response = await fetch('/template-generator/api/template', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ data: formattedJson }),
       });
 
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
+      if (!response.ok) throw new Error('Network response was not ok');
+
       showSuccess('Template generated successfully!');
 
-      const parsedJson: JsonTemplate = JSON.parse(formattedJson); // Ensure consistent typing
-      if (parsedJson.namingConvention.use_generate_folder) {
-        // Type assertion for parsedJson.namingConvention.users_2_000___
-        setPathButton(
-          `/generate/${
-            parsedJson.namingConvention.users_2_000___ as string // Assert type to string
-          }`,
-        );
-      } else {
-        // Type assertion for parsedJson.namingConvention.users_2_000___
-        setPathButton(
-          `/dashboard/${
-            parsedJson.namingConvention.users_2_000___ as string // Assert type to string
-          }`,
-        );
-      }
+      const parsedJson: JsonTemplate = JSON.parse(formattedJson);
+      const basePath = parsedJson.namingConvention.use_generate_folder ? '/generate' : '/dashboard';
+      setPathButton(`${basePath}/${parsedJson.namingConvention.users_2_000___ as string}`);
     } catch (error) {
       setError('Failed to fetch: ' + (error as Error).message);
     } finally {
@@ -288,13 +286,13 @@ const JsonEditor: React.FC = () => {
   };
 
   const customBtn =
-    "inline-flex items-center justify-center whitespace-nowrap text-sm font-medium disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive cursor-pointer min-w-[80px] border-1 border-green-400 shadow-xl bg-green-300/40 hover:bg-green-400 transition-all duration-300 text-green-50 hover:text-white h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5";
+    'inline-flex items-center justify-center whitespace-nowrap text-sm font-medium disabled:pointer-events-none disabled:opacity-50 shrink-0 outline-none cursor-pointer min-w-[80px] border-1 border-green-400 shadow-xl bg-green-300/40 hover:bg-green-400 transition-all duration-300 text-green-50 hover:text-white h-8 rounded-md gap-1.5 px-3';
+
   return (
     <>
       <SuccessPopup isVisible={showSuccessPopup} message={successMessage} />
 
       <div className="w-full mx-auto p-4 md:p-6">
-        {/* ✅ Path Action Buttons */}
         {pathButton && (
           <div className="flex flex-wrap items-center justify-center gap-3">
             <Link href={`${pathButton}/personal`} target="_blank" className={customBtn}>
@@ -303,29 +301,18 @@ const JsonEditor: React.FC = () => {
             <Link href={`${pathButton}/admin`} target="_blank" className={customBtn}>
               Admin
             </Link>
-
             <Link href={`${pathButton}/ssr-view`} target="_blank" className={customBtn}>
               SSR
             </Link>
-
             <Link href={`${pathButton}/client-view`} target="_blank" className={customBtn}>
               CSR
             </Link>
           </div>
         )}
 
-        {/* ✅ Main Card */}
-        <div
-          className="mt-6 rounded-xl p-6 border border-white/20 bg-white/10
-                backdrop-blur-xl shadow-lg transition-all duration-300"
-        >
+        <div className="mt-6 rounded-xl p-6 border border-white/20 bg-white/10 backdrop-blur-xl shadow-lg transition-all duration-300">
           <div className="flex justify-between items-center mb-4">
-            <h2
-              className="text-2xl font-bold bg-clip-text text-transparent 
-                        bg-linear-to-r from-white to-blue-100 drop-shadow-md"
-            >
-              JSON Editor
-            </h2>
+            <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-linear-to-r from-white to-blue-100 drop-shadow-md">JSON Editor</h2>
             <ViewDataType />
           </div>
 
@@ -335,60 +322,37 @@ const JsonEditor: React.FC = () => {
             <textarea
               value={jsonInput}
               onChange={handleInputChange}
-              className="w-full h-[500px] p-4 rounded-lg resize-vertical font-mono text-sm
-                        bg-white/5 text-blue-50 backdrop-blur-xl
-                        border border-white/10 focus:ring-2 ring-blue-400"
+              className="w-full h-[500px] p-4 rounded-lg resize-vertical font-mono text-sm bg-white/5 text-blue-50 backdrop-blur-xl border border-white/10 focus:ring-2 ring-blue-400"
               placeholder="Enter your JSON..."
             />
           </div>
 
-          {error && (
-            <div
-              className="mt-4 p-3 rounded-lg text-red-300
-                        border border-red-400/30 bg-red-500/20 backdrop-blur-xl"
-            >
-              {error}
-            </div>
-          )}
+          {error && <div className="mt-4 p-3 rounded-lg text-red-300 border border-red-400/30 bg-red-500/20 backdrop-blur-xl">{error}</div>}
 
-          {/* ✅ Buttons */}
           <div className="flex flex-wrap gap-3 mt-6">
             <Button onClick={handleSave} disabled={isLoading} variant="outlineGlassy" size="sm" className="border-1 border-slate-50/50 shadow-xl">
               {isLoading ? 'Saving...' : 'Save'}
             </Button>
-
             <Button onClick={handleFormat} variant="outlineGlassy" size="sm" className="border-1 border-slate-50/50 shadow-xl">
-              Format
+              Format & Validate
             </Button>
-
             <Button onClick={handleGenerate} disabled={isGenerating} variant="outlineGlassy" size="sm" className="border-1 border-slate-50/50 shadow-xl">
               {isGenerating ? 'Generating...' : 'Generate'}
             </Button>
           </div>
         </div>
 
-        {/* ✅ Saved Items Card */}
-        <div
-          className="mt-8 rounded-xl p-6 border border-white/20 bg-white/10
-                backdrop-blur-xl shadow-lg transition-all duration-300"
-        >
+        <div className="mt-8 rounded-xl p-6 border border-white/20 bg-white/10 backdrop-blur-xl shadow-lg transition-all duration-300">
           <div className="flex justify-between items-center mb-6">
-            <h3
-              className="text-lg font-semibold bg-clip-text text-transparent
-                        bg-linear-to-r from-white to-blue-200 drop-shadow-md"
-            >
+            <h3 className="text-lg font-semibold bg-clip-text text-transparent bg-linear-to-r from-white to-blue-200 drop-shadow-md">
               Saved Items ({items.length})
             </h3>
-
             {items.length > 0 && (
               <AlertDialog>
-                <AlertDialogTrigger className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive cursor-pointer min-w-[80px] border-1 border-rose-400 shadow-xl bg-rose-300/40 hover:bg-rose-400 transition-all duration-300 hover:text-rose-50 h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5 text-rose-50">
+                <AlertDialogTrigger className="inline-flex items-center justify-center text-sm font-medium border-1 border-rose-400 shadow-xl bg-rose-300/40 hover:bg-rose-400 transition-all duration-300 text-rose-50 h-8 rounded-md px-3">
                   Clear All
                 </AlertDialogTrigger>
-                <AlertDialogContent
-                  className="p-5 rounded-xl border border-white/20 bg-white/10
-                                backdrop-blur-xl"
-                >
+                <AlertDialogContent className="p-5 rounded-xl border border-white/20 bg-white/10 backdrop-blur-xl">
                   <AlertDialogHeader>
                     <AlertDialogTitle className="text-white">Confirm Delete?</AlertDialogTitle>
                     <AlertDialogDescription className="text-gray-200">This will delete all saved templates.</AlertDialogDescription>
