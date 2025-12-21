@@ -1,0 +1,55 @@
+1. Install NextJs
+2. Implement PWA
+3. Update .env
+4. Deploy Vercel
+5. Update Dashboard
+- access/access
+- access/account
+- access/footer-editor
+- access/install-popup
+- access/menu-editor
+- access/role
+- access/session
+- access/sidebar
+- access/user
+- access/verification
+
+- media
+- profile
+
+6. Others Page
+- actions (for revalidation)
+- [...pageTitle]) (dynamic page)
+- api
+- api/access/access
+- api/access/account
+- api/access/footer-editor
+- api/access/install-popup
+- api/access/menu-editor
+- api/access/role
+- api/access/session
+- api/access/sidebar
+- api/access/user
+- api/access/verification
+
+- api/media
+- api/profile
+- email-conformation
+- forgot-password
+- login
+- register
+- reset-password
+- unauthorized
+- verify
+- verify-success
+
+7. Main Features
+- Menu editor
+- Brand editor
+- Footer editor
+- Install popup
+- Page Builder
+- template generator
+- Dashboard Builder
+- Authentication
+- Authorization
