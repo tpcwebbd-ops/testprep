@@ -1,0 +1,60 @@
+{
+  "uid": "84e32cbd-0e8b-4ad3-b837-4353f9118f93",
+  "templateName": "Basic Template",
+  "schema": {
+    "title": "STRING",
+    "email": "EMAIL",
+    "author-email": "EMAIL#readonly",
+    "password": "PASSWORD",
+    "passcode": "PASSCODE",
+    "area": "SELECT#Bangladesh, India, Pakistan, Canada",
+    "sub-area": "DYNAMICSELECT",
+    "products-images": "IMAGES",
+    "personal-image": "IMAGE",
+    "description": "DESCRIPTION",
+    "age": "INTNUMBER",
+    "amount": "FLOATNUMBER",
+    "isActive": "BOOLEAN",
+    "start-date": "DATE",
+    "start-time": "TIME",
+    "schedule-date": "DATERANGE",
+    "schedule-time": "TIMERANGE",
+    "favorite-color": "COLORPICKER",
+    "number": "PHONE",
+    "profile": "URL",
+    "test": "RICHTEXT",
+    "info": "AUTOCOMPLETE",
+    "shift": "RADIOBUTTON#OP 1, OP 2, OP 3, OP 4",
+    "policy": "CHECKBOX",
+    "hobbies": "MULTICHECKBOX",
+    "ideas": "MULTIOPTIONS#O 1, O 2, O 3, O 4",
+    "students": "STRINGARRAY#Name, Class, Roll",
+    "complexValue": {
+      "id": "STRING",
+      "title": "STRING",
+      "parent": {
+        "id": "STRING",
+        "title": "STRING",
+        "child": {
+          "id": "STRING",
+          "title": "STRING",
+          "child": "STRING",
+          "note": "STRING"
+        },
+        "note": "STRING"
+      },
+      "note": "STRING"
+    }
+  },
+  "namingConvention": {
+    "Users_1_000___": "Posts",
+    "users_2_000___": "posts",
+    "User_3_000___": "Post",
+    "user_4_000___": "post",
+    "use_generate_folder": false,
+    "bulk_action": [
+      "title",
+      "area"
+    ]
+  }
+}
