@@ -254,7 +254,7 @@ const CourseBuilderPage = () => {
   }
 
   return (
-    <main className="min-h-screen  pb-20 px-4 md:px-8">
+    <main className="min-h-screen pb-20 px-4 md:px-8">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6 animate-in slide-in-from-top-4 duration-500">
@@ -273,18 +273,10 @@ const CourseBuilderPage = () => {
             </div>
           </div>
           <div className="flex gap-3">
-            <Button
-              onClick={() => refetch()}
-              variant="outline"
-              size="icon"
-              className="bg-white/5 border-white/10 text-slate-300 hover:text-white hover:bg-white/10 transition-transform active:scale-95"
-            >
+            <Button onClick={() => refetch()} variant="outlineGlassy" size="sm">
               <RefreshCw className="h-4 w-4" />
             </Button>
-            <Button
-              onClick={handleOpenAddDialog}
-              className="bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/20 gap-2 transition-transform active:scale-95"
-            >
+            <Button onClick={handleOpenAddDialog} variant="outlineGlassy" size="sm">
               <Plus className="h-4 w-4" />
               Add Day
             </Button>
@@ -390,24 +382,16 @@ const CourseBuilderPage = () => {
       {/* --- ADD DAY MODAL --- */}
       {isAddDialogOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-slate-900 border border-white/10 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between p-5 border-b border-white/10 bg-white/5">
-              <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                <Plus className="h-5 w-5 text-indigo-400" />
-                Add New Day
-              </h2>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsAddDialogOpen(false)}
-                className="h-8 w-8 rounded-full hover:bg-white/10 text-slate-400 hover:text-white"
-              >
+          <div className=" bg-purple-500/90 backdrop-blur-xl border border-white/20 rounded-2xl text-white transition-all duration-300l shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between p-5 border-b  ">
+              <h2 className="text-lg font-semibold text-white flex items-center gap-2">Add New Day</h2>
+              <Button variant="ghost" size="icon" onClick={() => setIsAddDialogOpen(false)} className="min-w-1">
                 <X className="h-4 w-4" />
               </Button>
             </div>
 
             <div className="p-6 space-y-6">
-              <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-lg p-3 flex items-center gap-3">
+              <div className="  rounded-lg p-3 flex items-center gap-3">
                 <div className="p-2 bg-indigo-500/20 rounded-full">
                   <Layers className="h-4 w-4 text-indigo-400" />
                 </div>
@@ -420,7 +404,7 @@ const CourseBuilderPage = () => {
               <div className="space-y-2">
                 <Label className="text-slate-300">Select Day Number</Label>
                 <select
-                  className="w-full bg-slate-950 border border-white/10 rounded-lg px-3 py-2.5 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all appearance-none cursor-pointer"
+                  className="w-full border border-white/10 rounded-lg px-3 py-2.5 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all appearance-none cursor-pointer"
                   value={selectedDayNum}
                   onChange={e => setSelectedDayNum(e.target.value)}
                 >
@@ -434,15 +418,15 @@ const CourseBuilderPage = () => {
                   ))}
                   {daysForDropdown.length === 0 && <option disabled>All 100 days created!</option>}
                 </select>
-                <p className="text-xs text-slate-500">Only uncreated days are shown.</p>
+                <p className="text-xs text-slate-100">Only uncreated days are shown.</p>
               </div>
             </div>
 
             <div className="p-5 bg-white/5 flex justify-end gap-3">
-              <Button variant="ghost" onClick={() => setIsAddDialogOpen(false)} className="text-slate-400 hover:text-white">
+              <Button variant="ghost" onClick={() => setIsAddDialogOpen(false)} size="sm">
                 Cancel
               </Button>
-              <Button onClick={handleSaveDay} disabled={!selectedDayNum || isAdding} className="bg-indigo-600 hover:bg-indigo-500 text-white min-w-[100px]">
+              <Button onClick={handleSaveDay} disabled={!selectedDayNum || isAdding} variant="outlineGlassy" size="sm">
                 {isAdding ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'Create Day'}
               </Button>
             </div>
@@ -459,12 +443,7 @@ const CourseBuilderPage = () => {
                 <Edit className="h-4 w-4 text-blue-400" />
                 Edit Day
               </h2>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsEditDialogOpen(false)}
-                className="h-8 w-8 rounded-full hover:bg-white/10 text-slate-400 hover:text-white"
-              >
+              <Button variant="ghost" size="icon" onClick={() => setIsEditDialogOpen(false)} className="min-w-1">
                 <X className="h-4 w-4" />
               </Button>
             </div>
@@ -494,10 +473,10 @@ const CourseBuilderPage = () => {
             </div>
 
             <div className="p-5 bg-white/5 flex justify-end gap-3">
-              <Button variant="ghost" onClick={() => setIsEditDialogOpen(false)} className="text-slate-400 hover:text-white">
+              <Button variant="outlineGlassy" onClick={() => setIsEditDialogOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleUpdateDay} disabled={isUpdating} className="bg-blue-600 hover:bg-blue-500 text-white min-w-[100px]">
+              <Button onClick={handleUpdateDay} disabled={isUpdating} variant="outlineGlassy">
                 {isUpdating ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'Save Changes'}
               </Button>
             </div>
@@ -514,12 +493,7 @@ const CourseBuilderPage = () => {
                 <AlertTriangle className="h-5 w-5" />
                 <h2 className="text-lg font-semibold">Delete Day?</h2>
               </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsDeleteDialogOpen(false)}
-                className="h-8 w-8 rounded-full hover:bg-white/10 text-slate-400 hover:text-white"
-              >
+              <Button variant="ghost" size="icon" onClick={() => setIsDeleteDialogOpen(false)} className="min-w-1">
                 <X className="h-4 w-4" />
               </Button>
             </div>
@@ -534,10 +508,10 @@ const CourseBuilderPage = () => {
             </div>
 
             <div className="p-5 bg-white/5 flex justify-end gap-3">
-              <Button variant="ghost" onClick={() => setIsDeleteDialogOpen(false)} className="text-slate-400 hover:text-white">
+              <Button variant="outlineGlassy" onClick={() => setIsDeleteDialogOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={confirmDelete} className="bg-red-600 hover:bg-red-500 text-white border-none shadow-lg shadow-red-500/20">
+              <Button onClick={confirmDelete} variant="outlineGlassy">
                 Delete Day
               </Button>
             </div>
