@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { defaultDashboardSidebarData, defaultDashboardSidebarFullData, IDefaultSidebarItem } from './default-items';
+import { defaultDashboardSidebarData, IDefaultSidebarItem } from './default-items';
 import { useGetSidebarsQuery } from '@/redux/features/sidebars/sidebarsSlice';
 import { useGetAccessManagementsQuery } from '@/redux/features/accessManagements/accessManagementsSlice';
 import { useGetRolesQuery } from '@/redux/features/roles/rolesSlice';
@@ -15,7 +15,6 @@ type APISidebarItem = {
 };
 
 export const useFetchSidebar = (email: string | null | undefined) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [sidebarData, setSidebarData] = useState<IDefaultSidebarItem[]>([]);
 
   // Queries
@@ -113,6 +112,5 @@ export const useFetchSidebar = (email: string | null | undefined) => {
     setSidebarData(finalFilteredSidebar.length > 0 ? finalFilteredSidebar : defaultDashboardSidebarData);
   }, [email, allSidebarsQuery, userAccessManagementQuery, allRolesQuery, convertAPISidebarItemsToIDefaultSidebarItems]);
 
-  //   return [...sidebarData];
-  return [...defaultDashboardSidebarFullData];
+  return [...sidebarData];
 };
