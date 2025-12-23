@@ -225,7 +225,7 @@ const CourseBuilderPage = () => {
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-950 pt-[90px] pb-20 px-4 md:px-8">
+      <main className="min-h-screen  pb-20 px-4 md:px-8">
         <div className="max-w-7xl mx-auto flex items-center justify-center min-h-[50vh]">
           <div className="flex flex-col items-center gap-4 animate-in fade-in zoom-in-95 duration-500">
             <GraduationCap className="h-12 w-12 text-indigo-400 animate-bounce" />
@@ -238,7 +238,7 @@ const CourseBuilderPage = () => {
 
   if (error) {
     return (
-      <main className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-950 pt-[90px] pb-20 px-4 md:px-8">
+      <main className="min-h-screen  pb-20 px-4 md:px-8">
         <div className="max-w-7xl mx-auto flex flex-col items-center justify-center min-h-[50vh] gap-6">
           <AlertTriangle className="h-12 w-12 text-red-500" />
           <div className="text-center">
@@ -254,7 +254,7 @@ const CourseBuilderPage = () => {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-950 pt-[90px] pb-20 px-4 md:px-8">
+    <main className="min-h-screen  pb-20 px-4 md:px-8">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6 animate-in slide-in-from-top-4 duration-500">
@@ -389,7 +389,7 @@ const CourseBuilderPage = () => {
 
       {/* --- ADD DAY MODAL --- */}
       {isAddDialogOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-slate-900 border border-white/10 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between p-5 border-b border-white/10 bg-white/5">
               <h2 className="text-lg font-semibold text-white flex items-center gap-2">
