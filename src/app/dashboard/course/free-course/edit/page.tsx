@@ -297,7 +297,7 @@ function EditCourseContent() {
     };
 
     setItems([...items, newItem]);
-    toast.success('Assignment added');
+    toast.success('Widget added');
 
     setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 100);
     setIsAddModalOpen(false);
@@ -306,7 +306,7 @@ function EditCourseContent() {
   const onSubmitEdit = (updatedData: unknown) => {
     if (editingItem) setItems(items.map(item => (item.id === editingItem.id ? { ...item, data: updatedData } : item)));
     setEditingItem(null);
-    toast.success('Assignment updated locally');
+    toast.success('Widget updated locally');
   };
 
   const handleConfirmDelete = () => {
@@ -397,7 +397,7 @@ function EditCourseContent() {
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="text-xs text-slate-500 font-mono hidden md:block">{items.length} Assignments</div>
+            <div className="text-xs text-slate-500 font-mono hidden md:block">{items.length} Widgets</div>
           </div>
         </div>
       </div>
@@ -409,8 +409,8 @@ function EditCourseContent() {
             <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center mb-4 text-emerald-400">
               <BookOpen className="h-8 w-8" />
             </div>
-            <h2 className="text-2xl font-bold text-white mb-2 text-center">No Assignments Yet</h2>
-            <p className="text-slate-400 text-center max-w-md mb-8">This day has no content. Click &quot;Add Assignment&quot; below to start.</p>
+            <h2 className="text-2xl font-bold text-white mb-2 text-center">No Widgets Yet</h2>
+            <p className="text-slate-400 text-center max-w-md mb-8">This day has no content. Click &quot;Add Widget&quot; below to start.</p>
           </div>
         ) : (
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
@@ -426,7 +426,7 @@ function EditCourseContent() {
               {activeId ? (
                 <div className="backdrop-blur-xl shadow-2xl rounded-xl border border-emerald-500/30 bg-slate-900/90 p-4 flex items-center gap-4 transform scale-105 cursor-grabbing">
                   <GripVertical className="h-6 w-6 text-emerald-400" />
-                  <span className="text-white font-medium text-lg">Moving Assignment...</span>
+                  <span className="text-white font-medium text-lg">Moving Widget...</span>
                 </div>
               ) : null}
             </DragOverlay>
@@ -484,7 +484,7 @@ function EditCourseContent() {
                   <div className="p-1 rounded-full bg-white/20 group-hover:rotate-90 transition-transform duration-300">
                     <Plus className="h-4 w-4" />
                   </div>
-                  Add Assignment
+                  Add Widget
                 </Button>
 
                 <div className="h-8 w-px bg-white/10 hidden sm:block" />
@@ -532,7 +532,7 @@ function EditCourseContent() {
         </div>
       </div>
 
-      {/* --- ASSIGNMENT SELECTION MODAL --- */}
+      {/* --- WIDGET SELECTION MODAL --- */}
       <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
         <DialogContent className="p-0 overflow-hidden bg-slate-950/95 backdrop-blur-3xl border-white/10 shadow-2xl text-white gap-0 flex flex-col max-w-[90vw] min-w-[90vw] h-[85vh] mt-10">
           {(() => {
@@ -631,7 +631,7 @@ function EditCourseContent() {
       <Dialog open={!!movingItem} onOpenChange={() => setMovingItem(null)}>
         <DialogContent className="bg-slate-900 border-white/10 text-white w-full max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-center">Move Assignment</DialogTitle>
+            <DialogTitle className="text-center">Move Widget</DialogTitle>
           </DialogHeader>
           <div className="flex flex-col gap-3 py-4">
             <Button onClick={handleMoveUp} className="h-12 text-lg bg-slate-800 hover:bg-slate-700 justify-start px-6">
@@ -651,7 +651,7 @@ function EditCourseContent() {
             <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
               <AlertTriangle className="h-8 w-8 text-red-500" />
             </div>
-            <DialogTitle className="text-xl font-bold mb-2">Remove Assignment?</DialogTitle>
+            <DialogTitle className="text-xl font-bold mb-2">Remove Widget?</DialogTitle>
             <p className="text-slate-400 mb-6 text-sm">
               Are you sure you want to remove <span className="text-white font-medium">{deletingItem?.heading}</span>?
             </p>
@@ -672,7 +672,7 @@ function EditCourseContent() {
         <DialogContent className="max-w-6xl h-[85vh] mt-10 p-0 bg-slate-900/95 backdrop-blur-xl border-white/10 text-white flex flex-col">
           <DialogHeader className="p-4 border-b border-white/10 bg-white/5 shrink-0">
             <DialogTitle className="flex items-center gap-2">
-              <Edit className="h-5 w-5 text-emerald-400" /> Edit Assignment
+              <Edit className="h-5 w-5 text-emerald-400" /> Edit Widget
             </DialogTitle>
           </DialogHeader>
           <ScrollArea className="flex-1 w-full bg-black/20">
