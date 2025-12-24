@@ -3,7 +3,7 @@ import { UploadThingError } from 'uploadthing/server';
 
 const f = createUploadthing();
 
-// --- Simulated auth function (replace with your real one) ---
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const auth = async (req: Request) => {
   // Replace with your actual auth/session logic
   return { id: 'fakeUserId' };
@@ -26,8 +26,8 @@ export const ourFileRouter = {
       return { userId: user.id };
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      console.log('📝 Document upload complete for:', metadata.userId);
-      console.log('📄 File:', file.name, '| URL:', file.ufsUrl);
+      // console.log('📝 Document upload complete for:', metadata.userId);
+      // console.log('📄 File:', file.name, '| URL:', file.ufsUrl);
 
       // Save to DB (example)
       // await db.upload.create({
@@ -65,8 +65,8 @@ export const ourFileRouter = {
       return { userId: user.id };
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      console.log('📚 PDF upload complete for:', metadata.userId);
-      console.log('🧾 File URL:', file.ufsUrl);
+      // console.log('📚 PDF upload complete for:', metadata.userId);
+      // console.log('🧾 File URL:', file.ufsUrl);
 
       // Example DB save
       // await db.upload.create({
@@ -104,8 +104,8 @@ export const ourFileRouter = {
       return { userId: user.id };
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      console.log('🎥 Video upload complete for:', metadata.userId);
-      console.log('📹 File URL:', file.ufsUrl);
+      // console.log('🎥 Video upload complete for:', metadata.userId);
+      // console.log('📹 File URL:', file.ufsUrl);
 
       // Example DB save
       // await db.upload.create({
