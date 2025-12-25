@@ -20,6 +20,7 @@ import {
   Layers,
   Sparkles,
   Box,
+  FileText,
 } from 'lucide-react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent, DragOverlay, DragStartEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -34,7 +35,7 @@ import { useGetCoursesQuery, useUpdateCourseMutation } from '@/redux/features/co
 import { IconType } from 'react-icons/lib';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-type ItemType = 'assignment' | 'video';
+type ItemType = 'assignment' | 'video' | 'documents';
 
 interface CourseContent {
   id: string;
@@ -65,8 +66,9 @@ interface ComponentMapEntry {
   collection: Record<string, WidgetConfig>;
   keys: string[];
   label: string;
-  icon: IconType;
+  icon: IconType | any;
   color: string;
+  activeColor: string;
 }
 
 const COMPONENT_MAP: Record<ItemType, ComponentMapEntry> = {
@@ -76,6 +78,7 @@ const COMPONENT_MAP: Record<ItemType, ComponentMapEntry> = {
     label: 'Assignments',
     icon: GraduationCap,
     color: 'text-emerald-400 from-emerald-500 to-teal-500',
+    activeColor: 'data-[state=active]:bg-emerald-500',
   },
   video: {
     collection: AllVideos as Record<string, WidgetConfig>,
@@ -83,23 +86,22 @@ const COMPONENT_MAP: Record<ItemType, ComponentMapEntry> = {
     label: 'Videos',
     icon: Video,
     color: 'text-purple-400 from-purple-500 to-indigo-500',
+    activeColor: 'data-[state=active]:bg-purple-500',
+  },
+  documents: {
+    collection: AllVideos as Record<string, WidgetConfig>,
+    keys: AllVideosKeys,
+    label: 'Documents',
+    icon: FileText,
+    color: 'text-blue-400 from-blue-500 to-cyan-500',
+    activeColor: 'data-[state=active]:bg-blue-500',
   },
 };
 
 const getTypeStyles = (type: ItemType) => {
-  if (type === 'video') {
-    return {
-      border: 'border-purple-500/20 hover:border-purple-400/40',
-      bg: 'bg-white/5',
-      badge: 'bg-purple-500/10 text-purple-300 border-purple-500/20',
-      icon: 'text-purple-400',
-      glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(168,85,247,0.2)]',
-    };
-  }
   return {
     border: 'border-emerald-500/20 hover:border-emerald-400/40',
     bg: 'bg-white/5',
-    badge: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20',
     icon: 'text-emerald-400',
     glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(16,185,129,0.2)]',
   };
@@ -162,7 +164,7 @@ const SortableItem = ({ item, onEdit, onDelete }: { item: CourseContent; onEdit:
   );
 };
 
-function EditCourseContent() {
+function EditDashboardContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const courseDayParam = searchParams.get('courseDay');
@@ -342,34 +344,32 @@ function EditCourseContent() {
 
       <Dialog open={isWidgetDialogOpen} onOpenChange={setIsWidgetDialogOpen}>
         <DialogContent className="p-0 overflow-hidden bg-white/10 backdrop-blur-[50px] mt-8 border-white/20 shadow-2xl text-white flex flex-col max-w-[95vw] md:max-w-5xl h-[85vh] rounded border">
-          <Tabs defaultValue="assignment" className="w-full h-full flex flex-col">
+          <Tabs defaultValue={Object.keys(COMPONENT_MAP)[0]} className="w-full h-full flex flex-col">
             <div className="shrink-0 p-8 border-b border-white/10 bg-white/5">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                  <DialogTitle className="text-3xl font-black text-white">Widgets Lists</DialogTitle>
-                  <p className="text-white/40 font-medium">Select a widget to inject into your apps.</p>
+                  <DialogTitle className="text-3xl font-black text-white">Widgets Library</DialogTitle>
+                  <p className="text-white/40 font-medium">Inject modules directly into your application timeline.</p>
                 </div>
-                <TabsList className="bg-white/5 border border-white/10 p-1 rounded-2xl h-14">
-                  <TabsTrigger
-                    value="assignment"
-                    className="rounded-xl px-6 data-[state=active]:bg-emerald-500 data-[state=active]:text-white font-bold transition-all"
-                  >
-                    Assignments
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="video"
-                    className="rounded-xl px-6 data-[state=active]:bg-purple-500 data-[state=active]:text-white font-bold transition-all"
-                  >
-                    Videos
-                  </TabsTrigger>
+                <TabsList className="bg-white/5 border border-white/10 p-1 rounded-2xl h-14 overflow-x-auto flex-nowrap">
+                  {Object.entries(COMPONENT_MAP).map(([type, meta]) => (
+                    <TabsTrigger
+                      key={type}
+                      value={type}
+                      onClick={() => setPaginationPage(1)}
+                      className={`rounded-xl px-6 ${meta.activeColor} data-[state=active]:text-white font-bold transition-all whitespace-nowrap`}
+                    >
+                      <meta.icon className="h-4 w-4 mr-2 inline-block" />
+                      {meta.label}
+                    </TabsTrigger>
+                  ))}
                 </TabsList>
               </div>
             </div>
 
-            {(['assignment', 'video'] as ItemType[]).map(type => (
+            {Object.entries(COMPONENT_MAP).map(([type, meta]) => (
               <TabsContent key={type} value={type} className="flex-1 overflow-hidden m-0 outline-none">
                 {(() => {
-                  const meta = COMPONENT_MAP[type];
                   const paginatedItems = meta.keys.slice((paginationPage - 1) * ITEMS_PER_PAGE, paginationPage * ITEMS_PER_PAGE);
                   const totalPages = Math.ceil(meta.keys.length / ITEMS_PER_PAGE);
 
@@ -392,7 +392,7 @@ function EditCourseContent() {
                                 </div>
                                 <div className="p-5 bg-white/5 border-t border-white/10 flex items-center justify-between">
                                   <span className="text-xs font-bold text-white/60 truncate uppercase">{key.replace(/-/g, ' ')}</span>
-                                  <Button onClick={() => handleAddItem(type, key)} variant="outlineGlassy" size="sm" className="min-w-1">
+                                  <Button onClick={() => handleAddItem(type as ItemType, key)} variant="outlineGlassy" size="sm" className="min-w-1">
                                     <Plus className="h-4 w-4 mr-2" /> Add
                                   </Button>
                                 </div>
@@ -403,7 +403,7 @@ function EditCourseContent() {
                       </ScrollArea>
                       {totalPages > 1 && (
                         <div className="shrink-0 p-6 border-t border-white/10 bg-white/5 flex items-center justify-between px-10">
-                          <span className="text-xs font-bold text-white/20 uppercase tracking-[0.2em]">{meta.keys.length} Modules</span>
+                          <span className="text-xs font-bold text-white/20 uppercase tracking-[0.2em]">{meta.keys.length} Available</span>
                           <div className="flex items-center gap-4">
                             <Button
                               variant="ghost"
@@ -488,7 +488,7 @@ function EditCourseContent() {
   );
 }
 
-export default function EditCourseDayPage() {
+export default function EditDashboardPageBuilder() {
   return (
     <Suspense
       fallback={
@@ -497,7 +497,24 @@ export default function EditCourseDayPage() {
         </div>
       }
     >
-      <EditCourseContent />
+      <EditDashboardContent />
     </Suspense>
   );
 }
+
+const componentsData = [
+  {
+    name: 'Assignments',
+    collection: AllAssignments as Record<string, WidgetConfig>,
+    keys: AllAssignmentsKeys,
+    label: 'Assignments',
+    icon: GraduationCap,
+  },
+  {
+    name: 'Videos',
+    collection: AllVideos as Record<string, WidgetConfig>,
+    keys: AllVideosKeys,
+    label: 'Videos',
+    icon: Video,
+  },
+];
