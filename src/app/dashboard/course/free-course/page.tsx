@@ -165,6 +165,7 @@ const CourseBuilderPage = () => {
       setIsDeleteDialogOpen(false);
       setCourseToDelete(null);
       refetch();
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       toast.error('Failed to delete day');
     }
@@ -246,10 +247,10 @@ const CourseBuilderPage = () => {
           </motion.div>
 
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex gap-3">
-            <Button onClick={() => refetch()} variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/20 rounded-xl">
+            <Button onClick={() => refetch()} className="min-w-1" variant="outlineGlassy" size="sm">
               <RefreshCw className="h-4 w-4" />
             </Button>
-            <Button onClick={handleOpenAddDialog} className="bg-white text-black hover:bg-white/90 rounded-xl font-bold px-6">
+            <Button onClick={handleOpenAddDialog} className="min-w-1" variant="outlineGlassy" size="sm">
               <Plus className="h-4 w-4 mr-2 stroke-[3px]" />
               New Day
             </Button>
@@ -303,44 +304,19 @@ const CourseBuilderPage = () => {
                   </div>
 
                   <div className="p-4 bg-white/5 border-t border-white/10 grid grid-cols-5 gap-2">
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => handleOpenEditDialog(course)}
-                      className="text-white/60 hover:text-white hover:bg-white/10 rounded-xl"
-                    >
+                    <Button onClick={() => handleOpenEditDialog(course)} variant="outlineGlassy" size="sm" className="min-w-1">
                       <Edit size={18} />
                     </Button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => handleEdit(course._id)}
-                      className="text-white/60 hover:text-white hover:bg-white/10 rounded-xl"
-                    >
+                    <Button variant="outlineGlassy" size="sm" className="min-w-1" onClick={() => handleEdit(course._id)}>
                       <BookOpen size={18} />
                     </Button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => handlePreview(course._id)}
-                      className="text-white/60 hover:text-white hover:bg-white/10 rounded-xl"
-                    >
+                    <Button variant="outlineGlassy" size="sm" className="min-w-1" onClick={() => handlePreview(course._id)}>
                       <Eye size={18} />
                     </Button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => handleLiveLink(course.courseDay)}
-                      className="text-white/60 hover:text-white hover:bg-white/10 rounded-xl"
-                    >
+                    <Button variant="outlineGlassy" size="sm" className="min-w-1" onClick={() => handleLiveLink(course.courseDay)}>
                       <ExternalLink size={18} />
                     </Button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => initiateDelete(course)}
-                      className="text-red-400/60 hover:text-red-400 hover:bg-red-400/10 rounded-xl"
-                    >
+                    <Button variant="outlineFire" size="sm" className="min-w-1" onClick={() => initiateDelete(course)}>
                       <Trash2 size={18} />
                     </Button>
                   </div>
@@ -387,11 +363,11 @@ const CourseBuilderPage = () => {
               </select>
             </div>
           </div>
-          <DialogFooter className="gap-3 sm:gap-0">
-            <Button variant="ghost" onClick={() => setIsAddDialogOpen(false)} className="text-white/60 hover:text-white hover:bg-white/5 rounded-xl">
+          <DialogFooter className="gap-2 flex">
+            <Button onClick={() => setIsAddDialogOpen(false)} variant="outlineGlassy" size="sm" className="min-w-1">
               Discard
             </Button>
-            <Button onClick={handleSaveDay} disabled={!selectedDayNum || isAdding} className="bg-white text-black hover:bg-white/90 rounded-xl font-bold px-8">
+            <Button onClick={handleSaveDay} disabled={!selectedDayNum || isAdding} variant="outlineGlassy" size="sm" className="min-w-1">
               {isAdding ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'Confirm Day'}
             </Button>
           </DialogFooter>
