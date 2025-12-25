@@ -20,7 +20,7 @@ import {
   Layers,
   Sparkles,
   Box,
-  FileText,
+  Search,
 } from 'lucide-react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent, DragOverlay, DragStartEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -29,19 +29,54 @@ import { AllAssignments, AllAssignmentsKeys } from '@/components/course/assignme
 import { AllVideos, AllVideosKeys } from '@/components/course/video/all-video-index/all-video-index';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
 import { useGetCoursesQuery, useUpdateCourseMutation } from '@/redux/features/course/courseSlice';
-import { IconType } from 'react-icons/lib';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-type ItemType = 'assignment' | 'video' | 'documents';
+interface WidgetConfig {
+  query: ComponentType<{ data: string }>;
+  mutation: ComponentType<{ data: string; onSave: (data: unknown) => void }>;
+  data: unknown;
+  name?: string;
+}
+
+interface ComponentDataEntry {
+  name: string;
+  collection: Record<string, WidgetConfig>;
+  keys: string[];
+  label: string;
+  icon: any;
+  color: string;
+  activeColor: string;
+}
+
+const componentsData: ComponentDataEntry[] = [
+  {
+    name: 'Assignments',
+    collection: AllAssignments as Record<string, WidgetConfig>,
+    keys: AllAssignmentsKeys,
+    label: 'Assignments',
+    icon: GraduationCap,
+    color: 'text-emerald-400 from-emerald-500 to-teal-500',
+    activeColor: 'data-[state=active]:bg-emerald-500',
+  },
+  {
+    name: 'Videos',
+    collection: AllVideos as Record<string, WidgetConfig>,
+    keys: AllVideosKeys,
+    label: 'Videos',
+    icon: Video,
+    color: 'text-purple-400 from-purple-500 to-indigo-500',
+    activeColor: 'data-[state=active]:bg-purple-500',
+  },
+];
 
 interface CourseContent {
   id: string;
   key: string;
   name: string;
-  type: ItemType;
+  type: string;
   heading?: string;
   data: unknown;
   [key: string]: unknown;
@@ -55,67 +90,37 @@ interface ICourse {
   isActive: boolean;
 }
 
-interface WidgetConfig {
-  query: ComponentType<{ data: string }>;
-  mutation: ComponentType<{ data: string; onSave: (data: unknown) => void }>;
-  data: unknown;
-  name?: string;
-}
-
-interface ComponentMapEntry {
-  collection: Record<string, WidgetConfig>;
-  keys: string[];
-  label: string;
-  icon: IconType | any;
-  color: string;
-  activeColor: string;
-}
-
-const COMPONENT_MAP: Record<ItemType, ComponentMapEntry> = {
-  assignment: {
-    collection: AllAssignments as Record<string, WidgetConfig>,
-    keys: AllAssignmentsKeys,
-    label: 'Assignments',
-    icon: GraduationCap,
-    color: 'text-emerald-400 from-emerald-500 to-teal-500',
-    activeColor: 'data-[state=active]:bg-emerald-500',
-  },
-  video: {
-    collection: AllVideos as Record<string, WidgetConfig>,
-    keys: AllVideosKeys,
-    label: 'Videos',
-    icon: Video,
-    color: 'text-purple-400 from-purple-500 to-indigo-500',
-    activeColor: 'data-[state=active]:bg-purple-500',
-  },
-  documents: {
-    collection: AllVideos as Record<string, WidgetConfig>,
-    keys: AllVideosKeys,
-    label: 'Documents',
-    icon: FileText,
-    color: 'text-blue-400 from-blue-500 to-cyan-500',
-    activeColor: 'data-[state=active]:bg-blue-500',
-  },
-};
-
-const getTypeStyles = (type: ItemType) => {
+const getTypeStyles = (type: string) => {
+  const meta = componentsData.find(c => c.name === type);
+  if (meta?.name === 'Assignments') {
+    return {
+      border: 'border-emerald-500/20 hover:border-emerald-400/40',
+      bg: 'bg-white/5',
+      icon: 'text-emerald-400',
+      glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(16,185,129,0.2)]',
+    };
+  }
   return {
-    border: 'border-emerald-500/20 hover:border-emerald-400/40',
+    border: 'border-purple-500/20 hover:border-purple-400/40',
     bg: 'bg-white/5',
-    icon: 'text-emerald-400',
-    glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(16,185,129,0.2)]',
+    icon: 'text-purple-400',
+    glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(168,85,247,0.2)]',
   };
 };
 
 const SortableItem = ({ item, onEdit, onDelete }: { item: CourseContent; onEdit: (item: CourseContent) => void; onDelete: (item: CourseContent) => void }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id });
   const style = { transform: CSS.Transform.toString(transform), transition };
-  const config = COMPONENT_MAP[item.type]?.collection[item.key];
+  const styles = getTypeStyles(item.type);
+
+  const config = useMemo(() => {
+    const category = componentsData.find(c => c.name === item.type);
+    return category?.collection[item.key];
+  }, [item.type, item.key]);
 
   if (!config) return null;
 
   const ComponentToRender = config.query;
-  const styles = getTypeStyles(item.type);
 
   return (
     <motion.div
@@ -130,7 +135,7 @@ const SortableItem = ({ item, onEdit, onDelete }: { item: CourseContent; onEdit:
         className={`relative backdrop-blur-2xl transition-all duration-500 overflow-hidden rounded-[2rem] border ${styles.border} ${styles.bg} ${styles.glow} ${isDragging ? 'scale-105 shadow-2xl' : ''}`}
       >
         <div className="flex flex-col">
-          <div className="flex items-center justify-between p-4 border-b border-white/10 bg-white/5">
+          <div className="flex items-center justify-between p-4 border-b  ">
             <div className="flex items-center gap-3">
               <button
                 {...attributes}
@@ -187,6 +192,7 @@ function EditDashboardContent() {
   const [isWidgetDialogOpen, setIsWidgetDialogOpen] = useState(false);
   const [isDockExpanded, setIsDockExpanded] = useState(true);
   const [paginationPage, setPaginationPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
   const ITEMS_PER_PAGE = 6;
 
   useEffect(() => {
@@ -211,20 +217,31 @@ function EditDashboardContent() {
     setActiveId(null);
   };
 
-  const handleAddItem = (type: ItemType, key: string) => {
-    const mapEntry = COMPONENT_MAP[type];
-    const config = mapEntry.collection[key];
+  const handleAddItem = (type: string, key: string) => {
+    const category = componentsData.find(c => c.name === type);
+    if (!category) return;
+    const config = category.collection[key];
     const newItem: CourseContent = {
       id: `${type}-${key}-${Date.now()}`,
       key: key,
-      name: config.name || `${mapEntry.label} ${key}`,
+      name: config.name || `${category.label} ${key}`,
       type: type,
-      heading: `${mapEntry.label}: ${key.replace(/-/g, ' ')}`,
+      heading: `${category.label}: ${key.replace(/-/g, ' ')}`,
       data: config.data,
     };
     setItems(prev => [...prev, newItem]);
-    toast.success(`${mapEntry.label} added to timeline`);
+    toast.success(`${category.label} added to timeline`);
   };
+
+  const allComponents = useMemo(() => {
+    return componentsData.flatMap(cat => cat.keys.map(key => ({ ...cat, currentKey: key })));
+  }, []);
+
+  const filteredAllComponents = useMemo(() => {
+    return allComponents.filter(
+      item => item.currentKey.toLowerCase().includes(searchTerm.toLowerCase()) || item.name.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
+  }, [allComponents, searchTerm]);
 
   const onSubmitEdit = (updatedData: unknown) => {
     if (editingItem) setItems(prev => prev.map(i => (i.id === editingItem.id ? { ...i, data: updatedData } : i)));
@@ -242,13 +259,12 @@ function EditDashboardContent() {
     }
   };
 
-  if (isLoading) {
+  if (isLoading)
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-6">
-        <RefreshCw className="h-16 w-16 text-white/20 animate-spin" />
+      <div className="min-h-screen flex items-center justify-center">
+        <RefreshCw className="h-12 w-12 text-white/20 animate-spin" />
       </div>
     );
-  }
 
   if (error || !currentCourse) {
     return (
@@ -265,7 +281,7 @@ function EditDashboardContent() {
   }
 
   return (
-    <main className="min-h-screen pb-40 px-4 md:px-10 lg:px-16 pt-8 overflow-x-hidden">
+    <main className="min-h-screen pb-40 px-4 md:px-10 lg:px-16 pt-8 overflow-x-hidden bg-[#020617]">
       <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
         <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-purple-500/10 blur-[120px] animate-pulse" />
         <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-emerald-500/10 blur-[120px] animate-pulse delay-700" />
@@ -344,45 +360,69 @@ function EditDashboardContent() {
 
       <Dialog open={isWidgetDialogOpen} onOpenChange={setIsWidgetDialogOpen}>
         <DialogContent className="p-0 overflow-hidden bg-white/10 backdrop-blur-[50px] mt-8 border-white/20 shadow-2xl text-white flex flex-col max-w-[95vw] md:max-w-5xl h-[85vh] rounded border">
-          <Tabs defaultValue={Object.keys(COMPONENT_MAP)[0]} className="w-full h-full flex flex-col">
-            <div className="shrink-0 p-8 border-b border-white/10 bg-white/5">
+          <Tabs defaultValue="all" className="w-full h-full flex flex-col">
+            <div className="shrink-0 p-8 border-b  ">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
                   <DialogTitle className="text-3xl font-black text-white">Widgets Library</DialogTitle>
                   <p className="text-white/40 font-medium">Inject modules directly into your application timeline.</p>
                 </div>
-                <TabsList className="bg-white/5 border border-white/10 p-1 rounded-2xl h-14 overflow-x-auto flex-nowrap">
-                  {Object.entries(COMPONENT_MAP).map(([type, meta]) => (
-                    <TabsTrigger
-                      key={type}
-                      value={type}
-                      onClick={() => setPaginationPage(1)}
-                      className={`rounded-xl px-6 ${meta.activeColor} data-[state=active]:text-white font-bold transition-all whitespace-nowrap`}
-                    >
-                      <meta.icon className="h-4 w-4 mr-2 inline-block" />
-                      {meta.label}
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
+                <div className="flex flex-col gap-4">
+                  <div className="relative group">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20 group-focus-within:text-emerald-400 transition-colors" />
+                    <input
+                      value={searchTerm}
+                      onChange={e => setSearchTerm(e.target.value)}
+                      placeholder="Search..."
+                      className="bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-white/30 w-full md:w-64"
+                    />
+                  </div>
+                  <TabsList className="bg-white/5 border border-white/10 p-1 rounded-2xl h-14 overflow-x-auto flex-nowrap w-fit">
+                    {componentsData.length > 1 && (
+                      <TabsTrigger
+                        value="all"
+                        onClick={() => setPaginationPage(1)}
+                        className="rounded-xl px-6 data-[state=active]:bg-white/20 data-[state=active]:text-white font-bold transition-all whitespace-nowrap"
+                      >
+                        All
+                      </TabsTrigger>
+                    )}
+                    {componentsData.map(cat => (
+                      <TabsTrigger
+                        key={cat.name}
+                        value={cat.name}
+                        onClick={() => setPaginationPage(1)}
+                        className={`rounded-xl px-6 ${cat.activeColor} data-[state=active]:text-white font-bold transition-all whitespace-nowrap`}
+                      >
+                        <cat.icon className="h-4 w-4 mr-2 inline-block" />
+                        {cat.label}
+                      </TabsTrigger>
+                    ))}
+                  </TabsList>
+                </div>
               </div>
             </div>
 
-            {Object.entries(COMPONENT_MAP).map(([type, meta]) => (
-              <TabsContent key={type} value={type} className="flex-1 overflow-hidden m-0 outline-none">
+            {['all', ...componentsData.map(c => c.name)].map(tabVal => (
+              <TabsContent key={tabVal} value={tabVal} className="flex-1 overflow-hidden m-0 outline-none">
                 {(() => {
-                  const paginatedItems = meta.keys.slice((paginationPage - 1) * ITEMS_PER_PAGE, paginationPage * ITEMS_PER_PAGE);
-                  const totalPages = Math.ceil(meta.keys.length / ITEMS_PER_PAGE);
+                  const itemsToRender =
+                    tabVal === 'all'
+                      ? filteredAllComponents
+                      : componentsData.find(c => c.name === tabVal)?.keys.map(k => ({ ...componentsData.find(c => c.name === tabVal)!, currentKey: k })) || [];
+                  const paginatedItems = itemsToRender.slice((paginationPage - 1) * ITEMS_PER_PAGE, paginationPage * ITEMS_PER_PAGE);
+                  const totalPages = Math.ceil(itemsToRender.length / ITEMS_PER_PAGE);
 
                   return (
                     <div className="flex flex-col h-full">
                       <ScrollArea className="flex-1 p-8">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-12">
-                          {paginatedItems.map(key => {
-                            const config = meta.collection[key];
+                          {paginatedItems.map(item => {
+                            const config = item.collection[item.currentKey];
                             const Preview = config.query;
                             return (
                               <div
-                                key={key}
+                                key={`${item.name}-${item.currentKey}`}
                                 className="group relative bg-white/5 border border-white/10 rounded-[2rem] overflow-hidden hover:border-white/30 transition-all flex flex-col h-[320px]"
                               >
                                 <div className="relative flex-1 bg-black/20 overflow-hidden flex items-center justify-center p-4">
@@ -391,8 +431,8 @@ function EditDashboardContent() {
                                   </div>
                                 </div>
                                 <div className="p-5 bg-white/5 border-t border-white/10 flex items-center justify-between">
-                                  <span className="text-xs font-bold text-white/60 truncate uppercase">{key.replace(/-/g, ' ')}</span>
-                                  <Button onClick={() => handleAddItem(type as ItemType, key)} variant="outlineGlassy" size="sm" className="min-w-1">
+                                  <span className="text-xs font-bold text-white/60 truncate uppercase">{item.currentKey.replace(/-/g, ' ')}</span>
+                                  <Button onClick={() => handleAddItem(item.name, item.currentKey)} variant="outlineGlassy" size="sm" className="min-w-1">
                                     <Plus className="h-4 w-4 mr-2" /> Add
                                   </Button>
                                 </div>
@@ -402,8 +442,8 @@ function EditDashboardContent() {
                         </div>
                       </ScrollArea>
                       {totalPages > 1 && (
-                        <div className="shrink-0 p-6 border-t border-white/10 bg-white/5 flex items-center justify-between px-10">
-                          <span className="text-xs font-bold text-white/20 uppercase tracking-[0.2em]">{meta.keys.length} Available</span>
+                        <div className="shrink-0 p-6 border-t   flex items-center justify-between px-10">
+                          <span className="text-xs font-bold text-white/20 uppercase tracking-[0.2em]">{itemsToRender.length} Available</span>
                           <div className="flex items-center gap-4">
                             <Button
                               variant="ghost"
@@ -438,8 +478,8 @@ function EditDashboardContent() {
 
       <Dialog open={!!editingItem} onOpenChange={() => setEditingItem(null)}>
         <DialogContent className="max-w-[95vw] md:max-w-6xl h-[90vh] p-0 bg-white/10 backdrop-blur-3xl border-white/20 text-white flex flex-col rounded-[3rem] overflow-hidden border">
-          <div className="p-6 border-b border-white/10 bg-white/5 flex items-center gap-4 px-10 shrink-0">
-            <div className="p-3 bg-emerald-400/20 rounded-2xl">
+          <div className="p-6 border-b   flex items-center gap-4 px-10 shrink-0">
+            <div className="p-3   rounded-2xl">
               <Edit className="h-6 w-6 text-emerald-400" />
             </div>
             <DialogTitle className="text-2xl font-black">Refine Module</DialogTitle>
@@ -448,8 +488,9 @@ function EditDashboardContent() {
             <div className="p-10">
               {editingItem &&
                 (() => {
-                  const MutationComp = COMPONENT_MAP[editingItem.type].collection[editingItem.key].mutation;
-                  return <MutationComp data={JSON.stringify(editingItem.data)} onSave={onSubmitEdit} />;
+                  const cat = componentsData.find(c => c.name === editingItem.type);
+                  const MutationComp = cat?.collection[editingItem.key].mutation;
+                  return MutationComp ? <MutationComp data={JSON.stringify(editingItem.data)} onSave={onSubmitEdit} /> : null;
                 })()}
             </div>
           </ScrollArea>
@@ -488,7 +529,7 @@ function EditDashboardContent() {
   );
 }
 
-export default function EditDashboardPageBuilder() {
+export default function CourseBuilderPage() {
   return (
     <Suspense
       fallback={
@@ -501,20 +542,3 @@ export default function EditDashboardPageBuilder() {
     </Suspense>
   );
 }
-
-const componentsData = [
-  {
-    name: 'Assignments',
-    collection: AllAssignments as Record<string, WidgetConfig>,
-    keys: AllAssignmentsKeys,
-    label: 'Assignments',
-    icon: GraduationCap,
-  },
-  {
-    name: 'Videos',
-    collection: AllVideos as Record<string, WidgetConfig>,
-    keys: AllVideosKeys,
-    label: 'Videos',
-    icon: Video,
-  },
-];
