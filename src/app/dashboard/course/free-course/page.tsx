@@ -2,10 +2,12 @@
 
 import { useState, useMemo } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { Plus, Edit, Trash2, Eye, ExternalLink, GraduationCap, X, AlertTriangle, RefreshCw, Calendar, BookOpen, Layers } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Plus, Edit, Trash2, Eye, ExternalLink, GraduationCap, AlertTriangle, RefreshCw, BookOpen, Layers, LayoutGrid } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { useGetCoursesQuery, useAddCourseMutation, useUpdateCourseMutation, useDeleteCourseMutation } from '@/redux/features/course/courseSlice';
 import { toast } from 'sonner';
 
@@ -21,7 +23,6 @@ const CourseBuilderPage = () => {
   const pathname = usePathname();
   const router = useRouter();
 
-  // 1. Extract Course Category from URL
   const courseCategory = useMemo(() => {
     return pathname?.split('/').pop() || '';
   }, [pathname]);
@@ -30,7 +31,6 @@ const CourseBuilderPage = () => {
     return courseCategory.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
   }, [courseCategory]);
 
-  // 2. Fetch Data
   const {
     data: coursesData,
     isLoading,
@@ -46,46 +46,31 @@ const CourseBuilderPage = () => {
   const [updateCourse, { isLoading: isUpdating }] = useUpdateCourseMutation();
   const [deleteCourse] = useDeleteCourseMutation();
 
-  // 3. Derived State (Replaces the buggy useEffect/useState sync)
   const courses = useMemo(() => {
-    const rawCourses = coursesData?.courses || [];
-    console.log('coursesData', coursesData);
-    // Filter strictly by category to ensure we don't show mixed data
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const filtered = rawCourses.filter((item: any) => (item.courseName || '').toLowerCase() === courseCategory.toLowerCase());
+    const rawCourses = (coursesData as { courses?: ICourse[] })?.courses || [];
+    const filtered = rawCourses.filter(item => (item.courseName || '').toLowerCase() === courseCategory.toLowerCase());
 
-    // Sort by Day Number (Day 01, Day 02...)
-    return (
-      filtered
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .map((item: any) => ({
-          ...item,
-          _id: item._id,
-          isActive: item.isActive ?? true,
-          courseName: item.courseName,
-          courseDay: item.courseDay || 'Day 00',
-        }))
-        .sort((a: ICourse, b: ICourse) => {
-          const numA = parseInt(a.courseDay.replace(/\D/g, '')) || 0;
-          const numB = parseInt(b.courseDay.replace(/\D/g, '')) || 0;
-          return numA - numB;
-        })
-    );
+    return filtered
+      .map(item => ({
+        ...item,
+        isActive: item.isActive ?? true,
+        courseDay: item.courseDay || 'Day 00',
+      }))
+      .sort((a, b) => {
+        const numA = parseInt(a.courseDay.replace(/\D/g, '')) || 0;
+        const numB = parseInt(b.courseDay.replace(/\D/g, '')) || 0;
+        return numA - numB;
+      });
   }, [coursesData, courseCategory]);
 
-  // Modal States
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  // Selection States
   const [selectedCourseToEdit, setSelectedCourseToEdit] = useState<ICourse | null>(null);
   const [courseToDelete, setCourseToDelete] = useState<ICourse | null>(null);
-
-  // Form State
   const [selectedDayNum, setSelectedDayNum] = useState<string>('');
 
-  // Dropdown Logic
   const availableDays = useMemo(() => {
     return Array.from({ length: 100 }, (_, i) => {
       const num = i + 1;
@@ -95,11 +80,9 @@ const CourseBuilderPage = () => {
   }, []);
 
   const daysForDropdown = useMemo(() => {
-    const existingDays = new Set(courses.map((c: ICourse) => c.courseDay));
+    const existingDays = new Set(courses.map(c => c.courseDay));
     return availableDays.filter(d => !existingDays.has(d.label));
   }, [availableDays, courses]);
-
-  // --- HANDLERS ---
 
   const handleOpenAddDialog = () => {
     setSelectedDayNum('');
@@ -108,8 +91,6 @@ const CourseBuilderPage = () => {
 
   const handleOpenEditDialog = (course: ICourse) => {
     const { courseDay, courseName } = course || {};
-    console.log('courseDay : ', courseDay.replaceAll(' ', '-'));
-    console.log('courseName : ', courseName);
     window.open(`/dashboard/course/${courseName}/edit?courseDay=${courseDay.replaceAll(' ', '-')}&courseName=${courseName}`, '_blank');
   };
 
@@ -120,9 +101,7 @@ const CourseBuilderPage = () => {
     }
 
     const dayLabel = `Day ${selectedDayNum.padStart(2, '0')}`;
-
-    // Check duplicates locally
-    const exists = courses.some((c: ICourse) => c.courseDay === dayLabel);
+    const exists = courses.some(c => c.courseDay === dayLabel);
     if (exists) {
       toast.error(`${dayLabel} already exists!`);
       return;
@@ -139,10 +118,10 @@ const CourseBuilderPage = () => {
       toast.success(`${dayLabel} created successfully`);
       setIsAddDialogOpen(false);
       setSelectedDayNum('');
-      refetch(); // Force UI update
+      refetch();
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       toast.error('Failed to create day');
-      console.error(err);
     }
   };
 
@@ -150,7 +129,7 @@ const CourseBuilderPage = () => {
     if (!selectedCourseToEdit || !selectedDayNum) return;
 
     const dayLabel = `Day ${selectedDayNum.padStart(2, '0')}`;
-    const exists = courses.some((c: ICourse) => c.courseDay === dayLabel && c._id !== selectedCourseToEdit._id);
+    const exists = courses.some(c => c.courseDay === dayLabel && c._id !== selectedCourseToEdit._id);
 
     if (exists) {
       toast.error(`${dayLabel} already exists!`);
@@ -166,10 +145,10 @@ const CourseBuilderPage = () => {
       toast.success('Day updated successfully');
       setIsEditDialogOpen(false);
       setSelectedCourseToEdit(null);
-      refetch(); // Force UI update
+      refetch();
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       toast.error('Failed to update day');
-      console.error(err);
     }
   };
 
@@ -180,16 +159,14 @@ const CourseBuilderPage = () => {
 
   const confirmDelete = async () => {
     if (!courseToDelete?._id) return;
-
     try {
       await deleteCourse({ id: courseToDelete._id }).unwrap();
       toast.success('Day deleted successfully');
       setIsDeleteDialogOpen(false);
       setCourseToDelete(null);
-      refetch(); // Force UI update
+      refetch();
     } catch (err) {
       toast.error('Failed to delete day');
-      console.error(err);
     }
   };
 
@@ -197,18 +174,15 @@ const CourseBuilderPage = () => {
     if (!course._id) return;
     try {
       const updatedStatus = !course.isActive;
-      // Note: Since we use courses directly from data, optimistic updates require cache manipulation
-      // or we just wait for the re-fetch. For better UX, we just call API and refetch.
       await updateCourse({ id: course._id, isActive: updatedStatus }).unwrap();
       refetch();
       toast.success(`${course.courseDay} ${updatedStatus ? 'activated' : 'deactivated'}`);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       toast.error('Failed to update status');
-      console.error(err);
     }
   };
 
-  // Missing Handler from original code
   const handleEdit = (id: string) => {
     router.push(`/dashboard/course-builder/edit?id=${id}`);
   };
@@ -221,303 +195,278 @@ const CourseBuilderPage = () => {
     window.open(`/courses/${courseCategory}/${day.replace(/\s+/g, '-').toLowerCase()}`, '_blank');
   };
 
-  // --- RENDERING ---
-
   if (isLoading) {
     return (
-      <main className="min-h-screen  pb-20 px-4 md:px-8">
-        <div className="max-w-7xl mx-auto flex items-center justify-center min-h-[50vh]">
-          <div className="flex flex-col items-center gap-4 animate-in fade-in zoom-in-95 duration-500">
-            <GraduationCap className="h-12 w-12 text-indigo-400 animate-bounce" />
-            <div className="text-white text-xl font-semibold">Loading curriculum...</div>
+      <div className="min-h-screen flex flex-col items-center justify-center p-6">
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center gap-6">
+          <div className="relative">
+            <GraduationCap className="h-16 w-16 text-white/40 animate-pulse" />
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ repeat: Infinity, duration: 2, ease: 'linear' }}
+              className="absolute -inset-2 border-t-2 border-r-2 border-purple-400 rounded-full"
+            />
           </div>
-        </div>
-      </main>
+          <p className="text-white/60 font-medium tracking-widest uppercase text-sm">Building Curriculum...</p>
+        </motion.div>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <main className="min-h-screen  pb-20 px-4 md:px-8">
-        <div className="max-w-7xl mx-auto flex flex-col items-center justify-center min-h-[50vh] gap-6">
-          <AlertTriangle className="h-12 w-12 text-red-500" />
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-white">Connection Error</h2>
-            <p className="text-slate-400">Failed to load days for this course.</p>
-          </div>
-          <Button onClick={() => refetch()} variant="outline" className="gap-2 bg-white/5 text-white border-white/10 hover:bg-white/10">
-            <RefreshCw className="h-4 w-4" /> Retry
+      <div className="min-h-screen flex items-center justify-center p-6">
+        <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-3xl text-center max-w-md shadow-2xl">
+          <AlertTriangle className="h-12 w-12 text-red-400 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-white mb-2">Sync Failed</h2>
+          <p className="text-white/60 mb-6">We couldn&apos;t retrieve the course structure. Please check your connection.</p>
+          <Button onClick={() => refetch()} className="bg-white/10 hover:bg-white/20 text-white border border-white/20 w-full">
+            <RefreshCw className="h-4 w-4 mr-2" /> Retry Connection
           </Button>
         </div>
-      </main>
+      </div>
     );
   }
 
   return (
-    <main className="min-h-screen pb-20 px-4 md:px-8">
-      <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6 animate-in slide-in-from-top-4 duration-500">
-          <div>
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-indigo-500/20 rounded-lg">
-                <GraduationCap className="h-6 w-6 text-indigo-400" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold text-white tracking-tight">{formattedCategoryTitle}</h1>
-                <p className="text-slate-400 text-sm flex items-center gap-2">
-                  <span className="bg-indigo-500/10 text-indigo-300 px-2 py-0.5 rounded text-xs font-mono">{courseCategory}</span>
-                  <span>• Manage your curriculum days</span>
-                </p>
-              </div>
+    <main className="min-h-screen pb-20 px-4 md:px-10 lg:px-16 pt-8">
+      <div className="max-w-7xl mx-auto space-y-10">
+        <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="space-y-2">
+            <div className="flex items-center gap-3 text-purple-400 mb-1">
+              <LayoutGrid size={18} />
+              <span className="text-xs font-bold tracking-[0.2em] uppercase">Course Architecture</span>
             </div>
-          </div>
-          <div className="flex gap-3">
-            <Button onClick={() => refetch()} variant="outlineGlassy" size="sm">
+            <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight">{formattedCategoryTitle}</h1>
+            <p className="text-white/50 flex items-center gap-2 text-sm">
+              <span className="bg-white/10 px-2 py-0.5 rounded text-white/80 font-mono">{courseCategory}</span>
+              <span>•</span>
+              <span>{courses.length} active modules found</span>
+            </p>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex gap-3">
+            <Button onClick={() => refetch()} variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/20 rounded-xl">
               <RefreshCw className="h-4 w-4" />
             </Button>
-            <Button onClick={handleOpenAddDialog} variant="outlineGlassy" size="sm">
-              <Plus className="h-4 w-4" />
-              Add Day
+            <Button onClick={handleOpenAddDialog} className="bg-white text-black hover:bg-white/90 rounded-xl font-bold px-6">
+              <Plus className="h-4 w-4 mr-2 stroke-[3px]" />
+              New Day
             </Button>
-          </div>
-        </div>
+          </motion.div>
+        </header>
 
-        {/* Content Area */}
         {courses.length === 0 ? (
-          <div className="animate-in fade-in zoom-in-95 duration-700 flex flex-col items-center justify-center min-h-[40vh] border-2 border-dashed border-white/10 rounded-2xl bg-white/5 backdrop-blur-sm p-12">
-            <div className="w-20 h-20 rounded-full bg-slate-900/50 flex items-center justify-center mb-6 ring-4 ring-indigo-500/20">
-              <Calendar className="h-10 w-10 text-slate-400" />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col items-center justify-center min-h-[45vh] bg-white/5 backdrop-blur-md border border-white/10 rounded-[2.5rem] p-12 text-center"
+          >
+            <div className="w-24 h-24 bg-white/10 rounded-full flex items-center justify-center mb-6 border border-white/10">
+              <BookOpen className="h-10 w-10 text-white/40" />
             </div>
-            <h2 className="text-2xl font-bold text-white mb-2">No Days Created Yet</h2>
-            <p className="text-slate-400 mb-8 text-center max-w-sm">
-              Start building your <strong>{formattedCategoryTitle}</strong> course by adding Day 01.
-            </p>
-            <Button onClick={handleOpenAddDialog} variant="secondary" size="lg" className="gap-2">
-              <Plus className="h-4 w-4" /> Create First Day
+            <h2 className="text-2xl font-bold text-white mb-3">Empty Curriculum</h2>
+            <p className="text-white/50 mb-8 max-w-sm">No days have been structured for this course yet. Start by defining Day 01.</p>
+            <Button onClick={handleOpenAddDialog} size="lg" className="bg-white text-black hover:bg-white/90 rounded-2xl px-8 font-bold">
+              Add First Day
             </Button>
-          </div>
+          </motion.div>
         ) : (
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-2 text-slate-300">
-                <Layers className="h-5 w-5 text-indigo-400" />
-                <h2 className="text-lg font-semibold">Course Schedule</h2>
-                <span className="text-xs bg-white/10 px-2.5 py-0.5 rounded-full text-white font-mono">{courses.length} Days</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {courses.map((course: ICourse) => (
-                <div
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <AnimatePresence mode="popLayout">
+              {courses.map((course, index) => (
+                <motion.div
                   key={course._id}
-                  className={`
-                    relative group overflow-hidden rounded-xl border backdrop-blur-md transition-all duration-300 flex flex-col
-                    ${
-                      course.isActive
-                        ? 'bg-slate-900/60 border-white/10 hover:border-indigo-500/50 hover:shadow-lg hover:shadow-indigo-500/10'
-                        : 'bg-slate-900/30 border-white/5 opacity-70 grayscale-[0.5] hover:opacity-100 hover:grayscale-0'
-                    }
-                  `}
+                  layout
+                  initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ delay: index * 0.05 }}
+                  className={`group relative flex flex-col rounded-3xl border backdrop-blur-xl transition-all duration-500 overflow-hidden ${
+                    course.isActive
+                      ? 'bg-white/10 border-white/20 hover:border-white/40 shadow-2xl shadow-black/20'
+                      : 'bg-white/5 border-white/5 grayscale opacity-60'
+                  }`}
                 >
-                  {/* Decorative Gradient Bar */}
-                  <div
-                    className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500 transition-opacity duration-300 ${course.isActive ? 'opacity-100' : 'opacity-30'}`}
-                  />
-
-                  <div className="p-5 flex-1 flex flex-col gap-4">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`h-10 w-10 rounded-lg flex items-center justify-center font-bold text-lg shadow-inner ${course.isActive ? 'bg-indigo-500/20 text-indigo-400' : 'bg-slate-800 text-slate-500'}`}
-                        >
-                          {course.courseDay.replace(/\D/g, '')}
-                        </div>
-                        <div>
-                          <h3 className="font-bold text-slate-100 truncate text-lg leading-tight" title={course.courseDay}>
-                            {course.courseDay}
-                          </h3>
-                          <p className="text-xs text-slate-500 font-mono mt-0.5">Content Module</p>
-                        </div>
+                  <div className="p-6 flex-1 space-y-5">
+                    <div className="flex justify-between items-start">
+                      <div className="h-12 w-12 rounded-2xl bg-white/10 flex items-center justify-center border border-white/20">
+                        <span className="text-xl font-black text-white">{course.courseDay.replace(/\D/g, '')}</span>
                       </div>
-                      <Switch
-                        checked={course.isActive}
-                        onCheckedChange={() => handleToggleActive(course)}
-                        className="data-[state=checked]:bg-emerald-500 shrink-0"
-                      />
+                      <Switch checked={course.isActive} onCheckedChange={() => handleToggleActive(course)} className="data-[state=checked]:bg-emerald-400" />
+                    </div>
+
+                    <div>
+                      <h3 className="text-xl font-bold text-white leading-tight mb-1">{course.courseDay}</h3>
+                      <p className="text-xs text-white/40 font-medium tracking-wider uppercase">Content Module</p>
                     </div>
                   </div>
 
-                  {/* Actions Footer */}
-                  <div className="p-3 bg-white/5 border-t border-white/5 flex items-center justify-between gap-2">
-                    <div className="flex gap-1">
-                      <Button size="sm" className="min-w-1" variant="outlineGlassy" onClick={() => handleOpenEditDialog(course)} title="Edit Day">
-                        <Edit className="h-4 w-4" />
-                      </Button>
-
-                      <Button size="sm" className="min-w-1" variant="outlineGlassy" onClick={() => handleEdit(course._id)} title="Build Content">
-                        <BookOpen className="h-4 w-4" />
-                      </Button>
-
-                      <Button size="sm" className="min-w-1" variant="outlineGlassy" onClick={() => handlePreview(course._id)} title="Preview">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-
-                      <Button size="sm" className="min-w-1" variant="outlineGlassy" onClick={() => handleLiveLink(course.courseDay)} title="Visit Live">
-                        <ExternalLink className="h-4 w-4" />
-                      </Button>
-                    </div>
-
-                    <Button size="sm" className="min-w-1" variant="outlineGlassy" onClick={() => initiateDelete(course)} title="Delete Day">
-                      <Trash2 className="h-4 w-4" />
+                  <div className="p-4 bg-white/5 border-t border-white/10 grid grid-cols-5 gap-2">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => handleOpenEditDialog(course)}
+                      className="text-white/60 hover:text-white hover:bg-white/10 rounded-xl"
+                    >
+                      <Edit size={18} />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => handleEdit(course._id)}
+                      className="text-white/60 hover:text-white hover:bg-white/10 rounded-xl"
+                    >
+                      <BookOpen size={18} />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => handlePreview(course._id)}
+                      className="text-white/60 hover:text-white hover:bg-white/10 rounded-xl"
+                    >
+                      <Eye size={18} />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => handleLiveLink(course.courseDay)}
+                      className="text-white/60 hover:text-white hover:bg-white/10 rounded-xl"
+                    >
+                      <ExternalLink size={18} />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => initiateDelete(course)}
+                      className="text-red-400/60 hover:text-red-400 hover:bg-red-400/10 rounded-xl"
+                    >
+                      <Trash2 size={18} />
                     </Button>
                   </div>
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </AnimatePresence>
           </div>
         )}
       </div>
 
-      {/* --- ADD DAY MODAL --- */}
-      {isAddDialogOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className=" bg-purple-500/90 backdrop-blur-xl border border-white/20 rounded-2xl text-white transition-all duration-300l shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between p-5 border-b  ">
-              <h2 className="text-lg font-semibold text-white flex items-center gap-2">Add New Day</h2>
-              <Button variant="ghost" size="icon" onClick={() => setIsAddDialogOpen(false)} className="min-w-1">
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-
-            <div className="p-6 space-y-6">
-              <div className="  rounded-lg p-3 flex items-center gap-3">
-                <div className="p-2 bg-indigo-500/20 rounded-full">
-                  <Layers className="h-4 w-4 text-indigo-400" />
-                </div>
-                <div>
-                  <p className="text-xs text-indigo-300 font-semibold uppercase">Adding to Category</p>
-                  <p className="text-sm text-white font-medium">{formattedCategoryTitle}</p>
-                </div>
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent className="sm:max-w-[450px] bg-white/10 backdrop-blur-2xl border border-white/20 rounded-[2rem] text-white shadow-2xl p-8">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold flex items-center gap-3">
+              <div className="p-2 bg-white/10 rounded-xl border border-white/20">
+                <Plus size={20} className="text-purple-400" />
               </div>
-
-              <div className="space-y-2">
-                <Label className="text-slate-300">Select Day Number</Label>
-                <select
-                  className="w-full border border-white/10 rounded-lg px-3 py-2.5 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all appearance-none cursor-pointer"
-                  value={selectedDayNum}
-                  onChange={e => setSelectedDayNum(e.target.value)}
-                >
-                  <option value="" disabled>
-                    Select a day...
+              New Course Day
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6 py-6">
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center gap-4">
+              <Layers className="text-white/40" size={24} />
+              <div>
+                <Label className="text-[10px] uppercase tracking-widest text-white/40 block mb-0.5">Destination</Label>
+                <p className="font-semibold text-white/90">{formattedCategoryTitle}</p>
+              </div>
+            </div>
+            <div className="space-y-3">
+              <Label className="text-sm font-medium text-white/60 ml-1">Select Schedule Position</Label>
+              <select
+                className="w-full bg-white/10 border border-white/20 rounded-2xl px-4 py-4 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/40 transition-all appearance-none cursor-pointer"
+                value={selectedDayNum}
+                onChange={e => setSelectedDayNum(e.target.value)}
+              >
+                <option value="" disabled className="bg-slate-900">
+                  Choose a day...
+                </option>
+                {daysForDropdown.map(day => (
+                  <option key={day.value} value={day.value} className="bg-slate-900 text-white">
+                    {day.label}
                   </option>
-                  {daysForDropdown.map(day => (
-                    <option key={day.value} value={day.value} className="bg-slate-900 text-white py-1">
-                      {day.label}
-                    </option>
-                  ))}
-                  {daysForDropdown.length === 0 && <option disabled>All 100 days created!</option>}
-                </select>
-                <p className="text-xs text-slate-100">Only uncreated days are shown.</p>
-              </div>
-            </div>
-
-            <div className="p-5 bg-white/5 flex justify-end gap-3">
-              <Button variant="ghost" onClick={() => setIsAddDialogOpen(false)} size="sm">
-                Cancel
-              </Button>
-              <Button onClick={handleSaveDay} disabled={!selectedDayNum || isAdding} variant="outlineGlassy" size="sm">
-                {isAdding ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'Create Day'}
-              </Button>
+                ))}
+              </select>
             </div>
           </div>
-        </div>
-      )}
+          <DialogFooter className="gap-3 sm:gap-0">
+            <Button variant="ghost" onClick={() => setIsAddDialogOpen(false)} className="text-white/60 hover:text-white hover:bg-white/5 rounded-xl">
+              Discard
+            </Button>
+            <Button onClick={handleSaveDay} disabled={!selectedDayNum || isAdding} className="bg-white text-black hover:bg-white/90 rounded-xl font-bold px-8">
+              {isAdding ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'Confirm Day'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-      {/* --- EDIT DAY MODAL --- */}
-      {isEditDialogOpen && selectedCourseToEdit && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-slate-900 border border-white/10 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between p-5 border-b border-white/10 bg-white/5">
-              <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                <Edit className="h-4 w-4 text-blue-400" />
-                Edit Day
-              </h2>
-              <Button variant="ghost" size="icon" onClick={() => setIsEditDialogOpen(false)} className="min-w-1">
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-
-            <div className="p-6 space-y-6">
-              <div className="space-y-2">
-                <Label className="text-slate-300">Change Day Number</Label>
-                <select
-                  className="w-full bg-slate-950 border border-white/10 rounded-lg px-3 py-2.5 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all appearance-none cursor-pointer"
-                  value={selectedDayNum}
-                  onChange={e => setSelectedDayNum(e.target.value)}
-                >
-                  <option value={selectedCourseToEdit.courseDay.replace(/\D/g, '')} className="bg-slate-800 font-bold">
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[450px] bg-white/10 backdrop-blur-2xl border border-white/20 rounded-[2rem] text-white shadow-2xl p-8">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold flex items-center gap-3">
+              <div className="p-2 bg-white/10 rounded-xl border border-white/20">
+                <Edit size={20} className="text-blue-400" />
+              </div>
+              Update Sequence
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6 py-6">
+            <div className="space-y-3">
+              <Label className="text-sm font-medium text-white/60 ml-1">Relocate Day Number</Label>
+              <select
+                className="w-full bg-white/10 border border-white/20 rounded-2xl px-4 py-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/40 appearance-none cursor-pointer"
+                value={selectedDayNum}
+                onChange={e => setSelectedDayNum(e.target.value)}
+              >
+                {selectedCourseToEdit && (
+                  <option value={selectedCourseToEdit.courseDay.replace(/\D/g, '')} className="bg-slate-900">
                     {selectedCourseToEdit.courseDay} (Current)
                   </option>
-                  {availableDays.map(day => {
-                    const isTaken = courses.some((c: ICourse) => c.courseDay === day.label && c._id !== selectedCourseToEdit._id);
-                    if (isTaken) return null;
-                    return (
-                      <option key={day.value} value={day.value} className="bg-slate-900 text-white">
-                        {day.label}
-                      </option>
-                    );
-                  })}
-                </select>
-              </div>
-            </div>
-
-            <div className="p-5 bg-white/5 flex justify-end gap-3">
-              <Button variant="outlineGlassy" onClick={() => setIsEditDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleUpdateDay} disabled={isUpdating} variant="outlineGlassy">
-                {isUpdating ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'Save Changes'}
-              </Button>
+                )}
+                {availableDays.map(day => {
+                  const isTaken = courses.some(c => c.courseDay === day.label && c._id !== selectedCourseToEdit?._id);
+                  return isTaken ? null : (
+                    <option key={day.value} value={day.value} className="bg-slate-900">
+                      {day.label}
+                    </option>
+                  );
+                })}
+              </select>
             </div>
           </div>
-        </div>
-      )}
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setIsEditDialogOpen(false)} className="text-white/60 hover:text-white hover:bg-white/5 rounded-xl">
+              Cancel
+            </Button>
+            <Button onClick={handleUpdateDay} disabled={isUpdating} className="bg-blue-500 text-white hover:bg-blue-600 rounded-xl font-bold px-8 border-none">
+              {isUpdating ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'Save Position'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-      {/* --- DELETE CONFIRMATION --- */}
-      {isDeleteDialogOpen && courseToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-slate-900 border border-red-500/20 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between p-5 border-b border-white/10 bg-red-500/5">
-              <div className="flex items-center gap-2 text-red-400">
-                <AlertTriangle className="h-5 w-5" />
-                <h2 className="text-lg font-semibold">Delete Day?</h2>
-              </div>
-              <Button variant="ghost" size="icon" onClick={() => setIsDeleteDialogOpen(false)} className="min-w-1">
-                <X className="h-4 w-4" />
-              </Button>
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-[450px] bg-white/10 backdrop-blur-2xl border border-red-500/20 rounded-[2rem] text-white shadow-2xl p-8">
+          <DialogHeader>
+            <div className="mx-auto w-16 h-16 bg-red-500/10 border border-red-500/20 rounded-full flex items-center justify-center mb-4">
+              <Trash2 className="text-red-400" size={28} />
             </div>
-
-            <div className="p-6">
-              <p className="text-slate-300">
-                Are you sure you want to delete <span className="font-bold text-white">{courseToDelete.courseDay}</span>?
-              </p>
-              <div className="mt-3 bg-red-950/30 border border-red-500/10 rounded-lg p-3 text-sm text-red-300/80">
-                This will permanently remove the day and all associated content content blocks.
-              </div>
-            </div>
-
-            <div className="p-5 bg-white/5 flex justify-end gap-3">
-              <Button variant="outlineGlassy" onClick={() => setIsDeleteDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={confirmDelete} variant="outlineGlassy">
-                Delete Day
-              </Button>
-            </div>
+            <DialogTitle className="text-2xl font-bold text-center">Confirm Deletion</DialogTitle>
+          </DialogHeader>
+          <div className="text-center py-4">
+            <p className="text-white/60 leading-relaxed">
+              Are you sure you want to remove <span className="text-white font-bold">{courseToDelete?.courseDay}</span>? This will erase all content modules
+              nested within this day.
+            </p>
           </div>
-        </div>
-      )}
+          <DialogFooter className="flex-col sm:flex-row gap-3 mt-4">
+            <Button variant="ghost" onClick={() => setIsDeleteDialogOpen(false)} className="w-full text-white/60 hover:bg-white/5 rounded-xl">
+              Abort
+            </Button>
+            <Button onClick={confirmDelete} className="w-full bg-red-500 text-white hover:bg-red-600 rounded-xl font-bold py-6">
+              Delete Permanently
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 };
