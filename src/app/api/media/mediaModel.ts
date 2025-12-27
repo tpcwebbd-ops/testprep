@@ -23,6 +23,11 @@ const mediaSchema = new mongoose.Schema(
       enum: ['active', 'trash'],
       default: 'active',
     },
+    contentType: {
+      type: String,
+      enum: ['video', 'image', 'pdf', 'docx'],
+      default: 'image',
+    },
   },
   {
     timestamps: true,
