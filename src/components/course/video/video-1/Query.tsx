@@ -13,15 +13,15 @@ const Query = () => {
   const video = mockVideo1;
 
   return (
-    <div className="min-h-screen bg-slate-950 p-4 md:p-12 flex items-center justify-center">
+    <div className="min-h-screen   p-4 md:p-12 flex items-center justify-center">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
         className="w-full max-w-5xl"
       >
-        <Card className="relative overflow-hidden bg-slate-900/40 border-slate-800/60 backdrop-blur-2xl group">
-          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-transparent to-purple-500/5 opacity-50" />
+        <Card className="relative overflow-hidden   backdrop-blur-2xl group">
+          <div className="absolute inset-0      opacity-50" />
 
           <div className="relative grid grid-cols-1 lg:grid-cols-5 gap-0">
             <div className="lg:col-span-3 relative aspect-video bg-black overflow-hidden group/player">

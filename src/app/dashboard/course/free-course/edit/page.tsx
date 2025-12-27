@@ -71,15 +71,6 @@ const componentsData: ComponentDataEntry[] = [
     color: 'text-purple-400 from-purple-500 to-indigo-500',
     activeColor: 'data-[state=active]:bg-purple-500',
   },
-  {
-    name: 'Videos 2',
-    collection: AllVideos as Record<string, WidgetConfig>,
-    keys: AllVideosKeys,
-    label: 'Videos 2',
-    icon: Video,
-    color: 'text-purple-400 from-purple-500 to-indigo-500',
-    activeColor: 'data-[state=active]:bg-purple-500',
-  },
 ];
 
 interface CourseContent {
@@ -276,10 +267,10 @@ function EditDashboardContent() {
   }
 
   return (
-    <main className="min-h-screen pb-40 px-4 md:px-10 lg:px-16 pt-8 overflow-x-hidden bg-[#020617]">
+    <main className="min-h-screen pb-40 px-4 md:px-10 lg:px-16 pt-8 overflow-x-hidden  ">
       <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-purple-500/10 blur-[120px] animate-pulse" />
-        <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-emerald-500/10 blur-[120px] animate-pulse delay-700" />
+        <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full  blur-[120px] animate-pulse" />
+        <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full  blur-[120px] animate-pulse delay-700" />
       </div>
 
       <div className="relative z-10 max-w-5xl mx-auto">
@@ -370,7 +361,7 @@ function EditDashboardContent() {
                   <p className="text-white/40 font-medium">Inject modules directly into your application timeline.</p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <TabsList className="bg-white/5 border border-white/10 p-1 rounded-2xl h-14 w-fit">
+                  <TabsList className="bg-white/5 border border-white/10 p-1 rounded-2xl h-10 w-fit">
                     <TabsTrigger
                       value="all"
                       className="rounded-xl px-6 data-[state=active]:bg-white/20 data-[state=active]:text-white font-bold transition-all"
@@ -478,15 +469,15 @@ function EditDashboardContent() {
       </Dialog>
 
       <Dialog open={!!editingItem} onOpenChange={() => setEditingItem(null)}>
-        <DialogContent className="max-w-[95vw] md:max-w-6xl h-[90vh] p-0 bg-white/10 backdrop-blur-3xl border-white/20 text-white flex flex-col rounded-[3rem] overflow-hidden border">
-          <div className="p-6 border-b border-white/5 flex items-center gap-4 px-10 shrink-0">
-            <div className="p-3 rounded-2xl">
+        <DialogContent className="max-w-[95vw] md:max-w-6xl h-[85vh] mt-10 p-0 bg-white/10 backdrop-blur-3xl border-white/20 text-white flex flex-col overflow-hidden border">
+          <div className="px-6 border-b border-white/5 flex items-center gap-4 shrink-0">
+            <div className="p-3 ">
               <Edit className="h-6 w-6 text-emerald-400" />
             </div>
-            <DialogTitle className="text-2xl font-black">Refine Module</DialogTitle>
+            <DialogTitle className="text-2xl font-black">Edit {editingItem?.heading}</DialogTitle>
           </div>
-          <ScrollArea className="flex-1">
-            <div className="p-10">
+          <ScrollArea className="flex-1 py-4 h-[70vh]">
+            <div className="">
               {editingItem &&
                 (() => {
                   const cat = componentsData.find(c => c.name === editingItem.type);
