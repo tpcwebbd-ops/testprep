@@ -20,7 +20,6 @@ import {
   Layers,
   Sparkles,
   Box,
-  Search,
 } from 'lucide-react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent, DragOverlay, DragStartEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -29,10 +28,11 @@ import { AllAssignments, AllAssignmentsKeys } from '@/components/course/assignme
 import { AllVideos, AllVideosKeys } from '@/components/course/video/all-video-index/all-video-index';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
 import { useGetCoursesQuery, useUpdateCourseMutation } from '@/redux/features/course/courseSlice';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface WidgetConfig {
   query: ComponentType<{ data: string }>;
@@ -46,6 +46,7 @@ interface ComponentDataEntry {
   collection: Record<string, WidgetConfig>;
   keys: string[];
   label: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   icon: any;
   color: string;
   activeColor: string;
@@ -70,6 +71,15 @@ const componentsData: ComponentDataEntry[] = [
     color: 'text-purple-400 from-purple-500 to-indigo-500',
     activeColor: 'data-[state=active]:bg-purple-500',
   },
+  {
+    name: 'Videos 2',
+    collection: AllVideos as Record<string, WidgetConfig>,
+    keys: AllVideosKeys,
+    label: 'Videos 2',
+    icon: Video,
+    color: 'text-purple-400 from-purple-500 to-indigo-500',
+    activeColor: 'data-[state=active]:bg-purple-500',
+  },
 ];
 
 interface CourseContent {
@@ -90,16 +100,7 @@ interface ICourse {
   isActive: boolean;
 }
 
-const getTypeStyles = (type: string) => {
-  const meta = componentsData.find(c => c.name === type);
-  if (meta?.name === 'Assignments') {
-    return {
-      border: 'border-emerald-500/20 hover:border-emerald-400/40',
-      bg: 'bg-white/5',
-      icon: 'text-emerald-400',
-      glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(16,185,129,0.2)]',
-    };
-  }
+const getTypeStyles = () => {
   return {
     border: 'border-purple-500/20 hover:border-purple-400/40',
     bg: 'bg-white/5',
@@ -111,7 +112,7 @@ const getTypeStyles = (type: string) => {
 const SortableItem = ({ item, onEdit, onDelete }: { item: CourseContent; onEdit: (item: CourseContent) => void; onDelete: (item: CourseContent) => void }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id });
   const style = { transform: CSS.Transform.toString(transform), transition };
-  const styles = getTypeStyles(item.type);
+  const styles = getTypeStyles();
 
   const config = useMemo(() => {
     const category = componentsData.find(c => c.name === item.type);
@@ -135,7 +136,7 @@ const SortableItem = ({ item, onEdit, onDelete }: { item: CourseContent; onEdit:
         className={`relative backdrop-blur-2xl transition-all duration-500 overflow-hidden rounded-[2rem] border ${styles.border} ${styles.bg} ${styles.glow} ${isDragging ? 'scale-105 shadow-2xl' : ''}`}
       >
         <div className="flex flex-col">
-          <div className="flex items-center justify-between p-4 border-b  ">
+          <div className="flex items-center justify-between p-4 border-b border-white/5">
             <div className="flex items-center gap-3">
               <button
                 {...attributes}
@@ -192,7 +193,7 @@ function EditDashboardContent() {
   const [isWidgetDialogOpen, setIsWidgetDialogOpen] = useState(false);
   const [isDockExpanded, setIsDockExpanded] = useState(true);
   const [paginationPage, setPaginationPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [activeTab, setActiveTab] = useState('all');
   const ITEMS_PER_PAGE = 6;
 
   useEffect(() => {
@@ -236,12 +237,6 @@ function EditDashboardContent() {
   const allComponents = useMemo(() => {
     return componentsData.flatMap(cat => cat.keys.map(key => ({ ...cat, currentKey: key })));
   }, []);
-
-  const filteredAllComponents = useMemo(() => {
-    return allComponents.filter(
-      item => item.currentKey.toLowerCase().includes(searchTerm.toLowerCase()) || item.name.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
-  }, [allComponents, searchTerm]);
 
   const onSubmitEdit = (updatedData: unknown) => {
     if (editingItem) setItems(prev => prev.map(i => (i.id === editingItem.id ? { ...i, data: updatedData } : i)));
@@ -360,45 +355,51 @@ function EditDashboardContent() {
 
       <Dialog open={isWidgetDialogOpen} onOpenChange={setIsWidgetDialogOpen}>
         <DialogContent className="p-0 overflow-hidden bg-white/10 backdrop-blur-[50px] mt-8 border-white/20 shadow-2xl text-white flex flex-col max-w-[95vw] md:max-w-5xl h-[85vh] rounded border">
-          <Tabs defaultValue="all" className="w-full h-full flex flex-col">
-            <div className="shrink-0 p-8 border-b  ">
+          <Tabs
+            value={activeTab}
+            onValueChange={val => {
+              setActiveTab(val);
+              setPaginationPage(1);
+            }}
+            className="w-full h-full flex flex-col"
+          >
+            <div className="shrink-0 p-8 border-b border-white/5">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
                   <DialogTitle className="text-3xl font-black text-white">Widgets Library</DialogTitle>
                   <p className="text-white/40 font-medium">Inject modules directly into your application timeline.</p>
                 </div>
-                <div className="flex flex-col gap-4">
-                  <div className="relative group">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20 group-focus-within:text-emerald-400 transition-colors" />
-                    <input
-                      value={searchTerm}
-                      onChange={e => setSearchTerm(e.target.value)}
-                      placeholder="Search..."
-                      className="bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-white/30 w-full md:w-64"
-                    />
-                  </div>
-                  <TabsList className="bg-white/5 border border-white/10 p-1 rounded-2xl h-14 overflow-x-auto flex-nowrap w-fit">
-                    {componentsData.length > 1 && (
-                      <TabsTrigger
-                        value="all"
-                        onClick={() => setPaginationPage(1)}
-                        className="rounded-xl px-6 data-[state=active]:bg-white/20 data-[state=active]:text-white font-bold transition-all whitespace-nowrap"
-                      >
-                        All
-                      </TabsTrigger>
-                    )}
-                    {componentsData.map(cat => (
-                      <TabsTrigger
-                        key={cat.name}
-                        value={cat.name}
-                        onClick={() => setPaginationPage(1)}
-                        className={`rounded-xl px-6 ${cat.activeColor} data-[state=active]:text-white font-bold transition-all whitespace-nowrap`}
-                      >
-                        <cat.icon className="h-4 w-4 mr-2 inline-block" />
-                        {cat.label}
-                      </TabsTrigger>
-                    ))}
+                <div className="flex items-center gap-3">
+                  <TabsList className="bg-white/5 border border-white/10 p-1 rounded-2xl h-14 w-fit">
+                    <TabsTrigger
+                      value="all"
+                      className="rounded-xl px-6 data-[state=active]:bg-white/20 data-[state=active]:text-white font-bold transition-all"
+                    >
+                      All
+                    </TabsTrigger>
                   </TabsList>
+
+                  <Select
+                    value={activeTab === 'all' ? '' : activeTab}
+                    onValueChange={val => {
+                      setActiveTab(val);
+                      setPaginationPage(1);
+                    }}
+                  >
+                    <SelectTrigger className="w-[180px] h-14 bg-white/5 border-white/10 rounded-2xl font-bold text-white focus:ring-0">
+                      <SelectValue placeholder="Select Category" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-900 border-white/10 text-white rounded-xl">
+                      {componentsData.map(cat => (
+                        <SelectItem key={cat.name} value={cat.name} className="focus:bg-white/10 focus:text-white cursor-pointer py-3">
+                          <div className="flex items-center gap-2">
+                            <cat.icon className="h-4 w-4" />
+                            {cat.label}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </div>
@@ -408,7 +409,7 @@ function EditDashboardContent() {
                 {(() => {
                   const itemsToRender =
                     tabVal === 'all'
-                      ? filteredAllComponents
+                      ? allComponents
                       : componentsData.find(c => c.name === tabVal)?.keys.map(k => ({ ...componentsData.find(c => c.name === tabVal)!, currentKey: k })) || [];
                   const paginatedItems = itemsToRender.slice((paginationPage - 1) * ITEMS_PER_PAGE, paginationPage * ITEMS_PER_PAGE);
                   const totalPages = Math.ceil(itemsToRender.length / ITEMS_PER_PAGE);
@@ -442,7 +443,7 @@ function EditDashboardContent() {
                         </div>
                       </ScrollArea>
                       {totalPages > 1 && (
-                        <div className="shrink-0 p-6 border-t   flex items-center justify-between px-10">
+                        <div className="shrink-0 p-6 border-t border-white/5 flex items-center justify-between px-10">
                           <span className="text-xs font-bold text-white/20 uppercase tracking-[0.2em]">{itemsToRender.length} Available</span>
                           <div className="flex items-center gap-4">
                             <Button
@@ -478,8 +479,8 @@ function EditDashboardContent() {
 
       <Dialog open={!!editingItem} onOpenChange={() => setEditingItem(null)}>
         <DialogContent className="max-w-[95vw] md:max-w-6xl h-[90vh] p-0 bg-white/10 backdrop-blur-3xl border-white/20 text-white flex flex-col rounded-[3rem] overflow-hidden border">
-          <div className="p-6 border-b   flex items-center gap-4 px-10 shrink-0">
-            <div className="p-3   rounded-2xl">
+          <div className="p-6 border-b border-white/5 flex items-center gap-4 px-10 shrink-0">
+            <div className="p-3 rounded-2xl">
               <Edit className="h-6 w-6 text-emerald-400" />
             </div>
             <DialogTitle className="text-2xl font-black">Refine Module</DialogTitle>
