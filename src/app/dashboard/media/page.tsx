@@ -191,7 +191,7 @@ export default function MediaDashboard() {
       setUploadingType(null);
     }
   };
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleCompleteUpload = (res: any, type: MediaType) => {
     if (res && res[0]) {
       const newUrl = res[0].url;
@@ -500,21 +500,19 @@ export default function MediaDashboard() {
         </Dialog>
 
         <Dialog open={isPreviewDialogOpen} onOpenChange={setIsPreviewDialogOpen}>
-          <DialogContent className="sm:max-w-[90vw] md:max-w-[800px] h-fit max-h-[90vh] bg-slate-950/90 backdrop-blur-3xl border border-white/20 shadow-2xl rounded-3xl text-white overflow-hidden flex flex-col p-0">
+          <DialogContent className="sm:max-w-[90vw] md:max-w-[800px] h-fit max-h-[90vh] bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl rounded-2xl text-white overflow-hidden flex flex-col p-0">
             <DialogHeader className="p-6 border-b border-white/10 flex flex-row items-center justify-between">
               <div>
-                <DialogTitle className="text-xl font-black uppercase italic tracking-tighter truncate max-w-[500px]">
-                  {previewMedia?.name || 'Data Preview'}
-                </DialogTitle>
+                <DialogTitle className="text-lg font-semibold uppercase italic truncate max-w-[500px]">{previewMedia?.name || 'Data Preview'}</DialogTitle>
                 <DialogDescription className="text-[10px] font-bold text-white/40 uppercase tracking-widest">
                   {previewMedia?.contentType} Asset Stream
                 </DialogDescription>
               </div>
             </DialogHeader>
-            <div className="flex-1 bg-black/40 relative min-h-[400px] flex items-center justify-center p-4">
+            <div className="flex-1 bg-black/20 relative min-h-[400px] flex items-center justify-center p-4">
               {previewMedia?.contentType === 'image' && <Image src={previewMedia.url} alt="Preview" fill className="object-contain p-4" unoptimized />}
               {previewMedia?.contentType === 'video' && (
-                <video src={previewMedia.url} className="max-w-full max-h-full aspect-video rounded-lg" controls autoPlay />
+                <video src={previewMedia.url} className="max-w-full max-h-full aspect-video rounded-xl shadow-2xl border border-white/5" controls autoPlay />
               )}
               {previewMedia?.contentType === 'audio' && (
                 <div className="flex flex-col items-center gap-8 w-full">
@@ -544,7 +542,7 @@ export default function MediaDashboard() {
                 </div>
               )}
             </div>
-            <DialogFooter className="p-4 bg-white/5 border-t border-white/10 flex flex-row gap-3">
+            <DialogFooter className="p-4 border-t border-white/10 flex flex-row gap-3">
               <Button variant="ghost" onClick={() => setIsPreviewDialogOpen(false)} className="text-[10px] uppercase font-black tracking-widest text-white/40">
                 Close Signal
               </Button>
