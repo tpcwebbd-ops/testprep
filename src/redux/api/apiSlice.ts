@@ -38,6 +38,7 @@ export const apiSlice = createApi({
     'tagTypeCourse',
     'tagTypeResponseActions',
     'tagTypeDashboardBuilder',
+    'tagTypeMedia',
   ],
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({
