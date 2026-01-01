@@ -18,6 +18,7 @@ import {
   XIcon,
   Link,
   Save,
+  Edit2,
 } from 'lucide-react';
 import { IoReloadCircleOutline } from 'react-icons/io5';
 import { toast } from 'react-toastify';
@@ -25,10 +26,9 @@ import Image from 'next/image';
 
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 import { useGetMediasQuery, useAddMediaMutation, useUpdateMediaMutation, useDeleteMediaMutation } from '@/redux/features/media/mediaSlice';
@@ -40,7 +40,7 @@ interface MediaItem {
   _id: string;
   url: string;
   display_url?: string;
-  mediaType: MediaType;
+  contentType: MediaType;
   status: MediaStatus;
   createdAt: string;
   updatedAt: string;
@@ -54,15 +54,18 @@ export default function MediaDashboard() {
   const itemsPerPage = 10;
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingMedia, setEditingMedia] = useState<MediaItem | null>(null);
+
   const [newMedia, setNewMedia] = useState({
     url: '',
-    mediaType: 'image' as MediaType,
+    contentType: 'image' as MediaType,
     status: 'active' as MediaStatus,
   });
 
   const { data: response, isLoading, isFetching, refetch } = useGetMediasQuery({});
   const [addMedia, { isLoading: isAdding }] = useAddMediaMutation();
-  const [updateMedia] = useUpdateMediaMutation();
+  const [updateMedia, { isLoading: isUpdating }] = useUpdateMediaMutation();
   const [deleteMedia] = useDeleteMediaMutation();
 
   const items = useMemo<MediaItem[]>(() => response?.data || [], [response?.data]);
@@ -73,9 +76,31 @@ export default function MediaDashboard() {
       await addMedia(newMedia).unwrap();
       toast.success('Media added successfully');
       setIsAddDialogOpen(false);
-      setNewMedia({ url: '', mediaType: 'image', status: 'active' });
+      setNewMedia({ url: '', contentType: 'image', status: 'active' });
     } catch {
       toast.error('Failed to add media');
+    }
+  };
+
+  const openEditDialog = (item: MediaItem) => {
+    setEditingMedia(item);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleUpdateMedia = async () => {
+    if (!editingMedia || !editingMedia.url) return toast.error('URL is required');
+    try {
+      await updateMedia({
+        id: editingMedia._id,
+        url: editingMedia.url,
+        contentType: editingMedia.contentType,
+        status: editingMedia.status,
+      }).unwrap();
+      toast.success('Media updated successfully');
+      setIsEditDialogOpen(false);
+      setEditingMedia(null);
+    } catch {
+      toast.error('Failed to update media');
     }
   };
 
@@ -99,7 +124,7 @@ export default function MediaDashboard() {
 
   const filteredItems = useMemo<MediaItem[]>(() => {
     return items.filter((item: MediaItem) => {
-      const matchType = activeTab === 'all' || item.mediaType === activeTab;
+      const matchType = activeTab === 'all' || item.contentType === activeTab;
       const matchStatus = item.status === activeStatus;
       const matchSearch = item.url.toLowerCase().includes(searchQuery.toLowerCase());
       return matchType && matchStatus && matchSearch;
@@ -117,7 +142,7 @@ export default function MediaDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#020617] bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 p-4 md:p-8 text-white relative overflow-hidden">
+    <div className="min-h-screen rounded-md bg-clip-padding backdrop-filter backdrop-blur-[120px] bg-opacity-30 border border-gray-100/50 p-4 md:p-8 text-white relative overflow-hidden">
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] bg-blue-600/10 blur-[150px] rounded-full" />
         <div className="absolute bottom-[-20%] left-[-10%] w-[800px] h-[800px] bg-indigo-600/10 blur-[150px] rounded-full" />
@@ -127,45 +152,50 @@ export default function MediaDashboard() {
         <header className="flex flex-col gap-8">
           <div className="flex flex-col md:flex-row gap-6 justify-between items-center">
             <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} className="w-full flex flex-col gap-1">
-              <h1 className="text-5xl font-black uppercase tracking-tighter italic bg-gradient-to-r from-white to-white/40 bg-clip-text text-transparent">
-                Media Vault
+              <h1 className="flex items-end justify-start gap-4">
+                <span className="text-5xl text-clip font-black uppercase tracking-tighter italic bg-gradient-to-r from-white to-white/40 bg-clip-text text-transparent">
+                  Media
+                </span>
+                <small className="text-xs text-slate-200 font-normal">{filteredItems.length} Records</small>
               </h1>
-              <p className="text-[10px] uppercase tracking-[0.4em] font-bold text-indigo-400/60">Encrypted Asset Management • {filteredItems.length} Records</p>
             </motion.div>
 
             <div className="w-full flex flex-wrap gap-3 items-center justify-end">
               <Button
                 size="sm"
                 variant="outlineWater"
-                className="bg-white/5 backdrop-blur-2xl border-white/10 hover:bg-white/10 transition-all rounded-2xl px-6 h-12"
                 onClick={() => {
                   refetch();
                   toast.info('Vault Synchronized');
                 }}
                 disabled={isLoading || isFetching}
               >
-                <IoReloadCircleOutline className={`w-5 h-5 mr-2 ${isFetching ? 'animate-spin' : ''}`} /> Sync
+                <IoReloadCircleOutline className={`w-5 h-5 mr-2 ${isFetching ? 'animate-spin' : ''}`} /> Reload
               </Button>
 
               <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button size="sm" variant="outlineGarden" className="rounded-2xl px-6 h-12 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
-                    <Plus className="w-5 h-5 mr-2" /> Intake Asset
+                  <Button size="sm" variant="outlineGarden">
+                    <Plus className="w-5 h-5 mr-2" /> Add Media
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="bg-slate-950/90 backdrop-blur-[120px] border-white/10 text-white rounded-[3rem] sm:max-w-md shadow-2xl">
-                  <DialogHeader className="space-y-2">
-                    <DialogTitle className="text-3xl font-black uppercase italic tracking-tighter">New Registration</DialogTitle>
-                    <DialogDescription className="text-slate-500 font-medium">Link external cloud storage directly to your vault.</DialogDescription>
+                <DialogContent
+                  className="sm:max-w-[500px] bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl 
+                             rounded-2xl text-white transition-all duration-300"
+                >
+                  <DialogHeader className="border-b border-white/10 pb-3">
+                    <DialogTitle className="text-lg font-semibold tracking-wide text-white/90 uppercase italic">New Registration</DialogTitle>
+                    <DialogDescription className="text-white/50 text-xs font-medium">Link external cloud storage directly to your vault.</DialogDescription>
                   </DialogHeader>
                   <div className="space-y-6 py-6">
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-indigo-400/60 ml-1">Cloud URI</label>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-white/60 ml-1">Cloud URI</label>
                       <div className="relative group">
-                        <Link className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
+                        <Link className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 group-focus-within:text-white transition-colors" />
                         <Input
                           placeholder="https://cloud.storage/asset.webp"
-                          className="bg-white/5 border-white/10 pl-12 h-14 rounded-2xl focus:ring-indigo-500 transition-all"
+                          className="bg-white/10 border border-white/20 placeholder:text-white/30 text-white 
+                                     rounded-xl focus-visible:ring-0 focus:border-white/40 backdrop-blur-md pl-12 h-14"
                           value={newMedia.url}
                           onChange={e => setNewMedia({ ...newMedia, url: e.target.value })}
                         />
@@ -173,98 +203,159 @@ export default function MediaDashboard() {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-indigo-400/60 ml-1">Asset Classification</label>
-                        <Select value={newMedia.mediaType} onValueChange={(v: MediaType) => setNewMedia({ ...newMedia, mediaType: v })}>
-                          <SelectTrigger className="bg-white/5 border-white/10 h-14 rounded-2xl">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-white/60 ml-1">Classification</label>
+                        <Select value={newMedia.contentType} onValueChange={(v: MediaType) => setNewMedia({ ...newMedia, contentType: v })}>
+                          <SelectTrigger className="bg-white/10 border border-white/20 h-14 rounded-xl focus:ring-0 text-white/80">
                             <SelectValue placeholder="Type" />
                           </SelectTrigger>
-                          <SelectContent className="bg-slate-900 border-white/10 text-white rounded-2xl">
-                            <SelectItem value="image">Image Component</SelectItem>
-                            <SelectItem value="video">Cinematic Stream</SelectItem>
-                            <SelectItem value="pdf">Portable Document</SelectItem>
-                            <SelectItem value="docx">Legacy Word Doc</SelectItem>
+                          <SelectContent className="bg-slate-900/90 backdrop-blur-3xl border-white/10 text-white rounded-xl">
+                            <SelectItem value="image">Image</SelectItem>
+                            <SelectItem value="video">Video</SelectItem>
+                            <SelectItem value="pdf">PDF</SelectItem>
+                            <SelectItem value="docx">Word Doc</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                       <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-indigo-400/60 ml-1">Initial Permissions</label>
+                        <label className="text-[10px] font-black uppercase tracking-widest text-white/60 ml-1">Permissions</label>
                         <Select value={newMedia.status} onValueChange={(v: MediaStatus) => setNewMedia({ ...newMedia, status: v })}>
-                          <SelectTrigger className="bg-white/5 border-white/10 h-14 rounded-2xl">
+                          <SelectTrigger className="bg-white/10 border border-white/20 h-14 rounded-xl focus:ring-0 text-white/80">
                             <SelectValue placeholder="Status" />
                           </SelectTrigger>
-                          <SelectContent className="bg-slate-900 border-white/10 text-white rounded-2xl">
-                            <SelectItem value="active">Active Deployment</SelectItem>
-                            <SelectItem value="trash">Restricted Archive</SelectItem>
+                          <SelectContent className="bg-slate-900/90 backdrop-blur-3xl border-white/10 text-white rounded-xl">
+                            <SelectItem value="active">Active</SelectItem>
+                            <SelectItem value="trash">Trash</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                     </div>
-                    <Button
-                      className="w-full h-14 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-black uppercase tracking-[0.2em] text-xs shadow-xl transition-all"
-                      onClick={handleAddMedia}
-                      disabled={isAdding}
-                    >
+                  </div>
+                  <DialogFooter className="mt-4 border-t border-white/10 pt-4">
+                    <Button variant="outlineGlassy" size="sm" onClick={handleAddMedia} disabled={isAdding}>
                       {isAdding ? (
                         <Loader2 className="w-5 h-5 animate-spin" />
                       ) : (
                         <>
-                          <Save className="w-5 h-5 mr-3" /> Execute Deployment
+                          <Save className="w-5 h-5 mr-3" /> Submit
                         </>
                       )}
                     </Button>
-                  </div>
+                  </DialogFooter>
                 </DialogContent>
               </Dialog>
             </div>
           </div>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative w-full max-w-2xl group">
-            <Input
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              placeholder="Search by unique identifier or origin..."
-              className="bg-white/5 border-white/10 h-16 pl-14 rounded-3xl focus:ring-2 focus:ring-indigo-500/50 backdrop-blur-3xl transition-all text-lg font-medium"
-            />
-            <LayoutGrid className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-white/20 group-focus-within:text-indigo-400 transition-colors" />
-          </motion.div>
         </header>
 
-        <Tabs value={activeTab} onValueChange={v => setActiveTab(v as MediaType)} className="w-full">
-          <TabsList className="bg-white/5 border border-white/10 p-2 h-16 rounded-3xl backdrop-blur-3xl flex w-full max-w-4xl mx-auto overflow-x-auto no-scrollbar gap-2 shadow-inner">
-            {[
-              { id: 'all', label: 'Universal', icon: LayoutGrid },
-              { id: 'image', label: 'Images', icon: ImageIcon },
-              { id: 'video', label: 'Videos', icon: Video },
-              { id: 'pdf', label: 'PDFs', icon: FileText },
-              { id: 'docx', label: 'Docs', icon: FileCode },
-            ].map(tab => (
-              <TabsTrigger
-                key={tab.id}
-                value={tab.id}
-                className="flex-1 rounded-2xl data-[state=active]:bg-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-2xl transition-all duration-500 text-[10px] font-black uppercase tracking-widest gap-2 h-full"
-              >
-                <tab.icon className="w-4 h-4" />
-                <span className="hidden md:inline">{tab.label}</span>
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
+        {/* Edit Media Dialog */}
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent
+            className="sm:max-w-[500px] bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl 
+                       rounded-2xl text-white transition-all duration-300"
+          >
+            <DialogHeader className="border-b border-white/10 pb-3">
+              <DialogTitle className="text-lg font-semibold tracking-wide text-white/90 uppercase italic">Edit Asset</DialogTitle>
+              <DialogDescription className="text-white/50 text-xs font-medium">Modify the parameters of this stored digital signature.</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-6 py-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-white/60 ml-1">Cloud URI</label>
+                <div className="relative group">
+                  <Link className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 group-focus-within:text-white transition-colors" />
+                  <Input
+                    placeholder="Update URL"
+                    className="bg-white/10 border border-white/20 placeholder:text-white/30 text-white 
+                               rounded-xl focus-visible:ring-0 focus:border-white/40 backdrop-blur-md pl-12 h-14"
+                    value={editingMedia?.url || ''}
+                    onChange={e => editingMedia && setEditingMedia({ ...editingMedia, url: e.target.value })}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-white/60 ml-1">Classification</label>
+                  <Select
+                    value={editingMedia?.contentType}
+                    onValueChange={(v: MediaType) => editingMedia && setEditingMedia({ ...editingMedia, contentType: v })}
+                  >
+                    <SelectTrigger className="bg-white/10 border border-white/20 h-14 rounded-xl focus:ring-0 text-white/80">
+                      <SelectValue placeholder="Type" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-900/90 backdrop-blur-3xl border-white/10 text-white rounded-xl">
+                      <SelectItem value="image">Image</SelectItem>
+                      <SelectItem value="video">Video</SelectItem>
+                      <SelectItem value="pdf">PDF</SelectItem>
+                      <SelectItem value="docx">Word Doc</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-white/60 ml-1">Permissions</label>
+                  <Select value={editingMedia?.status} onValueChange={(v: MediaStatus) => editingMedia && setEditingMedia({ ...editingMedia, status: v })}>
+                    <SelectTrigger className="bg-white/10 border border-white/20 h-14 rounded-xl focus:ring-0 text-white/80">
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-900/90 backdrop-blur-3xl border-white/10 text-white rounded-xl">
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="trash">Trash</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+            <DialogFooter className="mt-4 border-t border-white/10 pt-4">
+              <Button variant="outlineGlassy" size="sm" onClick={handleUpdateMedia} disabled={isUpdating}>
+                {isUpdating ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <>
+                    <Save className="w-5 h-5 mr-3" /> Update Asset
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <div className="w-full gap-2 flex items-center justify-between">
+          <Tabs value={activeTab} onValueChange={v => setActiveTab(v as MediaType)}>
+            <TabsList className="bg-transparent gap-2">
+              {[
+                { id: 'all', label: 'All', icon: LayoutGrid },
+                { id: 'image', label: 'Images', icon: ImageIcon },
+                { id: 'video', label: 'Videos', icon: Video },
+                { id: 'pdf', label: 'PDFs', icon: FileText },
+                { id: 'docx', label: 'Docs', icon: FileCode },
+              ].map(tab => (
+                <TabsTrigger
+                  key={tab.id}
+                  value={tab.id}
+                  className="bg-linear-to-r from-blue-500/20 to-purple-500/20 border border-white/30 text-white/50 backdrop-blur-xl shadow-lg shadow-blue-500/20 hover:from-blue-500/30 hover:to-purple-500/30 h-8 hover:border-white/50 hover:shadow-xl hover:shadow-purple-500/30 hover:scale-[1.02] transition-all duration-300 data-[state=active]:border-white data-[state=active]:text-green-100 data-[state=active]:bg-green-400/20"
+                >
+                  <tab.icon className="w-4 h-4" />
+                  <span className="hidden md:inline">{tab.label}</span>
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative w-full max-w-2xl group">
+            <Input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search media..." className="pl-14" />
+            <LayoutGrid className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-white/20 group-focus-within:text-indigo-400 transition-colors" />
+          </motion.div>
+        </div>
 
         <section className="space-y-8 pb-20">
           <div className="flex items-center gap-4">
             {[
-              { id: 'active', label: 'Operational', icon: HardDrive },
-              { id: 'trash', label: 'Quarantine', icon: Trash2 },
+              { id: 'active', label: 'Active', icon: HardDrive },
+              { id: 'trash', label: 'Trash', icon: Trash2 },
             ].map(status => (
               <Button
                 key={status.id}
                 onClick={() => setActiveStatus(status.id as MediaStatus)}
-                variant="ghost"
-                className={`rounded-full px-8 h-12 border transition-all duration-500 gap-3 text-[10px] font-black uppercase tracking-[0.2em] ${
-                  activeStatus === status.id
-                    ? 'bg-indigo-500/20 border-indigo-500/50 text-indigo-300 shadow-lg'
-                    : 'border-white/5 text-white/30 hover:text-white hover:bg-white/5'
-                }`}
+                variant="outlineGlassy"
+                className={`bg-linear-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-xl shadow-lg shadow-blue-500/20 hover:from-blue-500/30 hover:to-purple-500/30 h-8 hover:border-white/50 hover:shadow-xl hover:shadow-purple-500/30 hover:scale-[1.02] transition-all duration-300 ${activeStatus === status.id ? ' border-green-50 text-green-50' : ' '}`}
               >
                 <status.icon className="w-4 h-4" /> {status.label}
               </Button>
@@ -283,7 +374,7 @@ export default function MediaDashboard() {
             )}
           </div>
 
-          <div className="min-h-[600px] w-full bg-white/5 border border-white/10 rounded-[4rem] backdrop-blur-[150px] p-8 md:p-12 transition-all relative">
+          <div className="min-h-[600px] w-full transition-all relative">
             <AnimatePresence mode="wait">
               {isLoading || isFetching ? (
                 <motion.div
@@ -311,9 +402,9 @@ export default function MediaDashboard() {
                         transition={{ duration: 0.5, delay: idx * 0.05 }}
                         className="group"
                       >
-                        <Card className="bg-slate-900/40 border-white/10 rounded-[2.5rem] overflow-hidden hover:border-indigo-500/50 transition-all duration-700 hover:shadow-[0_40px_80px_rgba(79,70,229,0.25)] relative">
+                        <div className="bg-slate-900/40 border-white/10 overflow-hidden hover:border-indigo-500/50 transition-all duration-700 hover:shadow-[0_40px_80px_rgba(79,70,229,0.25)] relative">
                           <div className="relative aspect-square">
-                            {item.mediaType === 'video' ? (
+                            {item.contentType === 'video' ? (
                               <video
                                 src={item.url}
                                 className="w-full h-full object-cover"
@@ -337,41 +428,53 @@ export default function MediaDashboard() {
                             <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-6">
                               <div className="flex gap-4 justify-center items-center">
                                 {item.status === 'active' ? (
-                                  <Button
-                                    size="icon"
-                                    onClick={() => handleUpdateStatus(item._id, 'trash')}
-                                    className="h-12 w-12 rounded-2xl bg-amber-500/20 hover:bg-amber-500 text-amber-500 hover:text-white backdrop-blur-xl transition-all shadow-xl"
-                                  >
-                                    <Trash2 className="w-6 h-6" />
-                                  </Button>
+                                  <div className="w-full flex gap-2">
+                                    <Button
+                                      size="sm"
+                                      onClick={() => openEditDialog(item)}
+                                      variant="outlineGlassy"
+                                      className="flex items-center justify-start gap-2"
+                                    >
+                                      <Edit2 className="w-6 h-6" /> Edit
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      onClick={() => handleUpdateStatus(item._id, 'trash')}
+                                      variant="outlineFire"
+                                      className="flex items-center justify-start gap-2 pl-2"
+                                    >
+                                      <Trash2 className="w-6 h-6" /> Delete
+                                    </Button>
+                                  </div>
                                 ) : (
-                                  <>
+                                  <div className="w-full flex flex-col gap-2">
                                     <Button
-                                      size="icon"
+                                      size="sm"
                                       onClick={() => handleUpdateStatus(item._id, 'active')}
-                                      className="h-12 w-12 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white shadow-2xl"
+                                      variant="outlineGlassy"
+                                      className="flex items-center justify-start gap-2"
                                     >
-                                      <CheckCircle className="w-6 h-6" />
+                                      <CheckCircle className="w-6 h-6" /> Restore
                                     </Button>
                                     <Button
-                                      size="icon"
-                                      variant="destructive"
+                                      size="sm"
                                       onClick={() => handleDelete(item._id)}
-                                      className="h-12 w-12 rounded-2xl shadow-2xl"
+                                      variant="outlineFire"
+                                      className="flex items-center justify-start gap-2"
                                     >
-                                      <AlertCircle className="w-6 h-6" />
+                                      <AlertCircle className="w-6 h-6" /> Permanently Delete
                                     </Button>
-                                  </>
+                                  </div>
                                 )}
                               </div>
                             </div>
                             <div className="absolute top-5 left-5">
                               <Badge className="bg-indigo-600/90 text-[8px] uppercase font-black px-4 py-1.5 border-none shadow-2xl rounded-full tracking-widest">
-                                {item.mediaType}
+                                {item.contentType}
                               </Badge>
                             </div>
                           </div>
-                        </Card>
+                        </div>
                       </motion.div>
                     ))}
                   </AnimatePresence>
