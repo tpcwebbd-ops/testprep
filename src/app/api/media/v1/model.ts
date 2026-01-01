@@ -10,6 +10,10 @@ const mediaSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    name: {
+      type: String,
+      trim: true,
+    },
     url: {
       type: String,
       trim: true,
