@@ -19,7 +19,6 @@ import {
   Link,
   Save,
   Edit2,
-  UploadCloud,
 } from 'lucide-react';
 import { IoReloadCircleOutline } from 'react-icons/io5';
 import { toast } from 'react-toastify';
@@ -70,7 +69,7 @@ export default function MediaDashboard() {
   const [updateMedia, { isLoading: isUpdating }] = useUpdateMediaMutation();
   const [deleteMedia] = useDeleteMediaMutation();
 
-  const [isAddImageLoading, setIsAddImageLoading] = useState(true);
+  const [isAddImageLoading, setIsAddImageLoading] = useState(false);
   const items = useMemo<MediaItem[]>(() => response?.data || [], [response?.data]);
 
   const handleAddMedia = async () => {
@@ -230,40 +229,118 @@ export default function MediaDashboard() {
                     <DialogTitle className="text-lg font-semibold tracking-wide text-white/90 uppercase italic">Import Media</DialogTitle>
                     <DialogDescription className="text-white/50 text-xs font-medium">Choose a media file to import.</DialogDescription>
                   </DialogHeader>
-                  <div className="space-y-6 py-6">
-                    <div className="w-full grid grid-cols-2 gap-2">
-                      <header className="flex justify-between items-center border-b border-white/10 pb-3 mb-4">
-                        <h2 className="text-white/90 font-semibold">Select an Image</h2>
-                        <Button
-                          asChild
-                          variant="outline"
-                          className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20 transition mr-8 text-white/90"
+                  {newMedia.url ? (
+                    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="space-y-6 py-6">
+                      <div className="relative group aspect-video w-full rounded-2xl overflow-hidden bg-white/5 border border-white/20 flex items-center justify-center backdrop-blur-md">
+                        {newMedia.contentType === 'image' && <Image src={newMedia.url} alt="Preview" fill className="object-contain p-2" unoptimized />}
+                        {newMedia.contentType === 'video' && <video src={newMedia.url} className="w-full h-full object-contain" controls />}
+                        {(newMedia.contentType === 'pdf' || newMedia.contentType === 'docx') && (
+                          <div className="flex flex-col items-center gap-3">
+                            {newMedia.contentType === 'pdf' ? (
+                              <FileText className="w-16 h-16 text-red-400/60" />
+                            ) : (
+                              <FileCode className="w-16 h-16 text-blue-400/60" />
+                            )}
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-white/40 truncate max-w-[200px]">
+                              {newMedia.url.split('/').pop()}
+                            </span>
+                          </div>
+                        )}
+
+                        <button
+                          onClick={() => setNewMedia({ ...newMedia, url: '' })}
+                          className="absolute top-3 right-3 p-2 bg-red-500/20 hover:bg-red-500 text-white rounded-full backdrop-blur-md transition-all opacity-0 group-hover:opacity-100"
                         >
-                          <label htmlFor="single-image-upload" className="cursor-pointer flex items-center gap-2">
-                            <UploadCloud className="w-4 h-4" />
-                            Upload
-                          </label>
-                        </Button>
-                        <Input
-                          id="single-image-upload"
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={handleImageUpload}
-                          disabled={isAddImageLoading || isLoading}
-                        />
-                      </header>
-                      <Button variant="outlineGlassy" size="xl">
-                        Videos
-                      </Button>
-                      <Button variant="outlineGlassy" size="xl">
-                        Pdf
-                      </Button>
-                      <Button variant="outlineGlassy" size="xl">
-                        Docs
-                      </Button>
+                          <XIcon className="w-4 h-4" />
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black uppercase tracking-widest text-white/60 ml-1">Change Type</label>
+                          <Select value={newMedia.contentType} onValueChange={(v: MediaType) => setNewMedia({ ...newMedia, contentType: v })}>
+                            <SelectTrigger className="bg-white/10 border border-white/20 h-12 rounded-xl focus:ring-0 text-white/80">
+                              <SelectValue placeholder="Type" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-slate-900/90 backdrop-blur-3xl border-white/10 text-white rounded-xl">
+                              <SelectItem value="image">Image</SelectItem>
+                              <SelectItem value="video">Video</SelectItem>
+                              <SelectItem value="pdf">PDF</SelectItem>
+                              <SelectItem value="docx">Word Doc</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black uppercase tracking-widest text-white/60 ml-1">Permissions</label>
+                          <Select value={newMedia.status} onValueChange={(v: MediaStatus) => setNewMedia({ ...newMedia, status: v })}>
+                            <SelectTrigger className="bg-white/10 border border-white/20 h-12 rounded-xl focus:ring-0 text-white/80">
+                              <SelectValue placeholder="Status" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-slate-900/90 backdrop-blur-3xl border-white/10 text-white rounded-xl">
+                              <SelectItem value="active">Active</SelectItem>
+                              <SelectItem value="trash">Trash</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ) : (
+                    <div className="space-y-6 py-8">
+                      <div className="grid grid-cols-2 gap-4">
+                        <label
+                          htmlFor="single-image-upload"
+                          className={`
+          flex flex-col items-center justify-center gap-3 p-8 rounded-2xl cursor-pointer
+          bg-linear-to-br from-white/5 to-white/[0.02] border border-white/10 backdrop-blur-xl 
+          hover:border-white/40 hover:bg-white/10 transition-all duration-500 group
+          ${isAddImageLoading ? 'opacity-50 cursor-wait' : ''}
+        `}
+                        >
+                          {isAddImageLoading ? (
+                            <Loader2 className="w-8 h-8 text-indigo-400 animate-spin" />
+                          ) : (
+                            <ImageIcon className="w-8 h-8 text-white/20 group-hover:text-white transition-colors" />
+                          )}
+                          <span className="text-[10px] font-black uppercase tracking-[0.2em]">Upload Image</span>
+                          <input
+                            id="single-image-upload"
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleImageUpload}
+                            disabled={isAddImageLoading || isLoading}
+                          />
+                        </label>
+
+                        <label
+                          htmlFor="single-image-upload"
+                          className={`flex flex-col items-center justify-center gap-3 p-8 rounded-2xl cursor-pointer          bg-linear-to-br from-white/5 to-white/[0.02] order border-white/10 backdrop-blur-xl           hover:border-white/40 hover:bg-white/10 transition-all duration-500 group`}
+                          onClick={() => setNewMedia({ ...newMedia, contentType: 'video', url: 'https://' })}
+                        >
+                          <Video className="w-8 h-8 text-white/20 group-hover:text-white transition-colors" />
+                          <span className="text-[10px] font-black uppercase tracking-[0.2em]">Link Video</span>
+                        </label>
+
+                        <label
+                          htmlFor="single-image-upload"
+                          className={`flex flex-col items-center justify-center gap-3 p-8 rounded-2xl cursor-pointer          bg-linear-to-br from-white/5 to-white/[0.02] order border-white/10 backdrop-blur-xl           hover:border-white/40 hover:bg-white/10 transition-all duration-500 group`}
+                          onClick={() => setNewMedia({ ...newMedia, contentType: 'pdf', url: 'https://' })}
+                        >
+                          <FileText className="w-8 h-8 text-white/20 group-hover:text-white transition-colors" />
+                          <span className="text-[10px] font-black uppercase tracking-[0.2em]">Link PDF</span>
+                        </label>
+
+                        <label
+                          htmlFor="single-image-upload"
+                          className={`flex flex-col items-center justify-center gap-3 p-8 rounded-2xl cursor-pointer          bg-linear-to-br from-white/5 to-white/[0.02] order border-white/10 backdrop-blur-xl           hover:border-white/40 hover:bg-white/10 transition-all duration-500 group`}
+                          onClick={() => setNewMedia({ ...newMedia, contentType: 'docx', url: 'https://' })}
+                        >
+                          <FileCode className="w-8 h-8 text-white/20 group-hover:text-white transition-colors" />
+                          <span className="text-[10px] font-black uppercase tracking-[0.2em]">Link Doc</span>
+                        </label>
+                      </div>
                     </div>
-                  </div>
+                  )}
                   <DialogFooter className="mt-4 border-t border-white/10 pt-4">
                     <Button variant="outlineGlassy" size="sm" onClick={handleAddMedia} disabled={isAdding}>
                       {isAdding ? (
