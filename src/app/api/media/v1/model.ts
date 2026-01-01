@@ -25,7 +25,7 @@ const mediaSchema = new mongoose.Schema(
     },
     contentType: {
       type: String,
-      enum: ['video', 'image', 'pdf', 'docx'],
+      enum: ['video', 'image', 'pdf', 'docx', 'audio'],
       default: 'image',
     },
   },

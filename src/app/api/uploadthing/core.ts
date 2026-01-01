@@ -2,14 +2,11 @@ import { createUploadthing, type FileRouter } from 'uploadthing/next';
 import { UploadThingError } from 'uploadthing/server';
 
 const f = createUploadthing();
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const auth = async (req: Request) => {
-  // Replace with your actual auth/session logic
   return { id: 'fakeUserId' };
 };
 
-// --- FILE ROUTER DEFINITION ---
 export const ourFileRouter = {
   /* =======================
    * 📄 Document Uploader (.doc / .docx)
@@ -41,7 +38,6 @@ export const ourFileRouter = {
       //     fileSize: file.size,
       //   },
       // });
-
       return {
         uploadedBy: metadata.userId,
         fileUrl: file.ufsUrl,
@@ -80,7 +76,6 @@ export const ourFileRouter = {
       //     fileSize: file.size,
       //   },
       // });
-
       return {
         uploadedBy: metadata.userId,
         fileUrl: file.ufsUrl,
@@ -119,7 +114,52 @@ export const ourFileRouter = {
       //     fileSize: file.size,
       //   },
       // });
+      return {
+        uploadedBy: metadata.userId,
+        fileUrl: file.ufsUrl,
+        fileName: file.name,
+        fileType: file.type,
+      };
+    }),
 
+  /* =======================
+   * 🎵 Audio Uploader (.mp3 / .wav / .ogg / etc.)
+   * ======================= */
+  audioUploader: f({
+    audio: {
+      maxFileSize: '1GB',
+      maxFileCount: 3,
+    },
+  })
+    .middleware(async ({ req }) => {
+      const user = await auth(req);
+      if (!user) throw new UploadThingError('Unauthorized');
+      return { userId: user.id };
+    })
+    .onUploadComplete(async ({ metadata, file }) => {
+      return {
+        uploadedBy: metadata.userId,
+        fileUrl: file.ufsUrl,
+        fileName: file.name,
+        fileType: file.type,
+      };
+    }),
+
+  /* =======================
+   * 📝 Docx Uploader (Alias for documentUploader)
+   * ======================= */
+  docxUploader: f({
+    blob: {
+      maxFileSize: '1GB',
+      maxFileCount: 3,
+    },
+  })
+    .middleware(async ({ req }) => {
+      const user = await auth(req);
+      if (!user) throw new UploadThingError('Unauthorized');
+      return { userId: user.id };
+    })
+    .onUploadComplete(async ({ metadata, file }) => {
       return {
         uploadedBy: metadata.userId,
         fileUrl: file.ufsUrl,
@@ -129,5 +169,4 @@ export const ourFileRouter = {
     }),
 } satisfies FileRouter;
 
-// --- Export router type for client ---
 export type OurFileRouter = typeof ourFileRouter;
