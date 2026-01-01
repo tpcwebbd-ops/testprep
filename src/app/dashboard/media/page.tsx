@@ -62,6 +62,8 @@ export default function MediaDashboard() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingMedia, setEditingMedia] = useState<MediaItem | null>(null);
 
+  const [uploadingType, setUploadingType] = useState<MediaType | null>(null);
+
   const [newMedia, setNewMedia] = useState({
     url: '',
     contentType: 'image' as MediaType,
@@ -145,36 +147,27 @@ export default function MediaDashboard() {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-  const [isUploading, setIsUploading] = useState(false);
-  const maxSizeMBImage = 1;
-  const maxWidthOrHeightImage = 1920;
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
+    setUploadingType('image');
     try {
       const options = {
-        maxSizeMBImage,
-        maxWidthOrHeightImage,
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1920,
         useWebWorker: true,
-        fileType: 'image/jpeg' as const,
       };
-
       const compressedFile = await imageCompression(file, options);
-
       const formData = new FormData();
       formData.append('image', compressedFile);
-
-      const response = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_IMGBB_API_KEY}`, {
+      const res = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_IMGBB_API_KEY}`, {
         method: 'POST',
         body: formData,
       });
-
-      const data = await response.json();
+      const data = await res.json();
       if (data.success) {
-        const newImageUrl = data.data.url;
-        await addMedia({ url: newImageUrl, contentType: 'image', status: 'active' }).unwrap();
+        await addMedia({ url: data.data.url, contentType: 'image', status: 'active' }).unwrap();
         toast.success('Image uploaded successfully!');
         setIsAddDialogOpen(false);
       } else {
@@ -184,15 +177,15 @@ export default function MediaDashboard() {
       toast.error(error instanceof Error ? error.message : 'Cannot upload the image.');
     } finally {
       e.target.value = '';
+      setUploadingType(null);
     }
   };
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleCompleteUpload = (res: any, type: MediaType) => {
     if (res && res[0]) {
       const newUrl = res[0].url;
       addMedia({ url: newUrl, contentType: type, status: 'active' }).unwrap();
-      setIsUploading(false);
+      setUploadingType(null);
       setIsAddDialogOpen(false);
       toast.success(`${type.toUpperCase()} asset registered`);
     }
@@ -313,28 +306,45 @@ export default function MediaDashboard() {
                             flex flex-col items-center justify-center gap-3 p-8 rounded-2xl cursor-pointer
                             bg-linear-to-br from-white/5 to-white/[0.02] border border-white/10 backdrop-blur-xl 
                             hover:border-white/40 hover:bg-white/10 transition-all duration-500 group
-                            ${isLoading ? 'opacity-50 cursor-wait' : ''}
+                            ${uploadingType === 'image' ? 'opacity-50 cursor-wait' : ''}
                           `}
                         >
-                          {isLoading ? (
+                          {uploadingType === 'image' ? (
                             <Loader2 className="w-8 h-8 text-indigo-400 animate-spin" />
                           ) : (
                             <ImageIcon className="w-8 h-8 text-white/20 group-hover:text-white transition-colors" />
                           )}
                           <span className="text-[10px] font-black uppercase tracking-[0.2em]">Upload Image</span>
-                          <input id="single-image-upload" type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={isLoading} />
+                          <input
+                            id="single-image-upload"
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleImageUpload}
+                            disabled={!!uploadingType}
+                          />
                         </label>
 
-                        {/* Video Upload Section */}
                         <div className="flex flex-col items-center justify-center gap-3 p-4 rounded-2xl bg-linear-to-br from-white/5 to-white/[0.02] border border-white/10 backdrop-blur-xl hover:border-white/40 hover:bg-white/10 transition-all duration-500 group relative min-h-[140px]">
                           <AnimatePresence mode="wait">
-                            {isUploading ? (
-                              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center gap-2">
+                            {uploadingType === 'video' ? (
+                              <motion.div
+                                key="video-loading"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="flex flex-col items-center gap-2"
+                              >
                                 <Loader2 className="w-6 h-6 text-indigo-400 animate-spin" />
                                 <span className="text-[8px] font-bold uppercase text-indigo-400">Uploading Video</span>
                               </motion.div>
                             ) : (
-                              <div className="flex flex-col items-center gap-2 text-center w-full">
+                              <motion.div
+                                key="video-idle"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="flex flex-col items-center gap-2 text-center w-full"
+                              >
                                 <Video className="w-6 h-6 text-white/20 group-hover:text-white transition-colors" />
                                 <span className="text-[10px] font-black uppercase tracking-[0.2em] mb-2">Video</span>
                                 <UploadButton
@@ -344,76 +354,139 @@ export default function MediaDashboard() {
                                       'bg-transparent text-white text-[10px] font-bold px-4 h-8 rounded-lg border-white/10 border hover:bg-white/5 transition-all w-full',
                                     allowedContent: 'hidden',
                                   }}
-                                  onUploadBegin={() => setIsUploading(true)}
+                                  onUploadBegin={() => setUploadingType('video')}
                                   onClientUploadComplete={res => handleCompleteUpload(res, 'video')}
                                   onUploadError={err => {
-                                    setIsUploading(false);
+                                    setUploadingType(null);
                                     toast.error(err.message);
                                   }}
                                 />
-                              </div>
+                              </motion.div>
                             )}
                           </AnimatePresence>
                         </div>
 
-                        {/* Audio Upload Section */}
                         <div className="flex flex-col items-center justify-center gap-3 p-4 rounded-2xl bg-linear-to-br from-white/5 to-white/[0.02] border border-white/10 backdrop-blur-xl hover:border-white/40 hover:bg-white/10 transition-all duration-500 group relative min-h-[140px]">
-                          <Music className="w-6 h-6 text-white/20 group-hover:text-white transition-colors" />
-                          <span className="text-[10px] font-black uppercase tracking-[0.2em] mb-2">Audio</span>
-                          <UploadButton
-                            endpoint="audioUploader"
-                            appearance={{
-                              button:
-                                'bg-transparent text-white text-[10px] font-bold px-4 h-8 rounded-lg border-white/10 border hover:bg-white/5 transition-all w-full',
-                              allowedContent: 'hidden',
-                            }}
-                            onUploadBegin={() => setIsUploading(true)}
-                            onClientUploadComplete={res => handleCompleteUpload(res, 'audio')}
-                            onUploadError={err => {
-                              setIsUploading(false);
-                              toast.error(err.message);
-                            }}
-                          />
+                          <AnimatePresence mode="wait">
+                            {uploadingType === 'audio' ? (
+                              <motion.div
+                                key="audio-loading"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="flex flex-col items-center gap-2"
+                              >
+                                <Loader2 className="w-6 h-6 text-indigo-400 animate-spin" />
+                                <span className="text-[8px] font-bold uppercase text-indigo-400">Uploading Audio</span>
+                              </motion.div>
+                            ) : (
+                              <motion.div
+                                key="audio-idle"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="flex flex-col items-center gap-2 text-center w-full"
+                              >
+                                <Music className="w-6 h-6 text-white/20 group-hover:text-white transition-colors" />
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] mb-2">Audio</span>
+                                <UploadButton
+                                  endpoint="audioUploader"
+                                  appearance={{
+                                    button:
+                                      'bg-transparent text-white text-[10px] font-bold px-4 h-8 rounded-lg border-white/10 border hover:bg-white/5 transition-all w-full',
+                                    allowedContent: 'hidden',
+                                  }}
+                                  onUploadBegin={() => setUploadingType('audio')}
+                                  onClientUploadComplete={res => handleCompleteUpload(res, 'audio')}
+                                  onUploadError={err => {
+                                    setUploadingType(null);
+                                    toast.error(err.message);
+                                  }}
+                                />
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
                         </div>
 
-                        {/* PDF Upload Section */}
                         <div className="flex flex-col items-center justify-center gap-3 p-4 rounded-2xl bg-linear-to-br from-white/5 to-white/[0.02] border border-white/10 backdrop-blur-xl hover:border-white/40 hover:bg-white/10 transition-all duration-500 group relative min-h-[140px]">
-                          <FileText className="w-6 h-6 text-white/20 group-hover:text-white transition-colors" />
-                          <span className="text-[10px] font-black uppercase tracking-[0.2em] mb-2">PDF</span>
-                          <UploadButton
-                            endpoint="pdfUploader"
-                            appearance={{
-                              button:
-                                'bg-transparent text-white text-[10px] font-bold px-4 h-8 rounded-lg border-white/10 border hover:bg-white/5 transition-all w-full',
-                              allowedContent: 'hidden',
-                            }}
-                            onUploadBegin={() => setIsUploading(true)}
-                            onClientUploadComplete={res => handleCompleteUpload(res, 'pdf')}
-                            onUploadError={err => {
-                              setIsUploading(false);
-                              toast.error(err.message);
-                            }}
-                          />
+                          <AnimatePresence mode="wait">
+                            {uploadingType === 'pdf' ? (
+                              <motion.div
+                                key="pdf-loading"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="flex flex-col items-center gap-2"
+                              >
+                                <Loader2 className="w-6 h-6 text-indigo-400 animate-spin" />
+                                <span className="text-[8px] font-bold uppercase text-indigo-400">Uploading PDF</span>
+                              </motion.div>
+                            ) : (
+                              <motion.div
+                                key="pdf-idle"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="flex flex-col items-center gap-2 text-center w-full"
+                              >
+                                <FileText className="w-6 h-6 text-white/20 group-hover:text-white transition-colors" />
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] mb-2">PDF</span>
+                                <UploadButton
+                                  endpoint="pdfUploader"
+                                  appearance={{
+                                    button:
+                                      'bg-transparent text-white text-[10px] font-bold px-4 h-8 rounded-lg border-white/10 border hover:bg-white/5 transition-all w-full',
+                                    allowedContent: 'hidden',
+                                  }}
+                                  onUploadBegin={() => setUploadingType('pdf')}
+                                  onClientUploadComplete={res => handleCompleteUpload(res, 'pdf')}
+                                  onUploadError={err => {
+                                    setUploadingType(null);
+                                    toast.error(err.message);
+                                  }}
+                                />
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
                         </div>
 
-                        {/* DOCX Upload Section */}
                         <div className="flex flex-col items-center justify-center gap-3 p-4 rounded-2xl bg-linear-to-br from-white/5 to-white/[0.02] border border-white/10 backdrop-blur-xl hover:border-white/40 hover:bg-white/10 transition-all duration-500 group relative min-h-[140px]">
-                          <FileCode className="w-6 h-6 text-white/20 group-hover:text-white transition-colors" />
-                          <span className="text-[10px] font-black uppercase tracking-[0.2em] mb-2">DOCX</span>
-                          <UploadButton
-                            endpoint="documentUploader"
-                            appearance={{
-                              button:
-                                'bg-transparent text-white text-[10px] font-bold px-4 h-8 rounded-lg border-white/10 border hover:bg-white/5 transition-all w-full',
-                              allowedContent: 'hidden',
-                            }}
-                            onUploadBegin={() => setIsUploading(true)}
-                            onClientUploadComplete={res => handleCompleteUpload(res, 'docx')}
-                            onUploadError={err => {
-                              setIsUploading(false);
-                              toast.error(err.message);
-                            }}
-                          />
+                          <AnimatePresence mode="wait">
+                            {uploadingType === 'docx' ? (
+                              <motion.div
+                                key="docx-loading"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="flex flex-col items-center gap-2"
+                              >
+                                <Loader2 className="w-6 h-6 text-indigo-400 animate-spin" />
+                                <span className="text-[8px] font-bold uppercase text-indigo-400">Uploading DOCX</span>
+                              </motion.div>
+                            ) : (
+                              <motion.div
+                                key="docx-idle"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="flex flex-col items-center gap-2 text-center w-full"
+                              >
+                                <FileCode className="w-6 h-6 text-white/20 group-hover:text-white transition-colors" />
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] mb-2">DOCX</span>
+                                <UploadButton
+                                  endpoint="documentUploader"
+                                  appearance={{
+                                    button:
+                                      'bg-transparent text-white text-[10px] font-bold px-4 h-8 rounded-lg border-white/10 border hover:bg-white/5 transition-all w-full',
+                                    allowedContent: 'hidden',
+                                  }}
+                                  onUploadBegin={() => setUploadingType('docx')}
+                                  onClientUploadComplete={res => handleCompleteUpload(res, 'docx')}
+                                  onUploadError={err => {
+                                    setUploadingType(null);
+                                    toast.error(err.message);
+                                  }}
+                                />
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
                         </div>
                       </div>
                     </div>
@@ -424,7 +497,7 @@ export default function MediaDashboard() {
                       variant="outlineGlassy"
                       size="sm"
                       onClick={handleAddMedia}
-                      disabled={isAdding || isUploading}
+                      disabled={isAdding || !!uploadingType}
                       className="w-full h-12 rounded-xl border-white/10 hover:border-white/30"
                     >
                       {isAdding ? (
@@ -442,7 +515,6 @@ export default function MediaDashboard() {
           </div>
         </header>
 
-        {/* Edit Asset Dialog */}
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
           <DialogContent
             className="sm:max-w-[500px] bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl 
@@ -513,7 +585,6 @@ export default function MediaDashboard() {
           </DialogContent>
         </Dialog>
 
-        {/* Tab Selection */}
         <div className="w-full gap-2 flex items-center justify-between">
           <Tabs value={activeTab} onValueChange={v => setActiveTab(v as MediaType)}>
             <TabsList className="bg-transparent gap-2">
@@ -543,7 +614,6 @@ export default function MediaDashboard() {
           </motion.div>
         </div>
 
-        {/* Grid and Main Section */}
         <section className="space-y-8 pb-20">
           <div className="flex items-center gap-4">
             {[
