@@ -889,11 +889,10 @@ export default function VideoUploadManagerSingle({ value, onChange, label = 'Fea
 
 
 
-Now Your task is implementwith those features in page.tsx. 
+Now Your task is implement those features in page.tsx
     i. At the Top there are Parent tabs. All Media, Videos, Images, Pdf, Documents
-    ii. each tabs have two sub tabs.
-        - Active, - Trash. 
-    iii. at the right side there is a button named Add Media 
+    ii. each tabs have three sub tabs.
+        - Active, - Trash, - Add Media  
     iv. If there are more then 10 items then show with paginations. 
     v. make them resposive for mobile, tablet, desktop. 
     vi. if there are no items then render empty div with Not found text. 
