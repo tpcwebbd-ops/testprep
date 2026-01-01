@@ -19,6 +19,7 @@ import {
   Link,
   Save,
   Edit2,
+  UploadCloud,
 } from 'lucide-react';
 import { IoReloadCircleOutline } from 'react-icons/io5';
 import { toast } from 'react-toastify';
@@ -33,9 +34,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 import { useGetMediasQuery, useAddMediaMutation, useUpdateMediaMutation, useDeleteMediaMutation } from '@/redux/features/media/mediaSlice';
 
+import imageCompression from 'browser-image-compression';
+
 type MediaType = 'all' | 'video' | 'image' | 'pdf' | 'docx';
 type MediaStatus = 'active' | 'trash';
-
 interface MediaItem {
   _id: string;
   url: string;
@@ -68,6 +70,7 @@ export default function MediaDashboard() {
   const [updateMedia, { isLoading: isUpdating }] = useUpdateMediaMutation();
   const [deleteMedia] = useDeleteMediaMutation();
 
+  const [isAddImageLoading, setIsAddImageLoading] = useState(true);
   const items = useMemo<MediaItem[]>(() => response?.data || [], [response?.data]);
 
   const handleAddMedia = async () => {
@@ -140,6 +143,46 @@ export default function MediaDashboard() {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+  const maxSizeMB = 1;
+  const maxWidthOrHeight = 1920;
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsAddImageLoading(true);
+    try {
+      const options = {
+        maxSizeMB,
+        maxWidthOrHeight,
+        useWebWorker: true,
+        fileType: 'image/jpeg' as const,
+      };
+
+      const compressedFile = await imageCompression(file, options);
+
+      const formData = new FormData();
+      formData.append('image', compressedFile);
+
+      const response = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_IMGBB_API_KEY}`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        const newImageUrl = data.data.url;
+        setNewMedia({ url: newImageUrl, contentType: 'image', status: 'active' });
+        toast.success('Image uploaded successfully!');
+      } else {
+        throw new Error(data.error.message || 'Image upload failed.');
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Cannot upload the image.');
+    } finally {
+      setIsAddImageLoading(false);
+      e.target.value = '';
+    }
+  };
 
   return (
     <div className="min-h-screen rounded-md bg-clip-padding backdrop-filter backdrop-blur-[120px] bg-opacity-30 border border-gray-100/50 p-4 md:p-8 text-white relative overflow-hidden">
@@ -184,50 +227,41 @@ export default function MediaDashboard() {
                              rounded-2xl text-white transition-all duration-300"
                 >
                   <DialogHeader className="border-b border-white/10 pb-3">
-                    <DialogTitle className="text-lg font-semibold tracking-wide text-white/90 uppercase italic">New Registration</DialogTitle>
-                    <DialogDescription className="text-white/50 text-xs font-medium">Link external cloud storage directly to your vault.</DialogDescription>
+                    <DialogTitle className="text-lg font-semibold tracking-wide text-white/90 uppercase italic">Import Media</DialogTitle>
+                    <DialogDescription className="text-white/50 text-xs font-medium">Choose a media file to import.</DialogDescription>
                   </DialogHeader>
                   <div className="space-y-6 py-6">
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-white/60 ml-1">Cloud URI</label>
-                      <div className="relative group">
-                        <Link className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 group-focus-within:text-white transition-colors" />
+                    <div className="w-full grid grid-cols-2 gap-2">
+                      <header className="flex justify-between items-center border-b border-white/10 pb-3 mb-4">
+                        <h2 className="text-white/90 font-semibold">Select an Image</h2>
+                        <Button
+                          asChild
+                          variant="outline"
+                          className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20 transition mr-8 text-white/90"
+                        >
+                          <label htmlFor="single-image-upload" className="cursor-pointer flex items-center gap-2">
+                            <UploadCloud className="w-4 h-4" />
+                            Upload
+                          </label>
+                        </Button>
                         <Input
-                          placeholder="https://cloud.storage/asset.webp"
-                          className="bg-white/10 border border-white/20 placeholder:text-white/30 text-white 
-                                     rounded-xl focus-visible:ring-0 focus:border-white/40 backdrop-blur-md pl-12 h-14"
-                          value={newMedia.url}
-                          onChange={e => setNewMedia({ ...newMedia, url: e.target.value })}
+                          id="single-image-upload"
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleImageUpload}
+                          disabled={isAddImageLoading || isLoading}
                         />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-white/60 ml-1">Classification</label>
-                        <Select value={newMedia.contentType} onValueChange={(v: MediaType) => setNewMedia({ ...newMedia, contentType: v })}>
-                          <SelectTrigger className="bg-white/10 border border-white/20 h-14 rounded-xl focus:ring-0 text-white/80">
-                            <SelectValue placeholder="Type" />
-                          </SelectTrigger>
-                          <SelectContent className="bg-slate-900/90 backdrop-blur-3xl border-white/10 text-white rounded-xl">
-                            <SelectItem value="image">Image</SelectItem>
-                            <SelectItem value="video">Video</SelectItem>
-                            <SelectItem value="pdf">PDF</SelectItem>
-                            <SelectItem value="docx">Word Doc</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-white/60 ml-1">Permissions</label>
-                        <Select value={newMedia.status} onValueChange={(v: MediaStatus) => setNewMedia({ ...newMedia, status: v })}>
-                          <SelectTrigger className="bg-white/10 border border-white/20 h-14 rounded-xl focus:ring-0 text-white/80">
-                            <SelectValue placeholder="Status" />
-                          </SelectTrigger>
-                          <SelectContent className="bg-slate-900/90 backdrop-blur-3xl border-white/10 text-white rounded-xl">
-                            <SelectItem value="active">Active</SelectItem>
-                            <SelectItem value="trash">Trash</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
+                      </header>
+                      <Button variant="outlineGlassy" size="xl">
+                        Videos
+                      </Button>
+                      <Button variant="outlineGlassy" size="xl">
+                        Pdf
+                      </Button>
+                      <Button variant="outlineGlassy" size="xl">
+                        Docs
+                      </Button>
                     </div>
                   </div>
                   <DialogFooter className="mt-4 border-t border-white/10 pt-4">
