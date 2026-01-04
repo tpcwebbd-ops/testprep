@@ -179,7 +179,7 @@ export default function ImageUploadManagerSingle({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between px-1">
-        <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 italic">{label}</h4>
+        <h4 className="text-sm text-white/40 ">{label}</h4>
         {value && (
           <Button
             variant="ghost"

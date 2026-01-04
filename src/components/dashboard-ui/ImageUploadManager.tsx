@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from 'react';
 import Image from 'next/image';
-import { Plus, X, UploadCloud, Loader2, ImageIcon, Ghost, Search, CheckCircle2, Layers } from 'lucide-react';
+import { Plus, X, UploadCloud, Loader2, ImageIcon, Ghost, Search, CheckCircle2, Layers, Zap } from 'lucide-react';
 import { toast } from 'react-toastify';
 import imageCompression from 'browser-image-compression';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -73,19 +73,15 @@ const InternalImageVault = ({ onImageToggle, selectedImages }: InternalImageDial
   };
 
   return (
-    <div className="flex flex-col h-[85vh] md:h-[75vh] bg-slate-950/60 backdrop-blur-3xl">
-      <DialogHeader className="p-8 border-b border-white/5 bg-white/[0.02]">
+    <div className="flex flex-col h-[85vh] md:h-[75vh] border border-slate-100/50 rounded-xl backdrop-blur-3xl">
+      <DialogHeader className="p-8 border-b border-white/5  ">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-1">
-            <DialogTitle className="text-2xl font-black uppercase tracking-tighter italic bg-gradient-to-r from-white to-white/40 bg-clip-text text-transparent">
-              Vault Explorer
-            </DialogTitle>
-            <DialogDescription className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/30">
-              Querying database for visual signatures
-            </DialogDescription>
+          <div className="hidden">
+            <DialogTitle className="text-2xl font-black uppercase tracking-tighter italic bg-gradient-to-r from-white to-white/40 bg-clip-text text-transparent"></DialogTitle>
+            <DialogDescription className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/30"></DialogDescription>
           </div>
 
-          <div className="flex flex-wrap items-center gap-4">
+          <div className="flex flex-wrap items-center gap-4 justify-between">
             <div className="relative group">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/20 group-focus-within:text-indigo-400 transition-colors" />
               <input
@@ -101,7 +97,7 @@ const InternalImageVault = ({ onImageToggle, selectedImages }: InternalImageDial
               <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={isUploadingLocal || isAdding} />
               <div className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-[10px] font-black uppercase tracking-widest hover:bg-indigo-500/20 transition-all shadow-[0_0_20px_rgba(99,102,241,0.1)]">
                 {isUploadingLocal || isAdding ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UploadCloud className="w-3.5 h-3.5" />}
-                Sync New
+                Upload
               </div>
             </label>
           </div>
@@ -193,34 +189,26 @@ export default function ImageUploadManager({
     }
   };
 
-  const removeImage = (url: string) => onChange(value.filter(item => item !== url));
-
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between px-1">
         <div className="space-y-1">
-          <h4 className="text-[10px] font-black bg-linear-to-r from-blue-500/20 to-purple-500/20 border border-white/30  backdrop-blur-xl shadow-lg shadow-blue-500/20 hover:from-blue-500/30 hover:to-purple-500/30 hover:border-white/50 hover:shadow-xl hover:shadow-purple-500/30 hover:scale-[1.02] transition-all duration-300 uppercase tracking-[0.4em] text-white/40 italic">
-            {label}
-          </h4>
+          <h4 className="text-sm text-white/40 ">{label}</h4>
           <p className="text-[8px] font-bold uppercase tracking-widest text-white/10">{value.length} Items Selected</p>
         </div>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
-            <Button
-              variant="outline"
-              size="sm"
-              className="rounded-xl border-white/10 bg-white/5 hover:bg-indigo-500/20 hover:border-indigo-500/40 text-[10px] font-black uppercase tracking-widest transition-all h-9"
-            >
-              <Plus className="w-3.5 h-3.5 mr-2" /> Browse Vault
+            <Button variant="outlineGlassy" size="sm">
+              <Plus className="w-3.5 h-3.5" /> Select
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-5xl bg-transparent border-none p-0 shadow-none overflow-hidden rounded-[2.5rem]">
+          <DialogContent className="max-w-5xl bg-transparent border-none p-0 shadow-none ">
             <InternalImageVault selectedImages={value} onImageToggle={toggleImage} />
           </DialogContent>
         </Dialog>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-5 p-6 rounded-[2rem] bg-slate-950/20 border border-white/5 backdrop-blur-3xl min-h-[160px] transition-all">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-5 p-6 rounded-4xl bg-slate-950/20 border border-white/5 backdrop-blur-3xl  md:h-[35vh] transition-all">
         <AnimatePresence mode="popLayout">
           {value.map((url, idx) => (
             <motion.div
@@ -230,30 +218,60 @@ export default function ImageUploadManager({
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.8 }}
               transition={{ duration: 0.4, delay: idx * 0.05 }}
-              className="relative aspect-square rounded-2xl overflow-hidden group border border-white/10 shadow-2xl"
+              className="relative group"
             >
-              <Image src={url} fill alt="Selected Asset" className="object-cover transition-transform duration-700 group-hover:scale-110" unoptimized />
-              <div className="absolute inset-0 bg-gradient-to-t from-red-950/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-3">
+              <div className="relative w-24 h-24 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center backdrop-blur-xl shadow-2xl overflow-hidden group-hover:border-indigo-500/30 transition-colors duration-500">
+                <motion.div animate={{ y: [0, -2, 0] }} transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }} className="relative w-full h-full">
+                  <Image src={url} fill alt="Selected Asset" className="object-cover transition-transform duration-700 group-hover:scale-110" unoptimized />
+                </motion.div>
+
+                <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 <button
-                  onClick={() => removeImage(url)}
-                  className="w-full py-1.5 bg-red-500/80 text-white rounded-lg text-[8px] font-black uppercase tracking-widest backdrop-blur-md hover:bg-red-500 transition-colors shadow-lg"
+                  type="button"
+                  onClick={() => onChange(value.filter(item => item !== url))}
+                  className="absolute top-1.5 right-1.5 z-20 p-1.5 rounded-lg bg-red-500/20 border border-red-500/50 text-red-400 opacity-0 group-hover:opacity-100 hover:bg-red-500 hover:text-white transition-all duration-300 transform translate-x-2 group-hover:translate-x-0"
                 >
-                  <X className="w-3 h-3 inline mr-1" /> Purge
+                  <X className="w-3.5 h-3.5" />
                 </button>
+                <Zap className="absolute -top-1 -right-1 w-5 h-5 text-indigo-500/40 animate-pulse pointer-events-none z-10" />
               </div>
             </motion.div>
           ))}
         </AnimatePresence>
 
         {value.length === 0 && (
-          <div className="col-span-full flex flex-col items-center justify-center py-12 text-white/10 space-y-4">
-            <div className="relative">
-              <ImageIcon className="w-12 h-12" />
-              <div className="absolute inset-0 border border-dashed border-white/20 rounded-full animate-[spin_8s_linear_infinite]" />
-            </div>
-            <div className="text-center">
-              <span className="text-[10px] font-black uppercase tracking-[0.5em] block">Empty Cluster</span>
-              <span className="text-[8px] font-bold uppercase tracking-widest text-white/5 mt-1 block">Initialize Selection to begin</span>
+          <div className="w-full flex-col min-w-96 gap-4  ">
+            <div className="w-full flex gap-4   ">
+              <div className="relative w-24 h-24 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center backdrop-blur-xl shadow-2xl group-hover:border-indigo-500/30 transition-colors duration-500">
+                <div className="absolute top-0 left-0 w-full h-full overflow-hidden rounded-2xl">
+                  <motion.div
+                    animate={{ x: ['-100%', '200%'] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                    className="w-1/2 h-full bg-gradient-to-r from-transparent via-white/5 to-transparent skew-x-12"
+                  />
+                </div>
+
+                <motion.div animate={{ y: [0, -5, 0] }} transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}>
+                  <ImageIcon className="w-10 h-10 text-white/20 group-hover:text-indigo-400/60 transition-colors duration-500" />
+                </motion.div>
+
+                <Zap className="absolute -top-1 -right-1 w-5 h-5 text-indigo-500/40 animate-pulse" />
+              </div>
+              <div className="relative w-24 h-24 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center backdrop-blur-xl shadow-2xl group-hover:border-indigo-500/30 transition-colors duration-500">
+                <div className="absolute top-0 left-0 w-full h-full overflow-hidden rounded-2xl">
+                  <motion.div
+                    animate={{ x: ['-100%', '200%'] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                    className="w-1/2 h-full bg-gradient-to-r from-transparent via-white/5 to-transparent skew-x-12"
+                  />
+                </div>
+
+                <motion.div animate={{ y: [0, -5, 0] }} transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}>
+                  <ImageIcon className="w-10 h-10 text-white/20 group-hover:text-indigo-400/60 transition-colors duration-500" />
+                </motion.div>
+
+                <Zap className="absolute -top-1 -right-1 w-5 h-5 text-indigo-500/40 animate-pulse" />
+              </div>
             </div>
           </div>
         )}
