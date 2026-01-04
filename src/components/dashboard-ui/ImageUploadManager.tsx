@@ -27,7 +27,7 @@ const InternalImageDialog = ({ onImageSelect, selectedImages, maxSizeMB = 1, max
   const fetchImages = useCallback(async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/media');
+      const response = await fetch('/api/media/v1');
       if (!response.ok) throw new Error('Failed to fetch images.');
       const data = await response.json();
 
@@ -35,8 +35,10 @@ const InternalImageDialog = ({ onImageSelect, selectedImages, maxSizeMB = 1, max
         setAllAvailableImages([]);
         return;
       }
-
-      const imageUrls: string[] = data.data.map((i: { url: string }) => i.url);
+      // console.log('data.data : ', data.data);
+      const imageUrls: string[] = data.data
+        .filter((i: { url: string; contentType: string }) => i.contentType === 'image')
+        .map((i: { url: string; contentType: string }) => i.url);
       setAllAvailableImages(imageUrls);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Could not fetch images.');
@@ -76,7 +78,7 @@ const InternalImageDialog = ({ onImageSelect, selectedImages, maxSizeMB = 1, max
       const data = await response.json();
       if (data.success) {
         const newImageUrl = data.data.url;
-        await fetch('/api/media', {
+        await fetch('/api/media/v1', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -189,7 +191,7 @@ export default function ImageUploadManager({ value, onChange, label = 'Images', 
 
       <div
         className="
-          w-full min-h-[120px] rounded-xl p-4
+          w-full min-h-[220px] rounded-xl p-4
           bg-white/5 backdrop-blur-md
           border border-white/20 shadow-inner
           flex items-center justify-center

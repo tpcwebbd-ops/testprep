@@ -25,7 +25,7 @@ const InternalImageDialog = ({ onImageSelect, selectedImage, maxSizeMB = 1, maxW
   const fetchImages = useCallback(async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/media');
+      const response = await fetch('/api/media/v1');
       if (!response.ok) throw new Error('Failed to fetch images.');
       const data = await response.json();
 
@@ -34,7 +34,7 @@ const InternalImageDialog = ({ onImageSelect, selectedImage, maxSizeMB = 1, maxW
         return;
       }
 
-      const imageUrls: string[] = data.data.map((i: { url: string }) => i.url);
+      const imageUrls: string[] = data.data.filter((i: { url: string; contentType: string }) => i.contentType === 'image').map((i: { url: string }) => i.url);
       setAllAvailableImages(imageUrls);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Could not fetch images.');
@@ -74,7 +74,7 @@ const InternalImageDialog = ({ onImageSelect, selectedImage, maxSizeMB = 1, maxW
       const data = await response.json();
       if (data.success) {
         const newImageUrl = data.data.url;
-        await fetch('/api/media', {
+        await fetch('/api/media/v1', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -175,7 +175,7 @@ export default function ImageUploadManagerSingle({ value, onChange, label = 'Ima
 
         {value && (
           <Button variant="ghost" size="sm" onClick={() => onChange('')} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 transition h-8">
-            Clear Selection
+            Clear
           </Button>
         )}
       </div>
@@ -204,18 +204,6 @@ export default function ImageUploadManagerSingle({ value, onChange, label = 'Ima
             "
                   >
                     <Image src={value} alt="Selected image" fill className="object-cover" />
-
-                    <button
-                      onClick={handleRemoveImage}
-                      className="
-                absolute top-2 right-2 bg-red-600 text-white w-8 h-8
-                rounded-full flex items-center justify-center
-                opacity-0 group-hover:opacity-100 transition-opacity
-                shadow-lg hover:bg-red-700
-              "
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
                   </div>
                 )}
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">

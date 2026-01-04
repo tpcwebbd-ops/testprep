@@ -16,7 +16,6 @@ import {
   HardDrive,
   Ghost,
   XIcon,
-  Link,
   Save,
   Edit2,
   Headphones,
@@ -27,6 +26,7 @@ import {
   Type,
   PlayCircle,
   FileSearch,
+  LinkIcon,
 } from 'lucide-react';
 import { IoReloadCircleOutline } from 'react-icons/io5';
 import { toast } from 'react-toastify';
@@ -43,6 +43,7 @@ import { useGetMediasQuery, useAddMediaMutation, useUpdateMediaMutation, useDele
 
 import imageCompression from 'browser-image-compression';
 import { UploadButton } from '@/lib/uploadthing';
+import { CustomLink } from '@/components/dashboard-ui/LinkButton';
 
 type MediaType = 'all' | 'video' | 'image' | 'pdf' | 'docx' | 'audio';
 type MediaStatus = 'active' | 'trash';
@@ -191,7 +192,7 @@ export default function MediaDashboard() {
       setUploadingType(null);
     }
   };
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleCompleteUpload = (res: any, type: MediaType) => {
     if (res && res[0]) {
       const newUrl = res[0].url;
@@ -223,6 +224,9 @@ export default function MediaDashboard() {
             </motion.div>
 
             <div className="w-full flex flex-wrap gap-3 items-center justify-end">
+              <CustomLink href="/dashboard/media/example" variant="outlineGlassy" size="sm">
+                Example
+              </CustomLink>
               <Button
                 size="sm"
                 variant="outlineWater"
@@ -444,7 +448,7 @@ export default function MediaDashboard() {
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase text-white/60">Cloud URI</label>
                 <div className="relative group">
-                  <Link className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                  <LinkIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
                   <Input
                     className="bg-white/10 border-white/20 pl-12 h-14 rounded-xl"
                     value={editingMedia?.url || ''}
@@ -553,7 +557,7 @@ export default function MediaDashboard() {
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-[10px] uppercase font-black tracking-widest"
                 >
-                  <Link className="w-3 h-3" /> External Link
+                  <LinkIcon className="w-3 h-3" /> External Link
                 </a>
               </Button>
             </DialogFooter>
