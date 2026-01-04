@@ -109,7 +109,7 @@ export default function AssetManagementPage() {
             <section className="space-y-6">
               <div className="flex items-center gap-3 px-1">
                 <Database className="w-5 h-5 text-indigo-400/60" />
-                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/60">Single</h3>
+                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/60">Single Assect</h3>
               </div>
 
               <div className="bg-slate-900/40 backdrop-blur-[120px] bg-opacity-30 border border-gray-100/10 p-8 rounded-2xl hover:border-indigo-500/50 transition-all duration-700 shadow-2xl">
@@ -122,7 +122,7 @@ export default function AssetManagementPage() {
             <section className="space-y-6">
               <div className="flex items-center gap-3 px-1">
                 <LayoutGrid className="w-5 h-5 text-indigo-400/60" />
-                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/60">Multiple</h3>
+                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/60">Multiple Assect</h3>
               </div>
 
               <div className="bg-slate-900/40 backdrop-blur-[120px] bg-opacity-30 border border-gray-100/10 p-8 rounded-2xl hover:border-indigo-500/50 transition-all duration-700 shadow-2xl">
