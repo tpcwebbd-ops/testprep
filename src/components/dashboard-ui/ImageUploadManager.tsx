@@ -199,7 +199,9 @@ export default function ImageUploadManager({
     <div className="space-y-5">
       <div className="flex items-center justify-between px-1">
         <div className="space-y-1">
-          <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 italic">{label}</h4>
+          <h4 className="text-[10px] font-black bg-linear-to-r from-blue-500/20 to-purple-500/20 border border-white/30  backdrop-blur-xl shadow-lg shadow-blue-500/20 hover:from-blue-500/30 hover:to-purple-500/30 hover:border-white/50 hover:shadow-xl hover:shadow-purple-500/30 hover:scale-[1.02] transition-all duration-300 uppercase tracking-[0.4em] text-white/40 italic">
+            {label}
+          </h4>
           <p className="text-[8px] font-bold uppercase tracking-widest text-white/10">{value.length} Items Selected</p>
         </div>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
