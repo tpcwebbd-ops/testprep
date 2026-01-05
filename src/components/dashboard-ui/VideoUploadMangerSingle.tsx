@@ -14,7 +14,7 @@ interface VideoUploadManagerSingleProps {
   label?: string;
 }
 
-export default function VideoUploadManagerSingle({ value, onChange, label = 'Feature Video' }: VideoUploadManagerSingleProps) {
+export default function VideoUploadManagerSingle({ value, onChange, label = 'Single Video' }: VideoUploadManagerSingleProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -65,15 +65,14 @@ export default function VideoUploadManagerSingle({ value, onChange, label = 'Fea
           </div>
         </DialogTrigger>
 
-        <DialogContent className="max-w-xl p-0 bg-[#020617]/80 backdrop-blur-[120px] border-white/10 rounded-[3rem] overflow-hidden">
+        <DialogContent className="max-w-xl p-0 bg-clip-padding backdrop-filter bg-opacity-30 border backdrop-blur-[120px] border-white/20 rounded-xl overflow-hidden">
           <div className="p-10 space-y-10">
             <div className="flex items-center gap-4">
-              <div className="p-4 bg-indigo-500/10 rounded-3xl border border-indigo-500/20">
+              <div className="p-2 bg-indigo-500/10 rounded-xl border border-indigo-500/20">
                 <UploadCloud className="w-6 h-6 text-indigo-400" />
               </div>
               <div className="space-y-1">
-                <DialogTitle className="text-2xl font-black text-white italic tracking-tighter uppercase">Source Selection</DialogTitle>
-                <p className="text-white/40 text-xs font-medium">Connect your high-resolution production master.</p>
+                <DialogTitle className="text-2xl font-black text-white/60 italic tracking-tighter uppercase">Source Selection</DialogTitle>
               </div>
             </div>
 
@@ -89,7 +88,7 @@ export default function VideoUploadManagerSingle({ value, onChange, label = 'Fea
                     <UploadButton
                       endpoint="videoUploader"
                       appearance={{
-                        button: 'bg-white text-black font-black px-12 h-14 rounded-2xl shadow-2xl hover:bg-white/90 transition-all',
+                        button: 'max-w-xl p-0 bg-clip-padding backdrop-filter bg-opacity-30 border backdrop-blur-[120px] border-white/20 rounded-xl h-28',
                         allowedContent: 'text-white/20 text-[10px] font-bold uppercase tracking-widest mt-4',
                       }}
                       onUploadBegin={() => setIsUploading(true)}
@@ -106,10 +105,6 @@ export default function VideoUploadManagerSingle({ value, onChange, label = 'Fea
                         toast.error(err.message);
                       }}
                     />
-                    <div className="space-y-2">
-                      <p className="text-white font-black uppercase text-xs italic tracking-widest">Master File Interface</p>
-                      <p className="text-white/20 text-[10px] max-w-[200px] leading-relaxed">Ensure bitrate compliance before deployment.</p>
-                    </div>
                   </div>
                 )}
               </AnimatePresence>

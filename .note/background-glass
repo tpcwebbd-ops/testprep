@@ -1,1 +1,4 @@
 bg-blue-400 rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-30 border border-gray-100
+
+----------------------------------------------------------------
+max-w-xl p-0 bg-clip-padding backdrop-filter bg-opacity-30 border backdrop-blur-[120px] border-white/20 rounded-xl overflow-hidden
