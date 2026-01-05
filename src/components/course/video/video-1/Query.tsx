@@ -23,7 +23,7 @@ const Query = () => {
         <Card className="relative overflow-hidden   backdrop-blur-2xl group">
           <div className="absolute inset-0      opacity-50" />
 
-          <div className="relative grid grid-cols-1 lg:grid-cols-5 gap-0">
+          <div className="relative grid grid-cols-1   gap-0">
             <div className="lg:col-span-3 relative aspect-video bg-black overflow-hidden group/player">
               <video
                 src={video.url || 'https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'}

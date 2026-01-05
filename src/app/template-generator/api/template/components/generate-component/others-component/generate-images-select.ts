@@ -1,5 +1,5 @@
 export const generateImagesSelectComponentFile = (): string => {
-    return `'use client'
+  return `'use client'
 
 import Image from 'next/image'
 import { Plus, X } from 'lucide-react'
@@ -60,7 +60,7 @@ export default function ImagesSelect({
             </div>
             <div className="w-full min-h-[150px] p-2 bg-slate-50 rounded-lg flex items-center justify-center">
                 {newImages && newImages.length > 0 ? (
-                    <div className="w-full grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+                    <div className="w-full grid grid-cols-3 md:grid-cols-4   gap-2">
                         {newImages.map((imageUrl, index) => (
                             <div
                                 key={index + imageUrl}
@@ -90,5 +90,5 @@ export default function ImagesSelect({
         </div>
     )
 }
-`
-}
+`;
+};

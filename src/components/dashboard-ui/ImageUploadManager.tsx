@@ -114,7 +114,7 @@ const InternalImageVault = ({ onImageToggle, selectedImages }: InternalImageDial
             <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 animate-pulse">Decrypting Records...</span>
           </div>
         ) : availableImages.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4   gap-6">
             <AnimatePresence mode="popLayout">
               {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -206,9 +206,9 @@ export default function ImageUploadManager({
             <InternalImageVault selectedImages={value} onImageToggle={toggleImage} />
           </DialogContent>
         </Dialog>
-      </div>
+      </div>  
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-5 p-6 rounded-4xl bg-slate-950/20 border border-white/5 backdrop-blur-3xl  md:h-[35vh] transition-all">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-5 p-6 rounded-4xl bg-slate-950/20 border border-white/5 backdrop-blur-3xl  md:h-[39vh] transition-all">
         <AnimatePresence mode="popLayout">
           {value.map((url, idx) => (
             <motion.div
