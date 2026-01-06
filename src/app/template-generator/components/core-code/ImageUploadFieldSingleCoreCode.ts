@@ -26,7 +26,7 @@ const ImageUploadFieldSingle = () => {
         // }
     }, [])
     const onImageUploadSuccess = (newImageUrl: string) => {
-        console.log('new Image url :', newImageUrl)
+   
     }
     const handleImageUpload = async (
         e: React.ChangeEvent<HTMLInputElement>

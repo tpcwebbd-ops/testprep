@@ -207,7 +207,7 @@ const DashboardBuilderPage = () => {
   const handleLiveLink = (path: string) => {
     window.open(`${path}`, '_blank');
   };
-  console.log('dashboardsData', dashboardsData);
+
   // --- Rendering ---
 
   if (isLoading) {

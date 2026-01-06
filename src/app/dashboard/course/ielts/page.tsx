@@ -49,7 +49,7 @@ const CourseBuilderPage = () => {
   // 3. Derived State (Replaces the buggy useEffect/useState sync)
   const courses = useMemo(() => {
     const rawCourses = coursesData?.courses || [];
-    console.log('coursesData', coursesData);
+   
     // Filter strictly by category to ensure we don't show mixed data
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filtered = rawCourses.filter((item: any) => (item.courseName || '').toLowerCase() === courseCategory.toLowerCase());

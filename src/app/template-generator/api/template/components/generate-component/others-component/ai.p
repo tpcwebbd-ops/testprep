@@ -95,10 +95,9 @@ export const generateAddComponentFile = (inputJsonFile: string): string => {
   // Find the key that has 'EMAIL#readonly'
   const readonlyEmailKey = Object.keys(schema).find(key => schema[key] === 'EMAIL#readonly');
   const stringArray = Object.keys(schema).find(key => {
-    console.log('key', schema[key]);
+ 
     return schema[key] === 'STRINGARRAY#';
-  });
-  console.log('stringArray', stringArray);
+  }); 
   const hasReadonlyEmail = !!readonlyEmailKey;
 
   const componentBodyStatements = new Set<string>();

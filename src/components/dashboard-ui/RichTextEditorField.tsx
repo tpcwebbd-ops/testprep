@@ -134,7 +134,8 @@ export default function RichTextEditorField({ id, value, onChange, label, classN
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
       Highlight,
     ],
-    content: value,
+
+    // content: value,
     editorProps: {
       attributes: {
         class:

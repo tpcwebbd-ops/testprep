@@ -73,7 +73,7 @@ const DashboardViewer = ({ pathString }: { pathString: string }) => {
     q: '',
   });
   const currentPath = `/dashboard${pathString}`;
-  console.log('currentPath', currentPath);
+
   const activeDashboard = useMemo(() => {
     if (!dashboardsData?.dashboards) return null;
     return dashboardsData.dashboards.find((d: IDashboard) => d.dashboardPath.toLowerCase() === currentPath.toLowerCase() && d.isActive !== false);
