@@ -573,7 +573,7 @@ export default function MediaDashboard() {
                 { id: 'video', label: 'Videos', icon: Video },
                 { id: 'audio', label: 'Audio', icon: Headphones },
                 { id: 'pdf', label: 'PDFs', icon: FileText },
-                { id: 'docx', label: 'Docx', icon: FileCode },
+                { id: 'docx', label: 'Docs', icon: FileCode },
               ].map(tab => (
                 <TabsTrigger
                   key={tab.id}
