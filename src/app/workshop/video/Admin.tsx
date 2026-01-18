@@ -30,7 +30,7 @@ const Admin = () => {
                 onClientUploadComplete={res => {
                   if (res) {
                     const newVideos = res.map(file => ({
-                      url: file.url,
+                      url: file.ufsUrl,
                       name: file.name,
                       key: file.key,
                       uploadedAt: new Date().toISOString(),
