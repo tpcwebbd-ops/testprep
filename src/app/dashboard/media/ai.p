@@ -1,295 +1,961 @@
-look at the code carefully
-
-route.ts
-```
-import { NextResponse } from 'next/server';
-import { getMedia, createMedia, updateMedia, deleteMedia, getMediaById } from './controller';
-import { handleRateLimit } from '@/app/api/utils/rate-limit';
-import { isUserHasAccessByRole, IWantAccess } from '../../utils/is-user-has-access-by-role';
-
-export async function GET(req: Request) {
-  const rateLimitResponse = handleRateLimit(req);
-  if (rateLimitResponse) return rateLimitResponse;
-
-  // const wantToAccess: IWantAccess = {
-  //   db_name: 'media',
-  //   access: 'read',
-  // };
-  // const isAccess = await isUserHasAccessByRole(wantToAccess);
-  // if (isAccess) return isAccess;
-
-  const id = new URL(req.url).searchParams.get('id');
-  const result = id ? await getMediaById(req) : await getMedia(req);
-
-  return NextResponse.json(result.data, { status: result.status, statusText: result.message });
-}
-
-export async function POST(req: Request) {
-  const rateLimitResponse = handleRateLimit(req);
-  if (rateLimitResponse) return rateLimitResponse;
-
-  // const wantToAccess: IWantAccess = {
-  //   db_name: 'media',
-  //   access: 'create',
-  // };
-  // const isAccess = await isUserHasAccessByRole(wantToAccess);
-  // if (isAccess) return isAccess;
-
-  const result = await createMedia(req);
-  return NextResponse.json(result.data, { status: result.status, statusText: result.message });
-}
-
-export async function PUT(req: Request) {
-  const rateLimitResponse = handleRateLimit(req);
-  if (rateLimitResponse) return rateLimitResponse;
-
-  // const wantToAccess: IWantAccess = {
-  //   db_name: 'media',
-  //   access: 'update',
-  // };
-  // const isAccess = await isUserHasAccessByRole(wantToAccess);
-  // if (isAccess) return isAccess;
-
-  const result = await updateMedia(req);
-  return NextResponse.json(result.data, { status: result.status, statusText: result.message });
-}
-
-export async function DELETE(req: Request) {
-  const rateLimitResponse = handleRateLimit(req);
-  if (rateLimitResponse) return rateLimitResponse;
-
-  // const wantToAccess: IWantAccess = {
-  //   db_name: 'media',
-  //   access: 'delete',
-  // };
-  // const isAccess = await isUserHasAccessByRole(wantToAccess);
-  // if (isAccess) return isAccess;
-
-  const result = await deleteMedia(req);
-  return NextResponse.json(result.data, { status: result.status, statusText: result.message });
-}
-
-```
-
-controller.ts
-```
-import { withDB } from '@/app/api/utils/db';
-import Media from './model';
-import { formatResponse, IResponse } from '@/app/api/utils/utils';
-import { FilterQuery } from 'mongoose';
-
-interface MongoError extends Error {
-  code?: number;
-  keyValue?: Record<string, unknown>;
-}
-
-function isMongoError(error: unknown): error is MongoError {
-  return error !== null && typeof error === 'object' && 'code' in error && typeof (error as MongoError).code === 'number';
-}
-
-export async function createMedia(req: Request): Promise<IResponse> {
-  return withDB(async () => {
-    try {
-      const mediaData = await req.json();
-      const newMidia = await Media.create(mediaData);
-
-      return formatResponse(newMidia, 'Media created successfully', 201);
-    } catch (error: unknown) {
-      if (isMongoError(error) && error.code === 11000) {
-        return formatResponse(null, `Duplicate: ${JSON.stringify(error.keyValue)}`, 409);
-      }
-      throw error;
-    }
-  });
-}
-
-export async function getMediaById(req: Request): Promise<IResponse> {
-  return withDB(async () => {
-    const id = new URL(req.url).searchParams.get('id');
-    if (!id) return formatResponse(null, 'ID is required', 400);
-
-    const media = await Media.findById(id);
-    if (!media) return formatResponse(null, 'Not found', 404);
-
-    return formatResponse(media, 'Fetched successfully', 200);
-  });
-}
-
-export async function getMedia(req: Request): Promise<IResponse> {
-  return withDB(async () => {
-    const url = new URL(req.url);
-    const page = parseInt(url.searchParams.get('page') || '1');
-    const limit = parseInt(url.searchParams.get('limit') || '10');
-    const skip = (page - 1) * limit;
-
-    const searchQuery = url.searchParams.get('q');
-    let filter: FilterQuery<unknown> = {};
-
-    if (searchQuery) {
-      filter = {
-        $or: [
-          { contentType: { $regex: searchQuery, $options: 'i' } },
-          { status: { $regex: searchQuery, $options: 'i' } },
-          { url: { $regex: searchQuery, $options: 'i' } },
-          { display_url: { $regex: searchQuery, $options: 'i' } },
-        ],
-      };
-    }
-
-    const data = await Media.find(filter).sort({ updatedAt: -1 }).skip(skip).limit(limit);
-    const total = await Media.countDocuments(filter);
-
-    return formatResponse({ data, total, page, limit }, 'Fetched successfully', 200);
-  });
-}
-
-export async function updateMedia(req: Request): Promise<IResponse> {
-  return withDB(async () => {
-    try {
-      const { id, ...updateData } = await req.json();
-      if (!id) return formatResponse(null, 'ID is required', 400);
-
-      const updated = await Media.findByIdAndUpdate(id, updateData, {
-        new: true,
-        runValidators: false,
-      });
-
-      if (!updated) return formatResponse(null, 'Not found', 404);
-
-      return formatResponse(updated, 'Updated successfully', 200);
-    } catch (error: unknown) {
-      if (isMongoError(error) && error.code === 11000) {
-        return formatResponse(null, `Duplicate: ${JSON.stringify(error.keyValue)}`, 409);
-      }
-      throw error;
-    }
-  });
-}
-
-export async function deleteMedia(req: Request): Promise<IResponse> {
-  return withDB(async () => {
-    const { id } = await req.json();
-    if (!id) return formatResponse(null, 'ID required', 400);
-
-    const deleted = await Media.findByIdAndDelete(id);
-    if (!deleted) return formatResponse(null, 'Not found', 404);
-
-    return formatResponse({ deletedCount: 1 }, 'Deleted successfully', 200);
-  });
-}
-
-```
-
-model.ts
-```
-import mongoose from 'mongoose';
-
-const mediaSchema = new mongoose.Schema(
-  {
-    delete_url: {
-      type: String,
-      trim: true,
-    },
-    display_url: {
-      type: String,
-      trim: true,
-    },
-    name: {
-      type: String,
-      trim: true,
-    },
-    url: {
-      type: String,
-      trim: true,
-    },
-    author_email: {
-      type: String,
-      trim: true,
-    },
-    status: {
-      type: String,
-      enum: ['active', 'trash'],
-      default: 'active',
-    },
-    contentType: {
-      type: String,
-      enum: ['video', 'image', 'pdf', 'docx', 'audio'],
-      default: 'image',
-    },
-  },
-  {
-    timestamps: true,
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true },
-  },
-);
-
-export default mongoose.models.Media || mongoose.model('Media', mediaSchema);
-
-```
-
-mediaSlice.ts
-```
-import { apiSlice } from '@/redux/api/apiSlice';
-
-export const mediaApi = apiSlice.injectEndpoints({
-  endpoints: builder => ({
-    getMedias: builder.query({
-      query: ({ page, limit, q }) => {
-        let url = `/api/media/v1?page=${page || 1}&limit=${limit || 10}`;
-        if (q) {
-          url += `&q=${encodeURIComponent(q)}`;
-        }
-        return url;
-      },
-      providesTags: [{ type: 'tagTypeMedia', id: 'LIST' }],
-    }),
-    getMediaById: builder.query({
-      query: id => `/api/media/v1?id=${id}`,
-      providesTags: (result, error, id) => [{ type: 'tagTypeMedia', id }],
-    }),
-    addMedia: builder.mutation({
-      query: newMedia => ({
-        url: '/api/media/v1',
-        method: 'POST',
-        body: newMedia,
-      }),
-      invalidatesTags: [{ type: 'tagTypeMedia', id: 'LIST' }],
-    }),
-    updateMedia: builder.mutation({
-      query: ({ id, ...data }) => ({
-        url: `/api/media/v1`,
-        method: 'PUT',
-        body: { id, ...data },
-      }),
-      invalidatesTags: (result, error, { id }) => [
-        { type: 'tagTypeMedia', id },
-        { type: 'tagTypeMedia', id: 'LIST' },
-      ],
-    }),
-    deleteMedia: builder.mutation({
-      query: ({ id }) => ({
-        url: `/api/media/v1`,
-        method: 'DELETE',
-        body: { id },
-      }),
-      invalidatesTags: (result, error, { id }) => [
-        { type: 'tagTypeMedia', id },
-        { type: 'tagTypeMedia', id: 'LIST' },
-      ],
-    }),
-  }),
-});
-
-export const { useGetMediasQuery, useGetMediaByIdQuery, useAddMediaMutation, useUpdateMediaMutation, useDeleteMediaMutation } = mediaApi;
-
-```
-
-page.tsx
+look at the first page.tsx 
 ```
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+  DragStartEvent,
+  DragOverlay,
+  DragOverEvent,
+  pointerWithin,
+} from '@dnd-kit/core';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { Eye, Edit2, Trash2, Plus, GripVertical, Save, ChevronDown, ChevronRight, Loader2, Search } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { toast } from 'react-toastify';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+  useGetSidebarsQuery,
+  useAddSidebarMutation,
+  useUpdateSidebarMutation,
+  useDeleteSidebarMutation,
+  useBulkUpdateSidebarsMutation,
+} from '@/redux/features/sidebars/sidebarsSlice';
+
+// --- Updated Import ---
+import { iconMap, iconOptions } from '@/components/all-icons/all-icons-jsx';
+import { DragState, SidebarItem, SortableItemProps } from './utils';
+import { logger } from 'better-auth';
+
+function SortableItem({
+  item,
+  onView,
+  onEdit,
+  onDelete,
+  onAddChild,
+  onToggleCollapse,
+  isCollapsed = false,
+  isChild = false,
+  isOverTarget = false,
+  isDragging = false,
+  dropPosition = null,
+}: SortableItemProps) {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+    id: item.sl_no.toString(),
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0 : 1,
+  };
+
+  const hasChildren = item.children && item.children.length > 0;
+
+  const getBorderClass = () => {
+    if (!isOverTarget) return 'border border-white/20';
+    if (dropPosition === 'inside') return 'border-2 border-purple-400 ring-2 ring-purple-400/50';
+    if (dropPosition === 'before') return 'border-t-4 border-t-blue-400 border-x border-b border-white/20';
+    if (dropPosition === 'after') return 'border-b-4 border-b-blue-400 border-x border-t border-white/20';
+    return 'border-2 border-blue-400 ring-2 ring-blue-400/50';
+  };
+
+  return (
+    <motion.div
+      ref={setNodeRef}
+      style={style}
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, height: 0 }}
+      transition={{ duration: 0.2 }}
+      className={`group relative backdrop-blur-xl bg-white/10 rounded-lg p-2 shadow-lg hover:shadow-2xl hover:bg-white/20 transition-all duration-300 ${
+        isChild ? 'ml-6' : ''
+      } ${getBorderClass()}`}
+    >
+      <div className="flex items-center gap-2">
+        <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing p-1 hover:bg-white/20 rounded transition-colors">
+          <GripVertical size={18} className="text-gray-300" />
+        </div>
+
+        {!isChild && hasChildren && (
+          <Button onClick={() => onToggleCollapse?.(item.sl_no)} variant="outlineGlassy" className="w-1 min-w-1" size="xs">
+            {isCollapsed ? <ChevronRight size={16} className="text-gray-300" /> : <ChevronDown size={16} className="text-gray-300" />}
+          </Button>
+        )}
+
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <div className="p-1.5 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-lg">{item.icon}</div>
+          <span className="font-medium text-sm text-white truncate">{item.name}</span>
+        </div>
+
+        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <Button onClick={() => onView(item)} variant="outlineGlassy" className="min-w-1" size="xs">
+            <Eye size={14} />
+          </Button>
+          <Button onClick={() => onEdit(item)} variant="outlineGlassy" className="min-w-1" size="xs">
+            <Edit2 size={14} />
+          </Button>
+          <Button onClick={() => onDelete(item)} variant="outlineGlassy" className="min-w-1" size="xs">
+            <Trash2 size={14} />
+          </Button>
+          {!isChild && onAddChild && (
+            <Button onClick={() => onAddChild(item)} variant="outlineGlassy" className="min-w-1" size="xs">
+              Add +
+            </Button>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function DropZone({ id, label, isOver }: { id: string; label: string; isOver: boolean }) {
+  const { setNodeRef } = useSortable({ id });
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={`h-12 rounded-lg border-2 border-dashed transition-all duration-200 flex items-center justify-center ${
+        isOver ? 'border-green-400 bg-green-400/20 scale-105' : 'border-white/20 bg-white/5'
+      }`}
+    >
+      <span className={`text-sm font-medium transition-colors ${isOver ? 'text-green-300' : 'text-gray-400'}`}>{label}</span>
+    </div>
+  );
+}
+
+export default function SiteMenuPage() {
+  const { data: sidebarData, isLoading, refetch } = useGetSidebarsQuery({ page: 1, limit: 100 });
+  const [addSidebar] = useAddSidebarMutation();
+  const [updateSidebar] = useUpdateSidebarMutation();
+  const [deleteSidebar] = useDeleteSidebarMutation();
+  const [bulkUpdateSidebars] = useBulkUpdateSidebarsMutation();
+
+  const [menuItems, setMenuItems] = useState<SidebarItem[]>([]);
+  const [originalData, setOriginalData] = useState<SidebarItem[]>([]);
+  const [, setHasChanges] = useState(false);
+  const [viewItem, setViewItem] = useState<SidebarItem | null>(null);
+  const [editItem, setEditItem] = useState<SidebarItem | null>(null);
+  const [addParentItem, setAddParentItem] = useState<SidebarItem | null>(null);
+  const [deleteItem, setDeleteItem] = useState<SidebarItem | null>(null);
+  const [isAddingNew, setIsAddingNew] = useState(false);
+
+  const [formData, setFormData] = useState({ name: '', path: '', iconName: 'Menu' });
+  const [collapsedItems, setCollapsedItems] = useState<Set<number>>(new Set());
+  const [iconSearch, setIconSearch] = useState('');
+
+  const [dragState, setDragState] = useState<DragState>({
+    activeId: null,
+    overId: null,
+    activeItem: null,
+    originalParentId: null,
+    originalIndex: -1,
+  });
+
+  // Filter icons based on search
+  const filteredIcons = useMemo(() => {
+    if (!iconSearch) return iconOptions.slice(0, 100);
+    return iconOptions.filter(i => i.toLowerCase().includes(iconSearch.toLowerCase()));
+  }, [iconSearch]);
+
+  useEffect(() => {
+    if (sidebarData?.data?.sidebars) {
+      // Helper to map DB item to State Item
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mapItem = (item: any): SidebarItem => {
+        const IconComp = iconMap[item.iconName || 'Menu'] || iconMap.Menu;
+        return {
+          ...item,
+          // Render the component
+          icon: <IconComp size={18} />,
+          children: item.children?.map(mapItem),
+        };
+      };
+
+      const formattedData = sidebarData.data.sidebars.map(mapItem);
+      setMenuItems(formattedData);
+      setOriginalData(JSON.parse(JSON.stringify(formattedData)));
+      setHasChanges(false);
+    }
+  }, [sidebarData]);
+
+  // Reset icon search on dialog close
+  useEffect(() => {
+    if (!editItem && !isAddingNew && !addParentItem) {
+      setIconSearch('');
+    }
+  }, [editItem, isAddingNew, addParentItem]);
+
+  useEffect(() => {
+    const compareItems = (items1: SidebarItem[], items2: SidebarItem[]): boolean => {
+      if (items1.length !== items2.length) return false;
+
+      return items1.every((item1, index) => {
+        const item2 = items2[index];
+        if (!item2) return false;
+
+        const basicMatch = item1.sl_no === item2.sl_no && item1.name === item2.name && item1.path === item2.path && item1.iconName === item2.iconName;
+
+        if (!basicMatch) return false;
+
+        const children1 = item1.children || [];
+        const children2 = item2.children || [];
+
+        if (children1.length !== children2.length) return false;
+
+        return children1.every((child1, childIndex) => {
+          const child2 = children2[childIndex];
+          return child2 && child1.sl_no === child2.sl_no && child1.name === child2.name && child1.path === child2.path && child1.iconName === child2.iconName;
+        });
+      });
+    };
+
+    const dataChanged = !compareItems(menuItems, originalData);
+    setHasChanges(dataChanged);
+  }, [menuItems, originalData]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  const updateSlNo = (items: SidebarItem[]): SidebarItem[] => {
+    return items.map((item, index) => {
+      const newSlNo = (index + 1) * 10;
+      return {
+        ...item,
+        sl_no: newSlNo,
+        children: item.children?.map((child, childIndex) => ({
+          ...child,
+          sl_no: newSlNo + childIndex + 1,
+        })),
+      };
+    });
+  };
+
+  const findItemById = (id: string, items: SidebarItem[] = menuItems): { item: SidebarItem; parentId: number | null; index: number } | null => {
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (item.sl_no.toString() === id) {
+        return { item, parentId: null, index: i };
+      }
+      if (item.children) {
+        for (let j = 0; j < item.children.length; j++) {
+          if (item.children[j].sl_no.toString() === id) {
+            return { item: item.children[j], parentId: item.sl_no, index: j };
+          }
+        }
+      }
+    }
+    return null;
+  };
+
+  const getAllSortableIds = (): string[] => {
+    const ids: string[] = ['drop-zone-top'];
+    menuItems.forEach(item => {
+      ids.push(item.sl_no.toString());
+      if (item.children) {
+        item.children.forEach(child => ids.push(child.sl_no.toString()));
+      }
+    });
+    return ids;
+  };
+
+  const getDropPosition = (overId: string, activeId: string): 'before' | 'after' | 'inside' | null => {
+    if (!overId || overId === activeId) return null;
+
+    const overItem = findItemById(overId);
+    const activeItem = findItemById(activeId);
+
+    if (!overItem || !activeItem) return null;
+
+    if (overItem.parentId === null && activeItem.parentId !== null) {
+      return 'inside';
+    }
+
+    if (overItem.parentId === activeItem.parentId) {
+      return overItem.index > activeItem.index ? 'after' : 'before';
+    }
+
+    return 'inside';
+  };
+
+  const handleDragStart = (event: DragStartEvent) => {
+    const activeId = event.active.id.toString();
+    const result = findItemById(activeId);
+
+    if (result) {
+      setDragState({
+        activeId,
+        overId: null,
+        activeItem: result.item,
+        originalParentId: result.parentId,
+        originalIndex: result.index,
+      });
+    }
+  };
+
+  const handleDragOver = (event: DragOverEvent) => {
+    const overId = event.over?.id?.toString() || null;
+    setDragState(prev => ({ ...prev, overId }));
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over) {
+      handleDragCancel();
+      return;
+    }
+
+    const activeId = active.id.toString();
+    const overId = over.id.toString();
+
+    if (activeId === overId) {
+      handleDragCancel();
+      return;
+    }
+
+    const activeResult = findItemById(activeId);
+    const overResult = overId === 'drop-zone-top' ? null : findItemById(overId);
+
+    if (!activeResult) {
+      handleDragCancel();
+      return;
+    }
+
+    setMenuItems(items => {
+      let newItems = [...items];
+
+      if (overId === 'drop-zone-top') {
+        newItems = newItems.map(item => ({
+          ...item,
+          children: item.children?.filter(c => c.sl_no !== activeResult.item.sl_no),
+        }));
+
+        const itemToMove = { ...activeResult.item, children: [] };
+        newItems = [itemToMove, ...newItems];
+        toast.success(`"${activeResult.item.name}" moved to top level!`, { toastId: `move-top-${Date.now()}` });
+        return updateSlNo(newItems);
+      }
+
+      if (!overResult) return items;
+
+      if (overResult.parentId === null) {
+        newItems = newItems.map(item => ({
+          ...item,
+          children: item.children?.filter(c => c.sl_no !== activeResult.item.sl_no),
+        }));
+
+        newItems = newItems.filter(item => item.sl_no !== activeResult.item.sl_no);
+
+        const targetParent = newItems.find(item => item.sl_no === overResult.item.sl_no);
+        if (targetParent) {
+          const childToAdd = { ...activeResult.item };
+          delete childToAdd.children;
+          targetParent.children = [...(targetParent.children || []), childToAdd];
+          toast.success(`"${activeResult.item.name}" moved to "${targetParent.name}" submenu!`, { toastId: `move-submenu-${Date.now()}` });
+        }
+
+        return updateSlNo(newItems);
+      }
+
+      if (activeResult.parentId === overResult.parentId) {
+        const parent = newItems.find(item => item.sl_no === activeResult.parentId);
+        if (parent?.children) {
+          const oldIndex = parent.children.findIndex(c => c.sl_no === activeResult.item.sl_no);
+          const newIndex = parent.children.findIndex(c => c.sl_no === overResult.item.sl_no);
+          parent.children = arrayMove(parent.children, oldIndex, newIndex);
+          toast.success('Submenu reordered!', { toastId: `reorder-${Date.now()}` });
+        }
+        return updateSlNo(newItems);
+      }
+
+      newItems = newItems.map(item => {
+        if (item.sl_no === activeResult.parentId) {
+          return {
+            ...item,
+            children: item.children?.filter(c => c.sl_no !== activeResult.item.sl_no),
+          };
+        }
+        if (item.sl_no === overResult.parentId) {
+          const childToAdd = { ...activeResult.item };
+          delete childToAdd.children;
+          return {
+            ...item,
+            children: [...(item.children || []), childToAdd],
+          };
+        }
+        return item;
+      });
+
+      toast.success(`"${activeResult.item.name}" moved successfully!`, { toastId: `move-${Date.now()}` });
+      return updateSlNo(newItems);
+    });
+
+    handleDragCancel();
+  };
+
+  const handleDragCancel = () => {
+    setDragState({
+      activeId: null,
+      overId: null,
+      activeItem: null,
+      originalParentId: null,
+      originalIndex: -1,
+    });
+  };
+
+  const handleToggleCollapse = (itemId: number) => {
+    setCollapsedItems(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(itemId)) {
+        newSet.delete(itemId);
+      } else {
+        newSet.add(itemId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleDelete = (item: SidebarItem) => {
+    setDeleteItem(item);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteItem) return;
+
+    try {
+      let parentItem = null;
+      for (const item of menuItems) {
+        if (item.children && item.children.some(child => child.sl_no === deleteItem.sl_no)) {
+          parentItem = item;
+          break;
+        }
+      }
+
+      if (parentItem) {
+        const updatedChildren = (parentItem.children ?? [])
+          .filter(child => child.sl_no !== deleteItem.sl_no)
+          .map(({ icon, ...rest }) => {
+            logger.info(JSON.stringify(icon));
+            return rest;
+          });
+        await updateSidebar({
+          id: parentItem._id,
+          name: parentItem.name,
+          path: parentItem.path,
+          iconName: parentItem.iconName,
+          children: updatedChildren,
+        }).unwrap();
+        toast.success(`"${deleteItem.name}" deleted successfully!`, { toastId: `delete-${Date.now()}` });
+      } else if (deleteItem._id) {
+        await deleteSidebar({ id: deleteItem._id }).unwrap();
+        toast.success(`"${deleteItem.name}" deleted successfully!`, { toastId: `delete-${Date.now()}` });
+      }
+      setDeleteItem(null);
+      refetch();
+    } catch {
+      toast.error('Failed to delete sidebar item', { toastId: `error-delete-${Date.now()}` });
+    }
+  };
+
+  const handleEditSave = async () => {
+    if (!editItem) return;
+
+    try {
+      let parentItem = null;
+      for (const item of menuItems) {
+        if (item.children && item.children.some(child => child.sl_no === editItem.sl_no)) {
+          parentItem = item;
+          break;
+        }
+      }
+
+      if (parentItem) {
+        const updatedChildren = (parentItem.children ?? [])
+          .map(child => {
+            if (child.sl_no === editItem.sl_no) {
+              const IconComp = iconMap[formData.iconName] || iconMap.Menu;
+              return {
+                ...child,
+                name: formData.name,
+                path: formData.path,
+                iconName: formData.iconName,
+                icon: <IconComp size={18} />,
+              };
+            }
+            return child;
+          })
+          .map(({ icon, ...rest }) => {
+            logger.info(JSON.stringify(icon));
+            return rest;
+          });
+
+        await updateSidebar({
+          id: parentItem._id,
+          name: parentItem.name,
+          path: parentItem.path,
+          iconName: parentItem.iconName,
+          children: updatedChildren,
+        }).unwrap();
+        toast.success(`"${formData.name}" updated successfully!`, { toastId: `edit-${Date.now()}` });
+      } else if (editItem._id) {
+        await updateSidebar({
+          id: editItem._id,
+          name: formData.name,
+          path: formData.path,
+          iconName: formData.iconName,
+        }).unwrap();
+        toast.success(`"${formData.name}" updated successfully!`, { toastId: `edit-${Date.now()}` });
+      }
+
+      setEditItem(null);
+      setFormData({ name: '', path: '', iconName: 'Menu' });
+      refetch();
+    } catch {
+      toast.error('Failed to update sidebar item', { toastId: `error-edit-${Date.now()}` });
+    }
+  };
+
+  const handleAddNew = async () => {
+    if (!formData.name || !formData.path) {
+      toast.error('Please fill in all fields', { toastId: `error-${Date.now()}` });
+      return;
+    }
+
+    try {
+      const newSlNo = (menuItems.length + 1) * 10;
+
+      await addSidebar({
+        sl_no: newSlNo,
+        name: formData.name,
+        path: formData.path,
+        iconName: formData.iconName,
+        children: [],
+      }).unwrap();
+
+      toast.success(`"${formData.name}" added successfully!`, { toastId: `add-${Date.now()}` });
+      setIsAddingNew(false);
+      setFormData({ name: '', path: '', iconName: 'Menu' });
+      refetch();
+    } catch {
+      toast.error('Failed to add sidebar item', { toastId: `error-add-${Date.now()}` });
+    }
+  };
+
+  const handleAddChild = () => {
+    if (!addParentItem || !formData.name || !formData.path) {
+      toast.error('Please fill in all fields', { toastId: `error-${Date.now()}` });
+      return;
+    }
+
+    const IconComp = iconMap[formData.iconName] || iconMap.Menu;
+
+    setMenuItems(items =>
+      updateSlNo(
+        items.map(item => {
+          if (item.sl_no === addParentItem.sl_no) {
+            const children = item.children || [];
+            const newChild: SidebarItem = {
+              sl_no: item.sl_no * 10 + children.length + 1,
+              name: formData.name,
+              path: formData.path,
+              icon: <IconComp size={18} />,
+              iconName: formData.iconName,
+            };
+            return { ...item, children: [...children, newChild] };
+          }
+          return item;
+        }),
+      ),
+    );
+
+    toast.success(`"${formData.name}" added as submenu!`, { toastId: `add-child-${Date.now()}` });
+    setAddParentItem(null);
+    setFormData({ name: '', path: '', iconName: 'Menu' });
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const updates = menuItems.map(item => {
+        const { icon, ...itemWithoutIcon } = item;
+        logger.info(JSON.stringify(icon));
+        return {
+          id: item._id,
+          updateData: {
+            ...itemWithoutIcon,
+            children: item.children?.map(({ icon: childIcon, ...child }) => {
+              logger.info(JSON.stringify(childIcon));
+              return child;
+            }),
+          },
+        };
+      });
+
+      await bulkUpdateSidebars(updates).unwrap();
+      toast.success('Menu data saved successfully!', { toastId: `submit-${Date.now()}` });
+      refetch();
+    } catch (error) {
+      logger.error(JSON.stringify(error));
+      toast.error('Failed to save menu data', { toastId: `error-submit-${Date.now()}` });
+    }
+  };
+
+  // Helper for rendering Icon Grid with Names
+  const renderIconGrid = () => (
+    <div className="space-y-2">
+      <div className="relative">
+        <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+        <Input
+          value={iconSearch}
+          onChange={e => setIconSearch(e.target.value)}
+          placeholder="Search icons..."
+          className="pl-8 h-8 bg-white/5 border-white/10 text-xs text-white"
+        />
+      </div>
+      <ScrollArea className="h-48 border border-white/10 rounded-lg p-2 bg-white/5">
+        <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
+          {filteredIcons.map(iconName => {
+            const IconComp = iconMap[iconName];
+            if (!IconComp) return null;
+            return (
+              <button
+                key={iconName}
+                type="button"
+                onClick={() => setFormData({ ...formData, iconName: iconName })}
+                className={`flex flex-col items-center justify-center p-2 rounded hover:bg-white/20 gap-1 transition-all h-16 hover:text-white hover:border border-slate-100/50 ${
+                  formData.iconName === iconName ? 'bg-blue-600 text-white scale-105' : 'text-gray-400'
+                }`}
+                title={iconName}
+              >
+                <IconComp size={18} />
+                <span className="text-[10px] truncate w-full text-center leading-none">{iconName}</span>
+              </button>
+            );
+          })}
+        </div>
+        {filteredIcons.length === 0 && <div className="text-center text-gray-500 text-xs py-8">No icons found</div>}
+      </ScrollArea>
+    </div>
+  );
+
+  if (isLoading) {
+    return (
+      <main className="min-h-screen bg-transparent blur-4xl flex items-center justify-center">
+        <Loader2 className="w-12 h-12 animate-spin text-white" />
+      </main>
+    );
+  }
+
+  return (
+    <main className="min-h-screen p-2 bg-transparent blur-4xl sm:p-4 md:p-6">
+      <div className="mt-[65px]" />
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-6xl mx-auto">
+        <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-xl p-3 sm:p-4 mb-4 shadow-2xl">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1">Site Menu Editor</h1>
+              <p className="text-sm text-gray-300">Drag submenu items anywhere: reorder, move between parents, or promote to top-level</p>
+            </div>
+            <Button onClick={() => setIsAddingNew(true)} variant="outlineGlassy" size="sm">
+              <Plus size={18} className="mr-2" />
+              Add New Menu
+            </Button>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <DndContext
+            sensors={sensors}
+            collisionDetection={pointerWithin}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDragEnd={handleDragEnd}
+            onDragCancel={handleDragCancel}
+          >
+            <SortableContext items={getAllSortableIds()} strategy={verticalListSortingStrategy}>
+              <DropZone id="drop-zone-top" label="Drop here to create top-level menu" isOver={dragState.overId === 'drop-zone-top'} />
+
+              <AnimatePresence mode="popLayout">
+                {menuItems.map(item => (
+                  <div key={item.sl_no} className="space-y-2">
+                    <SortableItem
+                      item={item}
+                      onView={setViewItem}
+                      onEdit={i => {
+                        setEditItem(i);
+                        setFormData({ name: i.name, path: i.path, iconName: i.iconName || 'Menu' });
+                      }}
+                      onDelete={handleDelete}
+                      onAddChild={setAddParentItem}
+                      onToggleCollapse={handleToggleCollapse}
+                      isCollapsed={collapsedItems.has(item.sl_no)}
+                      isOverTarget={dragState.overId === item.sl_no.toString()}
+                      isDragging={dragState.activeId === item.sl_no.toString()}
+                      dropPosition={getDropPosition(dragState.overId || '', dragState.activeId || '')}
+                    />
+
+                    {item.children && item.children.length > 0 && !collapsedItems.has(item.sl_no) && (
+                      <motion.div
+                        className="space-y-2"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        {item.children.map(child => (
+                          <SortableItem
+                            key={child.sl_no}
+                            item={child}
+                            onView={setViewItem}
+                            onEdit={i => {
+                              setEditItem(i);
+                              setFormData({ name: i.name, path: i.path, iconName: i.iconName || 'Menu' });
+                            }}
+                            onDelete={handleDelete}
+                            isChild
+                            isOverTarget={dragState.overId === child.sl_no.toString()}
+                            isDragging={dragState.activeId === child.sl_no.toString()}
+                            dropPosition={getDropPosition(dragState.overId || '', dragState.activeId || '')}
+                          />
+                        ))}
+                      </motion.div>
+                    )}
+                  </div>
+                ))}
+              </AnimatePresence>
+            </SortableContext>
+
+            <DragOverlay dropAnimation={null}>
+              {dragState.activeItem ? (
+                <div className="backdrop-blur-xl bg-white/30 border-2 border-blue-400 rounded-lg p-2 shadow-2xl cursor-grabbing">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1 bg-white/40 rounded">
+                      <GripVertical size={18} className="text-white" />
+                    </div>
+                    <div className="flex items-center gap-2 flex-1">
+                      <div className="p-1.5 bg-gradient-to-br from-blue-400/50 to-purple-400/50 rounded-lg">{dragState.activeItem.icon}</div>
+                      <span className="font-semibold text-sm text-white">{dragState.activeItem.name}</span>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+            </DragOverlay>
+          </DndContext>
+        </div>
+
+        <div className="w-full flex items-center justify-end mt-4">
+          <Button onClick={handleSubmit} variant="outlineGlassy">
+            <Save size={20} className="mr-2" />
+            Submit Menu
+          </Button>
+        </div>
+      </motion.div>
+
+      <Dialog open={!!viewItem} onOpenChange={() => setViewItem(null)}>
+        <DialogContent className="backdrop-blur-xl bg-transparent border border-white/20 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">View Menu Item</DialogTitle>
+          </DialogHeader>
+          {viewItem && (
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 p-3 bg-white/10 rounded-lg">
+                <div className="p-2 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-lg">{viewItem.icon}</div>
+                <span className="font-semibold text-lg">{viewItem.name}</span>
+              </div>
+              <div className="grid grid-cols-1 gap-2 text-sm">
+                <div className="p-2 bg-white/5 rounded">
+                  <span className="text-gray-400">Serial No:</span>
+                  <span className="ml-2 font-mono">{viewItem.sl_no}</span>
+                </div>
+                <div className="p-2 bg-white/5 rounded">
+                  <span className="text-gray-400">Path:</span>
+                  <span className="ml-2 font-mono">{viewItem.path}</span>
+                </div>
+                <div className="p-2 bg-white/5 rounded">
+                  <span className="text-gray-400">Icon:</span>
+                  <span className="ml-2">{viewItem.iconName || 'N/A'}</span>
+                </div>
+                {viewItem.children && (
+                  <div className="p-2 bg-white/5 rounded">
+                    <span className="text-gray-400">Submenu Items:</span>
+                    <span className="ml-2">{viewItem.children.length}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!editItem} onOpenChange={() => setEditItem(null)}>
+        <DialogContent className="backdrop-blur-xl bg-transparent border border-white/20 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">Edit Menu Item</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label className="text-white mb-2">Name</Label>
+              <Input
+                value={formData.name}
+                onChange={e => setFormData({ ...formData, name: e.target.value })}
+                className="bg-white/10 border-white/20 text-white"
+              />
+            </div>
+            <div>
+              <Label className="text-white mb-2">Path</Label>
+              <Input
+                value={formData.path}
+                onChange={e => setFormData({ ...formData, path: e.target.value })}
+                className="bg-white/10 border-white/20 text-white"
+              />
+            </div>
+            <div>
+              <Label className="text-white mb-2">Icon</Label>
+              {renderIconGrid()}
+            </div>
+            <div className="w-full flex items-center justify-end">
+              <Button onClick={handleEditSave} variant="outlineGlassy" size="sm">
+                Save Changes
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isAddingNew} onOpenChange={setIsAddingNew}>
+        <DialogContent className="backdrop-blur-xl bg-transparent border border-white/20 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">Add New Menu</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label className="text-white mb-2">Name</Label>
+              <Input
+                value={formData.name}
+                onChange={e => setFormData({ ...formData, name: e.target.value })}
+                className="bg-white/10 border-white/20 text-white"
+                placeholder="Enter menu name"
+              />
+            </div>
+            <div>
+              <Label className="text-white mb-2">Path</Label>
+              <Input
+                value={formData.path}
+                onChange={e => setFormData({ ...formData, path: e.target.value })}
+                className="bg-white/10 border-white/20 text-white"
+                placeholder="/dashboard/..."
+              />
+            </div>
+            <div>
+              <Label className="text-white mb-2">Icon</Label>
+              {renderIconGrid()}
+            </div>
+            <div className="w-full flex justify-end">
+              <Button onClick={handleAddNew} variant="outlineGlassy">
+                Add Menu
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!addParentItem} onOpenChange={() => setAddParentItem(null)}>
+        <DialogContent className="backdrop-blur-xl bg-transparent border border-white/20 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">Add Submenu to &quot;{addParentItem?.name}&quot;</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label className="text-white mb-2">Name</Label>
+              <Input
+                value={formData.name}
+                onChange={e => setFormData({ ...formData, name: e.target.value })}
+                className="bg-white/10 border-white/20 text-white"
+                placeholder="Enter submenu name"
+              />
+            </div>
+            <div>
+              <Label className="text-white mb-2">Path</Label>
+              <Input
+                value={formData.path}
+                onChange={e => setFormData({ ...formData, path: e.target.value })}
+                className="bg-white/10 border-white/20 text-white"
+                placeholder="/dashboard/..."
+              />
+            </div>
+            <div>
+              <Label className="text-white mb-2">Icon</Label>
+              {renderIconGrid()}
+            </div>
+            <div className="w-full flex items-center justify-end">
+              <Button onClick={handleAddChild} variant="outlineGlassy" size="sm">
+                Add Submenu
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!deleteItem} onOpenChange={() => setDeleteItem(null)}>
+        <DialogContent className="backdrop-blur-xl bg-transparent border border-white/20 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">Delete Menu Item</DialogTitle>
+          </DialogHeader>
+          {deleteItem && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-3 p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
+                <div className="p-2 bg-gradient-to-br from-red-500/20 to-orange-500/20 rounded-lg">{deleteItem.icon}</div>
+                <div className="flex-1">
+                  <p className="font-semibold text-lg">{deleteItem.name}</p>
+                  <p className="text-sm text-gray-400 font-mono">{deleteItem.path}</p>
+                </div>
+              </div>
+              <p className="text-gray-300 text-sm">
+                Are you sure you want to delete <span className="font-semibold text-white">&quot;{deleteItem.name}&quot;</span>? This action cannot be undone.
+              </p>
+              {deleteItem.children && deleteItem.children.length > 0 && (
+                <div className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+                  <p className="text-yellow-300 text-sm font-medium">
+                    ⚠️ Warning: This menu has {deleteItem.children.length} submenu item(s) that will also be deleted.
+                  </p>
+                </div>
+              )}
+              <div className="flex items-center gap-3 justify-end pt-2">
+                <Button onClick={() => setDeleteItem(null)} variant="outlineGlassy" size="sm">
+                  Cancel
+                </Button>
+                <Button onClick={confirmDelete} variant="outlineFire" size="sm">
+                  <Trash2 size={16} />
+                  Delete
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </main>
+  );
+}
+```
+
+and here is second page.tsx 
+```
+'use client';
+
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutGrid,
@@ -300,22 +966,15 @@ import {
   Trash2,
   CheckCircle,
   Plus,
-  Loader2,
-  AlertCircle,
   HardDrive,
   Ghost,
-  XIcon,
-  Save,
-  Edit2,
   Headphones,
-  Music,
   Volume2,
   Eye,
-  Download,
-  Type,
-  PlayCircle,
-  FileSearch,
-  LinkIcon,
+  Search,
+  X,
+  RefreshCw,
+  Loader2,
 } from 'lucide-react';
 import { IoReloadCircleOutline } from 'react-icons/io5';
 import { toast } from 'react-toastify';
@@ -323,10 +982,8 @@ import Image from 'next/image';
 
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
 
 import { useGetMediasQuery, useAddMediaMutation, useUpdateMediaMutation, useDeleteMediaMutation } from '@/redux/features/media/mediaSlice';
 
@@ -336,130 +993,82 @@ import { CustomLink } from '@/components/dashboard-ui/LinkButton';
 
 type MediaType = 'all' | 'video' | 'image' | 'pdf' | 'docx' | 'audio';
 type MediaStatus = 'active' | 'trash';
+
 interface MediaItem {
   _id: string;
   url: string;
-  display_url?: string;
   name?: string;
   contentType: MediaType;
   status: MediaStatus;
   createdAt: string;
-  updatedAt: string;
 }
 
 export default function MediaDashboard() {
   const [activeTab, setActiveTab] = useState<MediaType>('all');
   const [activeStatus, setActiveStatus] = useState<MediaStatus>('active');
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-
+  const [processingId, setProcessingId] = useState<string | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isPreviewDialogOpen, setIsPreviewDialogOpen] = useState(false);
-  const [editingMedia, setEditingMedia] = useState<MediaItem | null>(null);
   const [previewMedia, setPreviewMedia] = useState<MediaItem | null>(null);
 
-  const [uploadingType, setUploadingType] = useState<MediaType | null>(null);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchQuery), 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
-  const [newMedia, setNewMedia] = useState({
-    url: '',
-    name: '',
-    contentType: 'image' as MediaType,
-    status: 'active' as MediaStatus,
+  const {
+    data: response,
+    isLoading,
+    isFetching,
+    refetch,
+  } = useGetMediasQuery({
+    page: currentPage,
+    limit: 10,
+    q: debouncedSearch,
+    contentType: activeTab,
+    status: activeStatus,
   });
-  const page = 1;
-  const limit = 20;
-  const q = '';
-  const tabs = 'images';
-  const { data: response, isLoading, isFetching, refetch } = useGetMediasQuery({ page, limit, q, tabs });
+
   const [addMedia, { isLoading: isAdding }] = useAddMediaMutation();
-  const [updateMedia, { isLoading: isUpdating }] = useUpdateMediaMutation();
+  const [updateMedia] = useUpdateMediaMutation();
   const [deleteMedia] = useDeleteMediaMutation();
 
-  const items = useMemo<MediaItem[]>(() => response?.data || [], [response?.data]);
-  console.log('items', items);
-  const handleAddMedia = async () => {
-    if (!newMedia.url) return toast.error('URL is required');
-    try {
-      await addMedia(newMedia).unwrap();
-      toast.success('Media added successfully');
-      setIsAddDialogOpen(false);
-      setNewMedia({ url: '', name: '', contentType: 'image', status: 'active' });
-    } catch {
-      toast.error('Failed to add media');
-    }
-  };
-
-  const openEditDialog = (item: MediaItem) => {
-    setEditingMedia(item);
-    setIsEditDialogOpen(true);
-  };
-
-  const openPreviewDialog = (item: MediaItem) => {
-    setPreviewMedia(item);
-    setIsPreviewDialogOpen(true);
-  };
-
-  const handleUpdateMedia = async () => {
-    if (!editingMedia || !editingMedia.url) return toast.error('URL is required');
-    try {
-      await updateMedia({
-        id: editingMedia._id,
-        url: editingMedia.url,
-        name: editingMedia.name,
-        contentType: editingMedia.contentType,
-        status: editingMedia.status,
-      }).unwrap();
-      toast.success('Media updated successfully');
-      setIsEditDialogOpen(false);
-      setEditingMedia(null);
-    } catch {
-      toast.error('Failed to update media');
-    }
-  };
+  const items = useMemo(() => response?.data || [], [response]);
+  const totalItems = response?.total || 0;
+  const totalPages = Math.ceil(totalItems / 10);
 
   const handleUpdateStatus = async (id: string, newStatus: MediaStatus) => {
+    setProcessingId(id);
     try {
       await updateMedia({ id, status: newStatus }).unwrap();
-      toast.success(`Moved to ${newStatus}`);
+      toast.success(`Asset status synchronized to ${newStatus}`);
     } catch {
-      toast.error('Failed to update status');
+      toast.error('Pessimistic update failed: Server unreachable');
+    } finally {
+      setProcessingId(null);
     }
   };
 
   const handleDelete = async (id: string) => {
+    if (!confirm('Permanent deletion is irreversible. Continue?')) return;
+    setProcessingId(id);
     try {
-      await deleteMedia(id).unwrap();
-      toast.success('Permanently deleted');
+      await deleteMedia({ id }).unwrap();
+      toast.success('Asset purged from database');
     } catch {
-      toast.error('Delete failed');
+      toast.error('Purge sequence aborted by server');
+    } finally {
+      setProcessingId(null);
     }
-  };
-
-  const filteredItems = useMemo<MediaItem[]>(() => {
-    return items.filter((item: MediaItem) => {
-      const matchType = activeTab === 'all' || item.contentType === activeTab;
-      const matchStatus = item.status === activeStatus;
-      const matchSearch = (item.name || item.url).toLowerCase().includes(searchQuery.toLowerCase());
-      return matchType && matchStatus && matchSearch;
-    });
-  }, [items, activeTab, activeStatus, searchQuery]);
-
-  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
-  const paginatedItems = useMemo<MediaItem[]>(() => {
-    return filteredItems.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-  }, [filteredItems, currentPage]);
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setUploadingType('image');
+    const toastId = toast.loading('Compressing and uploading...');
     try {
       const options = { maxSizeMB: 1, maxWidthOrHeight: 1920, useWebWorker: true };
       const compressedFile = await imageCompression(file, options);
@@ -472,646 +1081,255 @@ export default function MediaDashboard() {
       const data = await res.json();
       if (data.success) {
         await addMedia({ url: data.data.url, name: file.name, contentType: 'image', status: 'active' }).unwrap();
-        toast.success('Image uploaded successfully!');
+        toast.update(toastId, { render: 'Asset integrated', type: 'success', isLoading: false, autoClose: 2000 });
         setIsAddDialogOpen(false);
-      } else {
-        throw new Error(data.error.message || 'Image upload failed.');
       }
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Cannot upload the image.');
-    } finally {
-      e.target.value = '';
-      setUploadingType(null);
-    }
-  };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleCompleteUpload = (res: any, type: MediaType) => {
-    if (res && res[0]) {
-      const newUrl = res[0].url;
-      const fileName = res[0].name || 'unnamed_asset';
-      addMedia({ url: newUrl, name: fileName, contentType: type, status: 'active' }).unwrap();
-      setUploadingType(null);
-      setIsAddDialogOpen(false);
-      toast.success(`${type.toUpperCase()} asset registered`);
+    } catch {
+      toast.update(toastId, { render: 'Uplink failure', type: 'error', isLoading: false, autoClose: 2000 });
     }
   };
 
   return (
-    <div className="min-h-screen rounded-md bg-clip-padding backdrop-filter backdrop-blur-[120px] bg-opacity-30 border border-gray-100/50 p-4 md:p-8 text-white relative overflow-hidden">
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] bg-blue-600/10 blur-[150px] rounded-full" />
-        <div className="absolute bottom-[-20%] left-[-10%] w-[800px] h-[800px] bg-indigo-600/10 blur-[150px] rounded-full" />
-      </div>
+    <div className="min-h-screen bg-transparent p-4 md:p-8 text-white relative">
+      <div className="container mx-auto space-y-8 relative z-10">
+        <header className="flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex flex-col gap-1">
+            <h1 className="text-5xl font-black uppercase tracking-tighter italic bg-gradient-to-r from-white to-white/30 bg-clip-text text-transparent">
+              Media
+            </h1>
+            <p className="text-[10px] font-mono text-indigo-400/60 uppercase tracking-[0.3em]">System.Media.Controller_v1.0</p>
+          </div>
 
-      <div className="container mx-auto relative z-10 space-y-8">
-        <header className="flex flex-col gap-8">
-          <div className="flex flex-col md:flex-row gap-6 justify-between items-center">
-            <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} className="w-full flex flex-col gap-1">
-              <h1 className="flex items-end justify-start gap-4">
-                <span className="text-5xl text-clip font-black uppercase tracking-tighter italic bg-gradient-to-r from-white to-white/40 bg-clip-text text-transparent">
-                  Media
-                </span>
-                <small className="text-xs text-slate-200 font-normal">{filteredItems.length} Records</small>
-              </h1>
-            </motion.div>
-
-            <div className="w-full flex flex-wrap gap-3 items-center justify-end">
-              <CustomLink href="/dashboard/media/example" variant="outlineGlassy" size="sm">
-                Example
-              </CustomLink>
-              <Button
-                size="sm"
-                variant="outlineWater"
-                onClick={() => {
-                  refetch();
-                  toast.info('Vault Synchronized');
-                }}
-                disabled={isLoading || isFetching}
-              >
-                <IoReloadCircleOutline className={`w-5 h-5 mr-2 ${isFetching ? 'animate-spin' : ''}`} /> Reload
-              </Button>
-
-              <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button size="sm" variant="outlineGarden">
-                    <Plus className="w-5 h-5 mr-2" /> Add Media
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[500px] bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl mt-8 rounded-2xl text-white transition-all duration-300 overflow-y-auto max-h-[90vh]">
-                  <DialogHeader className="border-b border-white/10 pb-3">
-                    <DialogTitle className="text-lg font-semibold tracking-wide text-white/90 uppercase italic">Import Media</DialogTitle>
-                    <DialogDescription className="text-white/50 text-xs font-medium">Choose a media file to import.</DialogDescription>
-                  </DialogHeader>
-
-                  {newMedia.url ? (
-                    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="space-y-6 py-6">
-                      <div className="relative group aspect-video w-full rounded-2xl overflow-hidden bg-white/5 border border-white/20 flex items-center justify-center backdrop-blur-md">
-                        {newMedia.contentType === 'image' && <Image src={newMedia.url} alt="Preview" fill className="object-contain p-2" unoptimized />}
-                        {newMedia.contentType === 'video' && <video src={newMedia.url} className="w-full h-full object-contain" controls />}
-                        {newMedia.contentType === 'audio' && (
-                          <div className="flex flex-col items-center gap-4">
-                            <Headphones className="w-16 h-16 text-emerald-400/60 animate-pulse" />
-                            <audio src={newMedia.url} controls className="h-8" />
-                          </div>
-                        )}
-                        {(newMedia.contentType === 'pdf' || newMedia.contentType === 'docx') && (
-                          <div className="flex flex-col items-center gap-3">
-                            {newMedia.contentType === 'pdf' ? (
-                              <FileText className="w-16 h-16 text-red-400/60" />
-                            ) : (
-                              <FileCode className="w-16 h-16 text-blue-400/60" />
-                            )}
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-white/40 truncate max-w-[200px]">
-                              {newMedia.name || newMedia.url.split('/').pop()}
-                            </span>
-                          </div>
-                        )}
-                        <button
-                          onClick={() => setNewMedia({ ...newMedia, url: '', name: '' })}
-                          className="absolute top-3 right-3 p-2 bg-red-500/20 hover:bg-red-500 text-white rounded-full backdrop-blur-md transition-all opacity-0 group-hover:opacity-100"
-                        >
-                          <XIcon className="w-4 h-4" />
-                        </button>
-                      </div>
-                      <div className="grid grid-cols-1 gap-4">
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-black uppercase tracking-widest text-white/60 ml-1">Asset Name</label>
-                          <Input
-                            value={newMedia.name}
-                            onChange={e => setNewMedia({ ...newMedia, name: e.target.value })}
-                            className="bg-white/10 border-white/20 h-12 rounded-xl text-white/80"
-                            placeholder="Enter asset name"
-                          />
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-white/60 ml-1">Change Type</label>
-                            <Select value={newMedia.contentType} onValueChange={(v: MediaType) => setNewMedia({ ...newMedia, contentType: v })}>
-                              <SelectTrigger className="bg-white/10 border border-white/20 h-12 rounded-xl text-white/80">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent className="bg-slate-900/90 backdrop-blur-3xl text-white rounded-xl">
-                                <SelectItem value="image">Image</SelectItem>
-                                <SelectItem value="video">Video</SelectItem>
-                                <SelectItem value="audio">Audio</SelectItem>
-                                <SelectItem value="pdf">PDF</SelectItem>
-                                <SelectItem value="docx">Word Doc</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-white/60 ml-1">Permissions</label>
-                            <Select value={newMedia.status} onValueChange={(v: MediaStatus) => setNewMedia({ ...newMedia, status: v })}>
-                              <SelectTrigger className="bg-white/10 border border-white/20 h-12 rounded-xl text-white/80">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent className="bg-slate-900/90 backdrop-blur-3xl text-white rounded-xl">
-                                <SelectItem value="active">Active</SelectItem>
-                                <SelectItem value="trash">Trash</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ) : (
-                    <div className="space-y-6 py-8">
-                      <div className="grid grid-cols-2 gap-4">
-                        <label
-                          htmlFor="single-image-upload"
-                          className={`col-span-2 flex flex-col items-center justify-center gap-3 p-8 rounded-2xl cursor-pointer bg-linear-to-br from-white/5 to-white/[0.02] border border-white/10 backdrop-blur-xl hover:border-white/40 hover:bg-white/10 transition-all duration-500 group ${uploadingType === 'image' ? 'opacity-50 cursor-wait' : ''}`}
-                        >
-                          {uploadingType === 'image' ? (
-                            <Loader2 className="w-8 h-8 text-indigo-400 animate-spin" />
-                          ) : (
-                            <ImageIcon className="w-8 h-8 text-white/20 group-hover:text-white" />
-                          )}
-                          <span className="text-[10px] font-black uppercase tracking-[0.2em]">Upload Image</span>
-                          <input
-                            id="single-image-upload"
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={handleImageUpload}
-                            disabled={!!uploadingType}
-                          />
-                        </label>
-
-                        {['video', 'audio', 'pdf', 'docx'].map(type => (
-                          <div
-                            key={type}
-                            className="flex flex-col items-center justify-center gap-3 p-4 rounded-2xl bg-linear-to-br from-white/5 to-white/[0.02] border border-white/10 backdrop-blur-xl hover:border-white/40 hover:bg-white/10 transition-all duration-500 group relative min-h-[140px]"
-                          >
-                            <AnimatePresence mode="wait">
-                              {uploadingType === type ? (
-                                <motion.div
-                                  key={`${type}-loading`}
-                                  initial={{ opacity: 0 }}
-                                  animate={{ opacity: 1 }}
-                                  exit={{ opacity: 0 }}
-                                  className="flex flex-col items-center gap-2"
-                                >
-                                  <Loader2 className="w-6 h-6 text-indigo-400 animate-spin" />
-                                  <span className="text-[8px] font-bold uppercase text-indigo-400">Uploading {type.toUpperCase()}</span>
-                                </motion.div>
-                              ) : (
-                                <motion.div
-                                  key={`${type}-idle`}
-                                  initial={{ opacity: 0 }}
-                                  animate={{ opacity: 1 }}
-                                  className="flex flex-col items-center gap-2 text-center w-full"
-                                >
-                                  {type === 'video' && <Video className="w-6 h-6 text-white/20 group-hover:text-white" />}
-                                  {type === 'audio' && <Music className="w-6 h-6 text-white/20 group-hover:text-white" />}
-                                  {type === 'pdf' && <FileText className="w-6 h-6 text-white/20 group-hover:text-white" />}
-                                  {type === 'docx' && <FileCode className="w-6 h-6 text-white/20 group-hover:text-white" />}
-                                  <span className="text-[10px] font-black uppercase tracking-[0.2em] mb-2">{type}</span>
-                                  <UploadButton
-                                    endpoint={
-                                      type === 'docx'
-                                        ? 'documentUploader'
-                                        : type === 'pdf'
-                                          ? 'pdfUploader'
-                                          : type === 'video'
-                                            ? 'videoUploader'
-                                            : 'audioUploader'
-                                    }
-                                    appearance={{
-                                      button:
-                                        'bg-transparent text-white text-[10px] font-bold px-4 h-8 rounded-lg border-white/10 border hover:bg-white/5 transition-all w-full',
-                                      allowedContent: 'hidden',
-                                    }}
-                                    onUploadBegin={() => setUploadingType(type as MediaType)}
-                                    onClientUploadComplete={res => handleCompleteUpload(res, type as MediaType)}
-                                    onUploadError={err => {
-                                      setUploadingType(null);
-                                      toast.error(err.message);
-                                    }}
-                                  />
-                                </motion.div>
-                              )}
-                            </AnimatePresence>
-                          </div>
-                        ))}
-                      </div>
+          <div className="flex items-center gap-3">
+            <Button size="sm" variant="outlineWater" onClick={() => refetch()} disabled={isFetching}>
+              <RefreshCw className={`w-4 h-4 mr-2 ${isFetching ? 'animate-spin' : ''}`} /> Sync Array
+            </Button>
+            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm" variant="outlineGarden">
+                  <Plus className="w-4 h-4 mr-2" /> Ingest
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="bg-slate-950/95 border-white/10 rounded-[2rem] text-white">
+                <DialogHeader>
+                  <DialogTitle className="uppercase italic">New Ingestion Protocol</DialogTitle>
+                </DialogHeader>
+                <div className="grid grid-cols-2 gap-4 py-6">
+                  <label className="col-span-2 p-10 border border-dashed border-white/10 rounded-3xl flex flex-col items-center justify-center gap-4 hover:bg-white/5 cursor-pointer transition-all">
+                    <ImageIcon className="w-8 h-8 text-indigo-400" />
+                    <span className="text-[10px] font-black uppercase tracking-widest">Image Source</span>
+                    <input type="file" className="hidden" onChange={handleImageUpload} accept="image/*" />
+                  </label>
+                  {['video', 'audio', 'pdf', 'docx'].map(type => (
+                    <div key={type} className="p-2 bg-white/5 rounded-xl">
+                      <UploadButton
+                        endpoint={type === 'docx' ? 'documentUploader' : type === 'pdf' ? 'pdfUploader' : type === 'video' ? 'videoUploader' : 'audioUploader'}
+                        onClientUploadComplete={res => {
+                          if (res?.[0]) {
+                            addMedia({ url: res[0].url, name: res[0].name, contentType: type as MediaType, status: 'active' }).unwrap();
+                            setIsAddDialogOpen(false);
+                            toast.success('Asset Registered');
+                          }
+                        }}
+                        appearance={{ button: 'w-full bg-indigo-600/20 text-[9px] font-bold uppercase h-8' }}
+                      />
                     </div>
-                  )}
-                  <DialogFooter className="mt-4 border-t border-white/10 pt-4">
-                    <Button
-                      variant="outlineGlassy"
-                      size="sm"
-                      onClick={handleAddMedia}
-                      disabled={isAdding || !!uploadingType}
-                      className="w-full h-12 rounded-xl border-white/10"
-                    >
-                      {isAdding ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <div className="flex items-center gap-2 uppercase font-black tracking-widest text-[10px]">
-                          <Save className="w-4 h-4" /> Finalize Selection
-                        </div>
-                      )}
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </div>
+                  ))}
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </header>
 
-        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-          <DialogContent className="sm:max-w-[500px] bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl rounded-2xl text-white">
-            <DialogHeader className="border-b border-white/10 pb-3">
-              <DialogTitle className="text-lg font-semibold uppercase italic">Edit Asset</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-6 py-6">
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase text-white/60">Asset Name</label>
-                <div className="relative group">
-                  <Type className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-                  <Input
-                    className="bg-white/10 border-white/20 pl-12 h-14 rounded-xl"
-                    value={editingMedia?.name || ''}
-                    onChange={e => editingMedia && setEditingMedia({ ...editingMedia, name: e.target.value })}
-                    placeholder="Asset label"
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase text-white/60">Cloud URI</label>
-                <div className="relative group">
-                  <LinkIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-                  <Input
-                    className="bg-white/10 border-white/20 pl-12 h-14 rounded-xl"
-                    value={editingMedia?.url || ''}
-                    onChange={e => editingMedia && setEditingMedia({ ...editingMedia, url: e.target.value })}
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase text-white/60">Classification</label>
-                  <Select
-                    value={editingMedia?.contentType}
-                    onValueChange={(v: MediaType) => editingMedia && setEditingMedia({ ...editingMedia, contentType: v })}
-                  >
-                    <SelectTrigger className="bg-white/10 border-white/20 h-14 rounded-xl text-white/80">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-900/90 text-white">
-                      <SelectItem value="image">Image</SelectItem>
-                      <SelectItem value="video">Video</SelectItem>
-                      <SelectItem value="audio">Audio</SelectItem>
-                      <SelectItem value="pdf">PDF</SelectItem>
-                      <SelectItem value="docx">Word Doc</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase text-white/60">Permissions</label>
-                  <Select value={editingMedia?.status} onValueChange={(v: MediaStatus) => editingMedia && setEditingMedia({ ...editingMedia, status: v })}>
-                    <SelectTrigger className="bg-white/10 border-white/20 h-14 rounded-xl text-white/80">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-900/90 text-white">
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="trash">Trash</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </div>
-            <DialogFooter className="border-t border-white/10 pt-4">
-              <Button variant="outlineGlassy" size="sm" onClick={handleUpdateMedia} disabled={isUpdating}>
-                {isUpdating ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                ) : (
-                  <>
-                    <Save className="w-5 h-5 mr-3" /> Update Asset
-                  </>
-                )}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
-        <Dialog open={isPreviewDialogOpen} onOpenChange={setIsPreviewDialogOpen}>
-          <DialogContent className="sm:max-w-[90vw] md:max-w-[800px] h-fit max-h-[90vh] bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl rounded-2xl text-white overflow-hidden flex flex-col p-0">
-            <DialogHeader className="p-6 border-b border-white/10 flex flex-row items-center justify-between">
-              <div>
-                <DialogTitle className="text-lg font-semibold uppercase italic truncate max-w-[500px]">{previewMedia?.name || 'Data Preview'}</DialogTitle>
-                <DialogDescription className="text-[10px] font-bold text-white/40 uppercase tracking-widest">
-                  {previewMedia?.contentType} Asset Stream
-                </DialogDescription>
-              </div>
-            </DialogHeader>
-            <div className="flex-1 bg-black/20 relative min-h-[400px] flex items-center justify-center p-4">
-              {previewMedia?.contentType === 'image' && <Image src={previewMedia.url} alt="Preview" fill className="object-contain p-4" unoptimized />}
-              {previewMedia?.contentType === 'video' && (
-                <video src={previewMedia.url} className="max-w-full max-h-full aspect-video rounded-xl shadow-2xl border border-white/5" controls autoPlay />
-              )}
-              {previewMedia?.contentType === 'audio' && (
-                <div className="flex flex-col items-center gap-8 w-full">
-                  <div className="w-48 h-48 rounded-full bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20 relative group">
-                    <Music className="w-20 h-20 text-indigo-400 animate-pulse" />
-                    <div className="absolute inset-0 bg-indigo-500/10 blur-3xl rounded-full opacity-50" />
-                  </div>
-                  <audio src={previewMedia.url} controls className="w-full max-w-md h-12" autoPlay />
-                </div>
-              )}
-              {previewMedia?.contentType === 'pdf' && (
-                <iframe src={`${previewMedia.url}#toolbar=0`} className="w-full h-[60vh] rounded-xl border border-white/10" />
-              )}
-              {previewMedia?.contentType === 'docx' && (
-                <div className="flex flex-col items-center gap-6">
-                  <div className="w-32 h-32 rounded-3xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
-                    <FileCode className="w-16 h-16 text-blue-400" />
-                  </div>
-                  <div className="text-center space-y-2">
-                    <p className="text-sm font-bold opacity-60">Word Document Previewing Unavailable in Browser</p>
-                    <Button asChild variant="outlineGlassy" className="rounded-full">
-                      <a href={previewMedia.url} target="_blank" rel="noopener noreferrer">
-                        <Download className="w-4 h-4 mr-2" /> Download Document
-                      </a>
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </div>
-            <DialogFooter className="p-4 border-t border-white/10 flex flex-row gap-3">
-              <Button variant="ghost" onClick={() => setIsPreviewDialogOpen(false)} className="text-[10px] uppercase font-black tracking-widest text-white/40">
-                Close Signal
-              </Button>
-              <Button asChild variant="outlineGlassy" className="h-10 px-6 rounded-xl border-white/10">
-                <a
-                  href={previewMedia?.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-[10px] uppercase font-black tracking-widest"
-                >
-                  <LinkIcon className="w-3 h-3" /> External Link
-                </a>
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
-        <div className="w-full gap-2 flex items-center justify-between">
-          <Tabs value={activeTab} onValueChange={v => setActiveTab(v as MediaType)}>
-            <TabsList className="bg-transparent gap-2">
-              {[
-                { id: 'all', label: 'All', icon: LayoutGrid },
-                { id: 'image', label: 'Images', icon: ImageIcon },
-                { id: 'video', label: 'Videos', icon: Video },
-                { id: 'audio', label: 'Audio', icon: Headphones },
-                { id: 'pdf', label: 'PDFs', icon: FileText },
-                { id: 'docx', label: 'Docs', icon: FileCode },
-              ].map(tab => (
-                <TabsTrigger
-                  key={tab.id}
-                  value={tab.id}
-                  className="bg-linear-to-r from-blue-500/20 to-purple-500/20 border border-white/30 text-white/50 h-8 hover:scale-[1.02] transition-all data-[state=active]:border-white data-[state=active]:bg-green-400/20"
-                >
-                  <tab.icon className="w-4 h-4" />
-                  <span className="hidden md:inline">{tab.label}</span>
+        <div className="flex flex-col lg:flex-row gap-4 items-center justify-between bg-white/5 p-3 rounded-2xl border border-white/10 backdrop-blur-xl">
+          <Tabs
+            value={activeTab}
+            onValueChange={v => {
+              setActiveTab(v as MediaType);
+              setCurrentPage(1);
+            }}
+          >
+            <TabsList className="bg-black/40 h-12 rounded-xl">
+              {['all', 'image', 'video', 'audio', 'pdf', 'docx'].map(t => (
+                <TabsTrigger key={t} value={t} className="uppercase text-[10px] font-black px-4">
+                  {t}
                 </TabsTrigger>
               ))}
             </TabsList>
           </Tabs>
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative w-full max-w-2xl group">
-            <Input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search media by name..." className="pl-14" />
-            <LayoutGrid className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-white/20 group-focus-within:text-indigo-400 transition-colors" />
-          </motion.div>
+          <div className="flex items-center gap-3 w-full lg:w-auto">
+            <div className="relative flex-1 lg:w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+              <Input
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="bg-black/40 border-white/10 pl-10 h-12 rounded-xl"
+                placeholder="Filter IDs..."
+              />
+            </div>
+            <div className="flex bg-black/40 p-1 rounded-xl">
+              {['active', 'trash'].map(s => (
+                <Button
+                  key={s}
+                  variant="ghost"
+                  onClick={() => setActiveStatus(s as MediaStatus)}
+                  className={`h-10 px-4 text-[10px] font-black uppercase tracking-widest ${activeStatus === s ? 'bg-white/10 text-white' : 'text-white/20'}`}
+                >
+                  {s}
+                </Button>
+              ))}
+            </div>
+          </div>
         </div>
 
-        <section className="space-y-8 pb-20">
-          <div className="flex items-center gap-4">
-            {[
-              { id: 'active', label: 'Active', icon: HardDrive },
-              { id: 'trash', label: 'Trash', icon: Trash2 },
-            ].map(status => (
-              <Button
-                key={status.id}
-                onClick={() => setActiveStatus(status.id as MediaStatus)}
-                variant="outlineGlassy"
-                className={`h-8 transition-all ${activeStatus === status.id ? ' border-green-50 text-green-50' : ' '}`}
-              >
-                <status.icon className="w-4 h-4" /> {status.label}
-              </Button>
-            ))}
-          </div>
-
-          <div className="min-h-[600px] w-full transition-all relative">
-            <AnimatePresence mode="wait">
-              {isLoading || isFetching ? (
-                <motion.div
-                  key="loader"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="absolute inset-0 flex flex-col items-center justify-center gap-6"
-                >
-                  <Loader2 className="w-20 h-20 text-indigo-500 animate-spin" />
-                  <p className="text-white/20 font-black tracking-[0.5em] uppercase text-xs">Authenticating Vault Data</p>
-                </motion.div>
-              ) : paginatedItems.length > 0 ? (
-                <motion.div key="grid" layout className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-10">
-                  <AnimatePresence mode="popLayout">
-                    {paginatedItems.map((item: MediaItem, idx: number) => (
-                      <motion.div
-                        key={item._id}
-                        initial={{ opacity: 0, scale: 0.9, y: 30 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.8 }}
-                        transition={{ duration: 0.5, delay: idx * 0.05 }}
-                        className="group"
-                      >
-                        <div className="bg-slate-900/40 border-white/10 overflow-hidden hover:border-indigo-500/50 transition-all duration-700 hover:shadow-[0_40px_80px_rgba(79,70,229,0.25)] relative rounded-2xl">
-                          <div className="relative aspect-square">
-                            {item.contentType === 'video' && (
-                              <div className="w-full h-full relative group/video">
-                                <video
-                                  src={item.url}
-                                  className="w-full h-full object-cover"
-                                  muted
-                                  onMouseOver={e => e.currentTarget.play()}
-                                  onMouseOut={e => {
-                                    e.currentTarget.pause();
-                                    e.currentTarget.currentTime = 0;
-                                  }}
-                                />
-                                <div className="absolute inset-0 bg-slate-900/40 flex items-center justify-center opacity-100 group-hover/video:opacity-0 transition-opacity duration-500">
-                                  <div className="relative">
-                                    <PlayCircle className="w-12 h-12 text-white/40" />
-                                    <div className="absolute inset-0 border-2 border-indigo-500/30 rounded-full animate-ping" />
-                                  </div>
-                                </div>
-                                <div className="absolute top-2 right-2 flex items-center gap-1.5 px-2 py-0.5 bg-red-500/80 rounded text-[8px] font-bold uppercase tracking-tighter opacity-0 group-hover/video:opacity-100 transition-all">
-                                  <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" /> Live Preview
-                                </div>
-                              </div>
-                            )}
-
-                            {item.contentType === 'image' && (
-                              <Image
-                                src={item.url}
-                                alt={item.name || 'Vault'}
-                                fill
-                                sizes="(max-width: 768px) 50vw, 20vw"
-                                className="object-cover transition-transform duration-1000 group-hover:scale-125"
-                                unoptimized
-                              />
-                            )}
-
-                            {item.contentType === 'audio' && (
-                              <div className="w-full h-full flex flex-col items-center justify-center bg-linear-to-br from-indigo-900/20 to-slate-900 gap-4 group-hover:bg-indigo-900/30 transition-colors duration-500">
-                                <div className="relative">
-                                  <div className="absolute inset-[-12px] border border-indigo-400/20 rounded-full animate-[spin_10s_linear_infinite]" />
-                                  <div className="absolute inset-[-6px] border border-indigo-400/10 rounded-full animate-[spin_15s_linear_infinite_reverse]" />
-                                  <Volume2 className="w-12 h-12 text-indigo-400 group-hover:scale-110 transition-transform duration-500" />
-                                </div>
-                                <div className="flex items-end gap-1 h-3">
-                                  {[1, 2, 3, 4, 5].map(i => (
-                                    <motion.div
-                                      key={i}
-                                      animate={{ height: [4, 12, 6, 12, 4] }}
-                                      transition={{ duration: 1, repeat: Infinity, delay: i * 0.1 }}
-                                      className="w-1 bg-indigo-500/60 rounded-full"
-                                    />
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-
-                            {item.contentType === 'pdf' && (
-                              <div className="w-full h-full flex flex-col items-center justify-center bg-linear-to-br from-red-900/20 to-slate-900 gap-3 group-hover:from-red-900/40 transition-all duration-700">
-                                <div className="relative p-6 bg-red-500/5 rounded-2xl border border-red-500/10 group-hover:border-red-500/30 transition-all">
-                                  <FileText className="w-12 h-12 text-red-500/50 group-hover:text-red-400 transition-colors" />
-                                  <div className="absolute -bottom-2 -right-2 bg-red-500 text-[8px] font-black px-1.5 py-0.5 rounded italic">PDF</div>
-                                </div>
-                                <div className="h-0.5 w-12 bg-linear-to-r from-transparent via-red-500/40 to-transparent group-hover:w-20 transition-all duration-500" />
-                              </div>
-                            )}
-
-                            {item.contentType === 'docx' && (
-                              <div className="w-full h-full flex flex-col items-center justify-center bg-linear-to-br from-blue-900/20 to-slate-900 gap-3 group-hover:from-blue-900/40 transition-all duration-700">
-                                <div className="relative p-6 bg-blue-500/5 rounded-2xl border border-blue-500/10 group-hover:border-blue-500/30 transition-all">
-                                  <FileSearch className="w-12 h-12 text-blue-500/50 group-hover:text-blue-400 transition-colors" />
-                                  <div className="absolute -bottom-2 -right-2 bg-blue-500 text-[8px] font-black px-1.5 py-0.5 rounded italic">DOC</div>
-                                </div>
-                                <div className="h-0.5 w-12 bg-linear-to-r from-transparent via-blue-500/40 to-transparent group-hover:w-20 transition-all duration-500" />
-                              </div>
-                            )}
-
-                            <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
-                              <Badge className="bg-indigo-600/90 text-[8px] uppercase font-black px-4 py-1.5 border-none rounded-full tracking-widest">
-                                {item.contentType}
-                              </Badge>
-                            </div>
-
-                            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-4">
-                              <p className="text-[10px] font-black uppercase tracking-widest text-white mb-3 truncate border-l-2 border-indigo-500 pl-2">
-                                {item.name || 'UNNAMED_ASSET'}
-                              </p>
-                              <div className="flex flex-col gap-2">
-                                <Button
-                                  size="sm"
-                                  onClick={() => openPreviewDialog(item)}
-                                  variant="outlineWater"
-                                  className="w-full flex items-center justify-center gap-2"
-                                >
-                                  <Eye className="w-4 h-4" /> Preview
-                                </Button>
-                                <div className="flex gap-2">
-                                  {item.status === 'active' ? (
-                                    <>
-                                      <Button size="sm" onClick={() => openEditDialog(item)} variant="outlineGlassy" className="flex-1">
-                                        <Edit2 className="w-4 h-4" />
-                                      </Button>
-                                      <Button size="sm" onClick={() => handleUpdateStatus(item._id, 'trash')} variant="outlineFire" className="flex-1">
-                                        <Trash2 className="w-4 h-4" />
-                                      </Button>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Button size="sm" onClick={() => handleUpdateStatus(item._id, 'active')} variant="outlineGlassy" className="flex-1">
-                                        <CheckCircle className="w-4 h-4" />
-                                      </Button>
-                                      <Button size="sm" onClick={() => handleDelete(item._id)} variant="outlineFire" className="flex-1">
-                                        <AlertCircle className="w-4 h-4" />
-                                      </Button>
-                                    </>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="empty"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="h-[500px] flex flex-col items-center justify-center gap-10"
-                >
-                  <Ghost className="w-32 h-32 text-white/5 animate-bounce" />
-                  <div className="text-center space-y-4">
-                    <h3 className="text-4xl font-black uppercase tracking-[0.4em] italic text-white/10">Zero Assets</h3>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.5em] text-white/5">
-                      No detectable signatures found in this quadrant of the vault.
-                    </p>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-6 pt-12">
-              <Button
-                variant="outlineWater"
-                size="sm"
-                disabled={currentPage === 1}
-                onClick={() => handlePageChange(currentPage - 1)}
-                className="rounded-2xl border-white/10 h-14 px-8 font-black uppercase tracking-widest text-xs"
-              >
-                Prev
-              </Button>
-              <div className="flex gap-3">
-                {Array.from({ length: totalPages }).map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => handlePageChange(i + 1)}
-                    className={`w-14 h-14 rounded-2xl font-black text-[10px] transition-all border ${currentPage === i + 1 ? 'bg-indigo-600 border-indigo-400 text-white' : 'bg-white/5 border-white/5 text-white/20'}`}
+        <main className="min-h-[500px]">
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-40 gap-4">
+              <Loader2 className="w-12 h-12 text-indigo-500 animate-spin" />
+              <p className="text-[10px] font-black uppercase tracking-widest text-indigo-500">Retrieving Array</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+              <AnimatePresence mode="popLayout">
+                {items.map((item: MediaItem) => (
+                  <motion.div
+                    key={item._id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="group relative bg-slate-900/40 rounded-[2rem] border border-white/10 overflow-hidden transition-all duration-500 hover:border-indigo-500/50"
                   >
-                    {String(i + 1).padStart(2, '0')}
-                  </button>
+                    {/* Media Body */}
+                    <div className="aspect-square relative flex items-center justify-center bg-black/20">
+                      {item.contentType === 'image' && (
+                        <Image
+                          src={item.url}
+                          alt=""
+                          fill
+                          className="object-cover opacity-60 group-hover:scale-105 transition-transform duration-700"
+                          unoptimized
+                        />
+                      )}
+                      {item.contentType === 'video' && <Video className="w-12 h-12 text-white/10" />}
+                      {item.contentType === 'audio' && <Volume2 className="w-12 h-12 text-indigo-500/40 animate-pulse" />}
+                      {(item.contentType === 'pdf' || item.contentType === 'docx') && <FileText className="w-12 h-12 text-white/10" />}
+
+                      {/* Pessimistic Loading Overlay */}
+                      {processingId === item._id && (
+                        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-20 flex items-center justify-center">
+                          <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+                        </div>
+                      )}
+
+                      {/* Hover Controls */}
+                      <div className="absolute inset-0 bg-linear-to-t from-slate-950 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-5">
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outlineWater"
+                            className="flex-1 rounded-xl h-10"
+                            onClick={() => {
+                              setPreviewMedia(item);
+                              setIsPreviewDialogOpen(true);
+                            }}
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                          {activeStatus === 'active' ? (
+                            <Button
+                              size="sm"
+                              variant="outlineFire"
+                              className="w-10 h-10 rounded-xl p-0"
+                              disabled={!!processingId}
+                              onClick={() => handleUpdateStatus(item._id, 'trash')}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          ) : (
+                            <>
+                              <Button
+                                size="sm"
+                                variant="outlineGarden"
+                                className="w-10 h-10 rounded-xl p-0"
+                                disabled={!!processingId}
+                                onClick={() => handleUpdateStatus(item._id, 'active')}
+                              >
+                                <CheckCircle className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outlineFire"
+                                className="w-10 h-10 rounded-xl p-0"
+                                disabled={!!processingId}
+                                onClick={() => handleDelete(item._id)}
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-4 border-t border-white/5">
+                      <p className="text-[10px] font-bold text-white/80 truncate uppercase tracking-widest">{item.name || 'Unnamed'}</p>
+                      <p className="text-[8px] font-mono text-white/20 mt-1 uppercase">
+                        {item.contentType} // {new Date(item.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </motion.div>
                 ))}
-              </div>
-              <Button
-                variant="outlineWater"
-                size="sm"
-                disabled={currentPage === totalPages}
-                onClick={() => handlePageChange(currentPage + 1)}
-                className="rounded-2xl border-white/10 h-14 px-8 font-black uppercase tracking-widest text-xs"
-              >
-                Next
-              </Button>
+              </AnimatePresence>
             </div>
           )}
-        </section>
+        </main>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center gap-4 py-10">
+            <Button variant="outlineGlassy" disabled={currentPage === 1} onClick={() => setCurrentPage(prev => prev - 1)} className="h-12 w-12 rounded-xl">
+              ←
+            </Button>
+            <span className="text-[10px] font-black uppercase text-white/40">
+              Page {currentPage} of {totalPages}
+            </span>
+            <Button
+              variant="outlineGlassy"
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage(prev => prev + 1)}
+              className="h-12 w-12 rounded-xl"
+            >
+              →
+            </Button>
+          </div>
+        )}
       </div>
+
+      {/* Preview Dialog */}
+      <Dialog open={isPreviewDialogOpen} onOpenChange={setIsPreviewDialogOpen}>
+        <DialogContent className="sm:max-w-[800px] bg-slate-950/98 border-white/10 rounded-[2.5rem] p-0 overflow-hidden">
+          <div className="aspect-video relative bg-black flex items-center justify-center">
+            {previewMedia?.contentType === 'image' && <Image src={previewMedia.url} alt="" fill className="object-contain" unoptimized />}
+            {previewMedia?.contentType === 'video' && <video src={previewMedia.url} controls autoPlay className="w-full h-full" />}
+            {previewMedia?.contentType === 'audio' && <audio src={previewMedia.url} controls autoPlay className="w-2/3" />}
+            {(previewMedia?.contentType === 'pdf' || previewMedia?.contentType === 'docx') && (
+              <iframe src={previewMedia.url} className="w-full h-full min-h-[500px]" />
+            )}
+          </div>
+          <div className="p-6 bg-black/40 backdrop-blur-xl flex justify-between items-center">
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400 truncate max-w-md">{previewMedia?.name}</p>
+            <Button onClick={() => setIsPreviewDialogOpen(false)} variant="outlineGlassy" className="h-10 rounded-xl px-6 uppercase text-[10px] font-black">
+              Close Terminal
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
 
 ```
 
-
-Now Your task is implement those features
-1. implement pagination in page.tsx
-2. when I do a query on media there are an option for tabs.
+Now your task is 
+1. copy color-combination, and style from first page.tsx and implement the color-combination and style in second page.tsx 
+2. Update Pagination style.
+3. Make sure it has eye-catching view and stunning UI with animation. 

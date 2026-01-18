@@ -16,17 +16,25 @@ import {
   Headphones,
   Volume2,
   Eye,
-  PlayCircle,
   Search,
+  X,
+  RefreshCw,
+  Loader2,
+  ChevronLeft,
+  ChevronRight,
+  Play,
+  Calendar,
+  Cloud,
+  ExternalLink,
 } from 'lucide-react';
-import { IoReloadCircleOutline } from 'react-icons/io5';
 import { toast } from 'react-toastify';
 import Image from 'next/image';
 
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 import { useGetMediasQuery, useAddMediaMutation, useUpdateMediaMutation, useDeleteMediaMutation } from '@/redux/features/media/mediaSlice';
 
@@ -40,12 +48,10 @@ type MediaStatus = 'active' | 'trash';
 interface MediaItem {
   _id: string;
   url: string;
-  display_url?: string;
   name?: string;
   contentType: MediaType;
   status: MediaStatus;
   createdAt: string;
-  updatedAt: string;
 }
 
 export default function MediaDashboard() {
@@ -54,7 +60,10 @@ export default function MediaDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const [processingId, setProcessingId] = useState<string | null>(null);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isPreviewDialogOpen, setIsPreviewDialogOpen] = useState(false);
+  const [previewMedia, setPreviewMedia] = useState<MediaItem | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(searchQuery), 500);
@@ -68,105 +77,49 @@ export default function MediaDashboard() {
     refetch,
   } = useGetMediasQuery({
     page: currentPage,
-    limit: itemsPerPage,
+    limit: 10,
     q: debouncedSearch,
     contentType: activeTab,
     status: activeStatus,
   });
 
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [isPreviewDialogOpen, setIsPreviewDialogOpen] = useState(false);
-  const [editingMedia, setEditingMedia] = useState<MediaItem | null>(null);
-  const [previewMedia, setPreviewMedia] = useState<MediaItem | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [uploadingType, setUploadingType] = useState<MediaType | null>(null);
-
-  const [newMedia, setNewMedia] = useState({
-    url: '',
-    name: '',
-    contentType: 'image' as MediaType,
-    status: 'active' as MediaStatus,
-  });
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [addMedia, { isLoading: isAdding }] = useAddMediaMutation();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [updateMedia, { isLoading: isUpdating }] = useUpdateMediaMutation();
+  const [addMedia] = useAddMediaMutation();
+  const [updateMedia] = useUpdateMediaMutation();
   const [deleteMedia] = useDeleteMediaMutation();
 
   const items = useMemo(() => response?.data || [], [response]);
   const totalItems = response?.total || 0;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-  console.log('response', response);
-  console.log('items', items);
-  const handlePageChange = (p: number) => {
-    setCurrentPage(p);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleAddMedia = async () => {
-    if (!newMedia.url) return toast.error('URL is required');
-    try {
-      await addMedia(newMedia).unwrap();
-      toast.success('Media added successfully');
-      setIsAddDialogOpen(false);
-      setNewMedia({ url: '', name: '', contentType: 'image', status: 'active' });
-    } catch {
-      toast.error('Failed to add media');
-    }
-  };
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const openEditDialog = (item: MediaItem) => {
-    setEditingMedia(item);
-    setIsEditDialogOpen(true);
-  };
-
-  const openPreviewDialog = (item: MediaItem) => {
-    setPreviewMedia(item);
-    setIsPreviewDialogOpen(true);
-  };
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleUpdateMedia = async () => {
-    if (!editingMedia || !editingMedia.url) return toast.error('URL is required');
-    try {
-      await updateMedia({
-        id: editingMedia._id,
-        url: editingMedia.url,
-        name: editingMedia.name,
-        contentType: editingMedia.contentType,
-        status: editingMedia.status,
-      }).unwrap();
-      toast.success('Media updated successfully');
-      setIsEditDialogOpen(false);
-      setEditingMedia(null);
-    } catch {
-      toast.error('Failed to update media');
-    }
-  };
+  const totalPages = Math.ceil(totalItems / 10);
 
   const handleUpdateStatus = async (id: string, newStatus: MediaStatus) => {
+    setProcessingId(id);
     try {
       await updateMedia({ id, status: newStatus }).unwrap();
-      toast.success(`Moved to ${newStatus}`);
+      toast.success(`Asset successfully ${newStatus === 'trash' ? 'trashed' : 'restored'}`);
     } catch {
-      toast.error('Failed to update status');
+      toast.error('Pessimistic update failure: System sync interrupted');
+    } finally {
+      setProcessingId(null);
     }
   };
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   const handleDelete = async (id: string) => {
+    if (!confirm('This procedure is irreversible. Purge asset from core?')) return;
+    setProcessingId(id);
     try {
       await deleteMedia({ id }).unwrap();
-      toast.success('Permanently deleted');
+      toast.success('Asset purged successfully');
     } catch {
-      toast.error('Delete failed');
+      toast.error('System failure: Purge aborted');
+    } finally {
+      setProcessingId(null);
     }
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setUploadingType('image');
+    const toastId = toast.loading('Encrypting and uploading...');
     try {
       const options = { maxSizeMB: 1, maxWidthOrHeight: 1920, useWebWorker: true };
       const compressedFile = await imageCompression(file, options);
@@ -179,91 +132,50 @@ export default function MediaDashboard() {
       const data = await res.json();
       if (data.success) {
         await addMedia({ url: data.data.url, name: file.name, contentType: 'image', status: 'active' }).unwrap();
-        toast.success('Image uploaded successfully!');
+        toast.update(toastId, { render: 'Asset integrated', type: 'success', isLoading: false, autoClose: 2000 });
         setIsAddDialogOpen(false);
       }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
-      toast.error('Cannot upload the image.');
-    } finally {
-      e.target.value = '';
-      setUploadingType(null);
-    }
-  };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleCompleteUpload = (res: any, type: MediaType) => {
-    if (res && res[0]) {
-      addMedia({ url: res[0].url, name: res[0].name || 'unnamed_asset', contentType: type, status: 'active' }).unwrap();
-      setUploadingType(null);
-      setIsAddDialogOpen(false);
-      toast.success(`${type.toUpperCase()} asset registered`);
+    } catch {
+      toast.update(toastId, { render: 'Uplink failed', type: 'error', isLoading: false, autoClose: 2000 });
     }
   };
 
   return (
-    <div className="min-h-screen rounded-md bg-clip-padding backdrop-filter backdrop-blur-[120px] bg-opacity-30 border border-gray-100/50 p-4 md:p-8 text-white relative overflow-hidden">
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] bg-blue-600/10 blur-[150px] rounded-full" />
-        <div className="absolute bottom-[-20%] left-[-10%] w-[800px] h-[800px] bg-indigo-600/10 blur-[150px] rounded-full" />
-      </div>
-
-      <div className="container mx-auto relative z-10 space-y-8">
-        <header className="flex flex-col gap-8">
-          <div className="flex flex-col md:flex-row gap-6 justify-between items-center">
-            <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} className="w-full flex flex-col gap-1">
-              <h1 className="flex items-end justify-start gap-4">
-                <span className="text-5xl font-black uppercase tracking-tighter italic bg-gradient-to-r from-white to-white/40 bg-clip-text text-transparent">
-                  Vault
-                </span>
-                <small className="text-xs text-slate-400 font-mono">[{totalItems} Records Found]</small>
-              </h1>
-            </motion.div>
-
-            <div className="w-full flex flex-wrap gap-3 items-center justify-end">
-              <CustomLink href="/dashboard/media/example" variant="outlineGlassy" size="sm">
-                Live View
-              </CustomLink>
-              <Button size="sm" variant="outlineWater" onClick={() => refetch()} disabled={isLoading || isFetching}>
-                <IoReloadCircleOutline className={`w-5 h-5 mr-2 ${isFetching ? 'animate-spin' : ''}`} /> Sync
-              </Button>
-
-              <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button size="sm" variant="outlineGarden">
-                    <Plus className="w-5 h-5 mr-2" /> Import
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[500px] bg-slate-950/90 backdrop-blur-2xl border border-white/10 text-white rounded-3xl">
-                  <DialogHeader>
-                    <DialogTitle className="uppercase italic tracking-widest">New Asset Protocol</DialogTitle>
-                    <DialogDescription className="text-white/40">Select a data type to initiate upload.</DialogDescription>
-                  </DialogHeader>
-                  <div className="grid grid-cols-2 gap-4 py-4">
-                    <label className="col-span-2 p-8 border border-dashed border-white/20 rounded-2xl flex flex-col items-center justify-center gap-4 hover:bg-white/5 cursor-pointer transition-all">
-                      <ImageIcon className="w-8 h-8 opacity-40" />
-                      <span className="text-[10px] font-black uppercase tracking-[0.3em]">Direct Image Upload</span>
-                      <input type="file" className="hidden" onChange={handleImageUpload} />
-                    </label>
-                    {['video', 'audio', 'pdf', 'docx'].map(type => (
-                      <div key={type} className="p-4 bg-white/5 border border-white/10 rounded-2xl flex flex-col items-center gap-2 group">
-                        <UploadButton
-                          endpoint={
-                            type === 'docx' ? 'documentUploader' : type === 'pdf' ? 'pdfUploader' : type === 'video' ? 'videoUploader' : 'audioUploader'
-                          }
-                          onClientUploadComplete={res => handleCompleteUpload(res, type as MediaType)}
-                          appearance={{ button: 'bg-indigo-600/20 hover:bg-indigo-600/40 text-[10px] font-bold uppercase w-full h-8' }}
-                        />
-                        <span className="text-[8px] font-bold uppercase opacity-40">{type}</span>
-                      </div>
-                    ))}
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </div>
+    <main className="min-h-screen p-2 bg-transparent blur-4xl sm:p-4 md:p-6 text-white font-sans selection:bg-blue-500/30">
+      <div className="mt-[65px]" />
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-7xl mx-auto space-y-6">
+        <header className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-xl p-4 sm:p-6 shadow-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-all hover:bg-white/15">
+          <div className="space-y-1">
+            <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-white via-white/80 to-white/30 bg-clip-text text-transparent italic tracking-tighter">
+              Media Vault
+            </h1>
+            <p className="text-xs text-gray-400 flex items-center gap-2 font-mono">
+              <Cloud size={14} className="text-blue-400 animate-pulse" />
+              STATUS_READY: {totalItems} SECURE_OBJECTS_DETECTED
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <CustomLink href="/dashboard/media/example" variant="outlineGlassy" size="sm" className="h-10 px-4">
+              <LayoutGrid size={16} className="mr-2" />
+              Grid View
+            </CustomLink>
+            <Button size="sm" variant="outlineWater" onClick={() => refetch()} disabled={isFetching} className="h-10 px-4 bg-blue-500/5">
+              <RefreshCw size={16} className={`mr-2 ${isFetching ? 'animate-spin' : ''}`} />
+              {isFetching ? 'Syncing...' : 'Refresh'}
+            </Button>
+            <Button
+              onClick={() => setIsAddDialogOpen(true)}
+              variant="outlineGlassy"
+              size="sm"
+              className="h-10 px-4 bg-white/5 border-white/30 hover:bg-white/20"
+            >
+              <Plus size={18} className="mr-2" />
+              Ingest Asset
+            </Button>
           </div>
         </header>
 
-        <div className="flex flex-col lg:flex-row gap-6 items-center justify-between bg-white/5 p-4 rounded-3xl border border-white/10">
+        <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-xl p-3 shadow-xl flex flex-col lg:flex-row items-center justify-between gap-4">
           <Tabs
             value={activeTab}
             onValueChange={v => {
@@ -272,52 +184,49 @@ export default function MediaDashboard() {
             }}
             className="w-full lg:w-auto"
           >
-            <TabsList className="bg-black/20 p-1 h-12 gap-1 rounded-2xl border border-white/5">
+            <TabsList className="bg-white/5 border border-white/10 h-12 p-1 rounded-lg gap-1">
               {[
-                { id: 'all', icon: LayoutGrid, label: 'All' },
-                { id: 'image', icon: ImageIcon, label: 'Images' },
-                { id: 'video', icon: Video, label: 'Videos' },
-                { id: 'audio', icon: Headphones, label: 'Audio' },
-                { id: 'pdf', icon: FileText, label: 'PDF' },
-                { id: 'docx', icon: FileCode, label: 'Docs' },
-              ].map(t => (
+                { id: 'all', label: 'All', icon: LayoutGrid },
+                { id: 'image', label: 'Images', icon: ImageIcon },
+                { id: 'video', label: 'Videos', icon: Video },
+                { id: 'audio', label: 'Audio', icon: Headphones },
+                { id: 'pdf', label: 'PDF', icon: FileText },
+                { id: 'docx', label: 'Docs', icon: FileCode },
+              ].map(tab => (
                 <TabsTrigger
-                  key={t.id}
-                  value={t.id}
-                  className="rounded-xl px-4 data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-white/40 transition-all"
+                  key={tab.id}
+                  value={tab.id}
+                  className="rounded-md data-[state=active]:bg-white/20 data-[state=active]:text-white text-gray-400 transition-all text-xs font-bold uppercase tracking-widest px-4 h-full"
                 >
-                  <t.icon className="w-4 h-4 md:mr-2" />
-                  <span className="hidden md:inline text-[10px] font-black uppercase tracking-widest">{t.label}</span>
+                  <tab.icon size={14} className="mr-2 hidden md:block" />
+                  {tab.label}
                 </TabsTrigger>
               ))}
             </TabsList>
           </Tabs>
 
-          <div className="flex items-center gap-4 w-full lg:w-auto">
-            <div className="relative flex-1 lg:w-80 group">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-indigo-400 transition-colors" />
+          <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
+            <div className="relative w-full sm:w-72 group">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 group-focus-within:text-blue-400 transition-colors" />
               <Input
                 value={searchQuery}
-                onChange={e => {
-                  setSearchQuery(e.target.value);
-                  setCurrentPage(1);
-                }}
-                placeholder="Filter by filename..."
-                className="bg-black/20 border-white/10 pl-12 h-12 rounded-2xl"
+                onChange={e => setSearchQuery(e.target.value)}
+                className="bg-white/5 border-white/10 pl-10 h-12 rounded-lg focus:ring-blue-500/20 text-sm placeholder:text-gray-600 transition-all"
+                placeholder="Search file signatures..."
               />
             </div>
-            <div className="flex bg-black/20 p-1 rounded-2xl border border-white/5">
+            <div className="flex bg-white/5 p-1 rounded-lg border border-white/10 w-full sm:w-auto">
               {['active', 'trash'].map(s => (
                 <Button
                   key={s}
                   variant="ghost"
-                  onClick={() => {
-                    setActiveStatus(s as MediaStatus);
-                    setCurrentPage(1);
-                  }}
-                  className={`h-10 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeStatus === s ? 'bg-white/10 text-white' : 'text-white/20'}`}
+                  size="sm"
+                  onClick={() => setActiveStatus(s as MediaStatus)}
+                  className={`flex-1 sm:flex-none h-10 px-6 rounded-md text-[10px] font-black uppercase tracking-[0.2em] transition-all ${
+                    activeStatus === s ? 'bg-white/20 text-white shadow-xl' : 'text-gray-500 hover:text-gray-300'
+                  }`}
                 >
-                  {s === 'active' ? <HardDrive className="w-3 h-3 mr-2" /> : <Trash2 className="w-3 h-3 mr-2" />}
+                  {s === 'active' ? <HardDrive size={14} className="mr-2" /> : <Trash2 size={14} className="mr-2" />}
                   {s}
                 </Button>
               ))}
@@ -325,168 +234,364 @@ export default function MediaDashboard() {
           </div>
         </div>
 
-        <main className="min-h-[500px] relative">
+        <section className="min-h-[60vh] relative">
           <AnimatePresence mode="wait">
-            {isFetching ? (
+            {isLoading ? (
               <motion.div
-                key="loading"
+                key="loader"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="absolute inset-0 flex flex-col items-center justify-center gap-4"
+                className="absolute inset-0 flex flex-col items-center justify-center gap-6 py-40"
               >
-                <div className="w-16 h-16 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin" />
-                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20">Accessing Data...</p>
+                <div className="relative h-20 w-20">
+                  <div className="absolute inset-0 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin" />
+                  <div className="absolute inset-2 border-4 border-purple-500/10 border-b-purple-500 rounded-full animate-spin-reverse" />
+                </div>
+                <p className="text-xs font-mono text-gray-400 animate-pulse tracking-[0.5em] uppercase">Loading_Array_Data</p>
               </motion.div>
             ) : items.length > 0 ? (
               <motion.div
                 key="grid"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6"
               >
-                {items.map((item: MediaItem) => (
+                {items.map((item: MediaItem, idx: number) => (
                   <motion.div
                     key={item._id}
                     layout
-                    className="group relative aspect-square bg-slate-900/50 rounded-3xl overflow-hidden border border-white/5 hover:border-indigo-500/50 transition-all duration-500 shadow-2xl"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.05 }}
+                    className="group relative backdrop-blur-xl bg-white/10 rounded-2xl overflow-hidden border border-white/20 shadow-lg hover:shadow-2xl hover:bg-white/20 transition-all duration-500 flex flex-col h-full"
                   >
-                    {item.contentType === 'image' && (
-                      <Image
-                        src={item.url}
-                        alt={item.name || ''}
-                        fill
-                        className="object-cover group-hover:scale-110 transition-transform duration-700"
-                        unoptimized
-                      />
-                    )}
-                    {item.contentType === 'video' && (
-                      <div className="w-full h-full flex items-center justify-center bg-black/40">
-                        <PlayCircle className="w-12 h-12 text-white/20 group-hover:text-indigo-400 transition-colors" />
-                        <video
+                    <div className="relative aspect-video bg-black/40 overflow-hidden">
+                      {item.contentType === 'image' && (
+                        <Image
                           src={item.url}
-                          className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity"
-                          muted
-                          loop
-                          onMouseOver={e => e.currentTarget.play()}
-                          onMouseOut={e => {
-                            e.currentTarget.pause();
-                            e.currentTarget.currentTime = 0;
-                          }}
+                          alt={item.name || 'asset'}
+                          fill
+                          className="object-cover group-hover:scale-110 transition-transform duration-1000 opacity-80"
+                          unoptimized
                         />
-                      </div>
-                    )}
-                    {item.contentType === 'audio' && (
-                      <div className="w-full h-full flex flex-col items-center justify-center gap-4 bg-linear-to-br from-indigo-500/10 to-purple-500/10">
-                        <Volume2 className="w-10 h-10 text-indigo-400" />
-                        <div className="flex gap-1 h-4">
-                          {[1, 2, 3, 4].map(i => (
-                            <motion.div
-                              key={i}
-                              animate={{ height: [4, 16, 8, 16, 4] }}
-                              transition={{ repeat: Infinity, duration: 1, delay: i * 0.1 }}
-                              className="w-1 bg-indigo-500/40 rounded-full"
-                            />
-                          ))}
+                      )}
+                      {item.contentType === 'video' && (
+                        <div className="w-full h-full relative">
+                          <video src={item.url} className="w-full h-full object-cover opacity-60" preload="metadata" />
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-transparent transition-colors">
+                            <div className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-md border border-white/30 flex items-center justify-center transform group-hover:scale-110 transition-all duration-300 shadow-2xl">
+                              <Play size={20} className="text-white fill-white ml-1" />
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    )}
-                    {(item.contentType === 'pdf' || item.contentType === 'docx') && (
-                      <div className="w-full h-full flex flex-col items-center justify-center gap-3">
-                        <div className={`p-4 rounded-2xl ${item.contentType === 'pdf' ? 'bg-red-500/10' : 'bg-blue-500/10'}`}>
-                          {item.contentType === 'pdf' ? <FileText className="w-10 h-10 text-red-500" /> : <FileCode className="w-10 h-10 text-blue-500" />}
+                      )}
+                      {item.contentType === 'audio' && (
+                        <div className="w-full h-full flex flex-col items-center justify-center gap-3 bg-gradient-to-br from-blue-500/20 to-purple-500/20">
+                          <Volume2 size={48} className="text-blue-400/40 animate-pulse" />
                         </div>
-                        <span className="text-[10px] font-black opacity-40 uppercase">{item.contentType}</span>
-                      </div>
-                    )}
+                      )}
+                      {(item.contentType === 'pdf' || item.contentType === 'docx') && (
+                        <div className="w-full h-full flex flex-col items-center justify-center gap-3 bg-gradient-to-br from-red-500/10 to-orange-500/10">
+                          {item.contentType === 'pdf' ? (
+                            <FileText size={48} className="text-red-400/40" />
+                          ) : (
+                            <FileCode size={48} className="text-orange-400/40" />
+                          )}
+                        </div>
+                      )}
 
-                    <div className="absolute inset-0 bg-linear-to-t from-slate-950 via-slate-950/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-4">
-                      <p className="text-[10px] font-black uppercase tracking-widest truncate mb-4">{item.name || 'Unnamed'}</p>
-                      <div className="flex gap-2">
-                        <Button size="sm" variant="outlineWater" className="flex-1 h-10 rounded-xl" onClick={() => openPreviewDialog(item)}>
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                        {activeStatus === 'active' ? (
-                          <Button size="sm" variant="outlineFire" className="flex-1 h-10 rounded-xl" onClick={() => handleUpdateStatus(item._id, 'trash')}>
-                            <Trash2 className="w-4 h-4" />
+                      {processingId === item._id && (
+                        <div className="absolute inset-0 bg-black/70 backdrop-blur-sm z-30 flex flex-col items-center justify-center gap-2">
+                          <Loader2 className="w-8 h-8 text-blue-400 animate-spin" />
+                          <span className="text-[8px] font-mono text-blue-400 uppercase tracking-tighter">Syncing...</span>
+                        </div>
+                      )}
+
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end justify-center p-4 z-20">
+                        <div className="flex gap-2 w-full">
+                          <Button
+                            size="sm"
+                            variant="outlineGlassy"
+                            className="flex-1 h-10 bg-white/10 border-white/20 hover:bg-blue-500/20"
+                            onClick={() => {
+                              setPreviewMedia(item);
+                              setIsPreviewDialogOpen(true);
+                            }}
+                          >
+                            <Eye size={14} className="mr-2" />
+                            Preview
                           </Button>
-                        ) : (
-                          <Button size="sm" variant="outlineGarden" className="flex-1 h-10 rounded-xl" onClick={() => handleUpdateStatus(item._id, 'active')}>
-                            <CheckCircle className="w-4 h-4" />
-                          </Button>
-                        )}
+                          {activeStatus === 'active' ? (
+                            <Button
+                              size="sm"
+                              variant="outlineFire"
+                              className="w-10 h-10 p-0 flex-shrink-0"
+                              disabled={!!processingId}
+                              onClick={() => handleUpdateStatus(item._id, 'trash')}
+                            >
+                              <Trash2 size={16} />
+                            </Button>
+                          ) : (
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                variant="outlineGarden"
+                                className="w-10 h-10 p-0"
+                                disabled={!!processingId}
+                                onClick={() => handleUpdateStatus(item._id, 'active')}
+                              >
+                                <CheckCircle size={16} />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outlineFire"
+                                className="w-10 h-10 p-0"
+                                disabled={!!processingId}
+                                onClick={() => handleDelete(item._id)}
+                              >
+                                <X size={16} />
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-5 flex-1 space-y-3 border-t border-white/5 bg-white/[0.02]">
+                      <div className="flex items-start gap-4">
+                        <div
+                          className={`p-2.5 rounded-xl bg-white/5 border border-white/10 flex-shrink-0 transition-transform group-hover:-rotate-6 group-hover:scale-110`}
+                        >
+                          {item.contentType === 'video' ? (
+                            <Video size={18} className="text-purple-400" />
+                          ) : item.contentType === 'image' ? (
+                            <ImageIcon size={18} className="text-blue-400" />
+                          ) : item.contentType === 'audio' ? (
+                            <Headphones size={18} className="text-green-400" />
+                          ) : (
+                            <FileText size={18} className="text-orange-400" />
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-bold text-sm text-white/90 truncate group-hover:text-blue-400 transition-colors uppercase tracking-tight">
+                            {item.name || 'UNNAMED_ASSET'}
+                          </p>
+                          <p className="text-[10px] text-gray-500 flex items-center gap-1.5 mt-1 font-mono uppercase">
+                            <Calendar size={12} className="opacity-50" />
+                            {new Date(item.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </motion.div>
                 ))}
               </motion.div>
             ) : (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center py-40 gap-6 opacity-20">
-                <Ghost className="w-24 h-24" />
-                <p className="text-sm font-black uppercase tracking-[0.5em]">Sector Empty</p>
+              <motion.div
+                key="empty"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="flex items-center justify-center py-32 px-4"
+              >
+                <div className="max-w-md w-full backdrop-blur-3xl bg-white/5 border border-white/10 rounded-[2.5rem] p-16 shadow-2xl flex flex-col items-center text-center gap-8 group">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-blue-500/20 blur-3xl rounded-full group-hover:bg-blue-500/40 transition-colors duration-1000" />
+                    <div className="relative p-8 bg-white/5 rounded-full border border-white/20 transform group-hover:rotate-12 transition-transform duration-700">
+                      <Ghost className="w-20 h-20 text-white/20" />
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <h3 className="text-3xl font-black text-white tracking-[0.2em] uppercase italic">No data found.</h3>
+                    <p className="text-xs text-gray-500 font-mono leading-relaxed uppercase opacity-60">
+                      The specified cloud directory is currently showing zero detectable file signatures.
+                    </p>
+                  </div>
+                  <Button
+                    onClick={() => refetch()}
+                    variant="outlineGlassy"
+                    size="sm"
+                    className="h-12 px-8 bg-white/5 border-white/10 hover:bg-white/10 rounded-xl"
+                  >
+                    <RefreshCw size={16} className="mr-3 text-blue-400" />
+                    Reconnect Array
+                  </Button>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
-        </main>
+        </section>
 
         {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-4 py-12">
-            <Button variant="outlineGlassy" disabled={currentPage === 1} onClick={() => handlePageChange(currentPage - 1)} className="h-12 w-12 rounded-2xl">
-              ←
+          <nav className="flex items-center justify-center gap-4 py-16">
+            <Button
+              variant="outlineGlassy"
+              disabled={currentPage === 1}
+              onClick={() => {
+                setCurrentPage(prev => Math.max(1, prev - 1));
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="h-12 px-6 rounded-xl bg-white/5 border-white/10 hover:bg-white/10 disabled:opacity-20"
+            >
+              <ChevronLeft size={20} className="mr-2" />
+              Prev
             </Button>
-            <div className="flex gap-2">
-              {Array.from({ length: totalPages }).map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => handlePageChange(i + 1)}
-                  className={`w-12 h-12 rounded-2xl font-black text-[10px] transition-all border ${currentPage === i + 1 ? 'bg-indigo-600 border-indigo-400' : 'bg-white/5 border-white/10 text-white/40'}`}
-                >
-                  {(i + 1).toString().padStart(2, '0')}
-                </button>
-              ))}
+
+            <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-2xl p-1.5 backdrop-blur-md">
+              {Array.from({ length: totalPages }).map((_, i) => {
+                const pageNum = i + 1;
+                const isCurrent = currentPage === pageNum;
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => {
+                      setCurrentPage(pageNum);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className={`min-w-[48px] h-10 rounded-xl text-xs font-black transition-all duration-500 ${
+                      isCurrent
+                        ? 'bg-blue-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] border border-blue-400'
+                        : 'text-gray-500 hover:bg-white/10 hover:text-white'
+                    }`}
+                  >
+                    {pageNum.toString().padStart(2, '0')}
+                  </button>
+                );
+              })}
             </div>
+
             <Button
               variant="outlineGlassy"
               disabled={currentPage === totalPages}
-              onClick={() => handlePageChange(currentPage + 1)}
-              className="h-12 w-12 rounded-2xl"
+              onClick={() => {
+                setCurrentPage(prev => Math.min(totalPages, prev + 1));
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="h-12 px-6 rounded-xl bg-white/5 border-white/10 hover:bg-white/10 disabled:opacity-20"
             >
-              →
+              Next
+              <ChevronRight size={20} className="ml-2" />
             </Button>
-          </div>
+          </nav>
         )}
-      </div>
+      </motion.div>
 
-      <Dialog open={isPreviewDialogOpen} onOpenChange={setIsPreviewDialogOpen}>
-        <DialogContent className="sm:max-w-[800px] bg-slate-950/95 border-white/10 rounded-3xl p-0 overflow-hidden">
-          <DialogTitle className="hidden"></DialogTitle>
-          <div className="aspect-video relative bg-black flex items-center justify-center">
-            {previewMedia?.contentType === 'image' && <Image src={previewMedia.url} alt="" fill className="object-contain" unoptimized />}
-            {previewMedia?.contentType === 'video' && <video src={previewMedia.url} controls autoPlay className="w-full h-full" />}
-            {previewMedia?.contentType === 'audio' && <audio src={previewMedia.url} controls autoPlay className="w-2/3" />}
-            {previewMedia?.contentType === 'pdf' && <iframe src={previewMedia.url} className="w-full h-full" />}
-            {previewMedia?.contentType === 'docx' && (
-              <div className="text-center">
-                <FileCode className="w-20 h-20 mx-auto mb-4 opacity-20" />
-                <Button asChild variant="outlineGlassy">
-                  <a href={previewMedia.url} download>
-                    Download Document
-                  </a>
-                </Button>
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent className="backdrop-blur-3xl bg-slate-950/80 border border-white/20 text-white shadow-2xl rounded-[2.5rem] max-w-xl p-0 overflow-hidden">
+          <DialogHeader className="p-8 pb-0">
+            <DialogTitle className="text-3xl font-black bg-gradient-to-r from-white to-white/30 bg-clip-text text-transparent italic tracking-tighter">
+              New Ingestion Protocol
+            </DialogTitle>
+            <DialogDescription className="text-gray-400 text-sm mt-2 font-mono uppercase tracking-widest opacity-60">
+              Register source assets to secure cloud storage
+            </DialogDescription>
+          </DialogHeader>
+          <div className="p-8 space-y-6">
+            <label className="group relative block p-16 border-2 border-dashed border-white/10 rounded-3xl hover:border-blue-500/50 hover:bg-blue-500/5 cursor-pointer transition-all duration-500">
+              <div className="flex flex-col items-center justify-center gap-6">
+                <div className="p-5 bg-blue-500/10 rounded-full group-hover:scale-125 group-hover:rotate-12 transition-all duration-700">
+                  <ImageIcon className="w-12 h-12 text-blue-400" />
+                </div>
+                <div className="text-center space-y-1">
+                  <p className="text-md font-black uppercase tracking-[0.2em] text-white">Direct Image Uplink</p>
+                  <p className="text-[10px] text-gray-500 font-mono uppercase opacity-60">Supports JPG, PNG, WEBP via secured API</p>
+                </div>
               </div>
-            )}
-          </div>
-          <div className="p-6 flex items-center justify-between">
-            <div>
-              <h3 className="font-black uppercase tracking-widest text-sm">{previewMedia?.name}</h3>
-              <p className="text-[10px] text-white/40 font-mono mt-1">{previewMedia?.url}</p>
+              <input type="file" className="hidden" onChange={handleImageUpload} accept="image/*" />
+            </label>
+
+            <div className="grid grid-cols-2 gap-4">
+              {['video', 'audio', 'pdf', 'docx'].map(type => (
+                <div key={type} className="p-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all group relative overflow-hidden">
+                  <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-30 transition-opacity">
+                    {type === 'video' && <Video size={40} />}
+                    {type === 'audio' && <Headphones size={40} />}
+                    {type === 'pdf' && <FileText size={40} />}
+                    {type === 'docx' && <FileCode size={40} />}
+                  </div>
+                  <UploadButton
+                    endpoint={type === 'docx' ? 'documentUploader' : type === 'pdf' ? 'pdfUploader' : type === 'video' ? 'videoUploader' : 'audioUploader'}
+                    onClientUploadComplete={res => {
+                      if (res?.[0]) {
+                        addMedia({ url: res[0].url, name: res[0].name, contentType: type as MediaType, status: 'active' }).unwrap();
+                        setIsAddDialogOpen(false);
+                        toast.success(`Encrypted ${type.toUpperCase()} Synchronized`);
+                      }
+                    }}
+                    appearance={{
+                      button:
+                        'w-full bg-blue-600/10 hover:bg-blue-600/30 text-[10px] font-black uppercase tracking-widest h-12 border border-blue-500/20 rounded-xl transition-all',
+                      allowedContent: 'hidden',
+                    }}
+                  />
+                  <div className="mt-3 text-center">
+                    <span className="text-[9px] font-mono text-gray-500 uppercase tracking-[0.3em] group-hover:text-blue-400 transition-colors">
+                      {type} source
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
-            <Button onClick={() => setIsPreviewDialogOpen(false)} variant="outlineGlassy" className="rounded-xl h-10 px-6 uppercase text-[10px] font-black">
-              Close
-            </Button>
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+
+      <Dialog open={isPreviewDialogOpen} onOpenChange={setIsPreviewDialogOpen}>
+        <DialogContent className="sm:max-w-[1000px] backdrop-blur-3xl bg-black/80 border border-white/20 rounded-[3rem] p-0 overflow-hidden shadow-2xl">
+          <DialogTitle className="sr-only">Object Stream Viewer</DialogTitle>
+          <div className="aspect-video relative bg-slate-950/40 flex items-center justify-center">
+            <ScrollArea className="w-full h-full">
+              <div className="flex items-center justify-center min-h-[600px] w-full p-6 relative">
+                {previewMedia?.contentType === 'image' && <Image src={previewMedia.url} alt="" fill className="object-contain p-4" unoptimized />}
+                {previewMedia?.contentType === 'video' && (
+                  <video src={previewMedia.url} controls autoPlay className="w-full h-full max-h-[75vh] rounded-2xl shadow-2xl border border-white/10" />
+                )}
+                {previewMedia?.contentType === 'audio' && (
+                  <div className="flex flex-col items-center gap-10 w-full py-24">
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-blue-500/20 blur-3xl animate-pulse rounded-full" />
+                      <div className="w-40 h-40 rounded-full bg-gradient-to-tr from-blue-500/20 via-white/5 to-purple-500/20 flex items-center justify-center border border-white/10 shadow-2xl">
+                        <Headphones size={80} className="text-white/20 animate-bounce" />
+                      </div>
+                    </div>
+                    <audio src={previewMedia.url} controls autoPlay className="w-full max-w-lg h-14" />
+                  </div>
+                )}
+                {(previewMedia?.contentType === 'pdf' || previewMedia?.contentType === 'docx') && (
+                  <iframe src={previewMedia.url} className="w-full h-[75vh] rounded-2xl border border-white/10 bg-white/5" />
+                )}
+              </div>
+            </ScrollArea>
+          </div>
+          <div className="p-8 bg-white/5 backdrop-blur-2xl border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-6">
+            <div className="min-w-0 flex-1 space-y-1">
+              <h3 className="font-black text-xl text-white truncate uppercase tracking-[0.1em] italic">{previewMedia?.name || 'ASSET_SIGNATURE_UNKNOWN'}</h3>
+              <p className="text-[10px] text-blue-400/60 font-mono break-all tracking-tighter">URI: {previewMedia?.url}</p>
+            </div>
+            <div className="flex gap-4">
+              <Button asChild variant="outlineGlassy" className="rounded-2xl h-14 px-8 bg-white/5 border-white/10 hover:bg-white/10">
+                <a
+                  href={previewMedia?.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest"
+                >
+                  <ExternalLink size={16} />
+                  Open Source
+                </a>
+              </Button>
+              <Button
+                onClick={() => setIsPreviewDialogOpen(false)}
+                variant="outlineGlassy"
+                className="rounded-2xl h-14 px-10 font-black uppercase text-[10px] tracking-widest bg-white/10 border-white/30 hover:bg-white/20"
+              >
+                <X size={16} className="mr-3" />
+                Close Session
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </main>
   );
 }

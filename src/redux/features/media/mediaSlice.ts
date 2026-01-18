@@ -9,11 +9,11 @@ export const mediaApi = apiSlice.injectEndpoints({
         if (contentType && contentType !== 'all') url += `&contentType=${contentType}`;
         return url;
       },
-      providesTags: [{ type: 'tagTypeMedia', id: 'LIST' }],
-    }),
-    getMediaById: builder.query({
-      query: id => `/api/media/v1?id=${id}`,
-      providesTags: (result, error, id) => [{ type: 'tagTypeMedia', id }],
+      providesTags: result =>
+        result
+          ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            [...result.data.map(({ _id }: any) => ({ type: 'tagTypeMedia' as const, id: _id })), { type: 'tagTypeMedia', id: 'LIST' }]
+          : [{ type: 'tagTypeMedia', id: 'LIST' }],
     }),
     addMedia: builder.mutation({
       query: newMedia => ({
@@ -40,12 +40,9 @@ export const mediaApi = apiSlice.injectEndpoints({
         method: 'DELETE',
         body: { id },
       }),
-      invalidatesTags: (result, error, { id }) => [
-        { type: 'tagTypeMedia', id },
-        { type: 'tagTypeMedia', id: 'LIST' },
-      ],
+      invalidatesTags: [{ type: 'tagTypeMedia', id: 'LIST' }],
     }),
   }),
 });
 
-export const { useGetMediasQuery, useGetMediaByIdQuery, useAddMediaMutation, useUpdateMediaMutation, useDeleteMediaMutation } = mediaApi;
+export const { useGetMediasQuery, useAddMediaMutation, useUpdateMediaMutation, useDeleteMediaMutation } = mediaApi;
