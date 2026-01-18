@@ -3,11 +3,10 @@ import { apiSlice } from '@/redux/api/apiSlice';
 export const mediaApi = apiSlice.injectEndpoints({
   endpoints: builder => ({
     getMedias: builder.query({
-      query: ({ page, limit, q }) => {
-        let url = `/api/media/v1?page=${page || 1}&limit=${limit || 10}`;
-        if (q) {
-          url += `&q=${encodeURIComponent(q)}`;
-        }
+      query: ({ page, limit, q, contentType, status }) => {
+        let url = `/api/media/v1?page=${page || 1}&limit=${limit || 10}&status=${status || 'active'}`;
+        if (q) url += `&q=${encodeURIComponent(q)}`;
+        if (contentType && contentType !== 'all') url += `&contentType=${contentType}`;
         return url;
       },
       providesTags: [{ type: 'tagTypeMedia', id: 'LIST' }],

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getMedia, createMedia, updateMedia, deleteMedia, getMediaById } from './controller';
 import { handleRateLimit } from '@/app/api/utils/rate-limit';
-import { isUserHasAccessByRole, IWantAccess } from '../../utils/is-user-has-access-by-role';
+// import { isUserHasAccessByRole, IWantAccess } from '../../utils/is-user-has-access-by-role';
 
 export async function GET(req: Request) {
   const rateLimitResponse = handleRateLimit(req);

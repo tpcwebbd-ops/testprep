@@ -17,7 +17,6 @@ export async function createMedia(req: Request): Promise<IResponse> {
     try {
       const mediaData = await req.json();
       const newMidia = await Media.create(mediaData);
-
       return formatResponse(newMidia, 'Media created successfully', 201);
     } catch (error: unknown) {
       if (isMongoError(error) && error.code === 11000) {
@@ -32,10 +31,8 @@ export async function getMediaById(req: Request): Promise<IResponse> {
   return withDB(async () => {
     const id = new URL(req.url).searchParams.get('id');
     if (!id) return formatResponse(null, 'ID is required', 400);
-
     const media = await Media.findById(id);
     if (!media) return formatResponse(null, 'Not found', 404);
-
     return formatResponse(media, 'Fetched successfully', 200);
   });
 }
@@ -44,21 +41,31 @@ export async function getMedia(req: Request): Promise<IResponse> {
   return withDB(async () => {
     const url = new URL(req.url);
     const page = parseInt(url.searchParams.get('page') || '1');
-    const limit = parseInt(url.searchParams.get('limit') || '1000');
+    const limit = parseInt(url.searchParams.get('limit') || '10');
     const skip = (page - 1) * limit;
 
     const searchQuery = url.searchParams.get('q');
-    let filter: FilterQuery<unknown> = {};
+    const contentType = url.searchParams.get('contentType');
+    const status = url.searchParams.get('status') || 'active';
+
+    const filter: FilterQuery<unknown> = { status };
+
+    if (contentType && contentType !== 'all') {
+      filter.contentType = contentType;
+    }
 
     if (searchQuery) {
-      filter = {
-        $or: [
-          { contentType: { $regex: searchQuery, $options: 'i' } },
-          { status: { $regex: searchQuery, $options: 'i' } },
-          { url: { $regex: searchQuery, $options: 'i' } },
-          { display_url: { $regex: searchQuery, $options: 'i' } },
-        ],
-      };
+      filter.$and = [
+        { status },
+        ...(contentType && contentType !== 'all' ? [{ contentType }] : []),
+        {
+          $or: [
+            { name: { $regex: searchQuery, $options: 'i' } },
+            { url: { $regex: searchQuery, $options: 'i' } },
+            { display_url: { $regex: searchQuery, $options: 'i' } },
+          ],
+        },
+      ];
     }
 
     const data = await Media.find(filter).sort({ updatedAt: -1 }).skip(skip).limit(limit);
@@ -73,14 +80,11 @@ export async function updateMedia(req: Request): Promise<IResponse> {
     try {
       const { id, ...updateData } = await req.json();
       if (!id) return formatResponse(null, 'ID is required', 400);
-
       const updated = await Media.findByIdAndUpdate(id, updateData, {
         new: true,
         runValidators: false,
       });
-
       if (!updated) return formatResponse(null, 'Not found', 404);
-
       return formatResponse(updated, 'Updated successfully', 200);
     } catch (error: unknown) {
       if (isMongoError(error) && error.code === 11000) {
@@ -95,10 +99,8 @@ export async function deleteMedia(req: Request): Promise<IResponse> {
   return withDB(async () => {
     const { id } = await req.json();
     if (!id) return formatResponse(null, 'ID required', 400);
-
     const deleted = await Media.findByIdAndDelete(id);
     if (!deleted) return formatResponse(null, 'Not found', 404);
-
     return formatResponse({ deletedCount: 1 }, 'Deleted successfully', 200);
   });
 }
