@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Video, ImageIcon, FileText, FileCode, Music, Database, Ghost, LayoutGrid } from 'lucide-react';
+import { Video, ImageIcon, FileText, FileCode, Music, Database, LayoutGrid } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 import ImageUploadManagerSingle from '@/components/dashboard-ui/media/ImageUploadManagerSingle';
@@ -11,6 +11,12 @@ import VideoUploadManger from '@/components/dashboard-ui/media/VideoUploadManger
 import ImageUploadManager from '@/components/dashboard-ui/media/ImageUploadManager';
 
 import { CustomLink } from '@/components/dashboard-ui/LinkButton';
+import PdfUploadManagerSingle from '@/components/dashboard-ui/PdfUploadManagerSingle';
+import DocxUploadManagerSingle from '@/components/dashboard-ui/DocxUploadManagerSingle';
+import AudioUploadManagerSingle from '@/components/dashboard-ui/AudioUploadManagerSingle';
+import PdfUploadManager from '@/components/dashboard-ui/PdfUploadManager';
+import DocxUploadManager from '@/components/dashboard-ui/DocxUploadManager';
+import AudioUploadManager from '@/components/dashboard-ui/AudioUploadManager';
 
 type TabType = 'image' | 'video' | 'pdf' | 'docx' | 'audio';
 
@@ -18,59 +24,49 @@ interface TabConfig {
   id: TabType;
   label: string;
   icon: React.ElementType;
-  color: string;
 }
 
 const tabs: TabConfig[] = [
-  { id: 'image', label: 'Image', icon: ImageIcon, color: 'from-blue-500/20 to-indigo-500/20' },
-  { id: 'video', label: 'Video', icon: Video, color: 'from-purple-500/20 to-pink-500/20' },
-  { id: 'pdf', label: 'PDF', icon: FileText, color: 'from-red-500/20 to-orange-500/20' },
-  { id: 'docx', label: 'DOCX', icon: FileCode, color: 'from-sky-500/20 to-cyan-500/20' },
-  { id: 'audio', label: 'Audio', icon: Music, color: 'from-emerald-500/20 to-teal-500/20' },
+  { id: 'image', label: 'Image', icon: ImageIcon },
+  { id: 'video', label: 'Video', icon: Video },
+  { id: 'pdf', label: 'PDF', icon: FileText },
+  { id: 'docx', label: 'DOCX', icon: FileCode },
+  { id: 'audio', label: 'Audio', icon: Music },
 ];
 
 export default function AssetManagementPage() {
   const [activeTab, setActiveTab] = useState<TabType>('image');
+
   const [singleImage, setSingleImage] = useState<string>('');
   const [multipleImages, setMultipleImages] = useState<string[]>([]);
+
   const [singleVideo, setSingleVideo] = useState<string>('');
   const [multipleVideos, setMultipleVideos] = useState<string[]>([]);
 
-  const handleSingleImageUpdate = useCallback(async (newUrl: string) => {
-    setSingleImage(newUrl);
-    if (newUrl) {
-      toast.success('Vault Updated: Single Image');
-    }
-  }, []);
+  const [singlePdf, setSinglePdf] = useState<string>('');
+  const [multiplePdfs, setMultiplePdfs] = useState<string[]>([]);
 
-  const handleMultipleImagesUpdate = useCallback(async (newUrls: string[]) => {
-    setMultipleImages(newUrls);
-    toast.success('Vault Synced: Image Gallery');
-  }, []);
+  const [singleDocx, setSingleDocx] = useState<string>('');
+  const [multipleDocxs, setMultipleDocxs] = useState<string[]>([]);
 
-  const handleSingleVideoUpdate = useCallback(async (newUrl: string) => {
-    setSingleVideo(newUrl);
-    if (newUrl) {
-      toast.success('Vault Updated: Primary Video');
-    }
-  }, []);
+  const [singleAudio, setSingleAudio] = useState<string>('');
+  const [multipleAudios, setMultipleAudios] = useState<string[]>([]);
 
-  const handleMultipleVideosUpdate = useCallback(async (newUrls: string[]) => {
-    setMultipleVideos(newUrls);
-    toast.success('Vault Synced: Video Collection');
+  const handleUpdate = useCallback((type: string, isMultiple: boolean, value: string | string[]) => {
+    toast.success(`Vault Synced: ${type.toUpperCase()} ${isMultiple ? 'Collection' : 'Node'}`);
   }, []);
 
   return (
-    <div className="min-h-screen   relative overflow-hidden font-sans  ">
+    <div className="min-h-screen relative overflow-hidden bg-black/5">
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px]   blur-[150px] rounded-full" />
-        <div className="absolute bottom-[-20%] left-[-10%] w-[800px] h-[800px]   blur-[150px] rounded-full" />
+        <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] bg-indigo-500/5 blur-[150px] rounded-full" />
+        <div className="absolute bottom-[-20%] left-[-10%] w-[800px] h-[800px] bg-blue-500/5 blur-[150px] rounded-full" />
       </div>
 
       <div className="container mx-auto relative z-10 px-4 py-8 md:py-12">
-        <div className="w-full flex items-center justify-between mb-12">
-          <nav className="">
-            <div className="flex flex-wrap items-center gap-2">
+        <div className="w-full flex flex-col md:flex-row items-center justify-between mb-12 gap-6">
+          <nav className="w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
+            <div className="flex items-center gap-2 whitespace-nowrap">
               {tabs.map(tab => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
@@ -79,57 +75,152 @@ export default function AssetManagementPage() {
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={`
-                    relative flex items-center gap-2 px-5 py-2.5 rounded-sm transition-all duration-300 border
+                    relative flex items-center gap-2 px-6 py-3 rounded-xl transition-all duration-500 border
                     ${
                       isActive
-                        ? 'bg-green-400/10 border-white text-white scale-105'
-                        : 'bg-white/5 border-white/10 text-white/50 hover:bg-white/10 hover:border-white/30'
+                        ? 'bg-indigo-500/10 border-indigo-500/50 text-white shadow-[0_0_20px_rgba(99,102,241,0.2)]'
+                        : 'bg-white/5 border-white/5 text-white/40 hover:bg-white/10 hover:border-white/20'
                     }
                   `}
                   >
-                    <Icon className="w-4 h-4" />
-                    <span className="font-bold tracking-tight text-[11px] uppercase">{tab.label}</span>
+                    <Icon className={`w-4 h-4 transition-colors ${isActive ? 'text-indigo-400' : 'text-white/20'}`} />
+                    <span className="font-black tracking-widest text-[10px] uppercase">{tab.label}</span>
                   </button>
                 );
               })}
             </div>
           </nav>
           <CustomLink href="/dashboard/media" variant="outlineGlassy" size="sm">
-            Media
+            MEDIA CENTER
           </CustomLink>
         </div>
 
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+            initial={{ opacity: 0, scale: 0.98, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.98, y: -20 }}
+            transition={{ type: 'spring', stiffness: 100, damping: 20 }}
+            className="grid grid-cols-1 lg:grid-cols-2 gap-10"
           >
             <section className="space-y-6">
-              <div className="flex items-center gap-3 px-1">
-                <Database className="w-5 h-5 text-indigo-400/60" />
-                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/60">Single Assect</h3>
+              <div className="flex items-center gap-4 px-2">
+                <div className="p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
+                  <Database className="w-4 h-4 text-indigo-400" />
+                </div>
+                <div>
+                  <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-white">Primary Asset</h3>
+                  <p className="text-[8px] font-bold text-white/20 uppercase tracking-widest">Single Entry Node</p>
+                </div>
               </div>
 
-              <div className="bg-slate-900/40 backdrop-blur-[120px] bg-opacity-30 border border-gray-100/10 p-8 rounded-2xl hover:border-indigo-500/50 transition-all duration-700 shadow-2xl">
-                {activeTab === 'image' && <ImageUploadManagerSingle value={singleImage} onChange={handleSingleImageUpdate} />}
-                {activeTab === 'video' && <VideoUploadMangerSingle value={singleVideo} onChange={handleSingleVideoUpdate} />}
-                {activeTab !== 'image' && activeTab !== 'video' && <Placeholder type={activeTab} mode="Single" />}
+              <div className="bg-white/[0.02] backdrop-blur-3xl border border-white/5 p-8 rounded-[2.5rem] shadow-2xl transition-all duration-500 hover:border-white/10">
+                {activeTab === 'image' && (
+                  <ImageUploadManagerSingle
+                    value={singleImage}
+                    onChange={val => {
+                      setSingleImage(val);
+                      handleUpdate('image', false, val);
+                    }}
+                  />
+                )}
+                {activeTab === 'video' && (
+                  <VideoUploadMangerSingle
+                    value={singleVideo}
+                    onChange={val => {
+                      setSingleVideo(val);
+                      handleUpdate('video', false, val);
+                    }}
+                  />
+                )}
+                {activeTab === 'pdf' && (
+                  <PdfUploadManagerSingle
+                    value={singlePdf}
+                    onChange={val => {
+                      setSinglePdf(val);
+                      handleUpdate('pdf', false, val);
+                    }}
+                  />
+                )}
+                {activeTab === 'docx' && (
+                  <DocxUploadManagerSingle
+                    value={singleDocx}
+                    onChange={val => {
+                      setSingleDocx(val);
+                      handleUpdate('docx', false, val);
+                    }}
+                  />
+                )}
+                {activeTab === 'audio' && (
+                  <AudioUploadManagerSingle
+                    value={singleAudio}
+                    onChange={val => {
+                      setSingleAudio(val);
+                      handleUpdate('audio', false, val);
+                    }}
+                  />
+                )}
               </div>
             </section>
 
             <section className="space-y-6">
-              <div className="flex items-center gap-3 px-1">
-                <LayoutGrid className="w-5 h-5 text-indigo-400/60" />
-                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/60">Multiple Assect</h3>
+              <div className="flex items-center gap-4 px-2">
+                <div className="p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
+                  <LayoutGrid className="w-4 h-4 text-indigo-400" />
+                </div>
+                <div>
+                  <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-white">Gallery Cluster</h3>
+                  <p className="text-[8px] font-bold text-white/20 uppercase tracking-widest">Multi-Asset Data Grid</p>
+                </div>
               </div>
 
-              <div className="bg-slate-900/40 backdrop-blur-[120px] bg-opacity-30 border border-gray-100/10 p-8 rounded-2xl hover:border-indigo-500/50 transition-all duration-700 shadow-2xl">
-                {activeTab === 'image' && <ImageUploadManager value={multipleImages} onChange={handleMultipleImagesUpdate} />}
-                {activeTab === 'video' && <VideoUploadManger value={multipleVideos} onChange={handleMultipleVideosUpdate} />}
-                {activeTab !== 'image' && activeTab !== 'video' && <Placeholder type={activeTab} mode="Batch" />}
+              <div className="bg-white/[0.02] backdrop-blur-3xl border border-white/5 p-8 rounded-[2.5rem] shadow-2xl transition-all duration-500 hover:border-white/10">
+                {activeTab === 'image' && (
+                  <ImageUploadManager
+                    value={multipleImages}
+                    onChange={val => {
+                      setMultipleImages(val);
+                      handleUpdate('image', true, val);
+                    }}
+                  />
+                )}
+                {activeTab === 'video' && (
+                  <VideoUploadManger
+                    value={multipleVideos}
+                    onChange={val => {
+                      setMultipleVideos(val);
+                      handleUpdate('video', true, val);
+                    }}
+                  />
+                )}
+                {activeTab === 'pdf' && (
+                  <PdfUploadManager
+                    value={multiplePdfs}
+                    onChange={val => {
+                      setMultiplePdfs(val);
+                      handleUpdate('pdf', true, val);
+                    }}
+                  />
+                )}
+                {activeTab === 'docx' && (
+                  <DocxUploadManager
+                    value={multipleDocxs}
+                    onChange={val => {
+                      setMultipleDocxs(val);
+                      handleUpdate('docx', true, val);
+                    }}
+                  />
+                )}
+                {activeTab === 'audio' && (
+                  <AudioUploadManager
+                    value={multipleAudios}
+                    onChange={val => {
+                      setMultipleAudios(val);
+                      handleUpdate('audio', true, val);
+                    }}
+                  />
+                )}
               </div>
             </section>
           </motion.div>
@@ -138,18 +229,3 @@ export default function AssetManagementPage() {
     </div>
   );
 }
-
-const Placeholder = ({ type, mode }: { type: string; mode: string }) => (
-  <div className="flex flex-col items-center justify-center text-center p-12 min-h-[300px]">
-    <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}>
-      <Ghost className="w-16 h-16 text-white/5 mb-6" />
-    </motion.div>
-    <h4 className="text-xl font-black uppercase tracking-widest italic text-white/20">
-      {mode} {type}
-    </h4>
-    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/10 mt-2">Calibration required for this signal type</p>
-    <div className="mt-8 px-6 py-2 rounded-full border border-white/5 bg-white/[0.02] text-[9px] font-black uppercase tracking-widest text-white/20">
-      Awaiting Deployment
-    </div>
-  </div>
-);
