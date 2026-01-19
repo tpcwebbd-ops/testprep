@@ -168,7 +168,13 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageDialo
                         }
                       `}
                     >
-                      <Image src={item.url} fill alt={item.name} className="object-cover transition-transform duration-700 group-hover:scale-110" unoptimized />
+                      <Image
+                        src={item.url}
+                        fill
+                        alt={item.name || 'Images'}
+                        className="object-cover transition-transform duration-700 group-hover:scale-110"
+                        unoptimized
+                      />
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
                         <span className="text-[9px] font-black uppercase tracking-widest text-white truncate">{item.name}</span>
                       </div>
