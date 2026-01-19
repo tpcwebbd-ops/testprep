@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useMemo, useState, useRef } from 'react';
+import React, { useMemo, useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { X, UploadCloud, Loader2, ImageIcon, Ghost, RefreshCcw, Search, CheckCircle2, Zap } from 'lucide-react';
+import { X, UploadCloud, Loader2, ImageIcon, Ghost, RefreshCcw, Search, CheckCircle2, Zap, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 import imageCompression from 'browser-image-compression';
@@ -13,36 +13,64 @@ import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, Dialog
 
 import { useGetMediasQuery, useAddMediaMutation } from '@/redux/features/media/mediaSlice';
 
+interface MediaItem {
+  _id: string;
+  name: string;
+  url: string;
+  status: string;
+  contentType: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface MediaResponse {
+  data: MediaItem[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
 interface InternalImageDialogProps {
   onImageSelect: (newImage: string) => void;
   selectedImage: string;
 }
 
 const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageDialogProps) => {
-  const { data: response, isLoading: isFetching } = useGetMediasQuery({
-    page: 1,
-    limit: 100,
-    q: '',
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const ITEMS_PER_PAGE = 10;
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+      setCurrentPage(1);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const {
+    data: response,
+    isLoading: isFetching,
+    isFetching: isRefetching,
+  } = useGetMediasQuery({
+    page: currentPage,
+    limit: ITEMS_PER_PAGE,
+    q: debouncedSearch,
     contentType: 'image',
     status: 'active',
-  });
+  }) as { data: MediaResponse | undefined; isLoading: boolean; isFetching: boolean };
+
   const [addMedia, { isLoading: isAdding }] = useAddMediaMutation();
   const [isUploadingLocal, setIsUploadingLocal] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const availableImages = useMemo(() => {
-    if (!response?.data) return [];
-    console.log('response : ', response);
-    return (
-      response.data
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .filter((item: any) => item.contentType === 'image' && item.status === 'active')
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .filter((item: any) => (item.name || '').toLowerCase().includes(searchQuery.toLowerCase()))
-    );
-  }, [response, searchQuery]);
+  const availableImages = useMemo(() => response?.data || [], [response]);
+
+  const totalPages = useMemo(() => {
+    if (!response?.total || !response?.limit) return 1;
+    return Math.ceil(response.total / response.limit);
+  }, [response]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -80,99 +108,138 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageDialo
   };
 
   return (
-    <div className="flex flex-col h-[85vh] md:h-[70vh] backdrop-blur-[150px] rounded-xl overflow-hidden border border-white/10 bg-black/40">
-      <DialogHeader className="p-6 border-b border-white/5 text-white">
+    <div className="flex flex-col h-[90vh] md:h-[80vh] backdrop-blur-[150px] rounded-2xl overflow-hidden border border-white/10 bg-black/60 shadow-2xl">
+      <DialogHeader className="p-6 border-b border-white/5 bg-white/5">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/20" />
+            <Search
+              className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${
+                isRefetching ? 'text-indigo-500 animate-pulse' : 'text-white/20'
+              }`}
+            />
             <input
               type="text"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              placeholder="SEARCH VAULT..."
-              className="w-full bg-white/5 border border-white/10 rounded-lg py-2 pl-10 pr-4 text-[10px] font-black uppercase tracking-[0.2em] text-white focus:outline-none focus:border-indigo-500/50 transition-colors placeholder:text-white/20"
+              placeholder="SEARCH ASSET VAULT..."
+              className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-[11px] font-black uppercase tracking-[0.2em] text-white focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all placeholder:text-white/20"
             />
           </div>
-          <div className="space-y-1 hidden">
-            <DialogTitle></DialogTitle>
-            <DialogDescription></DialogDescription>
+          <div className="hidden">
+            <DialogTitle>Media Vault</DialogTitle>
+            <DialogDescription>Select or upload media assets</DialogDescription>
           </div>
         </div>
       </DialogHeader>
 
-      <ScrollArea className="flex-1 p-8">
-        {isFetching ? (
-          <div className="flex flex-col items-center justify-center py-32 gap-6">
-            <div className="relative">
-              <div className="w-16 h-16 border-2 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin" />
-              <Zap className="absolute inset-0 m-auto w-6 h-6 text-indigo-500/40" />
+      <div className="flex-1 relative overflow-hidden">
+        <ScrollArea className="h-full w-full p-8">
+          {isFetching ? (
+            <div className="flex flex-col items-center justify-center py-40 gap-6">
+              <div className="relative">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+                  className="w-20 h-20 border-2 border-indigo-500/20 border-t-indigo-500 rounded-full"
+                />
+                <Zap className="absolute inset-0 m-auto w-8 h-8 text-indigo-500 animate-pulse" />
+              </div>
+              <span className="text-[10px] font-black uppercase tracking-[0.5em] text-indigo-500/60">Scanning Bio-Grid...</span>
             </div>
-            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 animate-pulse">Syncing Vault Data...</span>
-          </div>
-        ) : availableImages.length > 0 ? (
-          <ScrollArea className="w-full h-80">
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+          ) : availableImages.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
               <AnimatePresence mode="popLayout">
-                {
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  availableImages.map((item: any, idx: number) => {
-                    const isSelected = selectedImage === item.url;
-                    return (
-                      <motion.div
-                        key={item.url}
-                        initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        transition={{ delay: idx * 0.03 }}
-                        onClick={() => onImageSelect(item.url)}
-                        className={`relative aspect-square rounded-2xl overflow-hidden border-2 cursor-pointer transition-all duration-500 group
-                      ${
-                        isSelected
-                          ? 'border-indigo-500 scale-95 shadow-[0_0_40px_rgba(99,102,241,0.3)]'
-                          : 'border-white/5 hover:border-white/20 hover:scale-105'
-                      }
-                    `}
-                      >
-                        <Image
-                          src={item.url}
-                          fill
-                          alt="Vault Item"
-                          className="object-cover transition-transform duration-1000 group-hover:scale-110"
-                          unoptimized
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-3">
-                          <span className="text-[8px] font-black uppercase tracking-widest text-white/60 truncate">{item.name || 'Image_DETECTED'}</span>
+                {availableImages.map((item, idx) => {
+                  const isSelected = selectedImage === item.url;
+                  return (
+                    <motion.div
+                      key={item._id}
+                      layout
+                      initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      transition={{ delay: idx * 0.02, type: 'spring', stiffness: 260, damping: 20 }}
+                      onClick={() => onImageSelect(item.url)}
+                      className={`relative aspect-square rounded-2xl overflow-hidden border-2 cursor-pointer transition-all duration-500 group
+                        ${
+                          isSelected
+                            ? 'border-indigo-500 scale-95 shadow-[0_0_50px_rgba(99,102,241,0.4)]'
+                            : 'border-white/5 hover:border-indigo-500/30 hover:scale-105 shadow-xl'
+                        }
+                      `}
+                    >
+                      <Image src={item.url} fill alt={item.name} className="object-cover transition-transform duration-700 group-hover:scale-110" unoptimized />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
+                        <span className="text-[9px] font-black uppercase tracking-widest text-white truncate">{item.name}</span>
+                      </div>
+                      {isSelected && (
+                        <div className="absolute inset-0 bg-indigo-500/20 flex items-center justify-center backdrop-blur-[2px]">
+                          <motion.div
+                            initial={{ scale: 0, rotate: -45 }}
+                            animate={{ scale: 1, rotate: 0 }}
+                            className="bg-indigo-500 text-white rounded-full p-3 shadow-2xl"
+                          >
+                            <CheckCircle2 className="w-6 h-6" />
+                          </motion.div>
                         </div>
-                        {isSelected && (
-                          <div className="absolute inset-0 bg-indigo-500/20 flex items-center justify-center backdrop-blur-[2px]">
-                            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="bg-indigo-500 text-white rounded-full p-2.5 shadow-2xl">
-                              <CheckCircle2 className="w-6 h-6" />
-                            </motion.div>
-                          </div>
-                        )}
-                      </motion.div>
-                    );
-                  })
-                }
+                      )}
+                    </motion.div>
+                  );
+                })}
               </AnimatePresence>
             </div>
-          </ScrollArea>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-32 opacity-20 space-y-6">
-            <Ghost className="w-20 h-20 animate-bounce" />
-            <div className="text-center">
-              <h3 className="text-2xl font-black uppercase tracking-[0.4em]">Zero Assets</h3>
-              <p className="text-[10px] font-bold uppercase tracking-widest mt-2">The quadrant appears to be empty</p>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-40 opacity-30 space-y-6">
+              <Ghost className="w-24 h-24 animate-bounce" />
+              <div className="text-center">
+                <h3 className="text-2xl font-black uppercase tracking-[0.6em]">Void Detected</h3>
+                <p className="text-[10px] font-bold uppercase tracking-widest mt-3">No assets matching the criteria found</p>
+              </div>
             </div>
-          </div>
-        )}
-      </ScrollArea>
-      <div className="flex items-center gap-4 justify-end w-full p-4 border-t border-white/5">
-        <input type="file" ref={fileInputRef} accept="image/*" className="hidden" onChange={handleImageUpload} />
+          )}
+        </ScrollArea>
+      </div>
 
-        <Button variant="outlineGlassy" size="sm" disabled={isUploadingLocal || isAdding} onClick={() => fileInputRef.current?.click()}>
-          {isUploadingLocal || isAdding ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UploadCloud className="w-3.5 h-3.5" />}
-          {isAdding ? 'Uploading...' : 'Upload'}
-        </Button>
+      <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-6 border-t border-white/5 bg-white/5">
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outlineGlassy"
+            size="sm"
+            className="min-w-1"
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            disabled={currentPage === 1 || isFetching}
+          >
+            <ChevronLeft className="w-5 h-5 text-white" />
+          </Button>
+
+          <div className="flex items-center gap-3 px-5 h-10 rounded-xl bg-white/5 border border-white/10">
+            <span className="text-[11px] font-black text-white">{currentPage}</span>
+            <span className="text-[10px] font-black text-white/20">/</span>
+            <span className="text-[11px] font-black text-white/60">{totalPages}</span>
+          </div>
+
+          <Button
+            variant="outlineGlassy"
+            size="sm"
+            className="min-w-1"
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages || isFetching}
+          >
+            <ChevronRight className="w-5 h-5 text-white" />
+          </Button>
+
+          <div className="hidden sm:block ml-4">
+            <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em]">Total : {response?.total || 0}</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4 w-full md:w-auto">
+          <input type="file" ref={fileInputRef} accept="image/*" className="hidden" onChange={handleImageUpload} />
+          <Button onClick={() => fileInputRef.current?.click()} disabled={isUploadingLocal || isAdding} variant="outlineGlassy" size="sm">
+            {isUploadingLocal || isAdding ? <Loader2 className="w-4 h-4 animate-spin" /> : <UploadCloud className="w-4 h-4" />}
+            {isAdding || isUploadingLocal ? 'Uploading...' : 'Upload'}
+          </Button>
+        </div>
       </div>
     </div>
   );
@@ -181,7 +248,7 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageDialo
 export default function ImageUploadManagerSingle({
   value,
   onChange,
-  label = 'Single Image',
+  label = 'ASSET SELECTION',
 }: {
   value: string;
   onChange: (val: string) => void;
@@ -190,51 +257,66 @@ export default function ImageUploadManagerSingle({
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 w-full">
       <div className="flex items-center justify-between px-1">
-        <h4 className="text-sm text-white/40 ">{label}</h4>
-        {value && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={e => {
-              e.stopPropagation();
-              onChange('');
-            }}
-            className="h-6 text-rose-200 cursor-pointer hover:text-red-400 text-[9px] border-rose-500 border font-black uppercase tracking-widest bg-red-500/5 hover:bg-red-500/10"
-          >
-            <X className="w-3 h-3 mr-1" /> Remove
-          </Button>
-        )}
+        <label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">{label}</label>
+        <AnimatePresence>
+          {value && (
+            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={e => {
+                  e.stopPropagation();
+                  onChange('');
+                }}
+                className="h-7 px-3 text-rose-400 hover:text-rose-300 border border-rose-500/30 hover:border-rose-500 font-black uppercase tracking-widest text-[9px] bg-rose-500/5 hover:bg-rose-500/10 rounded-lg transition-all"
+              >
+                <X className="w-3.5 h-3.5 mr-2" /> DISCARD
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <div className="group relative w-full aspect-video rounded-xl backdrop-blur-[120px] transition-all duration-700 cursor-pointer overflow-hidden flex flex-col items-center justify-center gap-4 border border-white/5 hover:border-white/10">
+          <div className="group relative w-full aspect-[16/9] md:aspect-[21/9] rounded-2xl backdrop-blur-3xl transition-all duration-700 cursor-pointer overflow-hidden flex flex-col items-center justify-center border border-white/5 hover:border-indigo-500/30 bg-white/[0.02]">
             {value ? (
               <>
-                <Image src={value} fill alt="Selected Image" className="object-cover transition-transform duration-1000 group-hover:scale-110" unoptimized />
-                <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center backdrop-blur-sm">
-                  <div className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-white/10 border border-white/20 text-[10px] font-black uppercase tracking-[0.2em] text-white scale-90 group-hover:scale-100 transition-transform">
-                    <RefreshCcw className="w-4 h-4 animate-[spin_4s_linear_infinite]" />
-                    Change Image
-                  </div>
+                <Image src={value} fill alt="Current Selection" className="object-cover transition-transform duration-1000 group-hover:scale-105" unoptimized />
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center backdrop-blur-sm">
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="flex items-center gap-3 px-8 py-4 rounded-2xl bg-white/10 border border-white/20 text-[10px] font-black uppercase tracking-[0.3em] text-white"
+                  >
+                    <RefreshCcw className="w-5 h-5 animate-[spin_4s_linear_infinite]" />
+                    REPLACE ASSET
+                  </motion.div>
                 </div>
               </>
             ) : (
-              <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 3, repeat: Infinity }} className="flex flex-col items-center gap-5">
-                <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:scale-110 group-hover:bg-indigo-500/10 group-hover:border-indigo-500/30 transition-all duration-500">
-                  <ImageIcon className="w-8 h-8 text-white/20 group-hover:text-indigo-400" />
+              <div className="flex flex-col items-center gap-6">
+                <motion.div
+                  animate={{
+                    y: [0, -10, 0],
+                    boxShadow: ['0 0 0px rgba(99,102,241,0)', '0 0 40px rgba(99,102,241,0.2)', '0 0 0px rgba(99,102,241,0)'],
+                  }}
+                  transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                  className="w-20 h-20 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-indigo-500/40 group-hover:bg-indigo-500/5 transition-all duration-500"
+                >
+                  <ImageIcon className="w-10 h-10 text-white/20 group-hover:text-indigo-400" />
+                </motion.div>
+                <div className="text-center space-y-2">
+                  <p className="text-[11px] font-black uppercase tracking-[0.5em] text-white/40 group-hover:text-white transition-colors">No Asset Selected</p>
+                  <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/20">Access the mainframe to proceed</p>
                 </div>
-                <div className="text-center space-y-1">
-                  <p className="text-xl text-white/40 group-hover:text-white transition-colors">No Image Found</p>
-                  <p className="text-sm text-white/60 group-hover:text-white transition-colors">Please Select One</p>
-                </div>
-              </motion.div>
+              </div>
             )}
           </div>
         </DialogTrigger>
-        <DialogContent className="bg-transparent border-none p-0 shadow-none overflow-hidden max-w-4xl w-[95vw] text-white">
+        <DialogContent className="bg-transparent border-none p-0 shadow-none overflow-hidden max-w-5xl w-[95vw] text-white mt-4">
           <InternalImageVault
             selectedImage={value}
             onImageSelect={url => {
