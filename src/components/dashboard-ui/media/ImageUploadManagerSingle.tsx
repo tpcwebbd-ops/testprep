@@ -19,7 +19,13 @@ interface InternalImageDialogProps {
 }
 
 const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageDialogProps) => {
-  const { data: response, isLoading: isFetching } = useGetMediasQuery({});
+  const { data: response, isLoading: isFetching } = useGetMediasQuery({
+    page: 1,
+    limit: 100,
+    q: '',
+    contentType: 'image',
+    status: 'active',
+  });
   const [addMedia, { isLoading: isAdding }] = useAddMediaMutation();
   const [isUploadingLocal, setIsUploadingLocal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -28,6 +34,7 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageDialo
 
   const availableImages = useMemo(() => {
     if (!response?.data) return [];
+    console.log('response : ', response);
     return (
       response.data
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -103,50 +110,52 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageDialo
             <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 animate-pulse">Syncing Vault Data...</span>
           </div>
         ) : availableImages.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-            <AnimatePresence mode="popLayout">
-              {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                availableImages.map((item: any, idx: number) => {
-                  const isSelected = selectedImage === item.url;
-                  return (
-                    <motion.div
-                      key={item.url}
-                      initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      transition={{ delay: idx * 0.03 }}
-                      onClick={() => onImageSelect(item.url)}
-                      className={`relative aspect-square rounded-2xl overflow-hidden border-2 cursor-pointer transition-all duration-500 group
+          <ScrollArea className="w-full h-80">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+              <AnimatePresence mode="popLayout">
+                {
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  availableImages.map((item: any, idx: number) => {
+                    const isSelected = selectedImage === item.url;
+                    return (
+                      <motion.div
+                        key={item.url}
+                        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        transition={{ delay: idx * 0.03 }}
+                        onClick={() => onImageSelect(item.url)}
+                        className={`relative aspect-square rounded-2xl overflow-hidden border-2 cursor-pointer transition-all duration-500 group
                       ${
                         isSelected
                           ? 'border-indigo-500 scale-95 shadow-[0_0_40px_rgba(99,102,241,0.3)]'
                           : 'border-white/5 hover:border-white/20 hover:scale-105'
                       }
                     `}
-                    >
-                      <Image
-                        src={item.url}
-                        fill
-                        alt="Vault Item"
-                        className="object-cover transition-transform duration-1000 group-hover:scale-110"
-                        unoptimized
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-3">
-                        <span className="text-[8px] font-black uppercase tracking-widest text-white/60 truncate">{item.name || 'Image_DETECTED'}</span>
-                      </div>
-                      {isSelected && (
-                        <div className="absolute inset-0 bg-indigo-500/20 flex items-center justify-center backdrop-blur-[2px]">
-                          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="bg-indigo-500 text-white rounded-full p-2.5 shadow-2xl">
-                            <CheckCircle2 className="w-6 h-6" />
-                          </motion.div>
+                      >
+                        <Image
+                          src={item.url}
+                          fill
+                          alt="Vault Item"
+                          className="object-cover transition-transform duration-1000 group-hover:scale-110"
+                          unoptimized
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-3">
+                          <span className="text-[8px] font-black uppercase tracking-widest text-white/60 truncate">{item.name || 'Image_DETECTED'}</span>
                         </div>
-                      )}
-                    </motion.div>
-                  );
-                })
-              }
-            </AnimatePresence>
-          </div>
+                        {isSelected && (
+                          <div className="absolute inset-0 bg-indigo-500/20 flex items-center justify-center backdrop-blur-[2px]">
+                            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="bg-indigo-500 text-white rounded-full p-2.5 shadow-2xl">
+                              <CheckCircle2 className="w-6 h-6" />
+                            </motion.div>
+                          </div>
+                        )}
+                      </motion.div>
+                    );
+                  })
+                }
+              </AnimatePresence>
+            </div>
+          </ScrollArea>
         ) : (
           <div className="flex flex-col items-center justify-center py-32 opacity-20 space-y-6">
             <Ghost className="w-20 h-20 animate-bounce" />

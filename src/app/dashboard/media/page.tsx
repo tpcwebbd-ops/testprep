@@ -157,7 +157,7 @@ export default function MediaDashboard() {
           <div className="flex flex-wrap items-center gap-3">
             <CustomLink href="/dashboard/media/example" variant="outlineGlassy" size="sm" className="h-10 px-4">
               <LayoutGrid size={16} className="mr-2" />
-              Grid View
+              Example
             </CustomLink>
             <Button size="sm" variant="outlineWater" onClick={() => refetch()} disabled={isFetching} className="h-10 px-4 bg-blue-500/5">
               <RefreshCw size={16} className={`mr-2 ${isFetching ? 'animate-spin' : ''}`} />
@@ -170,7 +170,7 @@ export default function MediaDashboard() {
               className="h-10 px-4 bg-white/5 border-white/30 hover:bg-white/20"
             >
               <Plus size={18} className="mr-2" />
-              Ingest Asset
+              Add
             </Button>
           </div>
         </header>
