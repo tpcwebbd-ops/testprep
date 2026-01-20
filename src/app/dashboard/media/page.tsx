@@ -42,6 +42,7 @@ import { useGetMediasQuery, useAddMediaMutation, useUpdateMediaMutation, useDele
 import imageCompression from 'browser-image-compression';
 import { UploadButton } from '@/lib/uploadthing';
 import { CustomLink } from '@/components/dashboard-ui/LinkButton';
+import Link from 'next/link';
 
 type MediaType = 'all' | 'video' | 'image' | 'pdf' | 'docx' | 'audio';
 type MediaStatus = 'active' | 'trash';
@@ -460,16 +461,14 @@ export default function MediaDashboard() {
       {/* 1. ADD ASSET DIALOG */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent className="backdrop-blur-xl mt-8 bg-white/10 border border-white/20 shadow-2xl   max-w-xl p-0 overflow-hidden text-white">
-          <DialogHeader className="p-8 pb-0">
+          <DialogHeader className="p-4 pb-0 pl-6">
             <DialogTitle className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-white via-white/80 to-white/30 bg-clip-text text-transparent italic tracking-tighter">
-              New Ingestion Protocol
+              Upload a new assect
             </DialogTitle>
-            <DialogDescription className="text-gray-200/50 text-xs mt-2 font-mono uppercase tracking-widest">
-              Register source assets to secure cloud storage
-            </DialogDescription>
+            <DialogDescription className="hidden"></DialogDescription>
           </DialogHeader>
-          <div className="p-8 space-y-6">
-            <label className="group relative block p-16 border-2 border-dashed border-white/10 rounded-3xl hover:border-white/40 hover:bg-white/5 cursor-pointer transition-all duration-500">
+          <div className="p-8 space-y-6 -mt-8">
+            <label className="group relative block p-4 border-2 border-dashed border-white/10 rounded-3xl hover:border-white/40 hover:bg-white/5 cursor-pointer transition-all duration-500">
               <div className="flex flex-col items-center justify-center gap-6">
                 <div className="p-5 bg-white/5 rounded-full group-hover:scale-125 group-hover:rotate-12 transition-all duration-700 border border-white/10">
                   <ImageIcon className="w-12 h-12 text-white/80" />
@@ -547,12 +546,12 @@ export default function MediaDashboard() {
 
       {/* 3. ASSET PREVIEW DIALOG */}
       <Dialog open={isPreviewDialogOpen} onOpenChange={setIsPreviewDialogOpen}>
-        <DialogContent className="sm:max-w-[1000px] mt-8 backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl   p-0 overflow-hidden text-white">
+        <DialogContent className="sm:max-w-[1000px] mt-8 backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl p-0 overflow-hidden text-white h-[80vh]">
           <DialogTitle className="sr-only">Object Stream Viewer</DialogTitle>
 
-          <div className="aspect-video  relative bg-white/5 flex items-center justify-center">
-            <ScrollArea className="w-full h-full">
-              <div className="flex items-center justify-center min-h-[600px] w-full p-6 relative">
+          <div className="relative bg-white/5 flex items-center justify-center">
+            <ScrollArea className="w-full h-[60vh]">
+              <div className="flex items-center justify-center min-h-[400px] w-full p-6 relative">
                 {previewMedia?.contentType === 'image' && (
                   <Image src={previewMedia.url} alt={previewMedia.name || 'Images'} fill className="object-contain p-4" unoptimized />
                 )}
@@ -572,7 +571,7 @@ export default function MediaDashboard() {
             </ScrollArea>
           </div>
 
-          <div className="p-8 bg-white/5 backdrop-blur-2xl border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-6">
+          <div className="p-8 py-0 bg-white/5 backdrop-blur-2xl border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-6">
             <div className="min-w-0 flex-1 space-y-1">
               <h3 className="text-2xl font-bold bg-gradient-to-r from-white via-white/80 to-white/30 bg-clip-text text-transparent italic tracking-tighter uppercase">
                 {previewMedia?.name || 'ASSET_SIGNATURE_UNKNOWN'}
@@ -581,22 +580,22 @@ export default function MediaDashboard() {
             </div>
 
             <div className="flex gap-4">
-              <Button asChild className="rounded-xl h-12 px-6 bg-white/5 border border-white/10 hover:bg-white/15 text-white">
-                <a
-                  href={previewMedia?.url}
+              <Button asChild variant="glassyInfo">
+                <Link
+                  href={previewMedia?.url || '#'}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest"
                 >
                   <ExternalLink size={14} /> Open
-                </a>
+                </Link>
               </Button>
-              <Button
+              {/* <Button
                 onClick={() => setIsPreviewDialogOpen(false)}
                 className="rounded-xl h-12 px-8 font-black uppercase text-[10px] tracking-widest bg-white/10 border border-white/20 hover:bg-white/20 text-white"
               >
                 <X size={14} className="mr-2" /> Terminate
-              </Button>
+              </Button> */}
             </div>
           </div>
         </DialogContent>
