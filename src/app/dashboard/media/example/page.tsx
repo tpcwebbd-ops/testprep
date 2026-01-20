@@ -117,7 +117,7 @@ export default function AssetManagementPage() {
                 </div>
               </div>
 
-              <div className="backdrop-blur-xl bg-white/10 border border-white/20 p-8 rounded-xl shadow-2xl transition-all duration-500 hover:bg-white/15">
+              <div className="backdrop-blur-xl bg-white/10 border border-white/60 p-8 rounded-xl shadow-2xl transition-all duration-500 hover:bg-white/15 h-[380px]">
                 {activeTab === 'image' && (
                   <ImageUploadManagerSingle
                     value={singleImage}
@@ -178,7 +178,7 @@ export default function AssetManagementPage() {
                 </div>
               </div>
 
-              <div className="backdrop-blur-xl bg-white/10 border border-white/20 p-8 rounded-xl shadow-2xl transition-all duration-500 hover:bg-white/15">
+              <div className="backdrop-blur-xl bg-white/10 border border-white/60 p-8 rounded-xl shadow-2xl transition-all duration-500 hover:bg-white/15 h-[380px]">
                 {activeTab === 'image' && (
                   <ImageUploadManager
                     value={multipleImages}

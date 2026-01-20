@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { X, UploadCloud, Loader2, ImageIcon, Ghost, RefreshCcw, Search, CheckCircle2, Zap, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, UploadCloud, Loader2, ImageIcon, Ghost, RefreshCcw, Search, CheckCircle2, Zap, ChevronLeft, ChevronRight, ImageUpIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 import imageCompression from 'browser-image-compression';
@@ -256,14 +256,17 @@ export default function ImageUploadManagerSingle({ value, onChange, label = 'Ima
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="space-y-4 w-full">
+    <div className="space-y-4 w-full h-full ">
       <div className="flex items-center justify-between px-1">
-        <label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/90">{label}</label>
+        <div className="w-full flex items-start justify-start gap-2">
+          <ImageUpIcon className="w-3.5 h-3.5" />
+          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/90">{label}</label>
+        </div>
         <AnimatePresence>
           {value && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
               <Button
-                variant="outlineFire"
+                variant="outlineGlassy"
                 size="sm"
                 onClick={e => {
                   e.stopPropagation();
@@ -279,7 +282,7 @@ export default function ImageUploadManagerSingle({ value, onChange, label = 'Ima
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <div className="group relative w-full aspect-[16/9] md:aspect-[21/9] rounded-2xl backdrop-blur-3xl transition-all duration-700 cursor-pointer overflow-hidden flex flex-col items-center justify-center border border-white/5 hover:border-indigo-500/30 bg-white/[0.02]">
+          <div className="group relative w-full aspect-[16/9] md:aspect-[21/9] rounded-sm backdrop-blur-3xl transition-all duration-700 cursor-pointer overflow-hidden flex flex-col items-center justify-center border border-white/50 hover:border-indigo-500/30 bg-white/2">
             {value ? (
               <>
                 <Image src={value} fill alt="Current Selection" className="object-cover transition-transform duration-1000 group-hover:scale-105" unoptimized />

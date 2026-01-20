@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { Plus, X, UploadCloud, Loader2, ImageIcon, Ghost, Search, CheckCircle2, Layers, Zap, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, X, UploadCloud, Loader2, ImageIcon, Ghost, Search, CheckCircle2, Layers, Zap, ChevronLeft, ChevronRight, ImagesIcon } from 'lucide-react';
 import { toast } from 'react-toastify';
 import imageCompression from 'browser-image-compression';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -110,7 +110,7 @@ const InternalImageVault = ({ onImageToggle, selectedImages }: InternalImageDial
   };
 
   return (
-    <div className="flex flex-col h-[85vh] md:h-[80vh] border border-slate-100/10 rounded-2xl backdrop-blur-3xl  bg-white/2 overflow-hidden shadow-2xl">
+    <div className="flex flex-col h-[85vh] md:h-[80vh] border border-white/50 rounded-sm backdrop-blur-3xl  bg-white/2 overflow-hidden shadow-2xl">
       <DialogHeader className="p-6 border-b border-white/5 bg-white/5">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 w-full">
           <div className="hidden">
@@ -127,7 +127,7 @@ const InternalImageVault = ({ onImageToggle, selectedImages }: InternalImageDial
               placeholder="SEARCH ASSET SIGNATURES..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-3 text-[11px] font-black uppercase tracking-widest text-white focus:outline-none focus:border-indigo-500/50 w-full transition-all placeholder:text-white/20"
+              className="bg-white/5 border border-white/10 rounded-sm pl-12 pr-4 py-3 text-[11px] font-black uppercase tracking-widest text-white focus:outline-none focus:border-indigo-500/50 w-full transition-all placeholder:text-white/20"
             />
           </div>
         </div>
@@ -160,7 +160,7 @@ const InternalImageVault = ({ onImageToggle, selectedImages }: InternalImageDial
                     exit={{ opacity: 0, scale: 0.9 }}
                     transition={{ delay: idx * 0.02, type: 'spring', stiffness: 260, damping: 20 }}
                     onClick={() => onImageToggle(item.url)}
-                    className={`relative aspect-square rounded-2xl overflow-hidden border-2 cursor-pointer transition-all duration-500 group
+                    className={`relative aspect-square rounded-sm overflow-hidden border-2 cursor-pointer transition-all duration-500 group
                     ${
                       isSelected
                         ? 'border-emerald-500/50 scale-95 shadow-[0_0_30px_rgba(16,185,129,0.3)]'
@@ -213,7 +213,7 @@ const InternalImageVault = ({ onImageToggle, selectedImages }: InternalImageDial
             <ChevronLeft className="w-5 h-5 text-white" />
           </Button>
 
-          <div className="flex items-center gap-3 px-5 h-10 rounded-xl bg-white/5 border border-white/10">
+          <div className="flex items-center gap-3 px-5 h-10 rounded-sm bg-white/5 border border-white/10">
             <span className="text-[11px] font-black text-white">{currentPage}</span>
             <span className="text-[10px] font-black text-white/20">/</span>
             <span className="text-[11px] font-black text-white/60">{totalPages}</span>
@@ -261,15 +261,18 @@ export default function ImageUploadManager({ value, onChange, label = 'IMAGES' }
     <div className="space-y-5 w-full">
       <div className="flex items-center justify-between px-1">
         <div className="space-y-1">
-          <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/80">{label}</h4>
-          <p className="text-[8px] font-bold uppercase tracking-widest text-white/50">{value.length} Assets Linked</p>
+          <div className="w-full flex items-start justify-start gap-2">
+            <ImagesIcon className="w-3.5 h-3.5" />
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/90">{label}</label>
+          </div>
+          <p className="text-[8px] font-bold uppercase tracking-widest text-white/90">{value.length} Selected</p>
         </div>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
             <Button
               variant="outlineGlassy"
               size="sm"
-              className="cursor-pointer h-8 text-[9px] font-black uppercase tracking-widest px-4 border-white/10 hover:border-indigo-500/50"
+              className="cursor-pointer h-8 text-[9px] font-black uppercase tracking-widest px-4 border-white/40 hover:border-indigo-500/50"
             >
               <Plus className="w-3.5 h-3.5" /> Select
             </Button>
@@ -280,7 +283,7 @@ export default function ImageUploadManager({ value, onChange, label = 'IMAGES' }
         </Dialog>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 p-8 rounded-[2rem] bg-white/2 border border-white/5 backdrop-blur-3xl min-h-[25vh] transition-all">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 p-8 rounded-sm bg-white/2 border border-white/50 backdrop-blur-3xl min-h-[25vh] transition-all">
         <AnimatePresence mode="popLayout">
           {value.map((url, idx) => (
             <motion.div
@@ -292,7 +295,7 @@ export default function ImageUploadManager({ value, onChange, label = 'IMAGES' }
               transition={{ duration: 0.4, delay: idx * 0.05 }}
               className="relative group"
             >
-              <div className="relative aspect-square rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center backdrop-blur-xl shadow-2xl overflow-hidden group-hover:border-indigo-500/30 transition-colors duration-500">
+              <div className="relative aspect-square rounded-sm bg-white/5 border border-white/10 flex items-center justify-center backdrop-blur-xl shadow-2xl overflow-hidden group-hover:border-indigo-500/30 transition-colors duration-500">
                 <motion.div animate={{ y: [0, -2, 0] }} transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }} className="relative w-full h-full">
                   <Image src={url} fill alt="Linked Asset" className="object-cover transition-transform duration-700 group-hover:scale-110" unoptimized />
                 </motion.div>
@@ -301,7 +304,7 @@ export default function ImageUploadManager({ value, onChange, label = 'IMAGES' }
                   <button
                     type="button"
                     onClick={() => onChange(value.filter(item => item !== url))}
-                    className="p-3 rounded-xl bg-rose-500/20 border border-rose-500/50 text-rose-400 hover:bg-rose-500 hover:text-white transition-all duration-300 transform scale-90 group-hover:scale-100 shadow-2xl"
+                    className="p-3 rounded-sm bg-rose-500/20 border border-rose-500/50 text-rose-400 hover:bg-rose-500 hover:text-white transition-all duration-300 transform scale-90 group-hover:scale-100 shadow-2xl"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -316,14 +319,14 @@ export default function ImageUploadManager({ value, onChange, label = 'IMAGES' }
           <div className="col-span-full flex flex-col items-center justify-center py-10 gap-4">
             <div className="flex gap-4">
               {[1, 2, 3].map(i => (
-                <div key={i} className="relative w-20 h-20 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+                <div key={i} className="relative w-20 h-20 rounded-sm bg-white/5 border border-white/10 flex items-center justify-center">
                   <motion.div
                     animate={{
                       y: [0, -10, 0],
                       boxShadow: ['0 0 0px rgba(99,102,241,0)', '0 0 40px rgba(99,102,241,0.2)', '0 0 0px rgba(99,102,241,0)'],
                     }}
                     transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-                    className="w-20 h-20 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-indigo-500/40 group-hover:bg-indigo-500/5 transition-all duration-500"
+                    className="w-20 h-20 rounded-sm bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-indigo-500/40 group-hover:bg-indigo-500/5 transition-all duration-500"
                   >
                     <ImageIcon className="w-10 h-10 text-white/20 group-hover:text-indigo-400" />
                   </motion.div>

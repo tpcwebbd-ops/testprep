@@ -1,7 +1,22 @@
 'use client';
 
 import React, { useMemo, useState, useEffect } from 'react';
-import { X, UploadCloud, Loader2, Ghost, Search, CheckCircle2, Zap, Play, Film, ChevronLeft, ChevronRight, Plus, Clapperboard } from 'lucide-react';
+import {
+  X,
+  UploadCloud,
+  Loader2,
+  Ghost,
+  Search,
+  CheckCircle2,
+  Zap,
+  Play,
+  Film,
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  Clapperboard,
+  MonitorPlay,
+} from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 
@@ -90,7 +105,7 @@ const InternalVideoVault = ({ onVideoToggle, selectedVideos }: InternalVideoVaul
   };
 
   return (
-    <div className="flex flex-col h-[85vh] md:h-[80vh] backdrop-blur-[150px] rounded-2xl overflow-hidden border border-white/10 bg-black/60 shadow-2xl">
+    <div className="flex flex-col h-[85vh] md:h-[80vh] backdrop-blur-[150px] rounded-sm overflow-hidden border border-white/10 bg-white/2 shadow-2xl">
       <DialogHeader className="p-6 border-b border-white/5 bg-white/5 text-white">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="relative flex-1 max-w-md">
@@ -102,7 +117,7 @@ const InternalVideoVault = ({ onVideoToggle, selectedVideos }: InternalVideoVaul
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               placeholder="SEARCH PRODUCTION VAULT..."
-              className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-[11px] font-black uppercase tracking-[0.2em] text-white focus:outline-none focus:border-indigo-500/50 transition-all placeholder:text-white/20"
+              className="w-full bg-white/5 border border-white/10 rounded-sm py-3 pl-12 pr-4 text-[11px] font-black uppercase tracking-[0.2em] text-white focus:outline-none focus:border-indigo-500/50 transition-all placeholder:text-white/20"
             />
           </div>
           <div className="hidden">
@@ -139,7 +154,7 @@ const InternalVideoVault = ({ onVideoToggle, selectedVideos }: InternalVideoVaul
                     exit={{ opacity: 0, scale: 0.9 }}
                     transition={{ delay: idx * 0.03, type: 'spring', stiffness: 260, damping: 20 }}
                     onClick={() => onVideoToggle(item.url)}
-                    className={`relative aspect-video rounded-2xl overflow-hidden border-2 cursor-pointer transition-all duration-500 group
+                    className={`relative aspect-video rounded-sm overflow-hidden border-2 cursor-pointer transition-all duration-500 group
                       ${isSelected ? 'border-emerald-500 scale-95 shadow-[0_0_40px_rgba(16,185,129,0.3)]' : 'border-white/5 hover:border-white/20 hover:scale-105 shadow-xl'}
                     `}
                   >
@@ -198,7 +213,7 @@ const InternalVideoVault = ({ onVideoToggle, selectedVideos }: InternalVideoVaul
             <ChevronLeft className="w-5 h-5 text-white" />
           </Button>
 
-          <div className="flex items-center gap-3 px-5 h-10 rounded-xl bg-white/5 border border-white/10">
+          <div className="flex items-center gap-3 px-5 h-10 rounded-sm bg-white/5 border border-white/10">
             <span className="text-[11px] font-black text-white">{currentPage}</span>
             <span className="text-[10px] font-black text-white/20">/</span>
             <span className="text-[11px] font-black text-white/60">{totalPages}</span>
@@ -215,7 +230,7 @@ const InternalVideoVault = ({ onVideoToggle, selectedVideos }: InternalVideoVaul
           </Button>
 
           <div className="hidden sm:block ml-4">
-            <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em]">RECORDS: {response?.total || 0}</p>
+            <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em]">Total: {response?.total || 0}</p>
           </div>
         </div>
 
@@ -223,7 +238,7 @@ const InternalVideoVault = ({ onVideoToggle, selectedVideos }: InternalVideoVaul
           <UploadButton
             endpoint="videoUploader"
             appearance={{
-              button: `h-11 px-8 rounded-xl border-none bg-indigo-600 text-[10px] font-black uppercase tracking-widest text-white hover:bg-indigo-500 transition-all flex items-center justify-center gap-3 duration-300 shadow-[0_0_20px_rgba(79,70,229,0.3)]`,
+              button: `bg-linear-to-r from-blue-500/20 to-purple-500/20 border border-white/30 text-white backdrop-blur-xl shadow-lg shadow-blue-500/20 hover:from-blue-500/30 hover:to-purple-500/30 hover:border-white/50 hover:shadow-xl hover:shadow-purple-500/30 hover:scale-[1.02] transition-all duration-300]`,
               allowedContent: 'hidden',
             }}
             content={{
@@ -231,11 +246,11 @@ const InternalVideoVault = ({ onVideoToggle, selectedVideos }: InternalVideoVaul
                 if (isUploadingLocal) return <Loader2 className="w-4 h-4 animate-spin" />;
                 return ready ? (
                   <>
-                    <UploadCloud className="w-4 h-4" />
-                    <span>IMPORT PRODUCTION</span>
+                    <UploadCloud className="w-4 h-4 mr-2" />
+                    <span>Upload</span>
                   </>
                 ) : (
-                  'INITIALIZING...'
+                  'Uploading...'
                 );
               },
             }}
@@ -252,15 +267,7 @@ const InternalVideoVault = ({ onVideoToggle, selectedVideos }: InternalVideoVaul
   );
 };
 
-export default function VideoUploadManager({
-  value,
-  onChange,
-  label = 'VIDEO GALLERY',
-}: {
-  value: string[];
-  onChange: (val: string[]) => void;
-  label?: string;
-}) {
+export default function VideoUploadManager({ value, onChange, label = 'VIDEOS' }: { value: string[]; onChange: (val: string[]) => void; label?: string }) {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleVideo = (url: string) => {
@@ -275,21 +282,21 @@ export default function VideoUploadManager({
     <div className="space-y-6 w-full">
       <div className="flex items-center justify-between px-2">
         <div className="space-y-1">
-          <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 flex items-center gap-2">
+          <div className="w-full flex items-start justify-start gap-2">
             <Clapperboard className="w-3.5 h-3.5" />
-            {label}
-          </h4>
-          <p className="text-[8px] font-bold uppercase tracking-widest text-indigo-400">{value.length} Assets Selected</p>
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/90">{label}</label>
+          </div>
+          <p className="text-[8px] font-bold uppercase tracking-widest text-white/90">{value.length} Selected</p>
         </div>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
             <Button
               variant="outlineGlassy"
               size="sm"
-              className="rounded-2xl border-white/10 bg-white/5 hover:bg-indigo-500/10 hover:border-indigo-500/50 transition-all gap-2 group h-9 px-5 text-[9px] font-black uppercase tracking-widest"
+              className="rounded-sm border-white/10 bg-white/2 hover:bg-indigo-500/10 hover:border-indigo-500/50 transition-all gap-2 group h-9 px-5 text-[9px] font-black uppercase tracking-widest"
             >
               <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" />
-              SELECT FOOTAGE
+              SELECT
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-6xl bg-transparent border-none p-0 shadow-none text-white mt-4">
@@ -298,7 +305,7 @@ export default function VideoUploadManager({
         </Dialog>
       </div>
 
-      <div className="min-h-[25vh] rounded-[2.5rem] p-8 bg-black/20 border border-white/5 backdrop-blur-3xl">
+      <div className="min-h-[25vh] rounded-sm p-8 bg-white/2 border border-white/50 backdrop-blur-3xl">
         <ScrollArea className="w-full">
           {value.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-4">
@@ -311,7 +318,7 @@ export default function VideoUploadManager({
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.8 }}
                     transition={{ duration: 0.4, delay: index * 0.05 }}
-                    className="group relative aspect-video rounded-3xl overflow-hidden bg-black/40 border border-white/10 hover:border-indigo-500/30 transition-all duration-500 shadow-2xl"
+                    className="group relative aspect-video rounded-sm overflow-hidden bg-black/40 border border-white/10 hover:border-indigo-500/30 transition-all duration-500 shadow-2xl"
                   >
                     <video
                       src={url}
@@ -326,14 +333,14 @@ export default function VideoUploadManager({
                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-5">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="p-2.5 bg-indigo-500/20 backdrop-blur-md rounded-xl border border-indigo-500/30">
+                          <div className="p-2.5 bg-indigo-500/20 backdrop-blur-md rounded-sm border border-indigo-500/30">
                             <Play className="w-3.5 h-3.5 text-white fill-white" />
                           </div>
                           <span className="text-[9px] font-black text-white uppercase tracking-widest">Live Stream</span>
                         </div>
                         <button
                           onClick={() => onChange(value.filter(v => v !== url))}
-                          className="p-2.5 bg-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-white rounded-xl border border-rose-500/20 transition-all duration-300 transform scale-90 group-hover:scale-100"
+                          className="p-2.5 bg-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-white rounded-sm border border-rose-500/20 transition-all duration-300 transform scale-90 group-hover:scale-100"
                         >
                           <X className="w-4 h-4" />
                         </button>
@@ -347,20 +354,26 @@ export default function VideoUploadManager({
               </AnimatePresence>
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center py-16 opacity-20 gap-6">
+            <div className="flex flex-col items-center justify-center py-4 gap-6">
               <div className="flex gap-4">
-                {[1, 2].map(i => (
+                {[1, 2, 3].map(i => (
                   <motion.div
+                    animate={{
+                      y: [0, -10, 0],
+                      boxShadow: ['0 0 0px rgba(99,102,241,0)', '0 0 40px rgba(99,102,241,0.2)', '0 0 0px rgba(99,102,241,0)'],
+                    }}
                     key={i}
-                    animate={{ y: [0, -10, 0] }}
-                    transition={{ duration: 4, repeat: Infinity, delay: i * 0.5 }}
-                    className="w-24 h-14 rounded-xl border border-white/10 bg-white/5 flex items-center justify-center"
+                    transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                    className="w-20 h-20 rounded-sm bg-white/5 border border-white/40 flex items-center justify-center group-hover:border-indigo-500/40 group-hover:bg-indigo-500/5 transition-all duration-500"
                   >
-                    <Film className="w-6 h-6" />
+                    <MonitorPlay className="w-10 h-10 text-white/20 group-hover:text-indigo-400" />
                   </motion.div>
                 ))}
               </div>
-              <p className="font-black uppercase tracking-[0.5em] text-[11px] text-center">Library Standby - Deploy Assets</p>
+              <div className="text-center space-y-2">
+                <p className="text-[11px] font-black uppercase tracking-[0.2em] text-white/90 group-hover:text-white transition-colors">No Video Selected</p>
+                <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/70">Click here to Select one</p>
+              </div>
             </div>
           )}
         </ScrollArea>
