@@ -32,11 +32,11 @@ const ViewNextComponents: React.FC = () => {
     try {
       return format(new Date(d), 'MMM dd, yyyy');
     } catch (error: unknown) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       let errMessage: string = 'Invalid Date';
       if (isApiErrorResponse(error)) {
         errMessage = formatDuplicateKeyError(error.data.message) || 'API error';
       } else if (error instanceof Error) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         errMessage = error.message;
       }
       return 'Invalid';

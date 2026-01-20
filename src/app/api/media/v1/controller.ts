@@ -103,6 +103,7 @@ export async function deleteMedia(req: Request): Promise<IResponse> {
       const urlParts = url.split('/');
       const key = urlParts[urlParts.length - 1];
       return key || null;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       return null;
     }
@@ -117,8 +118,9 @@ export async function deleteMedia(req: Request): Promise<IResponse> {
       if (fileKey) {
         await utapi.deleteFiles(fileKey);
       }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-       return formatResponse({ deletedCount: 0 }, 'Failed to delete', 500);
+      return formatResponse({ deletedCount: 0 }, 'Failed to delete', 500);
     }
     const deleted = await Media.findByIdAndDelete(id);
     if (!deleted) return formatResponse(null, 'Not found', 404);

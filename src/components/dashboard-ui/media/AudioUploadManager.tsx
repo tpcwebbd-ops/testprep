@@ -1,24 +1,7 @@
 'use client';
 
 import React, { useMemo, useState, useEffect, useRef } from 'react';
-import {
-  X,
-  UploadCloud,
-  Loader2,
-  Ghost,
-  Search,
-  CheckCircle2,
-  Zap,
-  Volume2,
-  Play,
-  Pause,
-  Music,
-  Files,
-  Plus,
-  ChevronLeft,
-  ChevronRight,
-  Headphones,
-} from 'lucide-react';
+import { X, UploadCloud, Loader2, Ghost, Search, CheckCircle2, Volume2, Play, Pause, Music, Plus, ChevronLeft, ChevronRight, Headphones } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 
@@ -283,6 +266,8 @@ export default function AudioUploadManager({
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-6xl bg-transparent border-none p-0 shadow-none text-white mt-4">
+            <DialogTitle className="hidden"></DialogTitle>
+            <DialogDescription className="hidden"></DialogDescription>
             <InternalAudioVault selectedAudios={value} onAudioToggle={toggleAudio} />
           </DialogContent>
         </Dialog>

@@ -51,7 +51,7 @@ export default function AssetManagementPage() {
 
   const [singleAudio, setSingleAudio] = useState<string>('');
   const [multipleAudios, setMultipleAudios] = useState<string[]>([]);
-
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleUpdate = useCallback((type: string, isMultiple: boolean, value: string | string[]) => {
     toast.success(`Vault Synced: ${type.toUpperCase()} ${isMultiple ? 'Collection' : 'Node'}`);
   }, []);

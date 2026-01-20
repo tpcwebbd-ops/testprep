@@ -1,23 +1,7 @@
 'use client';
 
-import React, { useMemo, useState, useEffect, useRef } from 'react';
-import {
-  X,
-  UploadCloud,
-  Loader2,
-  Ghost,
-  RefreshCcw,
-  Search,
-  CheckCircle2,
-  Zap,
-  MonitorPlay,
-  Play,
-  Film,
-  ChevronLeft,
-  ChevronRight,
-  Plus,
-  Clapperboard,
-} from 'lucide-react';
+import React, { useMemo, useState, useEffect } from 'react';
+import { X, UploadCloud, Loader2, Ghost, Search, CheckCircle2, Zap, Play, Film, ChevronLeft, ChevronRight, Plus, Clapperboard } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 

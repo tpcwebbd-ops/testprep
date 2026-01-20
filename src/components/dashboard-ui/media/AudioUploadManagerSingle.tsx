@@ -312,6 +312,8 @@ export default function AudioUploadManagerSingle({
           </div>
         </DialogTrigger>
         <DialogContent className="bg-transparent border-none p-0 shadow-none overflow-hidden max-w-5xl w-[95vw] text-white">
+          <DialogTitle className="hidden"></DialogTitle>
+          <DialogDescription className="hidden"></DialogDescription>
           <InternalAudioVault
             selectedAudio={value}
             onAudioSelect={url => {
