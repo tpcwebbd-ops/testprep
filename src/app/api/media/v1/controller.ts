@@ -2,6 +2,7 @@ import { withDB } from '@/app/api/utils/db';
 import Media from './model';
 import { formatResponse, IResponse } from '@/app/api/utils/utils';
 import { FilterQuery } from 'mongoose';
+import { UTApi } from 'uploadthing/server';
 
 interface MongoError extends Error {
   code?: number;
@@ -96,11 +97,37 @@ export async function updateMedia(req: Request): Promise<IResponse> {
 }
 
 export async function deleteMedia(req: Request): Promise<IResponse> {
+  const getFileKeyFromUrl = (url: string) => {
+    if (!url) return null;
+    try {
+      const urlParts = url.split('/');
+      const key = urlParts[urlParts.length - 1];
+      return key || null;
+    } catch (error) {
+      return null;
+    }
+  };
   return withDB(async () => {
     const { id } = await req.json();
     if (!id) return formatResponse(null, 'ID required', 400);
+    const media = await Media.findById(id);
+    const utapi = new UTApi();
+    const fileKey = getFileKeyFromUrl(media.url);
+    try {
+      if (fileKey) {
+        await utapi.deleteFiles(fileKey);
+      }
+    } catch (error) {
+       return formatResponse({ deletedCount: 0 }, 'Failed to delete', 500);
+    }
     const deleted = await Media.findByIdAndDelete(id);
     if (!deleted) return formatResponse(null, 'Not found', 404);
     return formatResponse({ deletedCount: 1 }, 'Deleted successfully', 200);
   });
 }
+
+/*
+
+
+
+*/

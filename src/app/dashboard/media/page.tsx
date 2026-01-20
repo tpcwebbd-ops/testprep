@@ -26,6 +26,7 @@ import {
   Calendar,
   Cloud,
   ExternalLink,
+  AlertTriangle,
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import Image from 'next/image';
@@ -33,7 +34,7 @@ import Image from 'next/image';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 import { useGetMediasQuery, useAddMediaMutation, useUpdateMediaMutation, useDeleteMediaMutation } from '@/redux/features/media/mediaSlice';
@@ -63,7 +64,9 @@ export default function MediaDashboard() {
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isPreviewDialogOpen, setIsPreviewDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [previewMedia, setPreviewMedia] = useState<MediaItem | null>(null);
+  const [mediaToDelete, setMediaToDelete] = useState<MediaItem | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(searchQuery), 500);
@@ -103,9 +106,16 @@ export default function MediaDashboard() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('This procedure is irreversible. Purge asset from core?')) return;
+  const initiateDelete = (item: MediaItem) => {
+    setMediaToDelete(item);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!mediaToDelete) return;
+    const id = mediaToDelete._id;
     setProcessingId(id);
+    setIsDeleteDialogOpen(false);
     try {
       await deleteMedia({ id }).unwrap();
       toast.success('Asset purged successfully');
@@ -113,6 +123,7 @@ export default function MediaDashboard() {
       toast.error('System failure: Purge aborted');
     } finally {
       setProcessingId(null);
+      setMediaToDelete(null);
     }
   };
 
@@ -169,7 +180,7 @@ export default function MediaDashboard() {
               size="sm"
               className="h-10 px-4 bg-white/5 border-white/30 hover:bg-white/20"
             >
-              <Plus size={18} className="mr-2" />
+              <Plus size={18} className="" />
               Add
             </Button>
           </div>
@@ -343,13 +354,7 @@ export default function MediaDashboard() {
                               >
                                 <CheckCircle size={16} />
                               </Button>
-                              <Button
-                                size="sm"
-                                variant="outlineFire"
-                                className="w-10 h-10 p-0"
-                                disabled={!!processingId}
-                                onClick={() => handleDelete(item._id)}
-                              >
+                              <Button size="sm" variant="outlineFire" className="w-10 h-10 p-0" disabled={!!processingId} onClick={() => initiateDelete(item)}>
                                 <X size={16} />
                               </Button>
                             </div>
@@ -536,13 +541,48 @@ export default function MediaDashboard() {
         </DialogContent>
       </Dialog>
 
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="backdrop-blur-3xl bg-slate-950/90 border border-white/20 text-white shadow-2xl rounded-[2.5rem] max-w-md p-0 overflow-hidden">
+          <div className="p-10 flex flex-col items-center text-center gap-6">
+            <div className="w-20 h-20 rounded-3xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400 animate-pulse">
+              <AlertTriangle size={40} />
+            </div>
+            <div className="space-y-2">
+              <DialogTitle className="text-2xl font-black uppercase tracking-tighter italic">Purge Confirmation</DialogTitle>
+              <DialogDescription className="text-gray-400 text-xs font-mono uppercase leading-relaxed tracking-wider">
+                This procedure is irreversible. Do you wish to permanently purge <span className="text-red-400">&quot;{mediaToDelete?.name}&quot;</span> from
+                the core directory?
+              </DialogDescription>
+            </div>
+          </div>
+          <DialogFooter className="p-8 bg-white/5 border-t border-white/10 flex flex-row gap-3 sm:justify-center">
+            <Button
+              onClick={() => setIsDeleteDialogOpen(false)}
+              variant="outlineGlassy"
+              className="flex-1 h-14 rounded-2xl font-black uppercase tracking-widest text-[10px] bg-white/5 border-white/10"
+            >
+              Abort Mission
+            </Button>
+            <Button
+              onClick={handleConfirmDelete}
+              variant="outlineFire"
+              className="flex-1 h-14 rounded-2xl font-black uppercase tracking-widest text-[10px] bg-red-500/20 border-red-500/50 hover:bg-red-500/40"
+            >
+              Confirm Purge
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={isPreviewDialogOpen} onOpenChange={setIsPreviewDialogOpen}>
         <DialogContent className="sm:max-w-[1000px] backdrop-blur-3xl bg-black/80 border border-white/20 rounded-[3rem] p-0 overflow-hidden shadow-2xl">
           <DialogTitle className="sr-only">Object Stream Viewer</DialogTitle>
           <div className="aspect-video relative bg-slate-950/40 flex items-center justify-center">
             <ScrollArea className="w-full h-full">
               <div className="flex items-center justify-center min-h-[600px] w-full p-6 relative">
-                {previewMedia?.contentType === 'image' && <Image src={previewMedia.url} alt="" fill className="object-contain p-4" unoptimized />}
+                {previewMedia?.contentType === 'image' && (
+                  <Image src={previewMedia.url} alt={previewMedia.name || 'Images'} fill className="object-contain p-4" unoptimized />
+                )}
                 {previewMedia?.contentType === 'video' && (
                   <video src={previewMedia.url} controls autoPlay className="w-full h-full max-h-[75vh] rounded-2xl shadow-2xl border border-white/10" />
                 )}
