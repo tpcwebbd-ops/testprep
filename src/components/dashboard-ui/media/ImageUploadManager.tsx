@@ -110,7 +110,7 @@ const InternalImageVault = ({ onImageToggle, selectedImages }: InternalImageDial
   };
 
   return (
-    <div className="flex flex-col h-[85vh] md:h-[80vh] border border-slate-100/10 rounded-2xl backdrop-blur-3xl bg-black/40 overflow-hidden shadow-2xl">
+    <div className="flex flex-col h-[85vh] md:h-[80vh] border border-slate-100/10 rounded-2xl backdrop-blur-3xl  bg-white/2 overflow-hidden shadow-2xl">
       <DialogHeader className="p-6 border-b border-white/5 bg-white/5">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 w-full">
           <div className="hidden">
@@ -246,15 +246,7 @@ const InternalImageVault = ({ onImageToggle, selectedImages }: InternalImageDial
   );
 };
 
-export default function ImageUploadManager({
-  value,
-  onChange,
-  label = 'IMAGE GALLERY',
-}: {
-  value: string[];
-  onChange: (val: string[]) => void;
-  label?: string;
-}) {
+export default function ImageUploadManager({ value, onChange, label = 'IMAGES' }: { value: string[]; onChange: (val: string[]) => void; label?: string }) {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleImage = (url: string) => {
@@ -269,8 +261,8 @@ export default function ImageUploadManager({
     <div className="space-y-5 w-full">
       <div className="flex items-center justify-between px-1">
         <div className="space-y-1">
-          <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">{label}</h4>
-          <p className="text-[8px] font-bold uppercase tracking-widest text-indigo-400">{value.length} Assets Linked</p>
+          <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/80">{label}</h4>
+          <p className="text-[8px] font-bold uppercase tracking-widest text-white/50">{value.length} Assets Linked</p>
         </div>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
@@ -279,7 +271,7 @@ export default function ImageUploadManager({
               size="sm"
               className="cursor-pointer h-8 text-[9px] font-black uppercase tracking-widest px-4 border-white/10 hover:border-indigo-500/50"
             >
-              <Plus className="w-3.5 h-3.5 mr-2" /> OPEN VAULT
+              <Plus className="w-3.5 h-3.5" /> Select
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-6xl bg-transparent border-none p-0 shadow-none text-white mt-4">
@@ -288,7 +280,7 @@ export default function ImageUploadManager({
         </Dialog>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 p-8 rounded-[2rem] bg-black/20 border border-white/5 backdrop-blur-3xl min-h-[25vh] transition-all">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 p-8 rounded-[2rem] bg-white/2 border border-white/5 backdrop-blur-3xl min-h-[25vh] transition-all">
         <AnimatePresence mode="popLayout">
           {value.map((url, idx) => (
             <motion.div
@@ -321,22 +313,26 @@ export default function ImageUploadManager({
         </AnimatePresence>
 
         {value.length === 0 && (
-          <div className="col-span-full flex flex-col items-center justify-center py-10 gap-4 opacity-30">
+          <div className="col-span-full flex flex-col items-center justify-center py-10 gap-4">
             <div className="flex gap-4">
               {[1, 2, 3].map(i => (
                 <div key={i} className="relative w-20 h-20 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
-                  <ImageIcon className="w-8 h-8 text-white/20" />
-                  <div className="absolute inset-0 overflow-hidden rounded-2xl">
-                    <motion.div
-                      animate={{ x: ['-100%', '200%'] }}
-                      transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', delay: i * 0.5 }}
-                      className="w-1/2 h-full bg-gradient-to-r from-transparent via-white/5 to-transparent skew-x-12"
-                    />
-                  </div>
+                  <motion.div
+                    animate={{
+                      y: [0, -10, 0],
+                      boxShadow: ['0 0 0px rgba(99,102,241,0)', '0 0 40px rgba(99,102,241,0.2)', '0 0 0px rgba(99,102,241,0)'],
+                    }}
+                    transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                    className="w-20 h-20 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-indigo-500/40 group-hover:bg-indigo-500/5 transition-all duration-500"
+                  >
+                    <ImageIcon className="w-10 h-10 text-white/20 group-hover:text-indigo-400" />
+                  </motion.div>
                 </div>
               ))}
             </div>
-            <p className="text-[10px] font-black uppercase tracking-[0.4em]">Grid Empty - Awaiting Linkage</p>
+            <div className="text-center space-y-2">
+              <p className="text-[11px] font-black uppercase tracking-[0.2em] text-white/90 group-hover:text-white transition-colors">No Images Selected</p>
+            </div>
           </div>
         )}
       </div>

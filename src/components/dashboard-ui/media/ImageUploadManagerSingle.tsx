@@ -108,7 +108,7 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageDialo
   };
 
   return (
-    <div className="flex flex-col h-[90vh] md:h-[80vh] backdrop-blur-[150px] rounded-2xl overflow-hidden border border-white/10 bg-black/60 shadow-2xl">
+    <div className="flex flex-col h-[90vh] md:h-[80vh] backdrop-blur-[150px] rounded-2xl overflow-hidden border border-white/10 bg-white/2 shadow-2xl">
       <DialogHeader className="p-6 border-b border-white/5 bg-white/5">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="relative flex-1 max-w-md">
@@ -126,8 +126,8 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageDialo
             />
           </div>
           <div className="hidden">
-            <DialogTitle>Media Vault</DialogTitle>
-            <DialogDescription>Select or upload media assets</DialogDescription>
+            <DialogTitle> </DialogTitle>
+            <DialogDescription> </DialogDescription>
           </div>
         </div>
       </DialogHeader>
@@ -167,6 +167,7 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageDialo
                             : 'border-white/5 hover:border-indigo-500/30 hover:scale-105 shadow-xl'
                         }
                       `}
+                      title={item.name || 'Image'}
                     >
                       <Image
                         src={item.url}
@@ -251,34 +252,25 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageDialo
   );
 };
 
-export default function ImageUploadManagerSingle({
-  value,
-  onChange,
-  label = 'ASSET SELECTION',
-}: {
-  value: string;
-  onChange: (val: string) => void;
-  label?: string;
-}) {
+export default function ImageUploadManagerSingle({ value, onChange, label = 'Image' }: { value: string; onChange: (val: string) => void; label?: string }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <div className="space-y-4 w-full">
       <div className="flex items-center justify-between px-1">
-        <label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">{label}</label>
+        <label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/90">{label}</label>
         <AnimatePresence>
           {value && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
               <Button
-                variant="ghost"
+                variant="outlineFire"
                 size="sm"
                 onClick={e => {
                   e.stopPropagation();
                   onChange('');
                 }}
-                className="h-7 px-3 text-rose-400 hover:text-rose-300 border border-rose-500/30 hover:border-rose-500 font-black uppercase tracking-widest text-[9px] bg-rose-500/5 hover:bg-rose-500/10 rounded-lg transition-all"
               >
-                <X className="w-3.5 h-3.5 mr-2" /> DISCARD
+                <X className="w-3.5 h-3.5" /> DISCARD
               </Button>
             </motion.div>
           )}
@@ -315,8 +307,8 @@ export default function ImageUploadManagerSingle({
                   <ImageIcon className="w-10 h-10 text-white/20 group-hover:text-indigo-400" />
                 </motion.div>
                 <div className="text-center space-y-2">
-                  <p className="text-[11px] font-black uppercase tracking-[0.5em] text-white/40 group-hover:text-white transition-colors">No Asset Selected</p>
-                  <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/20">Access the mainframe to proceed</p>
+                  <p className="text-[11px] font-black uppercase tracking-[0.2em] text-white/90 group-hover:text-white transition-colors">No Image Selected</p>
+                  <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/70">Click here to Select one</p>
                 </div>
               </div>
             )}
