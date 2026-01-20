@@ -105,7 +105,7 @@ const InternalVideoVault = ({ onVideoToggle, selectedVideos }: InternalVideoVaul
   };
 
   return (
-    <div className="flex flex-col h-[85vh] md:h-[80vh] backdrop-blur-[150px] rounded-sm overflow-hidden border border-white/10 bg-white/2 shadow-2xl">
+    <div className="flex flex-col h-[85vh] md:h-[80vh] backdrop-blur-[150px] rounded-sm overflow-hidden border border-white/60 bg-white/2 shadow-2xl">
       <DialogHeader className="p-6 border-b border-white/5 bg-white/5 text-white">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="relative flex-1 max-w-md">
@@ -154,6 +154,7 @@ const InternalVideoVault = ({ onVideoToggle, selectedVideos }: InternalVideoVaul
                     exit={{ opacity: 0, scale: 0.9 }}
                     transition={{ delay: idx * 0.03, type: 'spring', stiffness: 260, damping: 20 }}
                     onClick={() => onVideoToggle(item.url)}
+                    title={item.name || 'Video'}
                     className={`relative aspect-video rounded-sm overflow-hidden border-2 cursor-pointer transition-all duration-500 group
                       ${isSelected ? 'border-emerald-500 scale-95 shadow-[0_0_40px_rgba(16,185,129,0.3)]' : 'border-white/5 hover:border-white/20 hover:scale-105 shadow-xl'}
                     `}
@@ -206,14 +207,14 @@ const InternalVideoVault = ({ onVideoToggle, selectedVideos }: InternalVideoVaul
           <Button
             variant="outlineGlassy"
             size="sm"
-            className="min-w-1 h-10 w-10 p-0"
+            className="min-w-1 h-8 w-10 p-0"
             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
             disabled={currentPage === 1 || isFetching}
           >
             <ChevronLeft className="w-5 h-5 text-white" />
           </Button>
 
-          <div className="flex items-center gap-3 px-5 h-10 rounded-sm bg-white/5 border border-white/10">
+          <div className="flex items-center gap-3 px-5 h-8 rounded-sm bg-white/5 border border-white/10">
             <span className="text-[11px] font-black text-white">{currentPage}</span>
             <span className="text-[10px] font-black text-white/20">/</span>
             <span className="text-[11px] font-black text-white/60">{totalPages}</span>
@@ -222,7 +223,7 @@ const InternalVideoVault = ({ onVideoToggle, selectedVideos }: InternalVideoVaul
           <Button
             variant="outlineGlassy"
             size="sm"
-            className="min-w-1 h-10 w-10 p-0"
+            className="min-w-1 h-8 w-10 p-0"
             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages || isFetching}
           >
@@ -230,7 +231,7 @@ const InternalVideoVault = ({ onVideoToggle, selectedVideos }: InternalVideoVaul
           </Button>
 
           <div className="hidden sm:block ml-4">
-            <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em]">Total: {response?.total || 0}</p>
+            <p className="text-[9px] font-black text-white/80 uppercase tracking-[0.2em]">Total: {response?.total || 0}</p>
           </div>
         </div>
 
@@ -336,14 +337,10 @@ export default function VideoUploadManager({ value, onChange, label = 'VIDEOS' }
                           <div className="p-2.5 bg-indigo-500/20 backdrop-blur-md rounded-sm border border-indigo-500/30">
                             <Play className="w-3.5 h-3.5 text-white fill-white" />
                           </div>
-                          <span className="text-[9px] font-black text-white uppercase tracking-widest">Live Stream</span>
                         </div>
-                        <button
-                          onClick={() => onChange(value.filter(v => v !== url))}
-                          className="p-2.5 bg-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-white rounded-sm border border-rose-500/20 transition-all duration-300 transform scale-90 group-hover:scale-100"
-                        >
+                        <Button onClick={() => onChange(value.filter(v => v !== url))} variant="outlineFire" size="sm" className="min-w-1 h-8">
                           <X className="w-4 h-4" />
-                        </button>
+                        </Button>
                       </div>
                     </div>
                     <div className="absolute top-4 right-4 flex gap-1.5 pointer-events-none">

@@ -106,7 +106,7 @@ const InternalVideoVault = ({ onVideoSelect, selectedVideo }: InternalVideoVault
   };
 
   return (
-    <div className="flex flex-col h-[90vh] md:h-[80vh] backdrop-blur-[150px] rounded-sm overflow-hidden border border-white/50 bg-white/2 shadow-2xl">
+    <div className="flex flex-col h-[90vh] md:h-[80vh] backdrop-blur-[150px] rounded-sm overflow-hidden border border-white/60 bg-white/2 shadow-2xl">
       <DialogHeader className="p-6 border-b border-white/5 bg-white/5 text-white">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="relative flex-1 max-w-md">
@@ -156,6 +156,7 @@ const InternalVideoVault = ({ onVideoSelect, selectedVideo }: InternalVideoVault
                       exit={{ opacity: 0, scale: 0.9 }}
                       transition={{ delay: idx * 0.03, type: 'spring', stiffness: 260, damping: 20 }}
                       onClick={() => onVideoSelect(item.url)}
+                      title={item.name || 'Video'}
                       className={`relative aspect-video rounded-sm overflow-hidden border-2 cursor-pointer transition-all duration-500 group
                         ${isSelected ? 'border-indigo-500 scale-95 shadow-[0_0_50px_rgba(99,102,241,0.4)]' : 'border-white/5 hover:border-indigo-500/30 hover:scale-105 shadow-xl'}
                       `}
@@ -216,7 +217,7 @@ const InternalVideoVault = ({ onVideoSelect, selectedVideo }: InternalVideoVault
             <ChevronLeft className="w-5 h-5 text-white" />
           </Button>
 
-          <div className="flex items-center gap-3 px-5 h-10 rounded-sm bg-white/5 border border-white/50">
+          <div className="flex items-center gap-3 px-5 h-8 rounded-sm bg-white/5 border border-white/50">
             <span className="text-[11px] font-black text-white">{currentPage}</span>
             <span className="text-[10px] font-black text-white/20">/</span>
             <span className="text-[11px] font-black text-white/60">{totalPages}</span>
@@ -233,7 +234,7 @@ const InternalVideoVault = ({ onVideoSelect, selectedVideo }: InternalVideoVault
           </Button>
 
           <div className="hidden sm:block ml-4">
-            <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em]">Total : {response?.total || 0}</p>
+            <p className="text-[9px] font-black text-white/80 uppercase tracking-[0.2em]">Total : {response?.total || 0}</p>
           </div>
         </div>
 
@@ -241,7 +242,7 @@ const InternalVideoVault = ({ onVideoSelect, selectedVideo }: InternalVideoVault
           <UploadButton
             endpoint="videoUploader"
             appearance={{
-              button: `h-10 px-6 rounded-sm border border-white/20 bg-white/10 text-[10px] font-black uppercase tracking-widest text-white hover:bg-white/20 transition-all flex items-center justify-center gap-3 duration-300`,
+              button: `bg-linear-to-r from-blue-500/20 to-purple-500/20 border border-white/30 text-white backdrop-blur-xl shadow-lg shadow-blue-500/20 hover:from-blue-500/30 hover:to-purple-500/30 hover:border-white/50 hover:shadow-xl hover:shadow-purple-500/30 hover:scale-[1.02] transition-all duration-300]`,
               allowedContent: 'hidden',
             }}
             content={{
@@ -249,8 +250,8 @@ const InternalVideoVault = ({ onVideoSelect, selectedVideo }: InternalVideoVault
                 if (isUploadingLocal) return <Loader2 className="w-4 h-4 animate-spin" />;
                 return (
                   <>
-                    <UploadCloud className="w-4 h-4" />
-                    <span>{ready ? 'Upload' : 'Loading...'}</span>
+                    <UploadCloud className="w-4 h-4 mr-2" />
+                    <span>{ready ? 'Upload' : 'Uploading...'}</span>
                   </>
                 );
               },
