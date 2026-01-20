@@ -1,9 +1,7 @@
 import { formatResponse } from '@/app/api/utils/jwt-verify';
 import { isUserHasAccess, IWantAccess } from '../utils/is-user-has-access';
-import { logger } from 'better-auth';
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function GET(req: Request) {
-  logger.info(JSON.stringify(req));
   const wantToAccess: IWantAccess = {
     db_name: 'user',
     access: 'create',

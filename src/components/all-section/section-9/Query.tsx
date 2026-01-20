@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { ISection9Data, defaultDataSection9, Section9Props } from './data';
-import { logger } from 'better-auth';
 
 const ClientSection9: React.FC<Section9Props> = ({ data }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -14,8 +13,8 @@ const ClientSection9: React.FC<Section9Props> = ({ data }) => {
     if (!data) return defaultDataSection9;
     try {
       return typeof data === 'string' ? JSON.parse(data) : data;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
-      logger.info(JSON.stringify(e));
       return defaultDataSection9;
     }
   }, [data]);

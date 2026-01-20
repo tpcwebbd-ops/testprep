@@ -143,7 +143,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { StringArrayData } from './others-field-type/types';
-import { logger } from 'better-auth';
+ 
 import { formatDuplicateKeyError, isApiErrorResponse } from '@/components/common/utils';
 
 import { ${interfaceName}, ${defaultInstanceName} } from '../store/data/data';

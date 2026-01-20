@@ -1,6 +1,5 @@
 import { withDB } from '@/app/api/utils/db';
 import Role from '../model';
-import { logger } from 'better-auth';
 import { IResponse } from '@/app/api/utils/utils';
 
 // Helper to format responses
@@ -10,9 +9,8 @@ const formatResponse = (data: unknown, message: string, status: number): IRespon
   status,
   ok: status >= 200 && status < 300,
 });
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function getRoleSummary(req: Request): Promise<IResponse> {
-  logger.info('getRoleSummary', req);
   return withDB(async () => {
     const now = new Date();
     const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);

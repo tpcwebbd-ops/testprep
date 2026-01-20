@@ -25,7 +25,6 @@ import Summary from './components/Summary';
 import { useUsersStore } from './store/store';
 import { useGetUsersQuery } from '@/redux/features/user/userSlice';
 import { handleSuccess } from './components/utils';
-import { logger } from 'better-auth';
 
 const MainNextPage: React.FC = () => {
   const [hashSearchText, setHashSearchText] = useState('');
@@ -61,8 +60,8 @@ const MainNextPage: React.FC = () => {
           isApplied: true,
           displayText: `Filtering from ${startDate} to ${endDate}`,
         };
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (e) {
-        logger.info(JSON.stringify(e));
         return { isApplied: false, displayText: '' };
       }
     }

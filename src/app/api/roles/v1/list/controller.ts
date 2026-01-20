@@ -1,6 +1,6 @@
 import { withDB } from '@/app/api/utils/db';
 import Role from '../model';
-import { logger } from 'better-auth';
+
 import { IResponse } from '@/app/api/utils/utils';
 
 const formatResponse = (data: unknown, message: string, status: number): IResponse => ({
@@ -10,9 +10,8 @@ const formatResponse = (data: unknown, message: string, status: number): IRespon
   ok: status >= 200 && status < 300,
 });
 
-// ✅ Only return role names and IDs
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function getRoleNames(req: Request): Promise<IResponse> {
-  logger.info(JSON.stringify(req));
   return withDB(async () => {
     try {
       const roles = await Role.find({}, { _id: 1, name: 1 }).sort({ createdAt: -1 });

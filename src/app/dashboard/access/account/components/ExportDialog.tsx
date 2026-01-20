@@ -1,90 +1,75 @@
-'use client'
+'use client';
 
-import React, { useState, useEffect } from 'react'
-import * as XLSX from 'xlsx'
-import { logger } from 'better-auth'
+import React, { useState, useEffect } from 'react';
+import * as XLSX from 'xlsx';
 
-import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Label } from '@/components/ui/label'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  DialogDescription,
-} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 
-import { IAccounts, defaultAccounts } from '../store/data/data'
+import { IAccounts, defaultAccounts } from '../store/data/data';
 
-type HeaderItem = { key: string; label: string }
+type HeaderItem = { key: string; label: string };
 
 interface ExportDialogProps {
-  isOpen: boolean
-  onOpenChange: (isOpen: boolean) => void
-  headers: HeaderItem[]
-  data: IAccounts[]
-  fileName: string
+  isOpen: boolean;
+  onOpenChange: (isOpen: boolean) => void;
+  headers: HeaderItem[];
+  data: IAccounts[];
+  fileName: string;
 }
 
 const downloadFile = (data: IAccounts[], fileName: string) => {
-  const workbook = XLSX.utils.book_new()
-  const worksheet = XLSX.utils.json_to_sheet(data)
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'Data')
-  XLSX.writeFile(workbook, fileName)
-}
+  const workbook = XLSX.utils.book_new();
+  const worksheet = XLSX.utils.json_to_sheet(data);
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Data');
+  XLSX.writeFile(workbook, fileName);
+};
 
-const ExportDialog: React.FC<ExportDialogProps> = ({
-  isOpen,
-  onOpenChange,
-  headers,
-  data,
-  fileName,
-}) => {
-  const [selectedColumns, setSelectedColumns] = useState<Record<string, boolean>>({})
+const ExportDialog: React.FC<ExportDialogProps> = ({ isOpen, onOpenChange, headers, data, fileName }) => {
+  const [selectedColumns, setSelectedColumns] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (isOpen) {
-      const allSelected = headers.reduce((acc, header) => {
-        acc[header.key] = true
-        return acc
-      }, {} as Record<string, boolean>)
-      setSelectedColumns(allSelected)
+      const allSelected = headers.reduce(
+        (acc, header) => {
+          acc[header.key] = true;
+          return acc;
+        },
+        {} as Record<string, boolean>,
+      );
+      setSelectedColumns(allSelected);
     }
-  }, [isOpen, headers])
+  }, [isOpen, headers]);
 
   const handleCheckedChange = (key: string, isChecked: boolean) => {
-    const currentlyCheckedCount = Object.values(selectedColumns).filter(Boolean).length
-    if (currentlyCheckedCount === 1 && !isChecked) return
+    const currentlyCheckedCount = Object.values(selectedColumns).filter(Boolean).length;
+    if (currentlyCheckedCount === 1 && !isChecked) return;
 
     setSelectedColumns(prev => ({
       ...prev,
       [key]: isChecked,
-    }))
-  }
+    }));
+  };
 
   const handleExport = () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const processedData = data.map(row => {
-      logger.info(JSON.stringify(row))
-      const newRow: IAccounts = { ...defaultAccounts }
-      return newRow
-    })
+      const newRow: IAccounts = { ...defaultAccounts };
+      return newRow;
+    });
 
-    downloadFile(processedData, fileName)
-    onOpenChange(false)
-  }
+    downloadFile(processedData, fileName);
+    onOpenChange(false);
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px] rounded-xl border border-white/20 bg-white/10 text-white backdrop-blur-2xl shadow-xl transition-all">
         <DialogHeader>
-          <DialogTitle className="bg-clip-text bg-linear-to-r from-white to-blue-200 text-white">
-            Customize Your Export
-          </DialogTitle>
-          <DialogDescription className="text-white/70">
-            Select the columns you want to include in your XLSX file.
-          </DialogDescription>
+          <DialogTitle className="bg-clip-text bg-linear-to-r from-white to-blue-200 text-white">Customize Your Export</DialogTitle>
+          <DialogDescription className="text-white/70">Select the columns you want to include in your XLSX file.</DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4 py-4 max-h-60 overflow-y-auto pr-2 backdrop-blur-md p-2">
@@ -93,15 +78,10 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
               <Checkbox
                 id={`col-${header.key}`}
                 checked={!!selectedColumns[header.key]}
-                onCheckedChange={checked =>
-                  handleCheckedChange(header.key, !!checked)
-                }
+                onCheckedChange={checked => handleCheckedChange(header.key, !!checked)}
                 className="border-white/30 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-400"
               />
-              <Label
-                htmlFor={`col-${header.key}`}
-                className="font-normal text-white/90"
-              >
+              <Label htmlFor={`col-${header.key}`} className="font-normal text-white/90">
                 {header.label}
               </Label>
             </div>
@@ -109,21 +89,16 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
         </div>
 
         <DialogFooter className="gap-2">
-          <Button 
-            onClick={() => onOpenChange(false)}
-            variant="outlineWater" size="sm"
-          >
+          <Button onClick={() => onOpenChange(false)} variant="outlineWater" size="sm">
             Cancel
           </Button>
-          <Button
-            onClick={handleExport} variant="outlineWater" size="sm"
-          >
+          <Button onClick={handleExport} variant="outlineWater" size="sm">
             Export Data
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};
 
-export default ExportDialog
+export default ExportDialog;

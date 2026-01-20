@@ -6,7 +6,6 @@ import { X, ChevronDown, Search, Check, Loader2, AlertCircle, RefreshCw } from '
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
-import { logger } from 'better-auth';
 
 export interface DynamicSelectFieldProps {
   id?: string;
@@ -91,7 +90,7 @@ export default function DynamicSelectField({
           const json = await response.json();
 
           if (!Array.isArray(json)) {
-            logger.error('API response is not an array');
+            console.error('API response is not an array');
             setError('Invalid data format received');
             setIsLoading(false);
             return;
@@ -125,8 +124,8 @@ export default function DynamicSelectField({
 
           setIsLoading(false);
           return;
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (err) {
-          logger.error(JSON.stringify(err));
           if (attempt === MAX_RETRIES) {
             setError('Failed to load options. Try again.');
             setIsLoading(false);

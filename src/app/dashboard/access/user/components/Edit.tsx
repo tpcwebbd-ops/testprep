@@ -11,7 +11,6 @@ import { IUsers, defaultUsers } from '../store/data/data';
 import { useUsersStore } from '../store/store';
 import { useUpdateUsersMutation } from '@/redux/features/user/userSlice';
 import { formatDuplicateKeyError, handleError, handleSuccess, isApiErrorResponse } from './utils';
-import { logger } from 'better-auth';
 
 const EditNextComponents: React.FC = () => {
   const { toggleEditModal, isEditModalOpen, selectedUsers, setSelectedUsers } = useUsersStore();
@@ -33,8 +32,9 @@ const EditNextComponents: React.FC = () => {
     if (!selectedUsers) return;
 
     try {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { _id, createdAt, updatedAt, ...updateData } = editedUser;
-      logger.info(JSON.stringify({ _id, createdAt, updatedAt }));
+
       await updateUsers({
         id: selectedUsers._id,
         ...updateData,

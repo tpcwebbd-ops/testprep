@@ -8,7 +8,6 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { IUsers, defaultUsers } from '../store/data/data';
 import { useUsersStore } from '../store/store';
 import { useGetUsersByIdQuery } from '@/redux/features/user/userSlice';
-import { logger } from 'better-auth';
 
 const ViewNextComponents: React.FC = () => {
   const { isViewModalOpen, selectedUsers, toggleViewModal, setSelectedUsers } = useUsersStore();
@@ -31,8 +30,8 @@ const ViewNextComponents: React.FC = () => {
     if (!date) return 'N/A';
     try {
       return format(new Date(date), 'MMM dd, yyyy');
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      logger.error(JSON.stringify(error));
       return 'Invalid Date';
     }
   };
