@@ -152,8 +152,9 @@ export default function MediaDashboard() {
   };
 
   return (
-    <main className="min-h-screen p-2 bg-transparent blur-4xl text-white font-sans selection:bg-blue-500/30">
+    <main className="min-h-screen p-2 bg-transparent text-white font-sans selection:bg-blue-500/30">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-7xl mx-auto space-y-6">
+        {/* HEADER SECTION */}
         <header className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-xl p-4 shadow-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-all hover:bg-white/15">
           <div className="space-y-1">
             <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-white via-white/80 to-white/30 bg-clip-text text-transparent italic tracking-tighter">
@@ -180,6 +181,7 @@ export default function MediaDashboard() {
           </div>
         </header>
 
+        {/* FILTER BAR SECTION */}
         <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-xl p-3 shadow-xl flex flex-col lg:flex-row items-center justify-between gap-4">
           <Tabs
             value={activeTab}
@@ -201,7 +203,7 @@ export default function MediaDashboard() {
                 <TabsTrigger
                   key={tab.id}
                   value={tab.id}
-                  className="h-8 px-3 rounded-md flex items-center gap-1.5 text-white opacity-40 transition-all duration-300 bg-linear-to-r from-blue-500/20 to-purple-500/20 border border-white/30 backdrop-blur-xl shadow-lg shadow-blue-500/20 hover:from-blue-500/30 hover:to-purple-500/30 hover:border-white/50 hover:shadow-xl hover:shadow-purple-500/30 hover:scale-[1.02] hover:opacity-100 has-[>svg]:px-2.5 data-[state=active]:opacity-100"
+                  className="h-8 px-3 rounded-md flex items-center gap-1.5 text-white opacity-40 transition-all duration-300 bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-white/30 backdrop-blur-xl shadow-lg shadow-blue-500/20 hover:from-blue-500/30 hover:to-purple-500/30 hover:border-white/50 hover:shadow-xl hover:shadow-purple-500/30 hover:scale-[1.02] hover:opacity-100 has-[svg]:px-2.5 data-[state=active]:opacity-100"
                 >
                   <tab.icon size={14} className="mr-2 hidden md:block" />
                   {tab.label}
@@ -212,11 +214,11 @@ export default function MediaDashboard() {
 
           <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
             <div className="relative w-full sm:w-72 group">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 group-focus-within:text-blue-400 transition-colors" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400/50 group-focus-within:text-white transition-colors" />
               <Input
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="bg-white/5 border-white/10 pl-10 h-8 rounded-lg focus:ring-blue-500/20 text-sm placeholder:text-gray-600 transition-all"
+                className="bg-white/5 border-white/10 pl-10 h-8 rounded-lg focus:ring-white/20 text-sm placeholder:text-gray-600 text-white transition-all"
                 placeholder="Search file signatures..."
               />
             </div>
@@ -227,16 +229,17 @@ export default function MediaDashboard() {
                   variant="outlineGlassy"
                   size="sm"
                   onClick={() => setActiveStatus(s as MediaStatus)}
-                  className={` hover:from-blue-500/30 hover:to-purple-500/30 hover:border-white/50 hover:shadow-xl hover:shadow-purple-500/30 hover:scale-[1.02] hover:opacity-100 opacity-40 ${activeStatus === s ? 'opacity-100' : 'opacity-40'}`}
+                  className={`transition-all duration-300 border-white/20 ${activeStatus === s ? 'bg-white/20 opacity-100 shadow-lg' : 'opacity-40 hover:opacity-100'}`}
                 >
                   {s === 'active' ? <HardDrive size={14} className="mr-2" /> : <Trash2 size={14} className="mr-2" />}
-                  {s}
+                  {s === 'active' ? 'Active' : 'Trash'}
                 </Button>
               ))}
             </div>
           </div>
         </div>
 
+        {/* ASSET GRID SECTION */}
         <section className="min-h-[60vh] relative">
           <AnimatePresence mode="wait">
             {isLoading ? (
@@ -248,8 +251,7 @@ export default function MediaDashboard() {
                 className="absolute inset-0 flex flex-col items-center justify-center gap-6 py-40"
               >
                 <div className="relative h-20 w-20">
-                  <div className="absolute inset-0 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin" />
-                  <div className="absolute inset-2 border-4 border-purple-500/10 border-b-purple-500 rounded-full animate-spin-reverse" />
+                  <div className="absolute inset-0 border-4 border-white/10 border-t-white rounded-full animate-spin" />
                 </div>
                 <p className="text-xs font-mono text-gray-400 animate-pulse tracking-[0.5em] uppercase">Loading_Array_Data</p>
               </motion.div>
@@ -290,24 +292,20 @@ export default function MediaDashboard() {
                         </div>
                       )}
                       {item.contentType === 'audio' && (
-                        <div className="w-full h-full flex flex-col items-center justify-center gap-3 bg-gradient-to-br from-blue-500/20 to-purple-500/20">
-                          <Volume2 size={48} className="text-blue-400/40 animate-pulse" />
+                        <div className="w-full h-full flex flex-col items-center justify-center gap-3 bg-white/5">
+                          <Volume2 size={48} className="text-white/20 animate-pulse" />
                         </div>
                       )}
                       {(item.contentType === 'pdf' || item.contentType === 'docx') && (
-                        <div className="w-full h-full flex flex-col items-center justify-center gap-3 bg-gradient-to-br from-red-500/10 to-orange-500/10">
-                          {item.contentType === 'pdf' ? (
-                            <FileText size={48} className="text-red-400/40" />
-                          ) : (
-                            <FileCode size={48} className="text-orange-400/40" />
-                          )}
+                        <div className="w-full h-full flex flex-col items-center justify-center gap-3 bg-white/5">
+                          <FileText size={48} className="text-white/20" />
                         </div>
                       )}
 
                       {processingId === item._id && (
                         <div className="absolute inset-0 bg-black/70 backdrop-blur-sm z-30 flex flex-col items-center justify-center gap-2">
-                          <Loader2 className="w-8 h-8 text-blue-400 animate-spin" />
-                          <span className="text-[8px] font-mono text-blue-400 uppercase tracking-tighter">Syncing...</span>
+                          <Loader2 className="w-8 h-8 text-white animate-spin" />
+                          <span className="text-[8px] font-mono text-white uppercase tracking-tighter">Syncing...</span>
                         </div>
                       )}
 
@@ -317,38 +315,40 @@ export default function MediaDashboard() {
                             size="sm"
                             variant="outlineGlassy"
                             className="min-w-1"
-                            // className="flex-1 h-10 bg-white/10 border-white/20 hover:bg-blue-500/20"
                             onClick={() => {
                               setPreviewMedia(item);
                               setIsPreviewDialogOpen(true);
                             }}
                           >
-                            <Eye size={14} className="" />
+                            <Eye size={14} className="mr-1" />
                             Preview
                           </Button>
                           {activeStatus === 'active' ? (
                             <Button
                               size="sm"
-                              variant="outlineFire"
-                              // className="w-10 h-10 p-0 flex-shrink-0"
-                              className="min-w-1"
                               disabled={!!processingId}
+                              variant="outlineFire"
+                              className="min-w-1"
                               onClick={() => handleUpdateStatus(item._id, 'trash')}
                             >
                               <Trash2 size={16} />
                             </Button>
                           ) : (
-                            <div className="flex gap-2">
+                            <div className="flex gap-1">
                               <Button
                                 size="sm"
-                                variant="outlineGarden"
-                                className="w-10 h-10 p-0"
+                                className="w-10 h-10 p-0 bg-white/10 border border-white/20 hover:bg-green-500/40 text-white"
                                 disabled={!!processingId}
                                 onClick={() => handleUpdateStatus(item._id, 'active')}
                               >
                                 <CheckCircle size={16} />
                               </Button>
-                              <Button size="sm" variant="outlineFire" className="w-10 h-10 p-0" disabled={!!processingId} onClick={() => initiateDelete(item)}>
+                              <Button
+                                size="sm"
+                                className="w-10 h-10 p-0 bg-white/10 border border-white/20 hover:bg-red-500/40 text-white"
+                                disabled={!!processingId}
+                                onClick={() => initiateDelete(item)}
+                              >
                                 <X size={16} />
                               </Button>
                             </div>
@@ -359,24 +359,14 @@ export default function MediaDashboard() {
 
                     <div className="p-5 flex-1 space-y-3 border-t border-white/5 bg-white/[0.02]">
                       <div className="flex items-start gap-4">
-                        <div
-                          className={`p-2.5 rounded-xl bg-white/5 border border-white/10 flex-shrink-0 transition-transform group-hover:-rotate-6 group-hover:scale-110`}
-                        >
-                          {item.contentType === 'video' ? (
-                            <Video size={18} className="text-purple-400" />
-                          ) : item.contentType === 'image' ? (
-                            <ImageIcon size={18} className="text-blue-400" />
-                          ) : item.contentType === 'audio' ? (
-                            <Headphones size={18} className="text-green-400" />
-                          ) : (
-                            <FileText size={18} className="text-orange-400" />
-                          )}
+                        <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 flex-shrink-0">
+                          <Cloud size={18} className="text-white/50" />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="font-bold text-sm text-white/90 truncate group-hover:text-blue-400 transition-colors tracking-tight">
-                            {item.name || 'UNNAMED_ASSET'}
+                          <p className="font-bold text-sm text-white/90 truncate group-hover:text-white transition-colors tracking-tight">
+                            {item.name || 'Name Unavailable'}
                           </p>
-                          <p className="text-[10px] text-gray-50/60 flex items-center gap-.5 font-mono justify-start">
+                          <p className="text-[10px] text-gray-200/60 flex items-center gap-1 font-mono uppercase">
                             <Calendar size={12} className="opacity-50" />
                             {new Date(item.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                           </p>
@@ -393,19 +383,19 @@ export default function MediaDashboard() {
                 animate={{ opacity: 1, scale: 1 }}
                 className="flex items-center justify-center py-32 px-4"
               >
-                <div className="max-w-md w-full backdrop-blur-3xl bg-white/5 border border-white/10 rounded-[2.5rem] p-16 shadow-2xl flex flex-col items-center text-center gap-8 group">
+                <div className="max-w-md w-full backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl p-16 shadow-2xl flex flex-col items-center text-center gap-8 group">
                   <div className="relative">
-                    <div className="absolute inset-0 bg-blue-500/20 blur-3xl rounded-full group-hover:bg-blue-500/40 transition-colors duration-1000" />
-                    <div className="relative p-8 bg-white/5 rounded-full border border-white/20 transform group-hover:rotate-12 transition-transform duration-700">
+                    <div className="absolute inset-0 bg-white/10 blur-3xl rounded-full" />
+                    <div className="relative p-8 bg-white/5 rounded-full border border-white/20">
                       <Ghost className="w-20 h-20 text-white/20" />
                     </div>
                   </div>
                   <div className="space-y-3">
-                    <h3 className="text-3xl font-black text-white   ">No data found.</h3>
-                    <p className="text-xs text-gray-50/80 font-mono leading-relaxed  opacity-60">Ops! Nothing was found! Please try again.</p>
+                    <h3 className="text-3xl font-black text-white italic tracking-tighter uppercase">No data found</h3>
+                    <p className="text-xs text-gray-200/40 font-mono leading-relaxed">System scan complete: No records match the current filter parameters.</p>
                   </div>
                   <Button onClick={() => refetch()} variant="outlineGlassy" size="sm">
-                    <RefreshCw size={16} className="mr-3 text-blue-400" />
+                    <RefreshCw size={16} className="mr-3" />
                     Refetch
                   </Button>
                 </div>
@@ -414,6 +404,7 @@ export default function MediaDashboard() {
           </AnimatePresence>
         </section>
 
+        {/* PAGINATION */}
         {totalPages > 1 && (
           <nav className="flex items-center justify-center gap-4 py-16">
             <Button
@@ -423,7 +414,7 @@ export default function MediaDashboard() {
                 setCurrentPage(prev => Math.max(1, prev - 1));
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className="h-12 px-6 rounded-xl bg-white/5 border-white/10 hover:bg-white/10 disabled:opacity-20"
+              className="h-12 px-6 rounded-xl bg-white/5 border-white/10 text-white"
             >
               <ChevronLeft size={20} className="mr-2" />
               Prev
@@ -441,9 +432,7 @@ export default function MediaDashboard() {
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
                     className={`min-w-[48px] h-10 rounded-xl text-xs font-black transition-all duration-500 ${
-                      isCurrent
-                        ? 'bg-blue-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] border border-blue-400'
-                        : 'text-gray-500 hover:bg-white/10 hover:text-white'
+                      isCurrent ? 'bg-white/20 text-white shadow-lg border border-white/40' : 'text-gray-500 hover:bg-white/10 hover:text-white'
                     }`}
                   >
                     {pageNum.toString().padStart(2, '0')}
@@ -459,7 +448,7 @@ export default function MediaDashboard() {
                 setCurrentPage(prev => Math.min(totalPages, prev + 1));
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className="h-12 px-6 rounded-xl bg-white/5 border-white/10 hover:bg-white/10 disabled:opacity-20"
+              className="h-12 px-6 rounded-xl bg-white/5 border-white/10 text-white"
             >
               Next
               <ChevronRight size={20} className="ml-2" />
@@ -468,25 +457,26 @@ export default function MediaDashboard() {
         )}
       </motion.div>
 
+      {/* 1. ADD ASSET DIALOG */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="backdrop-blur-3xl bg-slate-950/80 border border-white/20 text-white shadow-2xl rounded-[2.5rem] max-w-xl p-0 overflow-hidden">
+        <DialogContent className="backdrop-blur-xl mt-8 bg-white/10 border border-white/20 shadow-2xl   max-w-xl p-0 overflow-hidden text-white">
           <DialogHeader className="p-8 pb-0">
-            <DialogTitle className="text-3xl font-black bg-gradient-to-r from-white to-white/30 bg-clip-text text-transparent italic tracking-tighter">
+            <DialogTitle className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-white via-white/80 to-white/30 bg-clip-text text-transparent italic tracking-tighter">
               New Ingestion Protocol
             </DialogTitle>
-            <DialogDescription className="text-gray-400 text-sm mt-2 font-mono uppercase tracking-widest opacity-60">
+            <DialogDescription className="text-gray-200/50 text-xs mt-2 font-mono uppercase tracking-widest">
               Register source assets to secure cloud storage
             </DialogDescription>
           </DialogHeader>
           <div className="p-8 space-y-6">
-            <label className="group relative block p-16 border-2 border-dashed border-white/10 rounded-3xl hover:border-blue-500/50 hover:bg-blue-500/5 cursor-pointer transition-all duration-500">
+            <label className="group relative block p-16 border-2 border-dashed border-white/10 rounded-3xl hover:border-white/40 hover:bg-white/5 cursor-pointer transition-all duration-500">
               <div className="flex flex-col items-center justify-center gap-6">
-                <div className="p-5 bg-blue-500/10 rounded-full group-hover:scale-125 group-hover:rotate-12 transition-all duration-700">
-                  <ImageIcon className="w-12 h-12 text-blue-400" />
+                <div className="p-5 bg-white/5 rounded-full group-hover:scale-125 group-hover:rotate-12 transition-all duration-700 border border-white/10">
+                  <ImageIcon className="w-12 h-12 text-white/80" />
                 </div>
                 <div className="text-center space-y-1">
                   <p className="text-md font-black uppercase tracking-[0.2em] text-white">Direct Image Uplink</p>
-                  <p className="text-[10px] text-gray-500 font-mono uppercase opacity-60">Supports JPG, PNG, WEBP via secured API</p>
+                  <p className="text-[10px] text-gray-200/40 font-mono uppercase">Supports JPG, PNG, WEBP via secured API</p>
                 </div>
               </div>
               <input type="file" className="hidden" onChange={handleImageUpload} accept="image/*" />
@@ -495,12 +485,6 @@ export default function MediaDashboard() {
             <div className="grid grid-cols-2 gap-4">
               {['video', 'audio', 'pdf', 'docx'].map(type => (
                 <div key={type} className="p-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all group relative overflow-hidden">
-                  <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-30 transition-opacity">
-                    {type === 'video' && <Video size={40} />}
-                    {type === 'audio' && <Headphones size={40} />}
-                    {type === 'pdf' && <FileText size={40} />}
-                    {type === 'docx' && <FileCode size={40} />}
-                  </div>
                   <UploadButton
                     endpoint={type === 'docx' ? 'documentUploader' : type === 'pdf' ? 'pdfUploader' : type === 'video' ? 'videoUploader' : 'audioUploader'}
                     onClientUploadComplete={res => {
@@ -512,12 +496,12 @@ export default function MediaDashboard() {
                     }}
                     appearance={{
                       button:
-                        'w-full bg-blue-600/10 hover:bg-blue-600/30 text-[10px] font-black uppercase tracking-widest h-12 border border-blue-500/20 rounded-xl transition-all',
+                        'w-full bg-white/10 hover:bg-white/20 text-[10px] font-black uppercase tracking-widest h-12 border border-white/20 rounded-xl transition-all text-white',
                       allowedContent: 'hidden',
                     }}
                   />
                   <div className="mt-3 text-center">
-                    <span className="text-[9px] font-mono text-gray-500 uppercase tracking-[0.3em] group-hover:text-blue-400 transition-colors">
+                    <span className="text-[9px] font-mono text-gray-200/40 uppercase tracking-[0.3em] group-hover:text-white transition-colors">
                       {type} source
                     </span>
                   </div>
@@ -528,32 +512,32 @@ export default function MediaDashboard() {
         </DialogContent>
       </Dialog>
 
+      {/* 2. DELETE/PURGE DIALOG */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="backdrop-blur-3xl bg-slate-950/90 border border-white/20 text-white shadow-2xl rounded-[2.5rem] max-w-md p-0 overflow-hidden">
+        <DialogContent className="backdrop-blur-xl mt-8 bg-white/10 border border-white/20 shadow-2xl   max-w-md p-0 overflow-hidden text-white">
           <div className="p-10 flex flex-col items-center text-center gap-6">
-            <div className="w-20 h-20 rounded-3xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400 animate-pulse">
+            <div className="w-20 h-20 rounded-3xl bg-white/5 border border-white/20 flex items-center justify-center text-white/80 animate-pulse">
               <AlertTriangle size={40} />
             </div>
             <div className="space-y-2">
-              <DialogTitle className="text-2xl font-black uppercase tracking-tighter italic">Purge Confirmation</DialogTitle>
-              <DialogDescription className="text-gray-400 text-xs font-mono uppercase leading-relaxed tracking-wider">
-                This procedure is irreversible. Do you wish to permanently purge <span className="text-red-400">&quot;{mediaToDelete?.name}&quot;</span> from
-                the core directory?
+              <DialogTitle className="text-3xl font-bold bg-gradient-to-r from-white via-white/80 to-white/30 bg-clip-text text-transparent italic tracking-tighter uppercase">
+                Purge Confirmation
+              </DialogTitle>
+              <DialogDescription className="text-gray-200/50 text-xs font-mono uppercase leading-relaxed tracking-wider">
+                This procedure is irreversible. Purge <span className="text-white font-bold">&quot;{mediaToDelete?.name}&quot;</span>?
               </DialogDescription>
             </div>
           </div>
           <DialogFooter className="p-8 bg-white/5 border-t border-white/10 flex flex-row gap-3 sm:justify-center">
             <Button
               onClick={() => setIsDeleteDialogOpen(false)}
-              variant="outlineGlassy"
-              className="flex-1 h-14 rounded-2xl font-black uppercase tracking-widest text-[10px] bg-white/5 border-white/10"
+              className="flex-1 h-14 rounded-2xl font-black uppercase tracking-widest text-[10px] bg-white/5 border border-white/10 text-white"
             >
-              Abort Mission
+              Abort
             </Button>
             <Button
               onClick={handleConfirmDelete}
-              variant="outlineFire"
-              className="flex-1 h-14 rounded-2xl font-black uppercase tracking-widest text-[10px] bg-red-500/20 border-red-500/50 hover:bg-red-500/40"
+              className="flex-1 h-14 rounded-2xl font-black uppercase tracking-widest text-[10px] bg-white/20 border border-white/40 hover:bg-white/30 text-white"
             >
               Confirm Purge
             </Button>
@@ -561,53 +545,26 @@ export default function MediaDashboard() {
         </DialogContent>
       </Dialog>
 
+      {/* 3. ASSET PREVIEW DIALOG */}
       <Dialog open={isPreviewDialogOpen} onOpenChange={setIsPreviewDialogOpen}>
-        <DialogContent className="sm:max-w-[1000px] bg-slate-950/80 backdrop-blur-2xl border mt-8 border-white/10 rounded-[2.5rem] p-0 overflow-hidden shadow-[0_0_50px_-12px_rgba(59,130,246,0.3)]">
+        <DialogContent className="sm:max-w-[1000px] mt-8 backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl   p-0 overflow-hidden text-white">
           <DialogTitle className="sr-only">Object Stream Viewer</DialogTitle>
 
-          {/* Main Preview Area */}
-          <div className="aspect-video relative bg-gradient-to-b from-blue-500/5 to-purple-500/5 flex items-center justify-center">
-            {/* Background Ambient Glow */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-              <div className="absolute -top-[20%] -left-[10%] w-72 h-72 bg-blue-500/10 blur-[120px] rounded-full" />
-              <div className="absolute -bottom-[20%] -right-[10%] w-72 h-72 bg-purple-500/10 blur-[120px] rounded-full" />
-            </div>
-
+          <div className="aspect-video  relative bg-white/5 flex items-center justify-center">
             <ScrollArea className="w-full h-full">
               <div className="flex items-center justify-center min-h-[600px] w-full p-6 relative">
                 {previewMedia?.contentType === 'image' && (
-                  <div className="relative w-full h-full flex items-center justify-center group">
-                    <Image
-                      src={previewMedia.url}
-                      alt={previewMedia.name || 'Images'}
-                      fill
-                      className="object-contain p-4 drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]"
-                      unoptimized
-                    />
-                  </div>
+                  <Image src={previewMedia.url} alt={previewMedia.name || 'Images'} fill className="object-contain p-4" unoptimized />
                 )}
-
                 {previewMedia?.contentType === 'video' && (
-                  <video
-                    src={previewMedia.url}
-                    controls
-                    autoPlay
-                    className="w-full h-full max-h-[75vh] rounded-2xl shadow-2xl border border-white/10 bg-black/40"
-                  />
+                  <video src={previewMedia.url} controls autoPlay className="w-full h-full max-h-[75vh] rounded-2xl shadow-2xl border border-white/10" />
                 )}
-
                 {previewMedia?.contentType === 'audio' && (
                   <div className="flex flex-col items-center gap-10 w-full py-24">
-                    <div className="relative">
-                      <div className="absolute inset-0 bg-blue-500/30 blur-3xl animate-pulse rounded-full" />
-                      <div className="relative w-44 h-44 rounded-full bg-white/5 backdrop-blur-3xl flex items-center justify-center border border-white/20 shadow-[0_0_40px_rgba(59,130,246,0.2)]">
-                        <Headphones size={80} className="text-blue-400/40 animate-bounce" />
-                      </div>
-                    </div>
+                    <Volume2 size={80} className="text-white/20 animate-bounce" />
                     <audio src={previewMedia.url} controls autoPlay className="w-full max-w-lg h-12 invert opacity-80" />
                   </div>
                 )}
-
                 {(previewMedia?.contentType === 'pdf' || previewMedia?.contentType === 'docx') && (
                   <iframe src={previewMedia.url} className="w-full h-[75vh] rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm" />
                 )}
@@ -615,42 +572,30 @@ export default function MediaDashboard() {
             </ScrollArea>
           </div>
 
-          {/* Footer Info Bar */}
-          <div className="p-8 bg-white/[0.03] backdrop-blur-3xl border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-6">
-            <div className="min-w-0 flex-1 space-y-2">
-              <h3 className="font-black text-2xl text-transparent bg-clip-text bg-gradient-to-r from-white to-white/60 truncate uppercase tracking-widest italic leading-none">
+          <div className="p-8 bg-white/5 backdrop-blur-2xl border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-6">
+            <div className="min-w-0 flex-1 space-y-1">
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-white via-white/80 to-white/30 bg-clip-text text-transparent italic tracking-tighter uppercase">
                 {previewMedia?.name || 'ASSET_SIGNATURE_UNKNOWN'}
               </h3>
-              <div className="flex items-center gap-2">
-                <span className="px-2 py-0.5 rounded-md bg-blue-500/10 border border-blue-500/20 text-[9px] text-blue-400 font-bold uppercase tracking-tighter">
-                  Verified Stream
-                </span>
-                <p className="text-[10px] text-white/30 font-mono truncate max-w-[300px]">{previewMedia?.url}</p>
-              </div>
+              <p className="text-[10px] text-gray-200/40 font-mono truncate max-w-[400px]">URI: {previewMedia?.url}</p>
             </div>
 
             <div className="flex gap-4">
-              <Button
-                asChild
-                className="rounded-xl h-12 px-6 bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 text-white transition-all"
-              >
+              <Button asChild className="rounded-xl h-12 px-6 bg-white/5 border border-white/10 hover:bg-white/15 text-white">
                 <a
                   href={previewMedia?.url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest"
                 >
-                  <ExternalLink size={14} />
-                  External Link
+                  <ExternalLink size={14} /> Open
                 </a>
               </Button>
-
               <Button
                 onClick={() => setIsPreviewDialogOpen(false)}
-                className="rounded-xl h-12 px-8 font-black uppercase text-[10px] tracking-widest bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-white/20 hover:scale-105 transition-all shadow-lg shadow-blue-500/10"
+                className="rounded-xl h-12 px-8 font-black uppercase text-[10px] tracking-widest bg-white/10 border border-white/20 hover:bg-white/20 text-white"
               >
-                <X size={14} className="mr-2" />
-                Terminate
+                <X size={14} className="mr-2" /> Terminate
               </Button>
             </div>
           </div>
