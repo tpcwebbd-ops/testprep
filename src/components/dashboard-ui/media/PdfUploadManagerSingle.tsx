@@ -10,6 +10,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 import { useGetMediasQuery, useAddMediaMutation } from '@/redux/features/media/mediaSlice';
+import { BsFilePdf } from 'react-icons/bs';
 
 interface MediaItem {
   _id: string;
@@ -104,7 +105,7 @@ const InternalPdfVault = ({ onPdfSelect, selectedPdf }: InternalVaultProps) => {
   };
 
   return (
-    <div className="flex flex-col h-[90vh] md:h-[80vh] backdrop-blur-[150px] rounded-2xl overflow-hidden border border-white/10 bg-white/2 shadow-2xl">
+    <div className="flex flex-col h-[90vh] md:h-[80vh] backdrop-blur-[150px] rounded-sm overflow-hidden border border-white/10 bg-white/2 shadow-2xl">
       <DialogHeader className="p-6 border-b border-white/5 bg-white/5 text-white">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="relative flex-1 max-w-md">
@@ -116,7 +117,7 @@ const InternalPdfVault = ({ onPdfSelect, selectedPdf }: InternalVaultProps) => {
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               placeholder="SEARCH DOCUMENT VAULT..."
-              className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-[11px] font-black uppercase tracking-[0.2em] text-white focus:outline-none focus:border-indigo-500/50 transition-all placeholder:text-white/20"
+              className="w-full bg-white/5 border border-white/10 rounded-sm py-3 pl-12 pr-4 text-[11px] font-black uppercase tracking-[0.2em] text-white focus:outline-none focus:border-indigo-500/50 transition-all placeholder:text-white/20"
             />
           </div>
           <div className="hidden">
@@ -154,7 +155,7 @@ const InternalPdfVault = ({ onPdfSelect, selectedPdf }: InternalVaultProps) => {
                       exit={{ opacity: 0, scale: 0.9 }}
                       transition={{ delay: idx * 0.03, type: 'spring', stiffness: 260, damping: 20 }}
                       onClick={() => onPdfSelect(item.url)}
-                      className={`relative aspect-[3/4] rounded-2xl overflow-hidden border-2 cursor-pointer transition-all duration-500 group bg-white/[0.02] flex flex-col items-center justify-center p-6
+                      className={`relative aspect-[3/4] rounded-sm overflow-hidden border-2 cursor-pointer transition-all duration-500 group bg-white/[0.02] flex flex-col items-center justify-center p-6
                         ${isSelected ? 'border-indigo-500 scale-95 shadow-[0_0_50px_rgba(99,102,241,0.4)]' : 'border-white/5 hover:border-indigo-500/30 hover:scale-105 shadow-xl'}
                       `}
                     >
@@ -203,7 +204,7 @@ const InternalPdfVault = ({ onPdfSelect, selectedPdf }: InternalVaultProps) => {
           >
             <ChevronLeft className="w-5 h-5 text-white" />
           </Button>
-          <div className="flex items-center gap-3 px-5 h-10 rounded-xl bg-white/5 border border-white/10">
+          <div className="flex items-center gap-3 px-5 h-10 rounded-sm bg-white/5 border border-white/10">
             <span className="text-[11px] font-black text-white">{currentPage}</span>
             <span className="text-[10px] font-black text-white/20">/</span>
             <span className="text-[11px] font-black text-white/60">{totalPages}</span>
@@ -233,21 +234,16 @@ const InternalPdfVault = ({ onPdfSelect, selectedPdf }: InternalVaultProps) => {
   );
 };
 
-export default function PdfUploadManagerSingle({
-  value,
-  onChange,
-  label = 'DOCUMENT SELECTION',
-}: {
-  value: string;
-  onChange: (val: string) => void;
-  label?: string;
-}) {
+export default function PdfUploadManagerSingle({ value, onChange, label = 'PDF' }: { value: string; onChange: (val: string) => void; label?: string }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <div className="space-y-4 w-full">
       <div className="flex items-center justify-between px-1">
-        <label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/90">{label}</label>
+        <div className="w-full flex items-start justify-start gap-2">
+          <BsFilePdf className="w-3.5 h-3.5" />
+          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/90">{label}</label>
+        </div>
         <AnimatePresence>
           {value && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
@@ -268,10 +264,10 @@ export default function PdfUploadManagerSingle({
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <div className="group relative w-full aspect-[16/9] md:aspect-[21/9] rounded-2xl backdrop-blur-3xl transition-all duration-700 cursor-pointer overflow-hidden flex flex-col items-center justify-center border border-white/5 hover:border-indigo-500/30 bg-white/[0.02]">
+          <div className="group relative w-full aspect-[16/9] md:aspect-[21/9] rounded-sm backdrop-blur-3xl transition-all duration-700 cursor-pointer overflow-hidden flex flex-col items-center justify-center border border-white/5 hover:border-indigo-500/30 bg-white/[0.02]">
             {value ? (
               <div className="flex flex-col items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                <div className="w-12 h-12 rounded-sm bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
                   <FileText className="w-6 h-6 text-indigo-400" />
                 </div>
                 <p className="text-[9px] font-black uppercase tracking-widest text-white/50">Document Synchronized</p>
@@ -279,7 +275,7 @@ export default function PdfUploadManagerSingle({
                   <motion.div
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="flex items-center gap-3 px-8 py-4 rounded-2xl bg-white/10 border border-white/20 text-[10px] font-black uppercase tracking-[0.3em] text-white"
+                    className="flex items-center gap-3 px-8 py-4 rounded-sm bg-white/10 border border-white/20 text-[10px] font-black uppercase tracking-[0.3em] text-white"
                   >
                     <RefreshCcw className="w-5 h-5 animate-[spin_4s_linear_infinite]" />
                     REPLACE ASSET
@@ -294,7 +290,7 @@ export default function PdfUploadManagerSingle({
                     boxShadow: ['0 0 0px rgba(99,102,241,0)', '0 0 40px rgba(99,102,241,0.2)', '0 0 0px rgba(99,102,241,0)'],
                   }}
                   transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-                  className="w-20 h-20 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-indigo-500/40 group-hover:bg-indigo-500/5 transition-all duration-500"
+                  className="w-20 h-20 rounded-sm bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-indigo-500/40 group-hover:bg-indigo-500/5 transition-all duration-500"
                 >
                   <FileSearch className="w-10 h-10 text-white/20 group-hover:text-indigo-400" />
                 </motion.div>

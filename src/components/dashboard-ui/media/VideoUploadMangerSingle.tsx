@@ -11,11 +11,9 @@ import {
   CheckCircle2,
   Zap,
   MonitorPlay,
-  Play,
   Film,
   ChevronLeft,
   ChevronRight,
-  Aperture,
   Clapperboard,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -85,7 +83,7 @@ const InternalVideoVault = ({ onVideoSelect, selectedVideo }: InternalVideoVault
     if (!response?.total || !response?.limit) return 1;
     return Math.ceil(response.total / response.limit);
   }, [response]);
-
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleUploadComplete = async (res: any) => {
     if (res && res[0]) {
       try {
