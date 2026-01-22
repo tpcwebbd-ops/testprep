@@ -269,11 +269,7 @@ export default function ImageUploadManager({ value, onChange, label = 'IMAGES' }
         </div>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
-            <Button
-              variant="outlineGlassy"
-              size="sm"
-              className="cursor-pointer h-8 text-[9px] font-black uppercase tracking-widest px-4 border-white/40 hover:border-indigo-500/50"
-            >
+            <Button variant="outlineGlassy" size="sm" className="min-w-1">
               <Plus className="w-3.5 h-3.5" /> Select
             </Button>
           </DialogTrigger>
