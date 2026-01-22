@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ImageIcon, Database, LayoutGrid, Upload } from 'lucide-react';
-import { toast } from 'react-toastify';
 
 import { CustomLink } from '@/components/common/LinkButton';
 import { Button } from '@/components/ui/button';
@@ -25,12 +24,7 @@ export default function AssetManagementPage() {
   const [activeTab, setActiveTab] = useState<TabType>('image');
 
   const [singleImage, setSingleImage] = useState<{ url: string; name: string }>({ url: '', name: '' });
-  const [multipleImages, setMultipleImages] = useState<string[]>([]);
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleUpdate = useCallback((type: string, isMultiple: boolean, url: string | string[]) => {
-    toast.success(`Vault Synced: ${type.toUpperCase()} ${isMultiple ? 'Collection' : 'Node'}`);
-  }, []);
+  const [multipleImages, setMultipleImages] = useState<{ url: string; name: string }[]>([]);
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-transparent">
@@ -101,7 +95,6 @@ export default function AssetManagementPage() {
                     value={singleImage}
                     onChange={val => {
                       setSingleImage({ url: val.url, name: val.name });
-                      handleUpdate('image', false, val.url);
                     }}
                   />
                 )}
@@ -125,8 +118,7 @@ export default function AssetManagementPage() {
                   <ImageUploadManager
                     value={multipleImages}
                     onChange={val => {
-                      setMultipleImages(val);
-                      handleUpdate('image', true, val);
+                      setMultipleImages([...val]);
                     }}
                   />
                 )}

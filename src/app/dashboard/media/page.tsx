@@ -119,9 +119,9 @@ export default function MediaDashboard() {
     setIsDeleteDialogOpen(false);
     try {
       await deleteMedia({ id }).unwrap();
-      toast.success('Asset purged successfully');
+      toast.success('Deleted successfully');
     } catch {
-      toast.error('System failure: Purge aborted');
+      toast.error('System failure: Delete aborted');
     } finally {
       setProcessingId(null);
       setMediaToDelete(null);
@@ -338,18 +338,14 @@ export default function MediaDashboard() {
                             <div className="flex gap-1">
                               <Button
                                 size="sm"
-                                className="w-10 h-10 p-0 bg-white/10 border border-white/20 hover:bg-green-500/40 text-white"
+                                className="min-w-1"
+                                variant="outlineGarden"
                                 disabled={!!processingId}
                                 onClick={() => handleUpdateStatus(item._id, 'active')}
                               >
                                 <CheckCircle size={16} />
                               </Button>
-                              <Button
-                                size="sm"
-                                className="w-10 h-10 p-0 bg-white/10 border border-white/20 hover:bg-red-500/40 text-white"
-                                disabled={!!processingId}
-                                onClick={() => initiateDelete(item)}
-                              >
+                              <Button size="sm" variant="outlineFire" className="min-w-1" disabled={!!processingId} onClick={() => initiateDelete(item)}>
                                 <X size={16} />
                               </Button>
                             </div>
@@ -395,10 +391,6 @@ export default function MediaDashboard() {
                     <h3 className="text-3xl font-black text-white italic tracking-tighter uppercase">No data found</h3>
                     <p className="text-xs text-gray-200/40 font-mono leading-relaxed">System scan complete: No records match the current filter parameters.</p>
                   </div>
-                  <Button onClick={() => refetch()} variant="outlineGlassy" size="sm">
-                    <RefreshCw size={16} className="mr-3" />
-                    Refetch
-                  </Button>
                 </div>
               </motion.div>
             )}
@@ -511,34 +503,28 @@ export default function MediaDashboard() {
         </DialogContent>
       </Dialog>
 
-      {/* 2. DELETE/PURGE DIALOG */}
+      {/* 2. DELETE DIALOG */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent className="backdrop-blur-xl mt-8 bg-white/10 border border-white/20 shadow-2xl   max-w-md p-0 overflow-hidden text-white">
           <div className="p-10 flex flex-col items-center text-center gap-6">
-            <div className="w-20 h-20 rounded-3xl bg-white/5 border border-white/20 flex items-center justify-center text-white/80 animate-pulse">
+            <div className="w-20 h-20 rounded-3xl bg-rose-200 border border-white/20 flex items-center justify-center text-rose-500 animate-pulse">
               <AlertTriangle size={40} />
             </div>
             <div className="space-y-2">
-              <DialogTitle className="text-3xl font-bold bg-gradient-to-r from-white via-white/80 to-white/30 bg-clip-text text-transparent italic tracking-tighter uppercase">
-                Purge Confirmation
+              <DialogTitle className="text-3xl font-bold bg-gradient-to-r from-rose-500 via-rose-300 to-rose-600 bg-clip-text text-transparent italic tracking-tighter uppercase">
+                Confirmation Delete?
               </DialogTitle>
               <DialogDescription className="text-gray-200/50 text-xs font-mono uppercase leading-relaxed tracking-wider">
-                This procedure is irreversible. Purge <span className="text-white font-bold">&quot;{mediaToDelete?.name}&quot;</span>?
+                This procedure is irreversible. Delete <span className="text-white font-bold">&quot;{mediaToDelete?.name}&quot;</span>?
               </DialogDescription>
             </div>
           </div>
           <DialogFooter className="p-8 bg-white/5 border-t border-white/10 flex flex-row gap-3 sm:justify-center">
-            <Button
-              onClick={() => setIsDeleteDialogOpen(false)}
-              className="flex-1 h-14 rounded-2xl font-black uppercase tracking-widest text-[10px] bg-white/5 border border-white/10 text-white"
-            >
+            <Button onClick={() => setIsDeleteDialogOpen(false)} size="sm" variant="outlineGlassy">
               Abort
             </Button>
-            <Button
-              onClick={handleConfirmDelete}
-              className="flex-1 h-14 rounded-2xl font-black uppercase tracking-widest text-[10px] bg-white/20 border border-white/40 hover:bg-white/30 text-white"
-            >
-              Confirm Purge
+            <Button onClick={handleConfirmDelete} size="sm" variant="outlineFire">
+              Confirm Delete
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -590,12 +576,6 @@ export default function MediaDashboard() {
                   <ExternalLink size={14} /> Open
                 </Link>
               </Button>
-              {/* <Button
-                onClick={() => setIsPreviewDialogOpen(false)}
-                className="rounded-xl h-12 px-8 font-black uppercase text-[10px] tracking-widest bg-white/10 border border-white/20 hover:bg-white/20 text-white"
-              >
-                <X size={14} className="mr-2" /> Terminate
-              </Button> */}
             </div>
           </div>
         </DialogContent>

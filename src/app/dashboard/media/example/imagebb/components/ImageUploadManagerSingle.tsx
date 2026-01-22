@@ -96,11 +96,11 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageDialo
           contentType: 'image',
           status: 'active',
         }).unwrap();
-        toast.success('Asset synchronized to vault');
+        toast.success('Image successfully uploaded');
         onImageSelect({ name: file.name, url: data.data.url });
       }
     } catch {
-      toast.error('Vault uplink failed');
+      toast.error('Image upload failed');
     } finally {
       setIsUploadingLocal(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -144,10 +144,10 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageDialo
                 />
                 <Zap className="absolute inset-0 m-auto w-8 h-8 text-indigo-500 animate-pulse" />
               </div>
-              <span className="text-[10px] font-black uppercase tracking-[0.5em] text-indigo-500/60">Scanning Bio-Grid...</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.5em] text-indigo-500/60">Loading...</span>
             </div>
           ) : availableImages.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
               <AnimatePresence mode="popLayout">
                 {availableImages.map((item, idx) => {
                   const isSelected = selectedImage === item.url;
@@ -227,8 +227,8 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageDialo
             <div className="flex flex-col items-center justify-center py-40 opacity-30 space-y-6">
               <Ghost className="w-24 h-24 animate-bounce" />
               <div className="text-center">
-                <h3 className="text-2xl font-black uppercase tracking-[0.6em]">Void Detected</h3>
-                <p className="text-[10px] font-bold uppercase tracking-widest mt-3">No assets matching the criteria found</p>
+                <h3 className="text-2xl font-black uppercase ">Ops! Nothing was found!</h3>
+                <p className="text-[10px] font-bold uppercase mt-3">Please Upload a New Image</p>
               </div>
             </div>
           )}
@@ -351,10 +351,15 @@ export default function ImageUploadManagerSingle({
                     y: [0, -10, 0],
                     boxShadow: ['0 0 0px rgba(99,102,241,0)', '0 0 40px rgba(99,102,241,0.2)', '0 0 0px rgba(99,102,241,0)'],
                   }}
-                  transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-                  className="w-20 h-20 rounded-sm bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-indigo-500/40 group-hover:bg-indigo-500/5 transition-all duration-500"
+                  transition={{
+                    duration: 4,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                    delay: 1 * 0.5,
+                  }}
+                  className="w-16 h-16 rounded-sm bg-white/5 border border-white/10 flex items-center justify-center"
                 >
-                  <ImageIcon className="w-10 h-10 text-white/20 group-hover:text-indigo-400" />
+                  <ImageIcon className="w-8 h-8 text-white/10" />
                 </motion.div>
                 <div className="text-center space-y-2">
                   <p className="text-[11px] font-black uppercase tracking-[0.2em] text-white/90 group-hover:text-white transition-colors">No Image Selected</p>
