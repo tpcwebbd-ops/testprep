@@ -167,7 +167,7 @@ export default function MediaDashboard() {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <CustomLink href="/dashboard/media/example" variant="outlineGlassy" size="sm">
+            <CustomLink href="/dashboard/media/example/uploadthings" variant="outlineGlassy" size="sm">
               <LayoutGrid size={16} className="mr-2" />
               Example
             </CustomLink>
