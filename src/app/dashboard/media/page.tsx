@@ -41,7 +41,7 @@ import { useGetMediasQuery, useAddMediaMutation, useUpdateMediaMutation, useDele
 
 import imageCompression from 'browser-image-compression';
 import { UploadButton } from '@/lib/uploadthing';
-import { CustomLink } from '@/components/dashboard-ui/LinkButton';
+import { CustomLink } from '@/components/common/LinkButton';
 import Link from 'next/link';
 
 type MediaType = 'all' | 'video' | 'image' | 'pdf' | 'docx' | 'audio';

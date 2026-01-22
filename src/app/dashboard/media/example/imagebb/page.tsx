@@ -5,11 +5,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ImageIcon, Database, LayoutGrid, Upload } from 'lucide-react';
 import { toast } from 'react-toastify';
 
-import ImageUploadManagerSingle from '@/components/dashboard-ui/media/imagebb/ImageUploadManagerSingle';
-import ImageUploadManager from '@/components/dashboard-ui/media/imagebb/ImageUploadManager';
-
-import { CustomLink } from '@/components/dashboard-ui/LinkButton';
+import { CustomLink } from '@/components/common/LinkButton';
 import { Button } from '@/components/ui/button';
+
+import ImageUploadManagerSingle from './components/ImageUploadManagerSingle';
+import ImageUploadManager from './components/ImageUploadManager';
 
 type TabType = 'image';
 

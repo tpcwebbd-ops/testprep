@@ -10,7 +10,7 @@ import VideoUploadMangerSingle from '@/components/dashboard-ui/media/VideoUpload
 import VideoUploadManger from '@/components/dashboard-ui/media/VideoUploadManger';
 import ImageUploadManager from '@/components/dashboard-ui/ImageUploadManager';
 
-import { CustomLink } from '@/components/dashboard-ui/LinkButton';
+import { CustomLink } from '@/components/common/LinkButton';
 import PdfUploadManagerSingle from '@/components/dashboard-ui/PdfUploadManagerSingle';
 import DocxUploadManagerSingle from '@/components/dashboard-ui/DocxUploadManagerSingle';
 import AudioUploadManagerSingle from '@/components/dashboard-ui/AudioUploadManagerSingle';
