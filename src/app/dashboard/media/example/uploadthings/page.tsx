@@ -6,8 +6,8 @@ import { Video, ImageIcon, FileText, FileCode, Music, Database, LayoutGrid, Imag
 import { toast } from 'react-toastify';
 import { CustomLink } from '@/components/common/LinkButton';
 
-import ImageUploadManagerSingle from '@/components/dashboard-ui/ImageUploadManagerSingle';
-import ImageUploadManager from '@/components/dashboard-ui/ImageUploadManager';
+import ImageUploadManagerSingle from '@/components/dashboard-ui/uploadthings/ImageUploadMangerSingle';
+import ImageUploadManager from '@/components/dashboard-ui/uploadthings/ImageUploadManger';
 import VideoUploadMangerSingle from '@/components/dashboard-ui/uploadthings/VideoUploadMangerSingle';
 import VideoUploadManger from '@/components/dashboard-ui/uploadthings/VideoUploadManger';
 
