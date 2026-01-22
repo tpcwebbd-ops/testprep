@@ -31,7 +31,7 @@ interface MediaResponse {
 }
 
 interface InternalImageDialogProps {
-  onImageSelect: (newImage: string) => void;
+  onImageSelect: ({ name, url }: { name: string; url: string }) => void;
   selectedImage: string;
 }
 
@@ -97,7 +97,7 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageDialo
           status: 'active',
         }).unwrap();
         toast.success('Asset synchronized to vault');
-        onImageSelect(data.data.url);
+        onImageSelect({ name: file.name, url: data.data.url });
       }
     } catch {
       toast.error('Vault uplink failed');
@@ -108,9 +108,9 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageDialo
   };
 
   return (
-    <div className="flex flex-col h-[90vh] md:h-[80vh] backdrop-blur-[150px] rounded-2xl overflow-hidden border border-white/10 bg-white/2 shadow-2xl">
+    <div className="flex flex-col h-[90vh] md:h-[80vh] backdrop-blur-[150px] rounded-sm overflow-hidden bg-white/2 shadow-2xl">
       <DialogHeader className="p-6 border-b border-white/5 bg-white/5">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 -mt-1">
           <div className="relative flex-1 max-w-md">
             <Search
               className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${
@@ -122,7 +122,7 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageDialo
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               placeholder="SEARCH ASSET VAULT..."
-              className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-[11px] font-black uppercase tracking-[0.2em] text-white focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all placeholder:text-white/20"
+              className="w-full bg-white/5 border border-white/10 rounded-sm py-3 pl-12 pr-4 text-[11px] font-black uppercase tracking-[0.2em] text-white focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all placeholder:text-white/20"
             />
           </div>
           <div className="hidden">
@@ -147,49 +147,77 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageDialo
               <span className="text-[10px] font-black uppercase tracking-[0.5em] text-indigo-500/60">Scanning Bio-Grid...</span>
             </div>
           ) : availableImages.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
               <AnimatePresence mode="popLayout">
                 {availableImages.map((item, idx) => {
                   const isSelected = selectedImage === item.url;
                   return (
                     <motion.div
-                      key={item._id}
+                      key={item.url}
                       layout
-                      initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                      initial={{ opacity: 0, scale: 0.9, y: 20 }}
                       animate={{ opacity: 1, scale: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.8 }}
-                      transition={{ delay: idx * 0.02, type: 'spring', stiffness: 260, damping: 20 }}
-                      onClick={() => onImageSelect(item.url)}
-                      className={`relative aspect-square rounded-2xl overflow-hidden border-2 cursor-pointer transition-all duration-500 group
-                        ${
-                          isSelected
-                            ? 'border-indigo-500 scale-95 shadow-[0_0_50px_rgba(99,102,241,0.4)]'
-                            : 'border-white/5 hover:border-indigo-500/30 hover:scale-105 shadow-xl'
-                        }
-                      `}
-                      title={item.name || 'Image'}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      transition={{
+                        delay: idx * 0.03,
+                        type: 'spring',
+                        stiffness: 260,
+                        damping: 20,
+                      }}
+                      className="flex flex-col gap-3 group "
                     >
-                      <Image
-                        src={item.url}
-                        fill
-                        alt={item.name || 'Images'}
-                        className="object-cover transition-transform duration-700 group-hover:scale-110"
-                        unoptimized
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
-                        <span className="text-[9px] font-black uppercase tracking-widest text-white truncate">{item.name}</span>
+                      <div
+                        onClick={() => onImageSelect({ name: item.name, url: item.url })}
+                        className={`relative aspect-square rounded-sm overflow-hidden cursor-pointer transition-all duration-500 
+          ${isSelected ? ' scale-[0.98] shadow-[0_0_40px_rgba(99,102,241,0.3)]' : 'hover:scale-[1.02] shadow-2xl'}
+        `}
+                      >
+                        <Image
+                          src={item.url}
+                          fill
+                          alt={item.name || 'Gallery Image'}
+                          className={`object-cover transition-transform duration-1000 ease-out  border border-white/40 rounded-sm 
+                            ${isSelected ? 'scale-110' : 'group-hover:scale-110 '}
+                            `}
+                          unoptimized
+                        />
+
+                        <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                        <AnimatePresence>
+                          {isSelected && (
+                            <motion.div
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                              className="absolute inset-0 bg-indigo-600/20 backdrop-blur-[3px] flex items-center justify-center overflow-hidden  border border-white/60 rounded-sm"
+                            >
+                              <motion.div
+                                initial={{ scale: 0, rotate: -180, opacity: 0 }}
+                                animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                                exit={{ scale: 0, rotate: 180, opacity: 0 }}
+                                transition={{ type: 'spring', damping: 12 }}
+                                className="bg-white text-indigo-600 rounded-sm p-4 shadow-2xl "
+                              >
+                                <CheckCircle2 className="w-8 h-8" />
+                              </motion.div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+
+                        <div className="absolute inset-0 pointer-events-none border-[1px] border-white/10 rounded-sm" />
                       </div>
-                      {isSelected && (
-                        <div className="absolute inset-0 bg-indigo-500/20 flex items-center justify-center backdrop-blur-[2px]">
-                          <motion.div
-                            initial={{ scale: 0, rotate: -45 }}
-                            animate={{ scale: 1, rotate: 0 }}
-                            className="bg-indigo-500 text-white rounded-full p-3 shadow-2xl"
-                          >
-                            <CheckCircle2 className="w-6 h-6" />
-                          </motion.div>
-                        </div>
-                      )}
+
+                      <div className="-mt-2 flex items-center justify-start gap-2">
+                        <ImageIcon className={`w-3.5 h-3.5 ${isSelected ? 'text-indigo-400' : 'text-white/40'}`} />
+                        <h3
+                          className={`text-sm font-medium transition-colors duration-300 truncate w-full
+          ${isSelected ? 'text-indigo-400' : 'text-white/50 group-hover:text-white'}
+        `}
+                        >
+                          {item.name || 'Untitled Name'}
+                        </h3>
+                      </div>
                     </motion.div>
                   );
                 })}
@@ -219,10 +247,10 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageDialo
             <ChevronLeft className="w-5 h-5 text-white" />
           </Button>
 
-          <div className="flex items-center gap-3 px-5 h-10 rounded-xl bg-white/5 border border-white/10">
-            <span className="text-[11px] font-black text-white">{currentPage}</span>
-            <span className="text-[10px] font-black text-white/20">/</span>
-            <span className="text-[11px] font-black text-white/60">{totalPages}</span>
+          <div className="flex items-center gap-3 px-5 h-8 rounded-sm bg-white/5 border border-white/10">
+            <span className="text-[11px] text-white">{currentPage}</span>
+            <span className="text-[10px] text-white/20">/</span>
+            <span className="text-[11px] text-white/60">{totalPages}</span>
           </div>
 
           <Button
@@ -236,7 +264,7 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageDialo
           </Button>
 
           <div className="hidden sm:block ml-4">
-            <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em]">Total : {response?.total || 0}</p>
+            <p className="text-sm text-white/60 ">Total : {response?.total || 0}</p>
           </div>
         </div>
 
@@ -252,9 +280,17 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageDialo
   );
 };
 
-export default function ImageUploadManagerSingle({ value, onChange, label = 'Image' }: { value: string; onChange: (val: string) => void; label?: string }) {
+export default function ImageUploadManagerSingle({
+  value,
+  onChange,
+  label = 'Image',
+}: {
+  value: { name: string; url: string };
+  onChange: (val: { name: string; url: string }) => void;
+  label?: string;
+}) {
   const [isOpen, setIsOpen] = useState(false);
-
+  console.log('value', value);
   return (
     <div className="space-y-4 w-full h-full ">
       <div className="flex items-center justify-between px-1">
@@ -263,14 +299,14 @@ export default function ImageUploadManagerSingle({ value, onChange, label = 'Ima
           <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/90">{label}</label>
         </div>
         <AnimatePresence>
-          {value && (
+          {value.name && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
               <Button
                 variant="outlineGlassy"
                 size="sm"
                 onClick={e => {
                   e.stopPropagation();
-                  onChange('');
+                  onChange({ name: '', url: '' });
                 }}
               >
                 <X className="w-3.5 h-3.5" /> DISCARD
@@ -283,20 +319,31 @@ export default function ImageUploadManagerSingle({ value, onChange, label = 'Ima
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
           <div className="group relative w-full aspect-[16/9] md:aspect-[21/9] rounded-sm backdrop-blur-3xl transition-all duration-700 cursor-pointer overflow-hidden flex flex-col items-center justify-center border border-white/50 hover:border-indigo-500/30 bg-white/2">
-            {value ? (
-              <>
-                <Image src={value} fill alt="Current Selection" className="object-cover transition-transform duration-1000 group-hover:scale-105" unoptimized />
+            {value.name ? (
+              <div className="">
+                <Image
+                  src={value.url}
+                  fill
+                  alt="Current Selection"
+                  className="object-cover transition-transform duration-1000 group-hover:scale-105"
+                  unoptimized
+                />
+
                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center backdrop-blur-sm">
                   <motion.div
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="flex items-center gap-3 px-8 py-4 rounded-2xl bg-white/10 border border-white/20 text-[10px] font-black uppercase tracking-[0.3em] text-white"
+                    className="flex items-center gap-3 px-8 py-4 rounded-sm bg-white/10 border border-white/20 text-[10px] font-black uppercase tracking-[0.3em] text-white"
                   >
                     <RefreshCcw className="w-5 h-5 animate-[spin_4s_linear_infinite]" />
                     REPLACE ASSET
                   </motion.div>
                 </div>
-              </>
+                <div className="absolute bottom-1 left-1 flex items-center justify-start gap-2">
+                  <ImageIcon className={`w-3.5 h-3.5 text-white/80 bg-gray-800/50`} />
+                  <h3 className={`text-sm font-medium truncate w-full`}>{value.name || 'Untitled Name'}</h3>
+                </div>
+              </div>
             ) : (
               <div className="flex flex-col items-center gap-6">
                 <motion.div
@@ -305,7 +352,7 @@ export default function ImageUploadManagerSingle({ value, onChange, label = 'Ima
                     boxShadow: ['0 0 0px rgba(99,102,241,0)', '0 0 40px rgba(99,102,241,0.2)', '0 0 0px rgba(99,102,241,0)'],
                   }}
                   transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-                  className="w-20 h-20 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-indigo-500/40 group-hover:bg-indigo-500/5 transition-all duration-500"
+                  className="w-20 h-20 rounded-sm bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-indigo-500/40 group-hover:bg-indigo-500/5 transition-all duration-500"
                 >
                   <ImageIcon className="w-10 h-10 text-white/20 group-hover:text-indigo-400" />
                 </motion.div>
@@ -317,11 +364,11 @@ export default function ImageUploadManagerSingle({ value, onChange, label = 'Ima
             )}
           </div>
         </DialogTrigger>
-        <DialogContent className="bg-transparent border-none p-0 shadow-none overflow-hidden max-w-5xl w-[95vw] text-white mt-4">
+        <DialogContent className="bg-transparent p-0 shadow-none overflow-hidden max-w-5xl w-[95vw] text-white mt-4 border-white/50 border rounded-sm">
           <InternalImageVault
-            selectedImage={value}
-            onImageSelect={url => {
-              onChange(url);
+            selectedImage={value.url}
+            onImageSelect={val => {
+              onChange({ name: val.name, url: val.url });
               setIsOpen(false);
             }}
           />

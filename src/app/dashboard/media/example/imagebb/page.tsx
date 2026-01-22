@@ -24,11 +24,11 @@ const tabs: TabConfig[] = [{ id: 'image', label: 'Image', icon: ImageIcon }];
 export default function AssetManagementPage() {
   const [activeTab, setActiveTab] = useState<TabType>('image');
 
-  const [singleImage, setSingleImage] = useState<string>('');
+  const [singleImage, setSingleImage] = useState<{ url: string; name: string }>({ url: '', name: '' });
   const [multipleImages, setMultipleImages] = useState<string[]>([]);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleUpdate = useCallback((type: string, isMultiple: boolean, value: string | string[]) => {
+  const handleUpdate = useCallback((type: string, isMultiple: boolean, url: string | string[]) => {
     toast.success(`Vault Synced: ${type.toUpperCase()} ${isMultiple ? 'Collection' : 'Node'}`);
   }, []);
 
@@ -100,8 +100,8 @@ export default function AssetManagementPage() {
                   <ImageUploadManagerSingle
                     value={singleImage}
                     onChange={val => {
-                      setSingleImage(val);
-                      handleUpdate('image', false, val);
+                      setSingleImage({ url: val.url, name: val.name });
+                      handleUpdate('image', false, val.url);
                     }}
                   />
                 )}

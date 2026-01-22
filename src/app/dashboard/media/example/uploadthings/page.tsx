@@ -5,10 +5,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Video, ImageIcon, FileText, FileCode, Music, Database, LayoutGrid, Image } from 'lucide-react';
 import { toast } from 'react-toastify';
 
-import ImageUploadManagerSingle from '@/components/dashboard-ui/media/imagebb/ImageUploadManagerSingle';
+import ImageUploadManagerSingle from '@/components/dashboard-ui/ImageUploadManagerSingle';
 import VideoUploadMangerSingle from '@/components/dashboard-ui/media/VideoUploadMangerSingle';
 import VideoUploadManger from '@/components/dashboard-ui/media/VideoUploadManger';
-import ImageUploadManager from '@/components/dashboard-ui/media/imagebb/ImageUploadManager';
+import ImageUploadManager from '@/components/dashboard-ui/ImageUploadManager';
 
 import { CustomLink } from '@/components/dashboard-ui/LinkButton';
 import PdfUploadManagerSingle from '@/components/dashboard-ui/PdfUploadManagerSingle';
