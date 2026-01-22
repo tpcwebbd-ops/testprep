@@ -2,21 +2,21 @@
 
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Video, ImageIcon, FileText, FileCode, Music, Database, LayoutGrid } from 'lucide-react';
+import { Video, ImageIcon, FileText, FileCode, Music, Database, LayoutGrid, Image } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { CustomLink } from '@/components/common/LinkButton';
 
-import ImageUploadManagerSingle from '@/components/dashboard-ui/media/ImageUploadManagerSingle';
-import VideoUploadMangerSingle from '@/components/dashboard-ui/media/VideoUploadMangerSingle';
-import VideoUploadManger from '@/components/dashboard-ui/media/VideoUploadManger';
-import ImageUploadManager from '@/components/dashboard-ui/media/ImageUploadManager';
+import ImageUploadManagerSingle from '@/components/dashboard-ui/uploadthings/ImageUploadMangerSingle';
+import ImageUploadManager from '@/components/dashboard-ui/uploadthings/ImageUploadManger';
+import VideoUploadMangerSingle from '@/components/dashboard-ui/uploadthings/VideoUploadMangerSingle';
+import VideoUploadManger from '@/components/dashboard-ui/uploadthings/VideoUploadManger';
 
-import { CustomLink } from '@/components/dashboard-ui/LinkButton';
-import PdfUploadManagerSingle from '@/components/dashboard-ui/PdfUploadManagerSingle';
-import DocxUploadManagerSingle from '@/components/dashboard-ui/DocxUploadManagerSingle';
-import AudioUploadManagerSingle from '@/components/dashboard-ui/AudioUploadManagerSingle';
-import PdfUploadManager from '@/components/dashboard-ui/PdfUploadManager';
-import DocxUploadManager from '@/components/dashboard-ui/DocxUploadManager';
-import AudioUploadManager from '@/components/dashboard-ui/AudioUploadManager';
+import PdfUploadManagerSingle from '@/components/dashboard-ui/uploadthings/PdfUploadManagerSingle';
+import DocxUploadManagerSingle from '@/components/dashboard-ui/uploadthings/DocxUploadManagerSingle';
+import AudioUploadManagerSingle from '@/components/dashboard-ui/uploadthings/AudioUploadManagerSingle';
+import PdfUploadManager from '@/components/dashboard-ui/uploadthings/PdfUploadManager';
+import DocxUploadManager from '@/components/dashboard-ui/uploadthings/DocxUploadManager';
+import AudioUploadManager from '@/components/dashboard-ui/uploadthings/AudioUploadManager';
 import { Button } from '@/components/ui/button';
 
 type TabType = 'image' | 'video' | 'pdf' | 'docx' | 'audio';
@@ -91,10 +91,16 @@ export default function AssetManagementPage() {
               })}
             </div>
           </nav>
-          <CustomLink href="/dashboard/media" variant="outlineGlassy">
-            <LayoutGrid size={16} className="mr-2" />
-            MEDIA
-          </CustomLink>
+          <div className="  flex items-end justify-end gap-2">
+            <CustomLink href="/dashboard/media/example/imagebb" variant="outlineGlassy">
+              <Image size={16} className="" />
+              Image BB
+            </CustomLink>
+            <CustomLink href="/dashboard/media" variant="outlineGlassy">
+              <LayoutGrid size={16} className="" />
+              MEDIA
+            </CustomLink>
+          </div>
         </header>
 
         <AnimatePresence mode="wait">
