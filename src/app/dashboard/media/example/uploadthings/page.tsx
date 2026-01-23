@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Video, ImageIcon, FileText, FileCode, Music, Database, LayoutGrid } from 'lucide-react';
-import { toast } from 'react-toastify';
+
 import { CustomLink } from '@/components/common/LinkButton';
 
 import ImageUploadManagerSingle from '../uploadthings/components/ImageUploadMangerSingle';
@@ -37,8 +37,8 @@ const tabs: TabConfig[] = [
 export default function AssetManagementPage() {
   const [activeTab, setActiveTab] = useState<TabType>('image');
 
-  const [singleImage, setSingleImage] = useState<string>('');
-  const [multipleImages, setMultipleImages] = useState<string[]>([]);
+  const [singleImage, setSingleImage] = useState<{ url: string; name: string }>({ url: '', name: '' });
+  const [multipleImages, setMultipleImages] = useState<{ url: string; name: string }[]>([]);
 
   const [singleVideo, setSingleVideo] = useState<string>('');
   const [multipleVideos, setMultipleVideos] = useState<string[]>([]);
@@ -51,10 +51,6 @@ export default function AssetManagementPage() {
 
   const [singleAudio, setSingleAudio] = useState<string>('');
   const [multipleAudios, setMultipleAudios] = useState<string[]>([]);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleUpdate = useCallback((type: string, isMultiple: boolean, value: string | string[]) => {
-    toast.success(`Vault Synced: ${type.toUpperCase()} ${isMultiple ? 'Collection' : 'Node'}`);
-  }, []);
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-transparent">
@@ -122,13 +118,12 @@ export default function AssetManagementPage() {
                 </div>
               </div>
 
-              <div className="backdrop-blur-xl bg-white/10 border border-white/60 p-8 rounded-xl shadow-2xl transition-all duration-500 hover:bg-white/15 h-[380px]">
+              <div className="backdrop-blur-xl bg-white/10 border border-white/60 p-8 rounded-xl shadow-2xl transition-all duration-500 hover:bg-white/15 min-h-[380px]">
                 {activeTab === 'image' && (
                   <ImageUploadManagerSingle
                     value={singleImage}
                     onChange={val => {
                       setSingleImage(val);
-                      handleUpdate('image', false, val);
                     }}
                   />
                 )}
@@ -137,7 +132,6 @@ export default function AssetManagementPage() {
                     value={singleVideo}
                     onChange={val => {
                       setSingleVideo(val);
-                      handleUpdate('video', false, val);
                     }}
                   />
                 )}
@@ -146,7 +140,6 @@ export default function AssetManagementPage() {
                     value={singlePdf}
                     onChange={val => {
                       setSinglePdf(val);
-                      handleUpdate('pdf', false, val);
                     }}
                   />
                 )}
@@ -155,7 +148,6 @@ export default function AssetManagementPage() {
                     value={singleDocx}
                     onChange={val => {
                       setSingleDocx(val);
-                      handleUpdate('docx', false, val);
                     }}
                   />
                 )}
@@ -164,7 +156,6 @@ export default function AssetManagementPage() {
                     value={singleAudio}
                     onChange={val => {
                       setSingleAudio(val);
-                      handleUpdate('audio', false, val);
                     }}
                   />
                 )}
@@ -183,13 +174,12 @@ export default function AssetManagementPage() {
                 </div>
               </div>
 
-              <div className="backdrop-blur-xl bg-white/10 border border-white/60 p-8 rounded-xl shadow-2xl transition-all duration-500 hover:bg-white/15 h-[380px]">
+              <div className="backdrop-blur-xl bg-white/10 border border-white/60 p-8 rounded-xl shadow-2xl transition-all duration-500 hover:bg-white/15 min-h-[380px]">
                 {activeTab === 'image' && (
                   <ImageUploadManager
                     value={multipleImages}
                     onChange={val => {
-                      setMultipleImages(val);
-                      handleUpdate('image', true, val);
+                      setMultipleImages([...val]);
                     }}
                   />
                 )}
@@ -198,7 +188,6 @@ export default function AssetManagementPage() {
                     value={multipleVideos}
                     onChange={val => {
                       setMultipleVideos(val);
-                      handleUpdate('video', true, val);
                     }}
                   />
                 )}
@@ -207,7 +196,6 @@ export default function AssetManagementPage() {
                     value={multiplePdfs}
                     onChange={val => {
                       setMultiplePdfs(val);
-                      handleUpdate('pdf', true, val);
                     }}
                   />
                 )}
@@ -216,7 +204,6 @@ export default function AssetManagementPage() {
                     value={multipleDocxs}
                     onChange={val => {
                       setMultipleDocxs(val);
-                      handleUpdate('docx', true, val);
                     }}
                   />
                 )}
@@ -225,7 +212,6 @@ export default function AssetManagementPage() {
                     value={multipleAudios}
                     onChange={val => {
                       setMultipleAudios(val);
-                      handleUpdate('audio', true, val);
                     }}
                   />
                 )}

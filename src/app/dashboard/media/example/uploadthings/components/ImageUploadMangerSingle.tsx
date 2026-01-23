@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useMemo, useState, useEffect } from 'react';
-import { X, Loader2, RefreshCcw, Search, CheckCircle2, Zap, ImageIcon, Wallpaper, ChevronLeft, ChevronRight, ImagePlus, Frame, Ghost } from 'lucide-react';
+import Image from 'next/image';
+import { X, Loader2, RefreshCcw, Search, CheckCircle2, Zap, ImageIcon, Wallpaper, ChevronLeft, ChevronRight, ImagePlus, Ghost } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 
@@ -11,7 +12,6 @@ import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, Dialog
 import { UploadButton } from '@/lib/uploadthing';
 
 import { useGetMediasQuery, useAddMediaMutation } from '@/redux/features/media/mediaSlice';
-import Image from 'next/image';
 
 interface MediaItem {
   _id: string;
@@ -31,7 +31,7 @@ interface MediaResponse {
 }
 
 interface InternalImageVaultProps {
-  onImageSelect: (url: string) => void;
+  onImageSelect: ({ name, url }: { name: string; url: string }) => void;
   selectedImage: string;
 }
 
@@ -39,7 +39,7 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageVault
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const ITEMS_PER_PAGE = 12;
+  const ITEMS_PER_PAGE = 10;
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -70,8 +70,8 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageVault
     if (!response?.total || !response?.limit) return 1;
     return Math.ceil(response.total / response.limit);
   }, [response]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleUploadComplete = async (res: any) => {
+
+  const handleUploadComplete = async (res: { url: string; name: string }[]) => {
     if (res && res[0]) {
       try {
         await addMedia({
@@ -81,7 +81,7 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageVault
           status: 'active',
         }).unwrap();
         toast.success('Creative asset synchronized');
-        onImageSelect(res[0].url);
+        onImageSelect({ name: res[0].name, url: res[0].url });
       } catch {
         toast.error('Sync to vault failed');
       } finally {
@@ -91,19 +91,21 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageVault
   };
 
   return (
-    <div className="flex flex-col h-[90vh] md:h-[80vh] backdrop-blur-[150px] rounded-sm overflow-hidden border border-white/60 bg-white/5 shadow-2xl">
-      <DialogHeader className="p-6 border-b border-white/5 bg-white/5 text-white">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div className="flex flex-col h-[90vh] md:h-[80vh] backdrop-blur-[150px] rounded-sm overflow-hidden bg-white/2 shadow-2xl">
+      <DialogHeader className="p-6 border-b border-white/5 bg-white/5">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 -mt-1">
           <div className="relative flex-1 max-w-md">
             <Search
-              className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${isRefetching ? 'text-cyan-500 animate-pulse' : 'text-white/20'}`}
+              className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${
+                isRefetching ? 'text-indigo-500 animate-pulse' : 'text-white/20'
+              }`}
             />
             <input
               type="text"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              placeholder="SEARCH IMAGE VAULT..."
-              className="w-full bg-white/5 border border-white/10 rounded-sm py-3 pl-12 pr-4 text-[11px] font-black uppercase tracking-[0.2em] text-white focus:outline-none focus:border-cyan-500/50 transition-all placeholder:text-white/20"
+              placeholder="SEARCH ASSET VAULT..."
+              className="w-full bg-white/5 border border-white/10 rounded-sm py-3 pl-12 pr-4 text-[11px] font-black uppercase tracking-[0.2em] text-white focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all placeholder:text-white/20"
             />
           </div>
           <div className="hidden">
@@ -119,16 +121,16 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageVault
             <div className="flex flex-col items-center justify-center py-40 gap-6">
               <div className="relative">
                 <motion.div
-                  animate={{ rotate: -360 }}
-                  transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
-                  className="w-20 h-20 border-2 border-cyan-500/20 border-t-cyan-500 rounded-full"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+                  className="w-20 h-20 border-2 border-indigo-500/20 border-t-indigo-500 rounded-full"
                 />
-                <Zap className="absolute inset-0 m-auto w-8 h-8 text-cyan-500 animate-pulse" />
+                <Zap className="absolute inset-0 m-auto w-8 h-8 text-indigo-500 animate-pulse" />
               </div>
-              <span className="text-[10px] font-black uppercase tracking-[0.5em] text-cyan-500/60">Downloading Catalog...</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.5em] text-indigo-500/60">Loading...</span>
             </div>
           ) : availableImages.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
               <AnimatePresence mode="popLayout">
                 {availableImages.map((item, idx) => {
                   const isSelected = selectedImage === item.url;
@@ -136,41 +138,69 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageVault
                     <motion.div
                       key={item._id}
                       layout
-                      initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                      initial={{ opacity: 0, scale: 0.9, y: 20 }}
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.9 }}
-                      transition={{ delay: idx * 0.02, type: 'spring', stiffness: 300, damping: 25 }}
-                      onClick={() => onImageSelect(item.url)}
-                      className={`relative aspect-square rounded-sm overflow-hidden border cursor-pointer transition-all duration-500 group
-                        ${isSelected ? 'border-cyan-500 ring-2 ring-cyan-500/20 scale-95 shadow-[0_0_40px_rgba(6,182,212,0.3)]' : 'border-white/10 hover:border-cyan-500/40 hover:scale-105'}
-                      `}
+                      transition={{
+                        delay: idx * 0.03,
+                        type: 'spring',
+                        stiffness: 260,
+                        damping: 20,
+                      }}
+                      className="flex flex-col gap-3 group"
                     >
-                      <div className="absolute inset-0 bg-slate-900 flex items-center justify-center">
-                        <ImageIcon className="w-6 h-6 text-white/5" />
+                      <div
+                        onClick={() => onImageSelect({ name: item.name, url: item.url })}
+                        className={`relative aspect-square rounded-sm overflow-hidden cursor-pointer transition-all duration-500 
+                          ${isSelected ? 'scale-[0.98] shadow-[0_0_40px_rgba(99,102,241,0.3)]' : 'hover:scale-[1.02] shadow-2xl'}
+                        `}
+                      >
                         <Image
-                          fill
                           src={item.url}
-                          alt={item.name}
-                          className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
-                          loading="lazy"
+                          fill
+                          alt={item.name || 'Gallery Image'}
+                          className={`object-cover transition-transform duration-1000 ease-out border border-white/40 rounded-sm 
+                            ${isSelected ? 'scale-110' : 'group-hover:scale-110'}
+                            `}
+                          unoptimized
                         />
+
+                        <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                        <AnimatePresence>
+                          {isSelected && (
+                            <motion.div
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                              className="absolute inset-0 bg-indigo-600/20 backdrop-blur-[3px] flex items-center justify-center overflow-hidden border border-white/60 rounded-sm"
+                            >
+                              <motion.div
+                                initial={{ scale: 0, rotate: -180, opacity: 0 }}
+                                animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                                exit={{ scale: 0, rotate: 180, opacity: 0 }}
+                                transition={{ type: 'spring', damping: 12 }}
+                                className="bg-white text-indigo-600 rounded-sm p-4 shadow-2xl"
+                              >
+                                <CheckCircle2 className="w-8 h-8" />
+                              </motion.div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+
+                        <div className="absolute inset-0 pointer-events-none border-[1px] border-white/10 rounded-sm" />
                       </div>
 
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-2">
-                        <span className="text-[8px] font-black uppercase tracking-tighter text-white truncate">{item.name || 'IMG_ASSET'}</span>
+                      <div className="-mt-2 flex items-center justify-start gap-2">
+                        <ImageIcon className={`w-3.5 h-3.5 ${isSelected ? 'text-indigo-400' : 'text-white/40'}`} />
+                        <h3
+                          className={`text-sm font-medium transition-colors duration-300 truncate w-full
+                            ${isSelected ? 'text-indigo-400' : 'text-white/50 group-hover:text-white'}
+                          `}
+                        >
+                          {item.name || 'Untitled Name'}
+                        </h3>
                       </div>
-
-                      {isSelected && (
-                        <div className="absolute inset-0 bg-cyan-500/10 flex items-center justify-center backdrop-blur-[1px]">
-                          <motion.div
-                            initial={{ scale: 0, rotate: 90 }}
-                            animate={{ scale: 1, rotate: 0 }}
-                            className="bg-cyan-500 text-white rounded-full p-2 shadow-2xl"
-                          >
-                            <CheckCircle2 className="w-5 h-5" />
-                          </motion.div>
-                        </div>
-                      )}
                     </motion.div>
                   );
                 })}
@@ -180,7 +210,7 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageVault
             <div className="flex flex-col items-center justify-center py-20 opacity-30 space-y-6">
               <Ghost className="w-24 h-24 animate-bounce" />
               <div className="text-center">
-                <h3 className="text-2xl font-black uppercase ">Ops! Nothing was found!</h3>
+                <h3 className="text-2xl font-black uppercase">Ops! Nothing was found!</h3>
                 <p className="text-[10px] font-bold uppercase mt-3">Please Upload a New Image</p>
               </div>
             </div>
@@ -217,7 +247,7 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageVault
           </Button>
 
           <div className="hidden sm:block ml-4">
-            <p className="text-sm text-white/60 ">Total : {response?.total || 0}</p>
+            <p className="text-sm text-white/60">Total : {response?.total || 0}</p>
           </div>
         </div>
 
@@ -225,7 +255,7 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageVault
           <UploadButton
             endpoint="imageUploader"
             appearance={{
-              button: `bg-linear-to-r from-blue-500/20 to-purple-500/20 border border-white/30 text-white backdrop-blur-xl shadow-lg shadow-blue-500/20 hover:from-blue-500/30 hover:to-purple-500/30 hover:border-white/50 hover:shadow-xl hover:shadow-purple-500/30 hover:scale-[1.02] transition-all duration-300 max-h-8 rounded-md gap-2 px-0 max-w-[100px] text-sm`,
+              button: `bg-linear-to-r from-blue-500/20 to-purple-500/20 border border-white/30 text-white backdrop-blur-xl shadow-lg shadow-blue-500/20 hover:from-blue-500/30 hover:to-purple-500/30 hover:border-white/50 hover:shadow-xl hover:shadow-purple-500/30 hover:scale-[1.02] transition-all duration-300 h-8 rounded-md gap-1 max-w-[100px] text-sm`,
               allowedContent: 'hidden',
             }}
             content={{
@@ -234,7 +264,7 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageVault
                 return (
                   <div className="flex items-center gap-2">
                     <ImagePlus className="w-4 h-4" />
-                    <span>{ready ? 'Upload' : 'Uploading...'}</span>
+                    <span>{ready ? 'Upload' : 'Connecting...'}</span>
                   </div>
                 );
               },
@@ -257,31 +287,32 @@ export default function ImageUploadManagerSingle({
   onChange,
   label = 'IMAGE ASSET',
 }: {
-  value: string;
-  onChange: (val: string) => void;
+  value: { name: string; url: string };
+  onChange: (val: { name: string; url: string }) => void;
   label?: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="space-y-4 w-full">
+    <div className="space-y-4 w-full h-full">
       <div className="flex items-center justify-between px-1">
         <div className="w-full flex items-start justify-start gap-2">
-          <Wallpaper className="w-3.5 h-3.5 text-cyan-500" />
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">{label}</label>
+          <Wallpaper className="w-3.5 h-3.5" />
+          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/90">{label}</label>
         </div>
         <AnimatePresence>
-          {value && (
-            <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }}>
-              <button
+          {value.url && (
+            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
+              <Button
+                variant="outlineGlassy"
+                size="sm"
                 onClick={e => {
                   e.stopPropagation();
-                  onChange('');
+                  onChange({ name: '', url: '' });
                 }}
-                className="group flex items-center gap-2 text-[9px] font-black text-white/40 hover:text-red-400 transition-colors uppercase tracking-widest"
               >
-                <X className="w-3 h-3" /> CLEAR
-              </button>
+                <X className="w-3.5 h-3.5" /> DISCARD
+              </Button>
             </motion.div>
           )}
         </AnimatePresence>
@@ -289,21 +320,32 @@ export default function ImageUploadManagerSingle({
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <div className="group relative w-full h-[280px] aspect-video rounded-sm backdrop-blur-3xl transition-all duration-500 cursor-pointer overflow-hidden flex flex-col items-center justify-center border border-white/10 hover:border-cyan-500/30 bg-white/[0.02]">
-            {value ? (
-              <>
-                <Image fill src={value} alt="Selected Preview" className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-110" />
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center backdrop-blur-[2px]">
+          <div className="group relative w-full h-[315px] aspect-[16/9] md:aspect-[21/9] rounded-sm backdrop-blur-3xl transition-all duration-700 cursor-pointer overflow-hidden flex flex-col items-center justify-center border border-white/50 hover:border-indigo-500/30 bg-white/2">
+            {value.url ? (
+              <div className="w-full h-full relative">
+                <Image
+                  src={value.url}
+                  fill
+                  alt="Current Selection"
+                  className="object-cover transition-transform duration-1000 group-hover:scale-105"
+                  unoptimized
+                />
+
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center backdrop-blur-sm">
                   <motion.div
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="flex items-center gap-3 px-6 py-3 rounded-sm bg-black/60 border border-white/20 text-[9px] font-black uppercase tracking-[0.4em] text-white"
+                    className="flex items-center gap-3 px-8 py-4 rounded-sm bg-white/10 border border-white/20 text-[10px] font-black uppercase tracking-[0.3em] text-white"
                   >
-                    <RefreshCcw className="w-4 h-4 animate-spin-slow" />
-                    CHANGE IMAGE
+                    <RefreshCcw className="w-5 h-5 animate-[spin_4s_linear_infinite]" />
+                    REPLACE ASSET
                   </motion.div>
                 </div>
-              </>
+                <div className="absolute bottom-2 left-2 flex items-center justify-start gap-2 px-2 py-1 bg-black/40 backdrop-blur-md rounded-sm">
+                  <ImageIcon className={`w-3.5 h-3.5 text-white/80`} />
+                  <h3 className={`text-[10px] font-medium truncate max-w-[200px] text-white`}>{value.name || 'Untitled Asset'}</h3>
+                </div>
+              </div>
             ) : (
               <div className="flex flex-col items-center gap-6">
                 <motion.div
@@ -315,7 +357,6 @@ export default function ImageUploadManagerSingle({
                     duration: 4,
                     repeat: Infinity,
                     ease: 'easeInOut',
-                    delay: 1 * 0.5,
                   }}
                   className="w-16 h-16 rounded-sm bg-white/5 border border-white/10 flex items-center justify-center"
                 >
@@ -329,11 +370,11 @@ export default function ImageUploadManagerSingle({
             )}
           </div>
         </DialogTrigger>
-        <DialogContent className="bg-transparent border-none p-0 shadow-none overflow-hidden max-w-6xl w-[98vw] text-white mt-8">
+        <DialogContent className="bg-transparent p-0 shadow-none overflow-hidden max-w-5xl w-[95vw] text-white border-white/50 border rounded-sm mt-8">
           <InternalImageVault
-            selectedImage={value}
-            onImageSelect={url => {
-              onChange(url);
+            selectedImage={value.url}
+            onImageSelect={val => {
+              onChange({ name: val.name, url: val.url });
               setIsOpen(false);
             }}
           />

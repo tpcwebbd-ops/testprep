@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { X, UploadCloud, Loader2, ImageIcon, Ghost, RefreshCcw, Search, CheckCircle2, Zap, ChevronLeft, ChevronRight, ImageUpIcon } from 'lucide-react';
+import { X, UploadCloud, Loader2, ImageIcon, Ghost, RefreshCcw, Search, CheckCircle2, Zap, ChevronLeft, ChevronRight, Wallpaper } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 import imageCompression from 'browser-image-compression';
@@ -296,7 +296,7 @@ export default function ImageUploadManagerSingle({
     <div className="space-y-4 w-full h-full ">
       <div className="flex items-center justify-between px-1">
         <div className="w-full flex items-start justify-start gap-2">
-          <ImageUpIcon className="w-3.5 h-3.5" />
+          <Wallpaper className="w-3.5 h-3.5" />
           <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/90">{label}</label>
         </div>
         <AnimatePresence>

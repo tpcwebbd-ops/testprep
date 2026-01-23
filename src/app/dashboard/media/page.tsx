@@ -215,12 +215,12 @@ export default function MediaDashboard() {
           </Tabs>
 
           <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
-            <div className="relative w-full sm:w-72 group">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400/50 group-focus-within:text-white transition-colors" />
+            <div className="relative w-full sm:w-72 group border border-white/50 rounded-sm">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-50 group-focus-within:text-white transition-colors" />
               <Input
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="bg-white/5 border-white/10 pl-10 h-8 rounded-lg focus:ring-white/20 text-sm placeholder:text-gray-600 text-white transition-all"
+                className="bg-white/5 border-white/10 pl-10 h-8 rounded-lg focus:ring-white/20 text-sm placeholder:text-gray-50 text-white transition-all"
                 placeholder="Search file signatures..."
               />
             </div>
