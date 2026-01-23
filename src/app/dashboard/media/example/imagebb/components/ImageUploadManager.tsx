@@ -102,6 +102,7 @@ const InternalImageVault = ({ onImageToggle, selectedImages }: InternalImageDial
           url: data.data.url,
           name: file.name,
           contentType: 'image',
+          uploaderPlace: 'imageBB',
           status: 'active',
         }).unwrap();
         toast.success('Image successfully uploaded');
@@ -310,7 +311,7 @@ export default function ImageUploadManager({
 
   return (
     <div className="space-y-4 w-full h-full">
-      <div className="flex items-center justify-between px-1">
+      <div className="flex items-center justify-between px-1 flex-col md:flex-row">
         <div className="flex flex-col gap-1">
           <div className="flex items-start justify-start gap-2">
             <ImagesIcon className="w-3.5 h-3.5" />
@@ -319,7 +320,7 @@ export default function ImageUploadManager({
           <p className="text-[8px] font-bold tracking-widest text-white/60">{value.length} Assets Linked</p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 mt-2 md:mt-0">
           <AnimatePresence>
             {value.length > 0 && (
               <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
@@ -358,14 +359,14 @@ export default function ImageUploadManager({
                 >
                   <div className="relative aspect-square rounded-sm bg-white/5 border border-white/10 flex items-center justify-center backdrop-blur-xl shadow-2xl overflow-hidden group-hover:border-indigo-500/30 transition-all duration-500">
                     <Image src={item.url} fill alt={item.name} className="object-cover transition-transform duration-700 group-hover:scale-110" unoptimized />
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                      <button
+                    <div className="absolute inset-0 bg-black/60 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                      <Button
                         type="button"
                         onClick={() => onChange(value.filter(u => u.url !== item.url))}
-                        className="p-3 cursor-pointer rounded-sm bg-rose-500/20 border border-rose-500/50 text-rose-400 hover:bg-rose-500 hover:text-white transition-all duration-300 transform scale-90 group-hover:scale-100"
+                        className="p-3 cursor-pointer rounded-sm bg-rose-500/20 border border-rose-500/50 text-rose-400 hover:bg-rose-500 hover:text-white transition-all duration-300 transform scale-90 group-hover:scale-100 min-w-1"
                       >
                         <X className="w-5 h-5" />
-                      </button>
+                      </Button>
                     </div>
                     <Zap className="absolute -top-1 -right-1 w-4 h-4 text-indigo-500/40 animate-pulse pointer-events-none z-10" />
                   </div>

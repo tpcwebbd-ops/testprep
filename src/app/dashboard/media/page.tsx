@@ -9,7 +9,6 @@ import {
   FileText,
   FileCode,
   Trash2,
-  CheckCircle,
   Plus,
   HardDrive,
   Ghost,
@@ -54,6 +53,7 @@ interface MediaItem {
   name?: string;
   contentType: MediaType;
   status: MediaStatus;
+  uploaderPlace: string;
   createdAt: string;
 }
 
@@ -144,7 +144,7 @@ export default function MediaDashboard() {
       });
       const data = await res.json();
       if (data.success) {
-        await addMedia({ url: data.data.url, name: file.name, contentType: 'image', status: 'active' }).unwrap();
+        await addMedia({ url: data.data.url, name: file.name, contentType: 'image', status: 'active', uploaderPlace: 'imageBB' }).unwrap();
         toast.update(toastId, { render: 'Asset integrated', type: 'success', isLoading: false, autoClose: 2000 });
         setIsAddDialogOpen(false);
       }
@@ -540,8 +540,12 @@ export default function MediaDashboard() {
               <DialogTitle className="text-3xl font-bold bg-gradient-to-r from-rose-500 via-rose-300 to-rose-600 bg-clip-text text-transparent italic tracking-tighter uppercase">
                 Confirmation Delete?
               </DialogTitle>
+              <span className="block text-sm">This procedure is irreversible.</span>
               <DialogDescription className="text-gray-200/50 text-xs font-mono uppercase leading-relaxed tracking-wider">
-                This procedure is irreversible. Delete <span className="text-white font-bold">&quot;{mediaToDelete?.name}&quot;</span>?
+                <span className="text-white font-bold">
+                  &quot;{mediaToDelete?.name?.length && mediaToDelete?.name?.length > 50 ? mediaToDelete?.name?.slice(50) : mediaToDelete?.name}&quot;
+                </span>
+                ?
               </DialogDescription>
             </div>
           </div>

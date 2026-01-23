@@ -94,6 +94,7 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageDialo
           url: data.data.url,
           name: file.name,
           contentType: 'image',
+          uploaderPlace: 'imageBB',
           status: 'active',
         }).unwrap();
         toast.success('Image successfully uploaded');
@@ -318,7 +319,7 @@ export default function ImageUploadManagerSingle({
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <div className="group relative w-full aspect-[16/9] md:aspect-[21/9] rounded-sm backdrop-blur-3xl transition-all duration-700 cursor-pointer overflow-hidden flex flex-col items-center justify-center border border-white/50 hover:border-indigo-500/30 bg-white/2">
+          <div className="group relative w-full h-[315px] aspect-[16/9] md:aspect-[21/9] rounded-sm backdrop-blur-3xl transition-all duration-700 cursor-pointer overflow-hidden flex flex-col items-center justify-center border border-white/50 hover:border-indigo-500/30 bg-white/2">
             {value.name ? (
               <div className="">
                 <Image

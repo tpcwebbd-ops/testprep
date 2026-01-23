@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Video, ImageIcon, FileText, FileCode, Music, Database, LayoutGrid, Image } from 'lucide-react';
+import { Video, ImageIcon, FileText, FileCode, Music, Database, LayoutGrid } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { CustomLink } from '@/components/common/LinkButton';
 
@@ -93,7 +93,7 @@ export default function AssetManagementPage() {
           </nav>
           <div className="  flex items-end justify-end gap-2">
             <CustomLink href="/dashboard/media/example/imagebb" variant="outlineGlassy">
-              <Image size={16} className="" />
+              <ImageIcon size={16} className="" />
               Image BB
             </CustomLink>
             <CustomLink href="/dashboard/media" variant="outlineGlassy">

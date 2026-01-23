@@ -5,7 +5,6 @@ import {
   X,
   UploadCloud,
   Loader2,
-  Ghost,
   Search,
   CheckCircle2,
   Zap,
@@ -27,6 +26,7 @@ import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, Dialog
 import { UploadButton } from '@/lib/uploadthing';
 
 import { useGetMediasQuery, useAddMediaMutation } from '@/redux/features/media/mediaSlice';
+import Image from 'next/image';
 
 interface MediaItem {
   _id: string;
@@ -85,7 +85,7 @@ const InternalImageVault = ({ onImageToggle, selectedImages }: InternalImageVaul
     if (!response?.total || !response?.limit) return 1;
     return Math.ceil(response.total / response.limit);
   }, [response]);
-
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleUploadComplete = async (res: any) => {
     if (res && res[0]) {
       try {
@@ -161,7 +161,8 @@ const InternalImageVault = ({ onImageToggle, selectedImages }: InternalImageVaul
                   >
                     <div className="absolute inset-0 bg-slate-950 flex items-center justify-center">
                       <ImageIcon className="w-6 h-6 text-white/5" />
-                      <img
+                      <Image
+                        fill
                         src={item.url}
                         alt={item.name}
                         className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity"
@@ -308,7 +309,8 @@ export default function ImageUploadManager({ value, onChange, label = 'IMAGES' }
                     transition={{ duration: 0.3, delay: index * 0.03 }}
                     className="group relative aspect-square rounded-sm overflow-hidden bg-black/40 border border-white/10 hover:border-cyan-500/40 transition-all duration-500 shadow-xl"
                   >
-                    <img
+                    <Image
+                      fill
                       src={url}
                       alt={`Selected asset ${index}`}
                       className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-700 group-hover:scale-110"

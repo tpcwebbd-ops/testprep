@@ -1,22 +1,7 @@
 'use client';
 
 import React, { useMemo, useState, useEffect } from 'react';
-import {
-  X,
-  UploadCloud,
-  Loader2,
-  Ghost,
-  RefreshCcw,
-  Search,
-  CheckCircle2,
-  Zap,
-  ImageIcon,
-  Wallpaper,
-  ChevronLeft,
-  ChevronRight,
-  ImagePlus,
-  Frame,
-} from 'lucide-react';
+import { X, Loader2, RefreshCcw, Search, CheckCircle2, Zap, ImageIcon, Wallpaper, ChevronLeft, ChevronRight, ImagePlus, Frame } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 
@@ -26,6 +11,7 @@ import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, Dialog
 import { UploadButton } from '@/lib/uploadthing';
 
 import { useGetMediasQuery, useAddMediaMutation } from '@/redux/features/media/mediaSlice';
+import Image from 'next/image';
 
 interface MediaItem {
   _id: string;
@@ -84,7 +70,7 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageVault
     if (!response?.total || !response?.limit) return 1;
     return Math.ceil(response.total / response.limit);
   }, [response]);
-
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleUploadComplete = async (res: any) => {
     if (res && res[0]) {
       try {
@@ -161,7 +147,8 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageVault
                     >
                       <div className="absolute inset-0 bg-slate-900 flex items-center justify-center">
                         <ImageIcon className="w-6 h-6 text-white/5" />
-                        <img
+                        <Image
+                          fill
                           src={item.url}
                           alt={item.name}
                           className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
@@ -301,7 +288,7 @@ export default function ImageUploadManagerSingle({
           <div className="group relative w-full aspect-video rounded-sm backdrop-blur-3xl transition-all duration-500 cursor-pointer overflow-hidden flex flex-col items-center justify-center border border-white/10 hover:border-cyan-500/30 bg-white/[0.02]">
             {value ? (
               <>
-                <img src={value} alt="Selected Preview" className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-110" />
+                <Image fill src={value} alt="Selected Preview" className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-110" />
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center backdrop-blur-[2px]">
                   <motion.div
                     whileHover={{ scale: 1.05 }}
