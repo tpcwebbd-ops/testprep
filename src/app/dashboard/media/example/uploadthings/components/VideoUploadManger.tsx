@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo, useState, useEffect } from 'react';
-import { X, Loader2, Ghost, Search, CheckCircle2, Zap, Film, ChevronLeft, ChevronRight, Plus, MonitorPlay, VideoIcon, Trash2 } from 'lucide-react';
+import { X, Loader2, Ghost, Search, CheckCircle2, Zap, Film, ChevronLeft, ChevronRight, Plus, MonitorPlay, VideoIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 
