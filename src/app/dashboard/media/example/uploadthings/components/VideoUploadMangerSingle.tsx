@@ -178,13 +178,6 @@ const InternalVideoVault = ({ onVideoSelect, selectedUrl }: InternalVideoVaultPr
                           />
                         </div>
 
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-3">
-                          <div className="flex items-center gap-2">
-                            <VideoIcon className="w-3 h-3 text-indigo-400" />
-                            <span className="text-[9px] font-black uppercase tracking-widest text-white truncate">{item.name || 'VIDEO_STREAM'}</span>
-                          </div>
-                        </div>
-
                         {isSelected && (
                           <div className="absolute inset-0 bg-indigo-500/20 flex items-center justify-center backdrop-blur-[2px]">
                             <motion.div
@@ -359,13 +352,18 @@ export default function VideoUploadManagerSingle({
               <div className="flex flex-col items-center gap-6">
                 <motion.div
                   animate={{
-                    y: [0, -8, 0],
-                    boxShadow: ['0 0 0px rgba(99,102,241,0)', '0 0 30px rgba(99,102,241,0.2)', '0 0 0px rgba(99,102,241,0)'],
+                    y: [0, -10, 0],
+                    boxShadow: ['0 0 0px rgba(99,102,241,0)', '0 0 40px rgba(99,102,241,0.2)', '0 0 0px rgba(99,102,241,0)'],
                   }}
-                  transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-                  className="w-16 h-16 rounded-sm bg-white/5 border border-white/20 flex items-center justify-center group-hover:border-indigo-500/50 group-hover:bg-indigo-500/5 transition-all duration-500"
+                  transition={{
+                    duration: 4,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                    delay: 1 * 0.5,
+                  }}
+                  className="w-16 h-16 rounded-sm bg-white/20 border border-white/10 flex items-center justify-center"
                 >
-                  <MonitorPlay className="w-8 h-8 text-white/10 group-hover:text-indigo-400/60" />
+                  <MonitorPlay className="w-8 h-8 text-white/50" />
                 </motion.div>
                 <div className="text-center space-y-2">
                   <p className="text-[11px] font-black uppercase tracking-[0.2em] text-white/90 group-hover:text-white transition-colors">No Video Selected</p>

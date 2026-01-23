@@ -55,14 +55,14 @@ export default function AssetManagementPage() {
   return (
     <div className="min-h-screen relative overflow-hidden bg-transparent">
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] bg-indigo-500/5 blur-[150px] rounded-full" />
-        <div className="absolute bottom-[-20%] left-[-10%] w-[800px] h-[800px] bg-blue-500/5 blur-[150px] rounded-full" />
+        <div className="absolute top-[-20%] right-[-10%] w-[400px] md:w-[800px] h-[800px] bg-indigo-500/5 blur-[150px] rounded-full" />
+        <div className="absolute bottom-[-20%] left-[-10%] w-[400px] md:w-[800px] h-[800px] bg-blue-500/5 blur-[150px] rounded-full" />
       </div>
 
       <div className="container mx-auto relative z-10 px-4 py-8 md:py-12">
         <header className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-xl p-4 shadow-2xl flex flex-col lg:flex-row justify-between items-center mb-12 gap-6 transition-all hover:bg-white/15">
-          <nav className="w-full lg:w-auto overflow-x-auto">
-            <div className="flex items-center gap-2 p-1 bg-transparent h-12 rounded-lg">
+          <nav className="w-full lg:w-auto">
+            <div className="flex items-center gap-2 p-1 bg-transparent h-12 rounded-lg flex-wrap">
               {tabs.map(tab => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
@@ -86,7 +86,7 @@ export default function AssetManagementPage() {
               })}
             </div>
           </nav>
-          <div className="  flex items-end justify-end gap-2">
+          <div className="mt-8 md:mt-0 flex items-end justify-end gap-2">
             <CustomLink href="/dashboard/media/example/imagebb" variant="outlineGlassy">
               <ImageIcon size={16} className="" />
               Image BB

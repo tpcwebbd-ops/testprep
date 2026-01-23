@@ -1,23 +1,7 @@
 'use client';
 
 import React, { useMemo, useState, useEffect } from 'react';
-import {
-  X,
-  Loader2,
-  Ghost,
-  Search,
-  CheckCircle2,
-  Zap,
-  Play,
-  Film,
-  ChevronLeft,
-  ChevronRight,
-  Plus,
-  Clapperboard,
-  MonitorPlay,
-  VideoIcon,
-  Trash2,
-} from 'lucide-react';
+import { X, Loader2, Ghost, Search, CheckCircle2, Zap, Film, ChevronLeft, ChevronRight, Plus, MonitorPlay, VideoIcon, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 
@@ -106,7 +90,7 @@ const InternalVideoVault = ({ onVideoToggle, selectedVideos }: InternalVideoVaul
   };
 
   return (
-    <div className="flex flex-col h-[90vh] md:h-[80vh] backdrop-blur-3xl rounded-sm overflow-hidden border border-white/20 bg-neutral-950/90 shadow-2xl">
+    <div className="flex flex-col h-[90vh] md:h-[80vh] backdrop-blur-3xl rounded-sm overflow-hidden shadow-2xl">
       <DialogHeader className="p-6 border-b border-white/10 bg-white/5 text-white">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="relative flex-1 max-w-md">
@@ -143,7 +127,7 @@ const InternalVideoVault = ({ onVideoToggle, selectedVideos }: InternalVideoVaul
               <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 animate-pulse">Scanning Grid...</span>
             </div>
           ) : availableVideos.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
               <AnimatePresence mode="popLayout">
                 {availableVideos.map((item, idx) => {
                   const isSelected = selectedVideos.some(v => v.url === item.url);
@@ -156,7 +140,7 @@ const InternalVideoVault = ({ onVideoToggle, selectedVideos }: InternalVideoVaul
                       exit={{ opacity: 0, scale: 0.9 }}
                       transition={{ delay: idx * 0.03, type: 'spring', stiffness: 260, damping: 20 }}
                       onClick={() => onVideoToggle({ url: item.url, name: item.name })}
-                      className={`relative aspect-video rounded-sm overflow-hidden border cursor-pointer transition-all duration-500 group
+                      className={`relative aspect-video rounded-sm border cursor-pointer transition-all duration-500 group
                         ${isSelected ? 'border-indigo-500 scale-95 shadow-[0_0_40px_rgba(99,102,241,0.3)]' : 'border-white/5 hover:border-white/20 hover:scale-105 shadow-xl'}
                       `}
                     >
@@ -172,10 +156,17 @@ const InternalVideoVault = ({ onVideoToggle, selectedVideos }: InternalVideoVaul
                             e.currentTarget.currentTime = 0;
                           }}
                         />
+                        <div className="mt-[105px] -ml-[60px] flex items-center justify-start gap-2">
+                          <VideoIcon className={`w-3.5 h-3.5 ${isSelected ? 'text-indigo-400' : 'text-white/40'}`} />
+                          <h3
+                            className={`text-sm transition-colors duration-300 truncate w-full ${isSelected ? 'text-indigo-400' : 'text-white/50 group-hover:text-white'}
+                                                `}
+                          >
+                            {item.name || 'Untitled Name'}
+                          </h3>
+                        </div>
                       </div>
-                      <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-3">
-                        <span className="text-[8px] font-black uppercase tracking-widest text-white/60 truncate">{item.name || 'VIDEO_NODE'}</span>
-                      </div>
+
                       {isSelected && (
                         <div className="absolute inset-0 bg-indigo-500/20 flex items-center justify-center backdrop-blur-[2px]">
                           <motion.div
@@ -209,7 +200,7 @@ const InternalVideoVault = ({ onVideoToggle, selectedVideos }: InternalVideoVaul
           <Button
             variant="outlineGlassy"
             size="sm"
-            className="min-w-1 h-9 w-10 border-white/10"
+            className="min-w-1 border-white/20 hover:bg-white/10"
             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
             disabled={currentPage === 1 || isFetching}
           >
@@ -225,7 +216,7 @@ const InternalVideoVault = ({ onVideoToggle, selectedVideos }: InternalVideoVaul
           <Button
             variant="outlineGlassy"
             size="sm"
-            className="min-w-1 h-9 w-10 border-white/10"
+            className="min-w-1 border-white/20 hover:bg-white/10"
             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages || isFetching}
           >
@@ -233,7 +224,7 @@ const InternalVideoVault = ({ onVideoToggle, selectedVideos }: InternalVideoVaul
           </Button>
 
           <div className="hidden sm:block ml-4">
-            <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">Total Vault Assets: {response?.total || 0}</p>
+            <p className="text-sm text-white/60">Total : {response?.total || 0}</p>
           </div>
         </div>
 
@@ -241,7 +232,7 @@ const InternalVideoVault = ({ onVideoToggle, selectedVideos }: InternalVideoVaul
           <UploadButton
             endpoint="videoUploader"
             appearance={{
-              button: `bg-white/10 hover:bg-white/20 border border-white/20 text-white backdrop-blur-xl transition-all duration-300 h-9 rounded-sm px-6 text-[11px] font-black uppercase tracking-widest`,
+              button: `bg-linear-to-r from-blue-500/20 to-purple-500/20 border border-white/30 text-white backdrop-blur-xl shadow-lg shadow-blue-500/20 hover:from-blue-500/30 hover:to-purple-500/30 hover:border-white/50 hover:shadow-xl hover:shadow-purple-500/30 hover:scale-[1.02] transition-all duration-300 h-8 rounded-md gap-1 max-w-[100px] text-sm`,
               allowedContent: 'hidden',
             }}
             content={{
@@ -250,7 +241,7 @@ const InternalVideoVault = ({ onVideoToggle, selectedVideos }: InternalVideoVaul
                 return (
                   <div className="flex items-center gap-2">
                     <Plus className="w-4 h-4" />
-                    <span>{ready ? 'NEW UPLOAD' : 'CONNECTING...'}</span>
+                    <span>{ready ? 'Upload' : 'Uonnecting...'}</span>
                   </div>
                 );
               },
@@ -271,7 +262,7 @@ const InternalVideoVault = ({ onVideoToggle, selectedVideos }: InternalVideoVaul
 export default function VideoUploadManager({
   value,
   onChange,
-  label = 'PRODUCTION ASSETS',
+  label = 'Videos',
 }: {
   value: { url: string; name: string }[];
   onChange: (val: { url: string; name: string }[]) => void;
@@ -291,25 +282,20 @@ export default function VideoUploadManager({
   return (
     <div className="space-y-6 w-full group/container">
       <div className="flex items-center justify-between px-2 flex-col sm:flex-row gap-4">
-        <div className="space-y-1">
-          <div className="w-full flex items-center justify-start gap-2">
-            <Clapperboard className="w-3.5 h-3.5 text-indigo-500" />
-            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/70">{label}</label>
+        <div className="flex flex-col gap-1">
+          <div className="flex items-start justify-start gap-2">
+            <MonitorPlay className="w-3.5 h-3.5" />
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/90">{label}</label>
           </div>
-          <p className="text-[8px] font-bold uppercase tracking-widest text-white/40">{value.length} Active Nodes Selected</p>
+          <p className="text-[8px] font-bold tracking-widest text-white/60">{value.length} Selected</p>
         </div>
 
         <div className="flex items-center gap-3">
           <AnimatePresence>
             {value.length > 0 && (
               <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onChange([])}
-                  className="h-9 text-[9px] font-black tracking-widest text-red-400 hover:text-red-300 hover:bg-red-500/10 border border-transparent hover:border-red-500/20"
-                >
-                  <Trash2 className="w-3.5 h-3.5 mr-2" /> DISCARD ALL
+                <Button variant="outlineFire" size="sm" onClick={() => onChange([])}>
+                  <Trash2 className="w-3.5 h-3.5 mr-2" /> Remove all
                 </Button>
               </motion.div>
             )}
@@ -317,23 +303,19 @@ export default function VideoUploadManager({
 
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-              <Button
-                variant="outlineGlassy"
-                size="sm"
-                className="rounded-sm border-white/10 bg-white/[0.03] hover:bg-indigo-500/10 hover:border-indigo-500/50 transition-all gap-2 group h-9 px-6 text-[9px] font-black uppercase tracking-widest"
-              >
+              <Button variant="outlineGlassy" size="sm">
                 <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" />
-                SELECT ASSETS
+                Add
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-6xl bg-transparent border-none p-0 shadow-none text-white overflow-hidden">
+            <DialogContent className="max-w-6xl bg-transparent p-0 shadow-none text-white overflow-hidden border border-white/50 rounded-sm mt-8">
               <InternalVideoVault selectedVideos={value} onVideoToggle={toggleVideo} />
             </DialogContent>
           </Dialog>
         </div>
       </div>
 
-      <div className="min-h-[250px] rounded-sm p-8 bg-neutral-900/30 border border-white/10 backdrop-blur-3xl transition-all duration-500 hover:border-white/20">
+      <div className="min-h-[250px] rounded-sm p-8 border border-white/10 backdrop-blur-3xl transition-all duration-500 hover:border-white/20">
         <ScrollArea className="w-full h-full">
           {value.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-4">
@@ -346,7 +328,7 @@ export default function VideoUploadManager({
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.8 }}
                     transition={{ duration: 0.4, delay: index * 0.05 }}
-                    className="group relative aspect-video rounded-sm overflow-hidden bg-black/40 border border-white/5 hover:border-indigo-500/40 transition-all duration-500 shadow-2xl"
+                    className="group relative aspect-video transition-all duration-500"
                   >
                     <video
                       src={item.url}
@@ -358,52 +340,43 @@ export default function VideoUploadManager({
                         e.currentTarget.currentTime = 0;
                       }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-5">
-                      <div className="flex items-center justify-between">
-                        <div className="flex flex-col gap-1 overflow-hidden">
-                          <div className="flex items-center gap-2">
-                            <VideoIcon className="w-3 h-3 text-indigo-400" />
-                            <span className="text-[10px] font-bold text-white tracking-wider truncate max-w-[150px]">{item.name || 'VIDEO_STREAM'}</span>
-                          </div>
-                        </div>
-                        <Button
-                          onClick={() => onChange(value.filter(v => v.url !== item.url))}
-                          className="h-8 w-8 p-0 rounded-sm bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500 hover:text-white transition-all"
-                        >
-                          <X className="w-4 h-4" />
-                        </Button>
-                      </div>
+                    <div className="absolute -top-5 -right-5 opacity-100 md:opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-5">
+                      <Button onClick={() => onChange(value.filter(v => v.url !== item.url))} variant="outlineFire" size="sm" className="min-w-1">
+                        <X className="w-4 h-4" />
+                      </Button>
                     </div>
-                    <div className="absolute top-4 left-4 flex gap-1.5 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
-                      <div className="px-2 py-0.5 rounded-full bg-indigo-500 text-[8px] font-black uppercase tracking-tighter">Live Preview</div>
+                    <div className="flex items-center gap-2 py-1 bg-transparent">
+                      <VideoIcon className="w-3 h-3 text-indigo-50" />
+                      <span className="text-[10px] font-bold text-white tracking-wider truncate max-w-[150px]">{item.name || 'VIDEO_STREAM'}</span>
                     </div>
-                    <Zap className="absolute top-4 right-4 w-4 h-4 text-indigo-400/20 animate-pulse" />
                   </motion.div>
                 ))}
               </AnimatePresence>
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center py-12 gap-8">
-              <div className="flex gap-5">
+            <div className="col-span-full flex flex-col items-center justify-center py-10 gap-6">
+              <div className="flex gap-4">
                 {[1, 2, 3].map(i => (
                   <motion.div
                     key={i}
                     animate={{
-                      y: [0, -12, 0],
-                      boxShadow: ['0 0 0px rgba(99,102,241,0)', '0 0 40px rgba(99,102,241,0.1)', '0 0 0px rgba(99,102,241,0)'],
+                      y: [0, -10, 0],
+                      boxShadow: ['0 0 0px rgba(99,102,241,0)', '0 0 40px rgba(99,102,241,0.2)', '0 0 0px rgba(99,102,241,0)'],
                     }}
-                    transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: i * 0.4 }}
-                    className="w-20 h-20 rounded-sm bg-white/[0.02] border border-white/10 flex items-center justify-center group-hover:border-indigo-500/40 transition-all duration-500"
+                    transition={{
+                      duration: 4,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                      delay: i * 0.5,
+                    }}
+                    className="w-16 h-16 rounded-sm bg-white/20 border border-white/10 flex items-center justify-center"
                   >
-                    <MonitorPlay className="w-8 h-8 text-white/5 group-hover:text-indigo-400/40" />
+                    <MonitorPlay className="w-8 h-8 text-white/50" />
                   </motion.div>
                 ))}
               </div>
-              <div className="text-center space-y-2">
-                <p className="text-[11px] font-black uppercase tracking-[0.3em] text-white/40 group-hover:text-white/60 transition-colors">
-                  System Awaiting Input
-                </p>
-                <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/20">Select cinematic assets from vault</p>
+              <div className="text-center space-y-1">
+                <p className="text-sm text-white/90">No Videos Selected</p>
               </div>
             </div>
           )}
