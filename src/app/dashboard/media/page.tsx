@@ -537,7 +537,7 @@ export default function MediaDashboard() {
               <AlertTriangle size={40} />
             </div>
             <div className="space-y-2">
-              <DialogTitle className="text-3xl font-bold bg-gradient-to-r from-rose-500 via-rose-300 to-rose-600 bg-clip-text text-transparent italic tracking-tighter uppercase">
+              <DialogTitle className="text-3xl font-bold bg-gradient-to-r from-rose-500 via-rose-300 to-rose-600 bg-clip-text text-transparent">
                 Confirmation Delete?
               </DialogTitle>
               <span className="block text-sm">This procedure is irreversible.</span>
