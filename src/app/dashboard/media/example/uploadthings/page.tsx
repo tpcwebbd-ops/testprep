@@ -6,17 +6,16 @@ import { Video, ImageIcon, FileText, FileCode, Music, Database, LayoutGrid } fro
 import { toast } from 'react-toastify';
 import { CustomLink } from '@/components/common/LinkButton';
 
-import ImageUploadManagerSingle from '@/components/dashboard-ui/uploadthings/ImageUploadMangerSingle';
-import ImageUploadManager from '@/components/dashboard-ui/uploadthings/ImageUploadManger';
-import VideoUploadMangerSingle from '@/components/dashboard-ui/uploadthings/VideoUploadMangerSingle';
-import VideoUploadManger from '@/components/dashboard-ui/uploadthings/VideoUploadManger';
-
-import PdfUploadManagerSingle from '@/components/dashboard-ui/uploadthings/PdfUploadManagerSingle';
-import DocxUploadManagerSingle from '@/components/dashboard-ui/uploadthings/DocxUploadManagerSingle';
-import AudioUploadManagerSingle from '@/components/dashboard-ui/uploadthings/AudioUploadManagerSingle';
-import PdfUploadManager from '@/components/dashboard-ui/uploadthings/PdfUploadManager';
-import DocxUploadManager from '@/components/dashboard-ui/uploadthings/DocxUploadManager';
-import AudioUploadManager from '@/components/dashboard-ui/uploadthings/AudioUploadManager';
+import ImageUploadManagerSingle from '../uploadthings/components/ImageUploadMangerSingle';
+import ImageUploadManager from '../uploadthings/components/ImageUploadManger';
+import VideoUploadMangerSingle from '../uploadthings/components/VideoUploadMangerSingle';
+import VideoUploadManger from '../uploadthings/components/VideoUploadManger';
+import PdfUploadManagerSingle from '../uploadthings/components/PdfUploadManagerSingle';
+import DocxUploadManagerSingle from '../uploadthings/components/DocxUploadManagerSingle';
+import AudioUploadManagerSingle from '../uploadthings/components/AudioUploadManagerSingle';
+import PdfUploadManager from '../uploadthings/components/PdfUploadManager';
+import DocxUploadManager from '../uploadthings/components/DocxUploadManager';
+import AudioUploadManager from '../uploadthings/components/AudioUploadManager';
 import { Button } from '@/components/ui/button';
 
 type TabType = 'image' | 'video' | 'pdf' | 'docx' | 'audio';

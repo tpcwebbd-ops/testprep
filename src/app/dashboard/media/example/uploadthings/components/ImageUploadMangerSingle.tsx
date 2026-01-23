@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo, useState, useEffect } from 'react';
-import { X, Loader2, RefreshCcw, Search, CheckCircle2, Zap, ImageIcon, Wallpaper, ChevronLeft, ChevronRight, ImagePlus, Frame } from 'lucide-react';
+import { X, Loader2, RefreshCcw, Search, CheckCircle2, Zap, ImageIcon, Wallpaper, ChevronLeft, ChevronRight, ImagePlus, Frame, Ghost } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 
@@ -177,11 +177,11 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageVault
               </AnimatePresence>
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center py-40 opacity-30 space-y-6">
-              <Frame className="w-20 h-20 animate-pulse" />
+            <div className="flex flex-col items-center justify-center py-20 opacity-30 space-y-6">
+              <Ghost className="w-24 h-24 animate-bounce" />
               <div className="text-center">
-                <h3 className="text-xl font-black uppercase tracking-[0.4em]">Gallery Empty</h3>
-                <p className="text-[10px] font-bold uppercase tracking-widest mt-2">Initialize upload to populate</p>
+                <h3 className="text-2xl font-black uppercase ">Ops! Nothing was found!</h3>
+                <p className="text-[10px] font-bold uppercase mt-3">Please Upload a New Image</p>
               </div>
             </div>
           )}
@@ -193,35 +193,39 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageVault
           <Button
             variant="outlineGlassy"
             size="sm"
-            className="min-w-[40px] h-10 border-white/20"
+            className="min-w-1"
             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
             disabled={currentPage === 1 || isFetching}
           >
-            <ChevronLeft className="w-4 h-4 text-white" />
+            <ChevronLeft className="w-5 h-5 text-white" />
           </Button>
 
-          <div className="flex items-center gap-3 px-6 h-10 rounded-sm bg-white/5 border border-white/20">
-            <span className="text-[11px] font-black text-cyan-400">{currentPage}</span>
-            <span className="text-[10px] font-black text-white/20">OF</span>
-            <span className="text-[11px] font-black text-white/60">{totalPages}</span>
+          <div className="flex items-center gap-3 px-5 h-8 rounded-sm bg-white/5 border border-white/10">
+            <span className="text-[11px] text-white">{currentPage}</span>
+            <span className="text-[10px] text-white/20">/</span>
+            <span className="text-[11px] text-white/60">{totalPages}</span>
           </div>
 
           <Button
             variant="outlineGlassy"
             size="sm"
-            className="min-w-[40px] h-10 border-white/20"
+            className="min-w-1"
             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages || isFetching}
           >
-            <ChevronRight className="w-4 h-4 text-white" />
+            <ChevronRight className="w-5 h-5 text-white" />
           </Button>
+
+          <div className="hidden sm:block ml-4">
+            <p className="text-sm text-white/60 ">Total : {response?.total || 0}</p>
+          </div>
         </div>
 
         <div className="flex items-center gap-4 w-full md:w-auto">
           <UploadButton
             endpoint="imageUploader"
             appearance={{
-              button: `bg-linear-to-r from-cyan-500/20 to-emerald-500/20 border border-white/20 text-white backdrop-blur-xl shadow-lg hover:from-cyan-500/30 hover:to-emerald-500/30 hover:border-white/40 hover:scale-[1.02] transition-all duration-300 font-black text-[10px] uppercase tracking-widest h-10 px-8`,
+              button: `bg-linear-to-r from-blue-500/20 to-purple-500/20 border border-white/30 text-white backdrop-blur-xl shadow-lg shadow-blue-500/20 hover:from-blue-500/30 hover:to-purple-500/30 hover:border-white/50 hover:shadow-xl hover:shadow-purple-500/30 hover:scale-[1.02] transition-all duration-300 max-h-8 rounded-md gap-2 px-0 max-w-[100px] text-sm`,
               allowedContent: 'hidden',
             }}
             content={{
@@ -230,7 +234,7 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageVault
                 return (
                   <div className="flex items-center gap-2">
                     <ImagePlus className="w-4 h-4" />
-                    <span>{ready ? 'NEW ASSET' : 'INITIALIZING...'}</span>
+                    <span>{ready ? 'Upload' : 'Uploading...'}</span>
                   </div>
                 );
               },
@@ -285,7 +289,7 @@ export default function ImageUploadManagerSingle({
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <div className="group relative w-full aspect-video rounded-sm backdrop-blur-3xl transition-all duration-500 cursor-pointer overflow-hidden flex flex-col items-center justify-center border border-white/10 hover:border-cyan-500/30 bg-white/[0.02]">
+          <div className="group relative w-full h-[280px] aspect-video rounded-sm backdrop-blur-3xl transition-all duration-500 cursor-pointer overflow-hidden flex flex-col items-center justify-center border border-white/10 hover:border-cyan-500/30 bg-white/[0.02]">
             {value ? (
               <>
                 <Image fill src={value} alt="Selected Preview" className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-110" />
@@ -301,26 +305,31 @@ export default function ImageUploadManagerSingle({
                 </div>
               </>
             ) : (
-              <div className="flex flex-col items-center gap-5">
+              <div className="flex flex-col items-center gap-6">
                 <motion.div
                   animate={{
-                    scale: [1, 1.05, 1],
-                    opacity: [0.3, 0.6, 0.3],
+                    y: [0, -10, 0],
+                    boxShadow: ['0 0 0px rgba(99,102,241,0)', '0 0 40px rgba(99,102,241,0.2)', '0 0 0px rgba(99,102,241,0)'],
                   }}
-                  transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-                  className="w-16 h-16 rounded-full border border-white/20 flex items-center justify-center group-hover:border-cyan-500/40 group-hover:bg-cyan-500/5 transition-all duration-500"
+                  transition={{
+                    duration: 4,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                    delay: 1 * 0.5,
+                  }}
+                  className="w-16 h-16 rounded-sm bg-white/5 border border-white/10 flex items-center justify-center"
                 >
-                  <ImagePlus className="w-6 h-6 text-white/20 group-hover:text-cyan-400" />
+                  <ImageIcon className="w-8 h-8 text-white/10" />
                 </motion.div>
-                <div className="text-center space-y-1">
-                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/60 group-hover:text-cyan-400 transition-colors">Surface Empty</p>
-                  <p className="text-[8px] font-bold uppercase tracking-widest text-white/30">Assign visual resource</p>
+                <div className="text-center space-y-2">
+                  <p className="text-[11px] font-black uppercase tracking-[0.2em] text-white/90 group-hover:text-white transition-colors">No Image Selected</p>
+                  <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/70">Click here to Select one</p>
                 </div>
               </div>
             )}
           </div>
         </DialogTrigger>
-        <DialogContent className="bg-transparent border-none p-0 shadow-none overflow-hidden max-w-6xl w-[98vw] text-white">
+        <DialogContent className="bg-transparent border-none p-0 shadow-none overflow-hidden max-w-6xl w-[98vw] text-white mt-8">
           <InternalImageVault
             selectedImage={value}
             onImageSelect={url => {

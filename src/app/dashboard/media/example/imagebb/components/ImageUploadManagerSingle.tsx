@@ -225,7 +225,7 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageDialo
               </AnimatePresence>
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center py-40 opacity-30 space-y-6">
+            <div className="flex flex-col items-center justify-center py-20 opacity-30 space-y-6">
               <Ghost className="w-24 h-24 animate-bounce" />
               <div className="text-center">
                 <h3 className="text-2xl font-black uppercase ">Ops! Nothing was found!</h3>
