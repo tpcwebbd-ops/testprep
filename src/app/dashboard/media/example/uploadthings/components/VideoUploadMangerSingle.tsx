@@ -16,6 +16,7 @@ import {
   Clapperboard,
   VideoIcon,
   Plus,
+  Trash2,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
@@ -301,18 +302,13 @@ export default function VideoUploadManagerSingle({
         </div>
         <AnimatePresence>
           {value?.url && (
-            <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}>
-              <Button
-                variant="outlineGlassy"
-                size="sm"
-                onClick={e => {
-                  e.stopPropagation();
-                  onChange({ name: '', url: '' });
-                }}
-              >
-                <X className="w-3 h-3 mr-1" /> Remove
-              </Button>
-            </motion.div>
+            <>
+              <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
+                <Button variant="outlineFire" size="sm" onClick={() => onChange({ name: '', url: '' })}>
+                  <X className="w-3.5 h-3.5" /> Remove
+                </Button>
+              </motion.div>
+            </>
           )}
         </AnimatePresence>
       </div>

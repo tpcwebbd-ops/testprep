@@ -38,7 +38,7 @@ const InternalVideoVault = ({ onVideoToggle, selectedVideos }: InternalVideoVaul
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const ITEMS_PER_PAGE = 8;
+  const ITEMS_PER_PAGE = 2;
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -295,7 +295,7 @@ export default function VideoUploadManager({
             {value.length > 0 && (
               <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
                 <Button variant="outlineFire" size="sm" onClick={() => onChange([])}>
-                  <Trash2 className="w-3.5 h-3.5 mr-2" /> Remove all
+                  <X className="w-3.5 h-3.5" /> Remove all
                 </Button>
               </motion.div>
             )}
@@ -332,7 +332,7 @@ export default function VideoUploadManager({
                   >
                     <video
                       src={item.url}
-                      className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-700"
+                      className="w-full h-full object-cover duration-700"
                       muted
                       onMouseOver={e => e.currentTarget.play()}
                       onMouseOut={e => {
