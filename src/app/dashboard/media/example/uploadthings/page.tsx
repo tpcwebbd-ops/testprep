@@ -40,8 +40,8 @@ export default function AssetManagementPage() {
   const [singleImage, setSingleImage] = useState<{ url: string; name: string }>({ url: '', name: '' });
   const [multipleImages, setMultipleImages] = useState<{ url: string; name: string }[]>([]);
 
-  const [singleVideo, setSingleVideo] = useState<string>('');
-  const [multipleVideos, setMultipleVideos] = useState<string[]>([]);
+  const [singleVideo, setSingleVideo] = useState<{ url: string; name: string }>({ url: '', name: '' });
+  const [multipleVideos, setMultipleVideos] = useState<{ url: string; name: string }[]>([]);
 
   const [singlePdf, setSinglePdf] = useState<string>('');
   const [multiplePdfs, setMultiplePdfs] = useState<string[]>([]);

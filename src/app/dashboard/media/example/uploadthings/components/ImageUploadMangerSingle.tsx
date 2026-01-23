@@ -264,7 +264,7 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageVault
                 return (
                   <div className="flex items-center gap-2">
                     <ImagePlus className="w-4 h-4" />
-                    <span>{ready ? 'Upload' : 'Connecting...'}</span>
+                    <span>{ready ? 'Upload' : 'Uonnecting...'}</span>
                   </div>
                 );
               },
@@ -311,7 +311,7 @@ export default function ImageUploadManagerSingle({
                   onChange({ name: '', url: '' });
                 }}
               >
-                <X className="w-3.5 h-3.5" /> DISCARD
+                <X className="w-3.5 h-3.5" /> Remove
               </Button>
             </motion.div>
           )}

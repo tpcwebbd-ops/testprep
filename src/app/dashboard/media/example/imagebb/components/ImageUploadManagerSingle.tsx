@@ -310,7 +310,7 @@ export default function ImageUploadManagerSingle({
                   onChange({ name: '', url: '' });
                 }}
               >
-                <X className="w-3.5 h-3.5" /> DISCARD
+                <X className="w-3.5 h-3.5" /> Remove
               </Button>
             </motion.div>
           )}
