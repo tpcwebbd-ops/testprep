@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, Dialog
 import { UploadButton } from '@/lib/uploadthing';
 
 import { useGetMediasQuery, useAddMediaMutation } from '@/redux/features/media/mediaSlice';
+import { FaFilePdf } from 'react-icons/fa';
 
 interface MediaItem {
   _id: string;
@@ -129,7 +130,7 @@ const InternalPdfVault = ({ onPdfSelect, selectedUrl }: InternalPdfVaultProps) =
               <span className="text-[10px] font-black uppercase tracking-[0.5em] text-indigo-500/60">Initializing Archive...</span>
             </div>
           ) : availablePdfs.length > 0 ? (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
               <AnimatePresence mode="popLayout">
                 {availablePdfs.map((item, idx) => {
                   const isSelected = selectedUrl === item.url;
@@ -149,8 +150,8 @@ const InternalPdfVault = ({ onPdfSelect, selectedUrl }: InternalPdfVaultProps) =
                         ${isSelected ? 'border-indigo-500 ring-2 ring-indigo-500/50 ring-offset-2 ring-offset-black' : 'border-white/10 hover:border-white/30'}
                       `}
                       >
-                        <div className="absolute inset-0 bg-neutral-900 flex items-center justify-center">
-                          <FileText className="w-12 h-12 text-white/5 group-hover:text-white/20 transition-all duration-500 group-hover:scale-110" />
+                        <div className="absolute inset-0 bg-white/5 flex items-center justify-center">
+                          <FaFilePdf className="w-12 h-12 text-white/50 group-hover:text-white/20 transition-all duration-500 group-hover:scale-110" />
                         </div>
 
                         {isSelected && (
@@ -292,7 +293,8 @@ export default function PdfUploadManagerSingle({
           <div className="group relative w-full aspect-video rounded-sm backdrop-blur-3xl transition-all duration-500 cursor-pointer overflow-hidden flex flex-col items-center justify-center border border-white/10 hover:border-indigo-500/40 bg-white/[0.02]">
             {value?.url ? (
               <div className="w-full h-full relative flex flex-col items-center justify-center bg-white/[0.03]">
-                <FileText className="w-20 h-20 text-indigo-400/30 transition-transform duration-1000 group-hover:scale-110 group-hover:text-indigo-400/50" />
+                <FaFilePdf className="w-24 h-24 text-white/50 group-hover:text-white/20 transition-all duration-500 group-hover:scale-110" />
+
                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center backdrop-blur-sm">
                   <motion.div
                     whileHover={{ scale: 1.05 }}

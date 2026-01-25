@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo, useState, useEffect } from 'react';
-import { X, Loader2, Ghost, Search, CheckCircle2, Zap, FileText, ChevronLeft, ChevronRight, Plus, Files, FilePlus, Trash2, Eye } from 'lucide-react';
+import { X, Loader2, Ghost, Search, CheckCircle2, Zap, ChevronLeft, ChevronRight, Plus, Files, Eye } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 
@@ -12,6 +12,7 @@ import { UploadButton } from '@/lib/uploadthing';
 
 import { useGetMediasQuery, useAddMediaMutation } from '@/redux/features/media/mediaSlice';
 import Link from 'next/link';
+import { FaFilePdf } from 'react-icons/fa';
 
 interface MediaItem {
   _id: string;
@@ -145,10 +146,8 @@ const InternalPdfVault = ({ onPdfToggle, selectedPdfs }: InternalPdfVaultProps) 
                         ${isSelected ? 'border-indigo-500 scale-95 shadow-[0_0_40px_rgba(99,102,241,0.3)]' : 'border-white/5 hover:border-white/20 hover:scale-105 shadow-xl'}
                       `}
                     >
-                      <div className="absolute inset-0 bg-neutral-900 flex flex-col items-center justify-center p-4">
-                        <FileText
-                          className={`w-12 h-12 transition-all duration-500 ${isSelected ? 'text-indigo-400' : 'text-white/10 group-hover:text-white/30 group-hover:scale-110'}`}
-                        />
+                      <div className="absolute inset-0 bg-white/5 flex flex-col items-center justify-center p-4">
+                        <FaFilePdf className="w-24 h-24 text-white/50 group-hover:text-white/20 transition-all duration-500 group-hover:scale-110" />
                         <div className="mt-4 text-center w-full">
                           <h3
                             className={`text-[10px] font-black uppercase tracking-widest transition-colors duration-300 truncate w-full ${isSelected ? 'text-indigo-400' : 'text-white/50 group-hover:text-white'}
@@ -324,7 +323,7 @@ export default function PdfUploadManager({
                   >
                     <div className="w-full flex gap-1 items-center justify-start">
                       <div className="text-white text-sm">{index + 1}. </div>
-                      <FileText className="w-4 h-4 text-white ml-2" />
+                      <FaFilePdf className="w-24 h-24 text-white/50 group-hover:text-white/20 transition-all duration-500 group-hover:scale-110" />
 
                       <span className="text-[10px] font-black text-white tracking-[0.2em] uppercase truncate w-full px-2">{item.name || 'PDF_DOC'}</span>
                       <div className="flex items-center justify-center gap-1 hover:underline">
@@ -364,7 +363,7 @@ export default function PdfUploadManager({
                     }}
                     className="w-16 h-20 rounded-sm bg-white/20 border border-white/10 flex items-center justify-center"
                   >
-                    <FileText className="w-8 h-8 text-white/50" />
+                    <FaFilePdf className="w-24 h-24 text-white/50 group-hover:text-white/20 transition-all duration-500 group-hover:scale-110" />
                   </motion.div>
                 ))}
               </div>
