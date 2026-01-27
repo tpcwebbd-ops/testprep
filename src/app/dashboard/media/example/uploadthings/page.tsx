@@ -11,10 +11,10 @@ import ImageUploadManager from '../uploadthings/components/ImageUploadManger';
 import VideoUploadMangerSingle from '../uploadthings/components/VideoUploadMangerSingle';
 import VideoUploadManger from '../uploadthings/components/VideoUploadManger';
 import PdfUploadManagerSingle from '../uploadthings/components/PdfUploadManagerSingle';
-import DocxUploadManagerSingle from '../uploadthings/components/DocxUploadManagerSingle';
-import AudioUploadManagerSingle from '../uploadthings/components/AudioUploadManagerSingle';
 import PdfUploadManager from '../uploadthings/components/PdfUploadManager';
+import DocxUploadManagerSingle from '../uploadthings/components/DocxUploadManagerSingle';
 import DocxUploadManager from '../uploadthings/components/DocxUploadManager';
+import AudioUploadManagerSingle from '../uploadthings/components/AudioUploadManagerSingle';
 import AudioUploadManager from '../uploadthings/components/AudioUploadManager';
 import { Button } from '@/components/ui/button';
 

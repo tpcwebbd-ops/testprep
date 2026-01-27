@@ -38,7 +38,7 @@ const InternalVideoVault = ({ onVideoToggle, selectedVideos }: InternalVideoVaul
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const ITEMS_PER_PAGE = 2;
+  const ITEMS_PER_PAGE = 9;
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -79,10 +79,10 @@ const InternalVideoVault = ({ onVideoToggle, selectedVideos }: InternalVideoVaul
           contentType: 'video',
           status: 'active',
         }).unwrap();
-        toast.success('Production asset synchronized');
+        toast.success('Successfully Uploaded');
         onVideoToggle({ url: res[0].url, name: res[0].name || 'Video_Source' });
       } catch {
-        toast.error('Sync to vault failed');
+        toast.error('Failed to Uploaded');
       } finally {
         setIsUploadingLocal(false);
       }
@@ -305,7 +305,7 @@ export default function VideoUploadManager({
             <DialogTrigger asChild>
               <Button variant="outlineGlassy" size="sm">
                 <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" />
-                Add
+                Select
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-6xl bg-transparent p-0 shadow-none text-white overflow-hidden border border-white/50 rounded-sm mt-8">

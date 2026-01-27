@@ -53,7 +53,7 @@ const InternalVideoVault = ({ onVideoSelect, selectedUrl }: InternalVideoVaultPr
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const ITEMS_PER_PAGE = 8;
+  const ITEMS_PER_PAGE = 9;
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -94,10 +94,10 @@ const InternalVideoVault = ({ onVideoSelect, selectedUrl }: InternalVideoVaultPr
           contentType: 'video',
           status: 'active',
         }).unwrap();
-        toast.success('Production asset synchronized');
+        toast.success('Successfully Uploaded');
         onVideoSelect({ name: res[0].name, url: res[0].url });
       } catch {
-        toast.error('Sync to vault failed');
+        toast.error('Failed to Uploaded');
       } finally {
         setIsUploadingLocal(false);
       }

@@ -39,7 +39,7 @@ const InternalImageVault = ({ onImageToggle, selectedImages }: InternalImageVaul
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const ITEMS_PER_PAGE = 10;
+  const ITEMS_PER_PAGE = 9;
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -80,10 +80,10 @@ const InternalImageVault = ({ onImageToggle, selectedImages }: InternalImageVaul
           contentType: 'image',
           status: 'active',
         }).unwrap();
-        toast.success('Asset synchronized to vault');
+        toast.success('Successfully Uploaded');
         onImageToggle({ url: res[0].url, name: res[0].name || 'Image_Asset' });
       } catch {
-        toast.error('Vault synchronization failed');
+        toast.error('Failed to Uploaded');
       } finally {
         setIsUploadingLocal(false);
       }
@@ -316,7 +316,7 @@ export default function ImageUploadManager({
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
               <Button variant="outlineGlassy" size="sm" className="min-w-1">
-                <Plus className="w-3.5 h-3.5" /> SELECT
+                <Plus className="w-3.5 h-3.5" /> Select
               </Button>
             </DialogTrigger>
             <DialogContent className="bg-transparent p-0 shadow-none overflow-hidden max-w-5xl w-[95vw] text-white border-white/50 border rounded-sm mt-8">

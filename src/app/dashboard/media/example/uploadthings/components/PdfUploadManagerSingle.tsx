@@ -39,7 +39,7 @@ const InternalPdfVault = ({ onPdfSelect, selectedUrl }: InternalPdfVaultProps) =
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const ITEMS_PER_PAGE = 8;
+  const ITEMS_PER_PAGE = 9;
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -80,10 +80,10 @@ const InternalPdfVault = ({ onPdfSelect, selectedUrl }: InternalPdfVaultProps) =
           contentType: 'pdf',
           status: 'active',
         }).unwrap();
-        toast.success('Document asset synchronized');
+        toast.success('Successfully Uploaded');
         onPdfSelect({ name: res[0].name, url: res[0].url });
       } catch {
-        toast.error('Sync to vault failed');
+        toast.error('Failed to Uploaded');
       } finally {
         setIsUploadingLocal(false);
       }

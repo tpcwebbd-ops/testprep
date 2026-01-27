@@ -40,7 +40,7 @@ const InternalPdfVault = ({ onPdfToggle, selectedPdfs }: InternalPdfVaultProps) 
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const ITEMS_PER_PAGE = 6;
+  const ITEMS_PER_PAGE = 9;
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -81,10 +81,10 @@ const InternalPdfVault = ({ onPdfToggle, selectedPdfs }: InternalPdfVaultProps) 
           contentType: 'pdf',
           status: 'active',
         }).unwrap();
-        toast.success('Document asset synchronized');
+        toast.success('Successfully Uploaded');
         onPdfToggle({ url: res[0].url, name: res[0].name || 'PDF_Document' });
       } catch {
-        toast.error('Sync to vault failed');
+        toast.error('Failed to Uploaded');
       } finally {
         setIsUploadingLocal(false);
       }
@@ -296,7 +296,7 @@ export default function PdfUploadManager({
             <DialogTrigger asChild>
               <Button variant="outlineGlassy" size="sm">
                 <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" />
-                Add
+                Select
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-6xl bg-transparent p-0 shadow-none text-white overflow-hidden border border-white/50 rounded-sm mt-8">

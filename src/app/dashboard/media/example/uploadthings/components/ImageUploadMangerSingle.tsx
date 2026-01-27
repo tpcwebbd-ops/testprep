@@ -39,7 +39,7 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageVault
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const ITEMS_PER_PAGE = 10;
+  const ITEMS_PER_PAGE = 9;
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -80,10 +80,10 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageVault
           contentType: 'image',
           status: 'active',
         }).unwrap();
-        toast.success('Creative asset synchronized');
+        toast.success('Successfully Uploaded');
         onImageSelect({ name: res[0].name, url: res[0].url });
       } catch {
-        toast.error('Sync to vault failed');
+        toast.error('Failed to Uploaded');
       } finally {
         setIsUploadingLocal(false);
       }

@@ -100,9 +100,9 @@ export default function MediaDashboard() {
     setProcessingId(id);
     try {
       await updateMedia({ id, status: newStatus }).unwrap();
-      toast.success(`Asset successfully ${newStatus === 'trash' ? 'trashed' : 'restored'}`);
+      toast.success(`Successfully ${newStatus === 'trash' ? 'Deleted' : 'Restored'}`);
     } catch {
-      toast.error('Pessimistic update failure: System sync interrupted');
+      toast.error(`Failed to ${newStatus === 'trash' ? 'Deleted' : 'Restored'}`);
     } finally {
       setProcessingId(null);
     }
@@ -122,7 +122,7 @@ export default function MediaDashboard() {
       await deleteMedia({ id }).unwrap();
       toast.success('Deleted successfully');
     } catch {
-      toast.error('System failure: Delete aborted');
+      toast.error('Failed to Delete');
     } finally {
       setProcessingId(null);
       setMediaToDelete(null);
@@ -132,7 +132,7 @@ export default function MediaDashboard() {
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const toastId = toast.loading('Encrypting and uploading...');
+    const toastId = toast.loading('uploading...');
     try {
       const options = { maxSizeMB: 1, maxWidthOrHeight: 1920, useWebWorker: true };
       const compressedFile = await imageCompression(file, options);
@@ -145,11 +145,11 @@ export default function MediaDashboard() {
       const data = await res.json();
       if (data.success) {
         await addMedia({ url: data.data.url, name: file.name, contentType: 'image', status: 'active', uploaderPlace: 'imageBB' }).unwrap();
-        toast.update(toastId, { render: 'Asset integrated', type: 'success', isLoading: false, autoClose: 2000 });
+        toast.update(toastId, { render: 'Successfully Uploaded', type: 'success', isLoading: false, autoClose: 2000 });
         setIsAddDialogOpen(false);
       }
     } catch {
-      toast.update(toastId, { render: 'Uplink failed', type: 'error', isLoading: false, autoClose: 2000 });
+      toast.update(toastId, { render: 'Failed to upload', type: 'error', isLoading: false, autoClose: 2000 });
     }
   };
 
@@ -417,9 +417,9 @@ export default function MediaDashboard() {
                 setCurrentPage(prev => Math.max(1, prev - 1));
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className="h-12 px-6 rounded-sm bg-white/5 border-white/10 text-white"
+              className="h-12 px-6 rounded-sm bg-white/5 text-white border border-white/50"
             >
-              <ChevronLeft size={20} className="mr-2" />
+              <ChevronLeft size={20} className="" />
               Prev
             </Button>
 
@@ -435,7 +435,7 @@ export default function MediaDashboard() {
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
                     className={`min-w-[48px] h-10 rounded-sm text-xs font-black transition-all duration-500 ${
-                      isCurrent ? 'bg-white/20 text-white shadow-lg border border-white/40' : 'text-gray-500 hover:bg-white/10 hover:text-white'
+                      isCurrent ? 'bg-white/20 text-white shadow-lg border border-white/40' : 'text-gray-300 hover:bg-white/40 hover:text-white'
                     }`}
                   >
                     {pageNum.toString().padStart(2, '0')}
@@ -451,10 +451,10 @@ export default function MediaDashboard() {
                 setCurrentPage(prev => Math.min(totalPages, prev + 1));
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className="h-12 px-6 rounded-sm bg-white/5 border-white/10 text-white"
+              className="h-12 px-6 rounded-sm bg-white/5 text-white border border-white/50"
             >
               Next
-              <ChevronRight size={20} className="ml-2" />
+              <ChevronRight size={20} className="" />
             </Button>
           </nav>
         )}
@@ -488,7 +488,7 @@ export default function MediaDashboard() {
                     if (res?.[0]) {
                       addMedia({ url: res[0].url, name: res[0].name, contentType: 'image' as MediaType, status: 'active' }).unwrap();
                       setIsAddDialogOpen(false);
-                      toast.success(`Image Successfully Uploaded`);
+                      toast.success(`Successfully Uploaded`);
                     }
                   }}
                   appearance={{
@@ -510,7 +510,7 @@ export default function MediaDashboard() {
                       if (res?.[0]) {
                         addMedia({ url: res[0].url, name: res[0].name, contentType: type as MediaType, status: 'active' }).unwrap();
                         setIsAddDialogOpen(false);
-                        toast.success(`Encrypted ${type.toUpperCase()} Synchronized`);
+                        toast.success(`Successfully Uploaded`);
                       }
                     }}
                     appearance={{

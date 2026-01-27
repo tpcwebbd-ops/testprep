@@ -39,7 +39,7 @@ const InternalAudioVault = ({ onAudioSelect, selectedUrl }: InternalAudioVaultPr
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const ITEMS_PER_PAGE = 8;
+  const ITEMS_PER_PAGE = 9;
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -80,10 +80,10 @@ const InternalAudioVault = ({ onAudioSelect, selectedUrl }: InternalAudioVaultPr
           contentType: 'audio',
           status: 'active',
         }).unwrap();
-        toast.success('Audio asset synchronized');
+        toast.success('Successfully Uploaded');
         onAudioSelect({ name: res[0].name, url: res[0].url });
       } catch {
-        toast.error('Sync to vault failed');
+        toast.error('Failed to Uploaded');
       } finally {
         setIsUploadingLocal(false);
       }
