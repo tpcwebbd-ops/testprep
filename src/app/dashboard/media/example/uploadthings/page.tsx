@@ -46,11 +46,11 @@ export default function AssetManagementPage() {
   const [singlePdf, setSinglePdf] = useState<{ url: string; name: string }>({ url: '', name: '' });
   const [multiplePdfs, setMultiplePdfs] = useState<{ url: string; name: string }[]>([]);
 
-  const [singleDocx, setSingleDocx] = useState<string>('');
-  const [multipleDocxs, setMultipleDocxs] = useState<string[]>([]);
+  const [singleDocx, setSingleDocx] = useState<{ url: string; name: string }>({ url: '', name: '' });
+  const [multipleDocxs, setMultipleDocxs] = useState<{ url: string; name: string }[]>([]);
 
-  const [singleAudio, setSingleAudio] = useState<string>('');
-  const [multipleAudios, setMultipleAudios] = useState<string[]>([]);
+  const [singleAudio, setSingleAudio] = useState<{ url: string; name: string }>({ url: '', name: '' });
+  const [multipleAudios, setMultipleAudios] = useState<{ url: string; name: string }[]>([]);
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-transparent">

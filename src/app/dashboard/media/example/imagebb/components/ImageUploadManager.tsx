@@ -39,7 +39,7 @@ const InternalImageVault = ({ onImageToggle, selectedImages }: InternalImageDial
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const ITEMS_PER_PAGE = 10;
+  const ITEMS_PER_PAGE = 9;
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -398,9 +398,9 @@ export default function ImageUploadManager({
                     </motion.div>
                   ))}
                 </div>
-                <div className="text-center space-y-1">
-                  <p className="text-[11px] font-black uppercase tracking-[0.2em] text-white/90">No Assets Selected</p>
-                  <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/40">Click Select to populate grid</p>
+                <div className="text-center space-y-2">
+                  <p className="text-[11px] font-black uppercase tracking-[0.2em] text-white/90 group-hover:text-white transition-colors">No Images Selected</p>
+                  <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/70">Click here to Select one</p>
                 </div>
               </div>
             )}

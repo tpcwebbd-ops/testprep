@@ -39,7 +39,7 @@ const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageDialo
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const ITEMS_PER_PAGE = 10;
+  const ITEMS_PER_PAGE = 9;
 
   useEffect(() => {
     const timer = setTimeout(() => {

@@ -1,29 +1,15 @@
 'use client';
 
-import React, { useMemo, useState, useEffect, useRef } from 'react';
-import {
-  X,
-  UploadCloud,
-  Loader2,
-  Ghost,
-  RefreshCcw,
-  Search,
-  CheckCircle2,
-  Zap,
-  Volume2,
-  Play,
-  Pause,
-  Music,
-  ChevronLeft,
-  ChevronRight,
-  Headphones,
-} from 'lucide-react';
+import React, { useMemo, useState, useEffect } from 'react';
+import { X, Loader2, Ghost, RefreshCcw, Search, CheckCircle2, Zap, FileText, Files, ChevronLeft, ChevronRight, FilePlus, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
+import { FaFileAudio } from 'react-icons/fa';
 
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { UploadButton } from '@/lib/uploadthing';
 
 import { useGetMediasQuery, useAddMediaMutation } from '@/redux/features/media/mediaSlice';
 
@@ -44,13 +30,15 @@ interface MediaResponse {
   limit: number;
 }
 
-const InternalAudioVault = ({ onAudioSelect, selectedAudio }: { onAudioSelect: (url: string) => void; selectedAudio: string }) => {
+interface InternalAudioVaultProps {
+  onAudioSelect: (val: { name: string; url: string }) => void;
+  selectedUrl: string;
+}
+
+const InternalAudioVault = ({ onAudioSelect, selectedUrl }: InternalAudioVaultProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [playingUrl, setPlayingUrl] = useState<string | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const ITEMS_PER_PAGE = 8;
 
   useEffect(() => {
@@ -73,182 +61,196 @@ const InternalAudioVault = ({ onAudioSelect, selectedAudio }: { onAudioSelect: (
     status: 'active',
   }) as { data: MediaResponse | undefined; isLoading: boolean; isFetching: boolean };
 
-  const [addMedia, { isLoading: isAdding }] = useAddMediaMutation();
+  const [addMedia] = useAddMediaMutation();
   const [isUploadingLocal, setIsUploadingLocal] = useState(false);
 
   const availableAudios = useMemo(() => response?.data || [], [response]);
-  const totalPages = useMemo(() => (response?.total ? Math.ceil(response.total / ITEMS_PER_PAGE) : 1), [response]);
 
-  const togglePlay = (url: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (playingUrl === url) {
-      audioRef.current?.pause();
-      setPlayingUrl(null);
-    } else {
-      setPlayingUrl(url);
-      if (audioRef.current) {
-        audioRef.current.src = url;
-        audioRef.current.play();
-      }
-    }
-  };
+  const totalPages = useMemo(() => {
+    if (!response?.total || !response?.limit) return 1;
+    return Math.ceil(response.total / response.limit);
+  }, [response]);
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !file.type.startsWith('audio/')) {
-      toast.error('VALID AUDIO FILE REQUIRED');
-      return;
-    }
-    setIsUploadingLocal(true);
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('upload_preset', 'ml_default');
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/upload`, {
-        method: 'POST',
-        body: formData,
-      });
-      const data = await res.json();
-      if (data.secure_url) {
-        await addMedia({ url: data.secure_url, name: file.name, contentType: 'audio', status: 'active' }).unwrap();
-        toast.success('SONIC ASSET ARCHIVED');
-        onAudioSelect(data.secure_url);
+  const handleUploadComplete = async (res: { url: string; name: string }[]) => {
+    if (res && res[0]) {
+      try {
+        await addMedia({
+          url: res[0].url,
+          name: res[0].name || 'AUDIO_Source',
+          contentType: 'audio',
+          status: 'active',
+        }).unwrap();
+        toast.success('Audio asset synchronized');
+        onAudioSelect({ name: res[0].name, url: res[0].url });
+      } catch {
+        toast.error('Sync to vault failed');
+      } finally {
+        setIsUploadingLocal(false);
       }
-    } catch {
-      toast.error('UPLINK FAILURE');
-    } finally {
-      setIsUploadingLocal(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
   return (
-    <div className="flex flex-col h-[85vh] md:h-[75vh] backdrop-blur-[150px] rounded-2xl overflow-hidden border border-white/10 bg-black/60 shadow-2xl">
-      <audio ref={audioRef} onEnded={() => setPlayingUrl(null)} className="hidden" />
-      <DialogHeader className="p-6 border-b border-white/5 bg-white/5 text-white">
+    <div className="flex flex-col h-[90vh] md:h-[80vh] backdrop-blur-3xl rounded-sm overflow-hidden shadow-2xl">
+      <DialogHeader className="p-6 border-b border-white/50 bg-white/2">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="relative flex-1 max-w-md">
             <Search
-              className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${isRefetching ? 'text-indigo-500 animate-pulse' : 'text-white/20'}`}
+              className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${
+                isRefetching ? 'text-indigo-500 animate-pulse' : 'text-white/20'
+              }`}
             />
             <input
               type="text"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              placeholder="SCAN FREQUENCY TITLES..."
-              className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-[11px] font-black uppercase tracking-[0.2em] text-white focus:outline-none focus:border-indigo-500/50 transition-all placeholder:text-white/20"
+              placeholder="SEARCH AUDIO VAULT..."
+              className="w-full bg-white/5 border border-white/10 rounded-sm py-3 pl-12 pr-4 text-[11px] font-black uppercase tracking-[0.2em] text-white focus:outline-none focus:border-indigo-500/50 transition-all placeholder:text-white/20"
             />
+          </div>
+          <div className="hidden">
+            <DialogTitle> </DialogTitle>
+            <DialogDescription> </DialogDescription>
           </div>
         </div>
       </DialogHeader>
 
-      <ScrollArea className="flex-1 p-8">
-        {isFetching ? (
-          <div className="flex flex-col items-center justify-center py-32 gap-6">
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-              className="w-16 h-16 border-2 border-indigo-500/20 border-t-indigo-500 rounded-full flex items-center justify-center"
-            >
-              <Zap className="w-6 h-6 text-indigo-500/40" />
-            </motion.div>
-            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20">Syncing Sonic Grid...</span>
-          </div>
-        ) : availableAudios.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <AnimatePresence mode="popLayout">
-              {availableAudios.map((item, idx) => {
-                const isSelected = selectedAudio === item.url;
-                const isPlaying = playingUrl === item.url;
-                return (
-                  <motion.div
-                    key={item._id}
-                    layout
-                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    transition={{ delay: idx * 0.03 }}
-                    onClick={() => onAudioSelect(item.url)}
-                    className={`relative aspect-square rounded-2xl overflow-hidden border-2 cursor-pointer transition-all duration-500 group bg-white/[0.02] flex flex-col items-center justify-center p-6
-                      ${isSelected ? 'border-indigo-500 scale-95 shadow-[0_0_40px_rgba(99,102,241,0.2)]' : 'border-white/5 hover:border-white/20 hover:scale-105 shadow-xl'}
-                    `}
-                  >
-                    <div className="relative">
-                      <Music
-                        className={`w-12 h-12 transition-all duration-500 ${isSelected ? 'text-indigo-400' : 'text-white/10 group-hover:text-white/30'}`}
-                      />
-                      {isPlaying && (
-                        <motion.div
-                          animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }}
-                          transition={{ repeat: Infinity, duration: 1 }}
-                          className="absolute -inset-2 border border-indigo-500/50 rounded-full"
-                        />
-                      )}
-                    </div>
-                    <p className="mt-4 text-[9px] font-black text-white/60 uppercase tracking-widest truncate max-w-full text-center px-2">{item.name}</p>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="absolute top-3 right-3 rounded-full bg-white/5 hover:bg-white/10 text-white transition-all"
-                      onClick={e => togglePlay(item.url, e)}
+      <div className="flex-1 relative overflow-hidden">
+        <ScrollArea className="h-full w-full p-8">
+          {isFetching ? (
+            <div className="flex flex-col items-center justify-center py-40 gap-6">
+              <div className="relative">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+                  className="w-20 h-20 border-2 border-indigo-500/20 border-t-indigo-500 rounded-full"
+                />
+                <Zap className="absolute inset-0 m-auto w-8 h-8 text-indigo-500 animate-pulse" />
+              </div>
+              <span className="text-[10px] font-black uppercase tracking-[0.5em] text-indigo-500/60">Initializing Archive...</span>
+            </div>
+          ) : availableAudios.length > 0 ? (
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
+              <AnimatePresence mode="popLayout">
+                {availableAudios.map((item, idx) => {
+                  const isSelected = selectedUrl === item.url;
+                  return (
+                    <motion.div
+                      key={item._id}
+                      layout
+                      initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      transition={{ delay: idx * 0.03, type: 'spring', stiffness: 260, damping: 20 }}
+                      onClick={() => onAudioSelect({ name: item.name, url: item.url })}
+                      className="group flex flex-col gap-3"
                     >
-                      {isPlaying ? <Pause className="w-4 h-4 fill-white" /> : <Play className="w-4 h-4 fill-white" />}
-                    </Button>
-                    {isSelected && (
-                      <div className="absolute inset-0 bg-indigo-500/10 flex items-center justify-center backdrop-blur-[2px]">
-                        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="bg-indigo-500 text-white rounded-full p-2.5">
-                          <CheckCircle2 className="w-6 h-6" />
-                        </motion.div>
-                      </div>
-                    )}
-                  </motion.div>
-                );
-              })}
-            </AnimatePresence>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-32 opacity-20 space-y-6">
-            <Ghost className="w-20 h-20 animate-bounce" />
-            <h3 className="text-xl font-black uppercase tracking-[0.4em]">Silence Detected</h3>
-          </div>
-        )}
-      </ScrollArea>
+                      <div
+                        className={`relative aspect-[3/4] rounded-sm overflow-hidden border cursor-pointer transition-all duration-500 
+                        ${isSelected ? 'border-indigo-500 ring-2 ring-indigo-500/50 ring-offset-2 ring-offset-black' : 'border-white/10 hover:border-white/30'}
+                      `}
+                      >
+                        <div className="absolute inset-0 bg-white/5 flex items-center justify-center">
+                          <FaFileAudio className="w-12 h-12 text-white/50 group-hover:text-white/20 transition-all duration-500 group-hover:scale-110" />
+                        </div>
 
-      <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-6 border-t border-white/5 bg-white/5">
+                        {isSelected && (
+                          <div className="absolute inset-0 bg-indigo-500/20 flex items-center justify-center backdrop-blur-[2px]">
+                            <motion.div
+                              initial={{ scale: 0, rotate: -45 }}
+                              animate={{ scale: 1, rotate: 0 }}
+                              className="bg-indigo-500 text-white rounded-sm p-3 shadow-2xl"
+                            >
+                              <CheckCircle2 className="w-6 h-6" />
+                            </motion.div>
+                          </div>
+                        )}
+                      </div>
+                      <div className="-mt-1 flex items-center justify-start gap-2">
+                        <FileText className={`w-3.5 h-3.5 ${isSelected ? 'text-indigo-400' : 'text-white/40'}`} />
+                        <h3
+                          className={`text-[10px] font-black uppercase tracking-widest transition-colors duration-300 truncate w-full
+                            ${isSelected ? 'text-indigo-400' : 'text-white/50 group-hover:text-white'}
+                          `}
+                        >
+                          {item.name || 'Untitled Audio'}
+                        </h3>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-20 opacity-30 space-y-6">
+              <Ghost className="w-24 h-24 animate-bounce" />
+              <div className="text-center">
+                <h3 className="text-2xl font-black uppercase text-white">No Assets Found</h3>
+                <p className="text-[10px] font-bold uppercase mt-3 text-white/60 tracking-widest">Awaiting new audio uploads</p>
+              </div>
+            </div>
+          )}
+        </ScrollArea>
+      </div>
+
+      <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-6 border-t border-white/10 bg-white/5">
         <div className="flex items-center gap-3">
           <Button
             variant="outlineGlassy"
             size="sm"
-            className="w-10 h-10 p-0"
+            className="min-w-1 border-white/20 hover:bg-white/10"
             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
             disabled={currentPage === 1 || isFetching}
           >
             <ChevronLeft className="w-5 h-5 text-white" />
           </Button>
-          <div className="flex items-center gap-3 px-5 h-10 rounded-xl bg-white/5 border border-white/10 text-[11px] font-black">
-            <span className="text-white">{currentPage}</span>
-            <span className="text-white/20">/</span>
-            <span className="text-white/60">{totalPages}</span>
+
+          <div className="flex items-center gap-3 px-5 h-9 rounded-sm bg-white/5 border border-white/10">
+            <span className="text-[11px] font-black text-white">{currentPage}</span>
+            <span className="text-[10px] font-black text-white/20">/</span>
+            <span className="text-[11px] font-black text-white/60">{totalPages}</span>
           </div>
+
           <Button
             variant="outlineGlassy"
             size="sm"
-            className="w-10 h-10 p-0"
+            className="min-w-1 border-white/20 hover:bg-white/10"
             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages || isFetching}
           >
             <ChevronRight className="w-5 h-5 text-white" />
           </Button>
+
+          <div className="hidden sm:block ml-4">
+            <p className="text-sm text-white/60">Total : {response?.total || 0}</p>
+          </div>
         </div>
+
         <div className="flex items-center gap-4 w-full md:w-auto">
-          <input type="file" ref={fileInputRef} accept="audio/*" className="hidden" onChange={handleUpload} />
-          <Button
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isUploadingLocal || isAdding}
-            className="w-full md:w-auto h-12 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black uppercase tracking-[0.2em] text-[10px] transition-all flex items-center justify-center gap-3 border-none shadow-2xl"
-          >
-            {isUploadingLocal || isAdding ? <Loader2 className="w-4 h-4 animate-spin" /> : <UploadCloud className="w-4 h-4" />}
-            {isUploadingLocal || isAdding ? 'ARCHIVING...' : 'IMPORT AUDIO'}
-          </Button>
+          <UploadButton
+            endpoint="audioUploader"
+            appearance={{
+              button: `bg-linear-to-r from-blue-500/20 to-purple-500/20 border border-white/30 text-white backdrop-blur-xl shadow-lg shadow-blue-500/20 hover:from-blue-500/30 hover:to-purple-500/30 hover:border-white/50 hover:shadow-xl hover:shadow-purple-500/30 hover:scale-[1.02] transition-all duration-300 h-8 rounded-md gap-1 max-w-[100px] text-sm`,
+              allowedContent: 'hidden',
+            }}
+            content={{
+              button({ ready }) {
+                if (isUploadingLocal) return <Loader2 className="w-4 h-4 animate-spin" />;
+                return (
+                  <div className="flex items-center gap-2">
+                    <Plus className="w-4 h-4" />
+                    <span>{ready ? 'Upload' : 'Connecting...'}</span>
+                  </div>
+                );
+              },
+            }}
+            onUploadBegin={() => setIsUploadingLocal(true)}
+            onClientUploadComplete={handleUploadComplete}
+            onUploadError={err => {
+              setIsUploadingLocal(false);
+              toast.error(err.message);
+            }}
+          />
         </div>
       </div>
     </div>
@@ -258,30 +260,26 @@ const InternalAudioVault = ({ onAudioSelect, selectedAudio }: { onAudioSelect: (
 export default function AudioUploadManagerSingle({
   value,
   onChange,
-  label = 'SONIC SOURCE',
+  label = 'AUDIO',
 }: {
-  value: string;
-  onChange: (val: string) => void;
+  value: { name: string; url: string };
+  onChange: (val: { name: string; url: string }) => void;
   label?: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="space-y-4 w-full">
+    <div className="space-y-4 w-full group/container">
       <div className="flex items-center justify-between px-1">
-        <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 flex items-center gap-2">
-          <Volume2 className="w-3.5 h-3.5" /> {label}
-        </h4>
+        <div className="flex items-center gap-2">
+          <Files className="w-3.5 h-3.5 text-indigo-50" />
+          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/90">{label}</label>
+        </div>
         <AnimatePresence>
-          {value && (
+          {value?.url && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onChange('')}
-                className="h-7 px-3 text-rose-400 border border-rose-500/30 font-black uppercase tracking-widest text-[9px] bg-rose-500/5 hover:bg-rose-500/10 rounded-lg"
-              >
-                <X className="w-3.5 h-3.5 mr-2" /> DISCARD
+              <Button variant="outlineFire" size="sm" onClick={() => onChange({ name: '', url: '' })}>
+                <X className="w-3.5 h-3.5" /> Remove
               </Button>
             </motion.div>
           )}
@@ -290,34 +288,56 @@ export default function AudioUploadManagerSingle({
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <div className="group relative w-full aspect-[21/9] rounded-2xl backdrop-blur-3xl transition-all duration-700 cursor-pointer overflow-hidden flex flex-col items-center justify-center border border-white/5 hover:border-indigo-500/30 bg-white/[0.02]">
-            {value ? (
-              <div className="flex flex-col items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Headphones className="w-6 h-6 text-indigo-400" />
+          <div className="group relative w-full aspect-video rounded-sm backdrop-blur-3xl transition-all duration-500 cursor-pointer overflow-hidden flex flex-col items-center justify-center border border-white/10 hover:border-indigo-500/40 bg-white/[0.02]">
+            {value?.url ? (
+              <div className="w-full h-full relative flex flex-col items-center justify-center bg-white/[0.03]">
+                <FaFileAudio className="w-24 h-24 text-white/50 group-hover:text-white/20 transition-all duration-500 group-hover:scale-110" />
+
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center backdrop-blur-sm">
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="flex items-center gap-3 px-8 py-4 rounded-sm bg-white/10 border border-white/20 text-[10px] font-black uppercase tracking-[0.3em] text-white"
+                  >
+                    <RefreshCcw className="w-4 h-4 animate-[spin_4s_linear_infinite]" />
+                    CHANGE ASSET
+                  </motion.div>
                 </div>
-                <p className="text-[9px] font-black uppercase tracking-widest text-white/50">Sonic Feed Locked</p>
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center backdrop-blur-sm">
-                  <div className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-white/10 border border-white/20 text-[10px] font-black uppercase tracking-widest text-white">
-                    <RefreshCcw className="w-4 h-4" /> REPLACE SOURCE
-                  </div>
+                <div className="absolute bottom-3 left-3 right-3 flex items-center gap-2 px-3 py-1.5 bg-black/60 backdrop-blur-xl border border-white/10 rounded-sm">
+                  <FileText className="w-3 h-3 text-indigo-400" />
+                  <span className="text-[10px] font-bold text-white tracking-wider truncate flex-1">{value.name || 'ACTIVE_AUDIO'}</span>
                 </div>
               </div>
             ) : (
-              <div className="flex flex-col items-center gap-4">
-                <Music className="w-10 h-10 text-white/10 group-hover:text-indigo-400 transition-all" />
-                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 group-hover:text-white/40">Select Audio Fragment</p>
+              <div className="flex flex-col items-center gap-6">
+                <motion.div
+                  animate={{
+                    y: [0, -10, 0],
+                    boxShadow: ['0 0 0px rgba(99,102,241,0)', '0 0 40px rgba(99,102,241,0.2)', '0 0 0px rgba(99,102,241,0)'],
+                  }}
+                  transition={{
+                    duration: 4,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                    delay: 1 * 0.5,
+                  }}
+                  className="w-16 h-16 rounded-sm bg-white/20 border border-white/10 flex items-center justify-center"
+                >
+                  <FilePlus className="w-8 h-8 text-white/50" />
+                </motion.div>
+                <div className="text-center space-y-2">
+                  <p className="text-[11px] font-black uppercase tracking-[0.2em] text-white/90 group-hover:text-white transition-colors">No audio Selected</p>
+                  <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/70">Click here to Select one</p>
+                </div>
               </div>
             )}
           </div>
         </DialogTrigger>
-        <DialogContent className="bg-transparent border-none p-0 shadow-none overflow-hidden max-w-5xl w-[95vw] text-white">
-          <DialogTitle className="hidden"></DialogTitle>
-          <DialogDescription className="hidden"></DialogDescription>
+        <DialogContent className="bg-transparent border border-white/50 p-0 shadow-none overflow-hidden max-w-5xl w-[95vw] text-white mt-8">
           <InternalAudioVault
-            selectedAudio={value}
-            onAudioSelect={url => {
-              onChange(url);
+            selectedUrl={value?.url}
+            onAudioSelect={val => {
+              onChange(val);
               setIsOpen(false);
             }}
           />

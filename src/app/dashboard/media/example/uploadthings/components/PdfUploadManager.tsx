@@ -323,7 +323,7 @@ export default function PdfUploadManager({
                   >
                     <div className="w-full flex gap-1 items-center justify-start">
                       <div className="text-white text-sm">{index + 1}. </div>
-                      <FaFilePdf className="w-24 h-24 text-white/50 group-hover:text-white/20 transition-all duration-500 group-hover:scale-110" />
+                      <FaFilePdf className="w-6 h-6 text-white/50 group-hover:text-white/20 transition-all duration-500 group-hover:scale-110" />
 
                       <span className="text-[10px] font-black text-white tracking-[0.2em] uppercase truncate w-full px-2">{item.name || 'PDF_DOC'}</span>
                       <div className="flex items-center justify-center gap-1 hover:underline">
