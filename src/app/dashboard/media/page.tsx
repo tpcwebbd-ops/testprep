@@ -27,6 +27,7 @@ import {
   ExternalLink,
   AlertTriangle,
   ArchiveRestore,
+  ListFilter,
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import Image from 'next/image';
@@ -63,6 +64,7 @@ export default function MediaDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isPreviewDialogOpen, setIsPreviewDialogOpen] = useState(false);
@@ -82,7 +84,7 @@ export default function MediaDashboard() {
     refetch,
   } = useGetMediasQuery({
     page: currentPage,
-    limit: 10,
+    limit: pageSize,
     q: debouncedSearch,
     contentType: activeTab,
     status: activeStatus,
@@ -94,7 +96,7 @@ export default function MediaDashboard() {
 
   const items = useMemo(() => response?.data || [], [response]);
   const totalItems = response?.total || 0;
-  const totalPages = Math.ceil(totalItems / 10);
+  const totalPages = Math.ceil(totalItems / pageSize);
 
   const handleUpdateStatus = async (id: string, newStatus: MediaStatus) => {
     setProcessingId(id);
@@ -153,10 +155,14 @@ export default function MediaDashboard() {
     }
   };
 
+  const handlePageSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setPageSize(Number(e.target.value));
+    setCurrentPage(1);
+  };
+
   return (
     <main className="min-h-screen p-2 bg-transparent text-white font-sans selection:bg-blue-500/30">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-7xl mx-auto space-y-6">
-        {/* HEADER SECTION */}
         <header className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-sm p-4 shadow-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-all hover:bg-white/15">
           <div className="space-y-1">
             <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-white via-white/80 to-white/30 bg-clip-text text-transparent italic tracking-tighter">
@@ -183,7 +189,6 @@ export default function MediaDashboard() {
           </div>
         </header>
 
-        {/* FILTER BAR SECTION */}
         <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-sm p-3 shadow-xl flex flex-col lg:flex-row items-center justify-between gap-4">
           <Tabs
             value={activeTab}
@@ -241,7 +246,6 @@ export default function MediaDashboard() {
           </div>
         </div>
 
-        {/* ASSET GRID SECTION */}
         <section className="min-h-[60vh] relative">
           <AnimatePresence mode="wait">
             {isLoading ? (
@@ -407,65 +411,83 @@ export default function MediaDashboard() {
           </AnimatePresence>
         </section>
 
-        {/* PAGINATION */}
         {totalPages > 1 && (
-          <nav className="flex items-center justify-center gap-4 py-16">
-            <Button
-              variant="outlineGlassy"
-              disabled={currentPage === 1}
-              onClick={() => {
-                setCurrentPage(prev => Math.max(1, prev - 1));
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-              className="h-12 px-6 rounded-sm bg-white/5 text-white border border-white/50"
-            >
-              <ChevronLeft size={20} className="" />
-              Prev
-            </Button>
-
-            <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-sm p-1.5 backdrop-blur-md">
-              {Array.from({ length: totalPages }).map((_, i) => {
-                const pageNum = i + 1;
-                const isCurrent = currentPage === pageNum;
-                return (
-                  <button
-                    key={pageNum}
-                    onClick={() => {
-                      setCurrentPage(pageNum);
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }}
-                    className={`min-w-[48px] h-10 rounded-sm text-xs font-black transition-all duration-500 ${
-                      isCurrent ? 'bg-white/20 text-white shadow-lg border border-white/40' : 'text-gray-300 hover:bg-white/40 hover:text-white'
-                    }`}
-                  >
-                    {pageNum.toString().padStart(2, '0')}
-                  </button>
-                );
-              })}
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 py-16 border-t border-white/5">
+            <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-sm p-1.5 backdrop-blur-md">
+              <div className="pl-3 pr-1 text-[10px] font-mono uppercase text-white/40 flex items-center gap-2">
+                <ListFilter size={14} />
+                View:
+              </div>
+              <select
+                value={pageSize}
+                onChange={handlePageSizeChange}
+                className="bg-transparent text-xs font-black text-white focus:outline-none cursor-pointer hover:text-blue-50 transition-colors py-1.5 px-2"
+              >
+                {[10, 20, 50, 100, 200].map(size => (
+                  <option key={size} value={size} className="bg-slate-900 text-white">
+                    {size} items
+                  </option>
+                ))}
+              </select>
             </div>
 
-            <Button
-              variant="outlineGlassy"
-              disabled={currentPage === totalPages}
-              onClick={() => {
-                setCurrentPage(prev => Math.min(totalPages, prev + 1));
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-              className="h-12 px-6 rounded-sm bg-white/5 text-white border border-white/50"
-            >
-              Next
-              <ChevronRight size={20} className="" />
-            </Button>
-          </nav>
+            <nav className="flex items-center gap-4">
+              <Button
+                variant="outlineGlassy"
+                disabled={currentPage === 1}
+                onClick={() => {
+                  setCurrentPage(prev => Math.max(1, prev - 1));
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="h-10 px-4 rounded-sm bg-white/5 text-white border border-white/50"
+              >
+                <ChevronLeft size={18} />
+                Prev
+              </Button>
+
+              <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-sm p-1 backdrop-blur-md">
+                {Array.from({ length: Math.min(totalPages, 5) }).map((_, i) => {
+                  const pageNum = i + 1;
+                  const isCurrent = currentPage === pageNum;
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => {
+                        setCurrentPage(pageNum);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className={`min-w-[40px] h-8 rounded-sm text-[10px] font-black transition-all duration-500 ${
+                        isCurrent ? 'bg-white/20 text-white shadow-lg border border-white/40' : 'text-gray-300 hover:bg-white/10 hover:text-white'
+                      }`}
+                    >
+                      {pageNum.toString().padStart(2, '0')}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <Button
+                variant="outlineGlassy"
+                disabled={currentPage === totalPages}
+                onClick={() => {
+                  setCurrentPage(prev => Math.min(totalPages, prev + 1));
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="h-10 px-4 rounded-sm bg-white/5 text-white border border-white/50"
+              >
+                Next
+                <ChevronRight size={18} />
+              </Button>
+            </nav>
+          </div>
         )}
       </motion.div>
 
-      {/* 1. ADD ASSET DIALOG */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="backdrop-blur-xl mt-8 bg-white/10 border border-white/20 shadow-2xl   max-w-xl p-0 overflow-hidden text-white">
+        <DialogContent className="backdrop-blur-xl mt-8 bg-white/10 border border-white/20 shadow-2xl max-w-xl p-0 overflow-hidden text-white">
           <DialogHeader className="p-4 pb-0 pl-6">
             <DialogTitle className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-white via-white/80 to-white/30 bg-clip-text text-transparent italic tracking-tighter">
-              Upload a new assect
+              Upload a new asset
             </DialogTitle>
             <DialogDescription className="hidden"></DialogDescription>
           </DialogHeader>
@@ -498,7 +520,7 @@ export default function MediaDashboard() {
                   }}
                 />
                 <div className="mt-3 text-center flex flex-col">
-                  <span className="text-[9px] font-mono text-gray-200/40= group-hover:text-white transition-colors">Image</span>
+                  <span className="text-[9px] font-mono text-gray-200/40 group-hover:text-white transition-colors">Image</span>
                   <small className="text-[8px] text-slate-50/50">Upload Things</small>
                 </div>
               </div>
@@ -529,9 +551,8 @@ export default function MediaDashboard() {
         </DialogContent>
       </Dialog>
 
-      {/* 2. DELETE DIALOG */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="backdrop-blur-xl mt-8 bg-white/10 border border-white/20 shadow-2xl   max-w-md p-0 overflow-hidden text-white">
+        <DialogContent className="backdrop-blur-xl mt-8 bg-white/10 border border-white/20 shadow-2xl max-w-md p-0 overflow-hidden text-white">
           <div className="p-10 flex flex-col items-center text-center gap-6">
             <div className="w-20 h-20 rounded-sm bg-rose-200 border border-white/20 flex items-center justify-center text-rose-500 animate-pulse">
               <AlertTriangle size={40} />
@@ -549,7 +570,7 @@ export default function MediaDashboard() {
               </DialogDescription>
             </div>
           </div>
-          <DialogFooter className="p-2  bg-white/5 border-t border-white/10 flex flex-row gap-3 items-center justify-end">
+          <DialogFooter className="p-2 bg-white/5 border-t border-white/10 flex flex-row gap-3 items-center justify-end">
             <Button onClick={() => setIsDeleteDialogOpen(false)} size="sm" variant="outlineGlassy">
               Abort
             </Button>
@@ -560,11 +581,9 @@ export default function MediaDashboard() {
         </DialogContent>
       </Dialog>
 
-      {/* 3. ASSET PREVIEW DIALOG */}
       <Dialog open={isPreviewDialogOpen} onOpenChange={setIsPreviewDialogOpen}>
         <DialogContent className="sm:max-w-[1000px] mt-8 backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl p-0 overflow-hidden text-white h-[80vh]">
           <DialogTitle className="sr-only">Object Stream Viewer</DialogTitle>
-
           <div className="relative bg-white/5 flex items-center justify-center">
             <ScrollArea className="w-full h-[60vh]">
               <div className="flex items-center justify-center min-h-[400px] w-full p-6 relative">
@@ -586,7 +605,6 @@ export default function MediaDashboard() {
               </div>
             </ScrollArea>
           </div>
-
           <div className="p-8 py-0 bg-white/5 backdrop-blur-2xl border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-6">
             <div className="min-w-0 flex-1 space-y-1">
               <h3 className="text-2xl font-bold bg-gradient-to-r from-white via-white/80 to-white/30 bg-clip-text text-transparent italic tracking-tighter uppercase">
@@ -594,7 +612,6 @@ export default function MediaDashboard() {
               </h3>
               <p className="text-[10px] text-gray-200/40 font-mono truncate max-w-[400px]">URI: {previewMedia?.url}</p>
             </div>
-
             <div className="flex gap-4">
               <Button asChild variant="glassyInfo">
                 <Link
