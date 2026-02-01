@@ -260,7 +260,7 @@ const ViewTableNextComponents: React.FC = () => {
                 {tableHeaders.map(header => (
                   <DropdownMenuCheckboxItem
                     key={header.key}
-                    className="capitalize"
+                    className="capitalize mb-1"
                     checked={columnVisibility[header.key]}
                     onCheckedChange={value =>
                       setColumnVisibility(prev => ({
@@ -340,24 +340,22 @@ const ViewTableNextComponents: React.FC = () => {
       {allData.length === 0 ? (
         <div className="py-12 text-center text-2xl text-slate-300">Ops! Nothing was found.</div>
       ) : (
-        <Table className="min-w-max border">
-          <>
-            <TableHeader>
-              <TableRow className="bg-blue-300/40 text-white font-bold">
-                <TableHead>
-                  <Checkbox onCheckedChange={checked => handleSelectAll(!!checked)} checked={bulkData.length === allData.length && allData.length > 0} />
+        <Table className=" border">
+          <TableHeader>
+            <TableRow className="bg-blue-300/40 text-white font-bold">
+              <TableHead>
+                <Checkbox onCheckedChange={checked => handleSelectAll(!!checked)} checked={bulkData.length === allData.length && allData.length > 0} />
+              </TableHead>
+              {visibleHeaders.map(({ key, label }) => (
+                <TableHead key={key} className="cursor-pointer bg-accent-100/60 text-slate-50 font-bold whitespace-nowrap" onClick={() => handleSort(key)}>
+                  {label}
+                  {sortConfig?.key === key && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                 </TableHead>
-                {visibleHeaders.map(({ key, label }) => (
-                  <TableHead key={key} className="cursor-pointer bg-accent-100/60 text-slate-50 font-bold whitespace-nowrap" onClick={() => handleSort(key)}>
-                    {label}
-                    {sortConfig?.key === key && (sortConfig.direction === 'asc' ? '↑' : '↓')}
-                  </TableHead>
-                ))}
-                <TableHead className="text-right bg-accent-100/60 text-slate-50 font-bold whitespace-nowrap">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>{renderTableRows()}</TableBody>
-          </>
+              ))}
+              <TableHead className="text-right bg-accent-100/60 text-slate-50 font-bold whitespace-nowrap">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>{renderTableRows()}</TableBody>
         </Table>
       )}
 
