@@ -1,9 +1,11 @@
-import React from 'react';
+'use client';
 
+import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { AlertTriangle, Trash2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-
 import { useAccessManagementsStore } from '../store/store';
 import { useBulkDeleteAccessManagementsMutation } from '@/redux/features/accessManagements/accessManagementsSlice';
 import { handleSuccess, handleError } from './utils';
@@ -16,7 +18,7 @@ const BulkDeleteNextComponents: React.FC = () => {
   const handleBulkDelete = async () => {
     if (!bulkData?.length) return;
     try {
-      const ids = bulkData.map(accessmanagements => accessmanagements._id);
+      const ids = bulkData.map(item => item._id);
       await bulkDeleteAccessManagements({ ids }).unwrap();
       toggleBulkDeleteModal(false);
       setBulkData([]);
@@ -29,32 +31,69 @@ const BulkDeleteNextComponents: React.FC = () => {
 
   return (
     <Dialog open={isBulkDeleteModalOpen} onOpenChange={toggleBulkDeleteModal}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Confirm Deletion</DialogTitle>
+      <DialogContent className="sm:max-w-md rounded-sm border border-white/20 bg-white/2 backdrop-blur-2xl shadow-2xl text-white overflow-hidden p-0">
+        <div className="absolute inset-0 pointer-events-none" />
+
+        <DialogHeader className="p-6 pb-2">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-full bg-red-500/20 border border-red-500/30">
+              <AlertTriangle className="w-5 h-5 text-red-400" />
+            </div>
+            <DialogTitle className="text-2xl font-bold text-white bg-clip-text bg-gradient-to-r from-white via-white to-red-200">Confirm Deletion</DialogTitle>
+          </div>
         </DialogHeader>
-        {bulkData?.length > 0 && (
-          <div className="pt-4">
-            <p>
-              You are about to delete <span className="font-semibold">({bulkData.length})</span> accessManagements.
-            </p>
-          </div>
-        )}
-        <ScrollArea className="h-[400px] w-full rounded-md border p-4">
-          <div className="flex flex-col">
-            {bulkData.map((accessmanagements, idx) => (
-              <span key={(accessmanagements._id as string) + idx} className="text-xs">
-                {idx + 1}. {(accessmanagements['user_name'] as string) || ''}
-              </span>
-            ))}
-          </div>
-        </ScrollArea>
-        <DialogFooter>
-          <Button className="cursor-pointer" variant="outline" onClick={() => toggleBulkDeleteModal(false)}>
+
+        <div className="px-6 space-y-4 relative z-10">
+          {bulkData?.length > 0 && (
+            <motion.p initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} className="text-white/70 text-sm leading-relaxed">
+              You are about to permanently delete&nbsp;
+              <span className="font-bold text-red-400 underline underline-offset-4 decoration-red-400/30">({bulkData.length})</span>
+              &nbsp;access management records. This action cannot be undone.
+            </motion.p>
+          )}
+
+          <ScrollArea className="h-[380px] w-full rounded-sm border border-white/10 bg-white/5 backdrop-blur-md shadow-inner">
+            <div className="flex flex-col gap-1">
+              <AnimatePresence mode="popLayout">
+                {bulkData.map((item, idx) => (
+                  <motion.div
+                    key={(item._id as string) + idx}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: idx * 0.03 }}
+                    className="group flex items-center gap-3 p-2 rounded-sm hover:bg-white/5 transition-colors border border-transparent hover:border-white/10"
+                  >
+                    <span className="flex-shrink-0 w-8 h-8 rounded-sm bg-white/10 flex items-center justify-center text-sm font-mono text-white/40 group-hover:text-white/80 transition-colors">
+                      {idx + 1}
+                    </span>
+                    <div className="w-full flex flex-col">
+                      <span className="text-xl font-medium text-white/90 truncate">{String(item['user_name'] || 'Unnamed User')}</span>
+                      <span className="text-sm font-medium text-white/70 truncate">{String(item['user_email'] || 'Unnamed Email')}</span>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          </ScrollArea>
+        </div>
+
+        <DialogFooter className="p-6 pt-4 gap-3 bg-white/5 border-t border-white/10 sm:justify-end">
+          <Button variant="outlineWater" size="sm" onClick={() => toggleBulkDeleteModal(false)}>
+            <X className="w-4 h-4 opacity-70" />
             Cancel
           </Button>
-          <Button disabled={isLoading} variant="destructive" onClick={handleBulkDelete}>
-            {isLoading ? 'Deleting...' : 'Delete Selected'}
+          <Button variant="outlineFire" size="sm" disabled={isLoading} onClick={handleBulkDelete}>
+            {isLoading ? (
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <span>Deleting...</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Trash2 className="w-4 h-4" />
+                <span>Delete Selected</span>
+              </div>
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>
