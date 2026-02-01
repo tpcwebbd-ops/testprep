@@ -31,7 +31,7 @@ const BulkDeleteNextComponents: React.FC = () => {
 
   return (
     <Dialog open={isBulkDeleteModalOpen} onOpenChange={toggleBulkDeleteModal}>
-      <DialogContent className="sm:max-w-md rounded-sm border border-white/20 bg-white/2 backdrop-blur-2xl shadow-2xl text-white overflow-hidden p-0">
+      <DialogContent className="sm:max-w-2xl rounded-sm border border-white/20 bg-white/2 backdrop-blur-2xl shadow-2xl text-white overflow-hidden p-0">
         <div className="absolute inset-0 pointer-events-none" />
 
         <DialogHeader className="p-6 pb-2">
@@ -52,7 +52,7 @@ const BulkDeleteNextComponents: React.FC = () => {
             </motion.p>
           )}
 
-          <ScrollArea className="h-[380px] w-full rounded-sm border border-white/10 bg-white/5 backdrop-blur-md shadow-inner">
+          <ScrollArea className="h-[380px] w-full rounded-sm border border-white/50 bg-white/5 backdrop-blur-md shadow-inner">
             <div className="flex flex-col gap-1">
               <AnimatePresence mode="popLayout">
                 {bulkData.map((item, idx) => (
@@ -61,13 +61,13 @@ const BulkDeleteNextComponents: React.FC = () => {
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: idx * 0.03 }}
-                    className="group flex items-center gap-3 p-2 rounded-sm hover:bg-white/5 transition-colors border border-transparent hover:border-white/10"
+                    className="group flex items-center gap-3 p-2 rounded-sm hover:bg-white/5 transition-colors border border-transparent hover:border-white/10 border-b border-b-white/50"
                   >
                     <span className="flex-shrink-0 w-8 h-8 rounded-sm bg-white/10 flex items-center justify-center text-sm font-mono text-white/40 group-hover:text-white/80 transition-colors">
                       {idx + 1}
                     </span>
                     <div className="w-full flex flex-col">
-                      <span className="text-xl font-medium text-white/90 truncate">{String(item['user_name'] || 'Unnamed User')}</span>
+                      <span className="text-lg font-medium text-white/90 truncate">{String(item['user_name'] || 'Unnamed User')}</span>
                       <span className="text-sm font-medium text-white/70 truncate">{String(item['user_email'] || 'Unnamed Email')}</span>
                     </div>
                   </motion.div>

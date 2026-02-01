@@ -54,12 +54,12 @@ const ViewNextComponents: React.FC = () => {
 
   return (
     <Dialog open={isViewModalOpen} onOpenChange={toggleViewModal}>
-      <DialogContent className="sm:max-w-[625px] bg-white/10 backdrop-blur-xl border border-white/20 text-white shadow-lg rounded-2xl">
+      <DialogContent className="sm:max-w-[625px] bg-white/10 backdrop-blur-xl border border-white/20 text-white shadow-lg rounded-sm mt-8">
         <DialogHeader className="border-b border-white/10 pb-3">
           <DialogTitle className="text-lg font-semibold tracking-wide text-white/90">AccessManagements Details</DialogTitle>
         </DialogHeader>
         {selectedAccessManagements && (
-          <ScrollArea className="h-[500px] w-full rounded-md border border-white/10 p-4 bg-white/5 backdrop-blur-md shadow-inner">
+          <ScrollArea className="h-[500px] w-full rounded-sm border border-white/10 p-4 bg-white/5 backdrop-blur-md shadow-inner">
             <div className="grid gap-1">
               <DetailRow label="User_name" value={selectedAccessManagements['user_name']} />
               <DetailRow label="User_email" value={selectedAccessManagements['user_email']} />
@@ -73,6 +73,7 @@ const ViewNextComponents: React.FC = () => {
         <DialogFooter className="border-t border-white/10 pt-3">
           <Button
             variant="outlineDefault"
+            size="sm"
             onClick={() => {
               toggleViewModal(false);
               setSelectedAccessManagements(defaultAccessManagements as IAccessManagements);

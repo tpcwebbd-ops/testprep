@@ -37,23 +37,22 @@ const DeleteNextComponents: React.FC = () => {
 
   return (
     <Dialog open={isDeleteModalOpen} onOpenChange={toggleDeleteModal}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-md rounded-sm border border-white/50 bg-white/10 backdrop-blur-2xl shadow-xl text-white">
         <DialogHeader>
-          <DialogTitle>Confirm Deletion</DialogTitle>
+          <DialogTitle className="bg-clip-text text-transparent bg-linear-to-r from-white to-red-200">Confirm Deletion</DialogTitle>
         </DialogHeader>
-        {selectedAccessManagements && (
-          <div className="py-4">
-            <p>
-              You are about to delete this accessmanagement: <span className="font-semibold">{displayName}</span>
-            </p>
-          </div>
-        )}
-        <DialogFooter>
-          <Button className="cursor-pointer" variant="outline" onClick={handleCancel}>
+
+        <p className="text-white/80 py-3">
+          Are you sure you want to delete:&nbsp;
+          <strong className="text-white">{displayName}</strong> ?
+        </p>
+
+        <DialogFooter className="gap-2">
+          <Button variant="outlineWater" size="sm" onClick={handleCancel}>
             Cancel
           </Button>
-          <Button disabled={isLoading} variant="destructive" onClick={handleDelete}>
-            {isLoading ? 'Deleting...' : 'Delete'}
+          <Button variant="outlineFire" size="sm" disabled={isLoading} onClick={handleDelete}>
+            {isLoading ? 'Deleting…' : 'Delete'}
           </Button>
         </DialogFooter>
       </DialogContent>

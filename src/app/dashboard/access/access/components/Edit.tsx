@@ -96,12 +96,12 @@ const EditNextComponents: React.FC = () => {
 
   return (
     <Dialog open={isEditModalOpen} onOpenChange={toggleEditModal}>
-      <DialogContent className={cn('sm:max-w-[625px] bg-white/10 backdrop-blur-xl border border-white/20 text-white shadow-lg rounded-2xl')}>
+      <DialogContent className={cn('sm:max-w-[625px] bg-white/10 backdrop-blur-xl border border-white/20 text-white shadow-lg rounded-sm mt-8')}>
         <DialogHeader className="border-b border-white/10 pb-3">
           <DialogTitle className="text-lg font-semibold tracking-wide text-white/90">Edit Access Management</DialogTitle>
         </DialogHeader>
 
-        <ScrollArea className="h-[500px] w-full rounded-md border border-white/10 p-4 bg-white/5 backdrop-blur-md shadow-inner">
+        <ScrollArea className="h-[500px] w-full rounded-sm border border-white/10 p-4 bg-white/5 backdrop-blur-md shadow-inner">
           <div className="grid gap-6 py-4">
             {/* User Name */}
             <div>
@@ -134,7 +134,7 @@ const EditNextComponents: React.FC = () => {
                 Assign Role
               </Label>
 
-              <div className="rounded-2xl border border-white/10 bg-white/10 backdrop-blur-lg p-4 space-y-2 shadow-md">
+              <div className="rounded-sm border border-white/10 bg-white/10 backdrop-blur-lg p-4 space-y-2 shadow-md">
                 {loadingRoles ? (
                   <p className="text-sm text-white/60 text-center">Loading roles...</p>
                 ) : roles.length === 0 ? (
@@ -146,7 +146,7 @@ const EditNextComponents: React.FC = () => {
                       <div
                         key={role.id}
                         className={cn(
-                          'flex items-center justify-between p-3 rounded-xl transition-all duration-200 border border-transparent cursor-pointer',
+                          'flex items-center justify-between p-3 rounded-sm transition-all duration-200 border border-transparent cursor-pointer',
                           selected ? 'bg-green-500/20 border-green-400/40 shadow-inner' : 'hover:bg-white/10 hover:border-white/20',
                         )}
                         onClick={() => toggleRoleSelection(role.name)}
@@ -186,6 +186,7 @@ const EditNextComponents: React.FC = () => {
         <DialogFooter className="border-t border-white/10 pt-3">
           <Button
             variant="outlineDefault"
+            size="sm"
             onClick={() => {
               toggleEditModal(false);
               setSelectedAccessManagements(null);
@@ -193,7 +194,7 @@ const EditNextComponents: React.FC = () => {
           >
             Cancel
           </Button>
-          <Button disabled={isLoading} onClick={handleEditAccessManagement} variant="outlineWater">
+          <Button disabled={isLoading} onClick={handleEditAccessManagement} variant="outlineWater" size="sm">
             {isLoading ? 'Saving...' : 'Save Changes'}
           </Button>
         </DialogFooter>
