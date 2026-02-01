@@ -2,9 +2,10 @@ import { withDB } from '@/app/api/utils/db';
 import Account from '../model';
 
 import { formatResponse, IResponse } from '@/app/api/utils/utils';
+import { logger } from 'better-auth';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function getAccountSummary(req: Request): Promise<IResponse> {
+  logger.info(JSON.stringify(req));
   return withDB(async () => {
     const now = new Date();
     const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);

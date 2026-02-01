@@ -2,8 +2,10 @@ import { withDB } from '@/app/api/utils/db';
 import Verification from '../model';
 
 import { formatResponse, IResponse } from '@/app/api/utils/utils';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { logger } from 'better-auth';
+
 export async function getVerificationSummary(req: Request): Promise<IResponse> {
+  logger.info(JSON.stringify(req));
   return withDB(async () => {
     const now = new Date();
     const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);

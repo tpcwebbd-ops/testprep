@@ -19,7 +19,6 @@ import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
 
-
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
@@ -67,7 +66,7 @@ const FilterDialog: React.FC<FilterDialogProps> = ({ isOpen, onOpenChange, onApp
       }
       setTempDateRange(dateRange);
     }
-  }, [initialFilter, isOpen,dateRange]);
+  }, [initialFilter, isOpen, dateRange]);
 
   useEffect(() => {
     if (isCalendarOpen) {

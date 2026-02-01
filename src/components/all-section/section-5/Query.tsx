@@ -15,7 +15,7 @@ const QuerySection5 = ({ data }: Section5Props) => {
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#10b98120_1px,transparent_1px),linear-gradient(to_bottom,#10b98120_1px,transparent_1px)] bg-[size:4rem_4rem]" />
 
       <div className="relative p-8 lg:p-12">
-        <div className="grid   gap-8 items-center">
+        <div className="grid lg:grid-cols-5 gap-8 items-center">
           <div className="lg:col-span-3 space-y-6">
             <div className="space-y-3">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/30">

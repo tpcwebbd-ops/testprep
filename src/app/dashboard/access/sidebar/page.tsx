@@ -34,6 +34,7 @@ import {
 // --- Updated Import ---
 import { iconMap, iconOptions } from '@/components/all-icons/all-icons-jsx';
 import { DragState, SidebarItem, SortableItemProps } from './utils';
+import { logger } from 'better-auth';
 
 function SortableItem({
   item,
@@ -445,8 +446,8 @@ export default function SiteMenuPage() {
       if (parentItem) {
         const updatedChildren = (parentItem.children ?? [])
           .filter(child => child.sl_no !== deleteItem.sl_no)
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           .map(({ icon, ...rest }) => {
+            logger.info(JSON.stringify(icon));
             return rest;
           });
         await updateSidebar({
@@ -495,8 +496,8 @@ export default function SiteMenuPage() {
             }
             return child;
           })
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           .map(({ icon, ...rest }) => {
+            logger.info(JSON.stringify(icon));
             return rest;
           });
 
@@ -587,15 +588,14 @@ export default function SiteMenuPage() {
   const handleSubmit = async () => {
     try {
       const updates = menuItems.map(item => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { icon, ...itemWithoutIcon } = item;
-
+        logger.info(JSON.stringify(icon));
         return {
           id: item._id,
           updateData: {
             ...itemWithoutIcon,
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             children: item.children?.map(({ icon: childIcon, ...child }) => {
+              logger.info(JSON.stringify(childIcon));
               return child;
             }),
           },
@@ -605,8 +605,8 @@ export default function SiteMenuPage() {
       await bulkUpdateSidebars(updates).unwrap();
       toast.success('Menu data saved successfully!', { toastId: `submit-${Date.now()}` });
       refetch();
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
+      logger.error(JSON.stringify(error));
       toast.error('Failed to save menu data', { toastId: `error-submit-${Date.now()}` });
     }
   };

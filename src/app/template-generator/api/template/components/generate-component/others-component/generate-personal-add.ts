@@ -28,13 +28,11 @@ export const generatePersonalAddComponentFile = (inputJsonFile: string): string 
   // Determine Names based on isPersonal flag
   const componentName = isPersonal ? `PersonalAddNextComponents` : `AddNextComponents`;
   const dialogTitle = isPersonal ? `Add New Personal ${singularPascalCase}` : `Add New ${singularPascalCase}`;
-  
+
   // Determine Redux Hook and Path
   // Standard: useAddPostsMutation from .../postsSlice
   // Personal: useAddPersonalPostMutation from .../personalPostsSlice
-  const reduxMutationHook = isPersonal 
-    ? `useAddPersonal${singularPascalCase}Mutation` 
-    : `useAdd${pluralPascalCase}Mutation`;
+  const reduxMutationHook = isPersonal ? `useAddPersonal${singularPascalCase}Mutation` : `useAdd${pluralPascalCase}Mutation`;
 
   const reduxPath = isPersonal
     ? `@/redux/features/${pluralLowerCase}/personal${pluralPascalCase}Slice`
@@ -70,12 +68,12 @@ ${optionsArray.map(opt => `        { label: '${opt.label}', value: '${opt.value}
 
   const generateFormFieldJsx = (key: string, type: string): string => {
     const label = key.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-    let [typeName, optionsString] = ["", ""];
-     [typeName, optionsString] = type.split('#');
-    
+    let [typeName, optionsString] = ['', ''];
+    [typeName, optionsString] = type.split('#');
+
     // Treat EMAIL#readonly as a distinct type for switch case
     if (type === 'EMAIL#readonly') {
-        typeName = 'EMAIL#readonly';
+      typeName = 'EMAIL#readonly';
     }
 
     const formFieldWrapper = (label: string, componentJsx: string, alignTop: boolean = false): string => `
@@ -165,7 +163,7 @@ ${optionsArray.map(opt => `        { label: '${opt.label}', value: '${opt.value}
         break;
       }
       case 'DYNAMICSELECT':
-        isTallComponent = true; 
+        isTallComponent = true;
         componentJsx = `<DynamicSelectField value={new${singularPascalCase}['${key}']} apiUrl='https://jsonplaceholder.typicode.com/users' onChange={(values) => handleFieldChange('${key}', values)} />`;
         break;
       case 'IMAGE':
@@ -223,8 +221,8 @@ ${optionsArray.map(opt => `        { label: '${opt.label}', value: '${opt.value}
 import ColorPickerField from '@/components/dashboard-ui/ColorPickerField'
 import DateRangePickerField from '@/components/dashboard-ui/DateRangePickerField'
 import DynamicSelectField from '@/components/dashboard-ui/DynamicSelectField'
-import ImageUploadManagerSingle from '@/components/dashboard-ui/ImageUploadManagerSingle'
-import ImageUploadManager from '@/components/dashboard-ui/ImageUploadManager'
+import ImageUploadManagerSingle from '@/components/dashboard-ui/imageBB/ImageUploadManagerSingle'
+import ImageUploadManager from '@/components/dashboard-ui/imageBB/ImageUploadManager'
 import InputFieldForEmail from '@/components/dashboard-ui/InputFieldForEmail'
 import InputFieldForPasscode from '@/components/dashboard-ui/InputFieldForPasscode'
 import InputFieldForPassword from '@/components/dashboard-ui/InputFieldForPassword'
@@ -277,10 +275,14 @@ const ${componentName}: React.FC = () => {
     const [add${pluralPascalCase}, { isLoading }] = ${reduxMutationHook}()
     const [new${singularPascalCase}, setNew${singularPascalCase}] = useState<${interfaceName}>(${defaultInstanceName})
 
-    ${hasReadonlyEmail ? `
+    ${
+      hasReadonlyEmail
+        ? `
     const session = useSession();
     const author_email = session?.data?.user?.email || "---";
-    ` : ''}
+    `
+        : ''
+    }
 
     const handleFieldChange = (name: string, value: unknown) => {
         setNew${singularPascalCase}(prev => ({ ...prev, [name]: value }))
@@ -290,13 +292,13 @@ const ${componentName}: React.FC = () => {
         try {
             const updateData = { ...new${singularPascalCase} }
             delete updateData._id
-            // if (updateData.students) {
-            //     updateData.students = updateData.students.map((i: StringArrayData) => {
-            //         const r = { ...i }
-            //         delete r._id
-            //         return r
-            //     })
-            // }
+            if (updateData.students) {
+                updateData.students = updateData.students.map((i: StringArrayData) => {
+                    const r = { ...i }
+                    delete r._id
+                    return r
+                })
+            }
             ${hasReadonlyEmail ? `updateData['${readonlyEmailKey}'] = author_email` : ''}
             const added${singularPascalCase} = await add${pluralPascalCase}(updateData).unwrap()
             set${pluralPascalCase}([added${singularPascalCase}])
@@ -320,7 +322,7 @@ ${dynamicVariablesContent}
     const updateDefaultData = { ...default${pluralPascalCase} };
     // updateDefaultData.area = areaOptions[0].value;
     setNew${singularPascalCase}(updateDefaultData);
-  }, [default${pluralPascalCase}]);
+  }, []);
 
     return (
         <Dialog open={isAddModalOpen} onOpenChange={toggleAddModal}>

@@ -34,6 +34,7 @@ interface IRoleDocument {
 const getRoleNamesByEmail = async (email: string): Promise<string[]> => {
   await connectDB();
   const accessManagement = await AccessManagement.findOne({ user_email: email });
+
   if (!accessManagement) return [];
   return accessManagement.assign_role;
 };
@@ -41,6 +42,7 @@ const getRoleNamesByEmail = async (email: string): Promise<string[]> => {
 const getRolePermissions = async (roleName: string): Promise<IDashboardAccessUI[] | null> => {
   await connectDB();
   const roleData = (await Role.findOne({ name: roleName }).lean()) as IRoleDocument | null;
+
   return roleData ? roleData.dashboard_access_ui : null;
 };
 
@@ -56,6 +58,7 @@ export const isUserHasAccessByRole = async (arg: IWantAccess): Promise<NextRespo
   }
 
   const userRoles = await getRoleNamesByEmail(email);
+
   if (userRoles.length === 0) {
     return NextResponse.json({ data: null, message: 'Access denied: No roles assigned', status: 403 }, { status: 403 });
   }

@@ -35,10 +35,8 @@ export const apiSlice = createApi({
     'tagTypeFormActions',
     'Footer',
     'tagTypeFormSubmission',
-    'tagTypeCourse',
-    'tagTypeResponseActions',
-    'tagTypeDashboardBuilder',
     'tagTypeMedia',
+    'tagTypeAssignments',
   ],
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({

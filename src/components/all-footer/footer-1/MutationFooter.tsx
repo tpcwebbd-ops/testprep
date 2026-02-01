@@ -695,7 +695,7 @@ const MutationFooter1 = ({ data, onSave }: MutationFooter1Props) => {
                     <p>Loading library...</p>
                   </div>
                 ) : mediaImages.length > 0 ? (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4   gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                     <label className="cursor-pointer border-2 border-dashed border-indigo-500/30 bg-indigo-500/5 hover:bg-indigo-500/10 hover:border-indigo-500/50 rounded-xl flex flex-col items-center justify-center gap-2 text-indigo-400 transition-all min-h-[160px]">
                       <Upload size={24} />
                       <span className="text-xs font-bold uppercase tracking-wide">Upload New</span>

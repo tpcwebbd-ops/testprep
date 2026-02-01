@@ -36,6 +36,9 @@ export const generateStoreData = (inputJsonFile: string): string => {
       case 'CHECKBOX':
         return 'boolean';
       case 'IMAGES':
+        return '{ url: string; name: string }[]';
+      case 'IMAGE':
+        return '{ url: string; name: string }';
       case 'MULTICHECKBOX':
       case 'DYNAMICSELECT':
       case 'MULTIOPTIONS':
@@ -65,6 +68,9 @@ export const generateStoreData = (inputJsonFile: string): string => {
       case 'CHECKBOX':
         return 'false';
       case 'IMAGES':
+        return '[]';
+      case 'IMAGE':
+        return '{ name: "", url: "" }';
       case 'MULTICHECKBOX':
       case 'DYNAMICSELECT':
       case 'MULTIOPTIONS':

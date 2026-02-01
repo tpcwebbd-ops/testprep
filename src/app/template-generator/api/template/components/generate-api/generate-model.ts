@@ -66,9 +66,9 @@ export const generateModel = (inputJsonFile: string): string => {
       case 'DYNAMICSELECT':
         return `[{ type: String }]`;
       case 'IMAGES':
-        return `[{ type: String }]`;
+        return ` [{ url: { type: String }, name: { type: String } }]`;
       case 'IMAGE':
-        return `{ type: String }`;
+        return ` { url: { type: String }, name: { type: String } }`;
       case 'DESCRIPTION':
         return `{ type: String, trim: true }`;
       case 'INTNUMBER':

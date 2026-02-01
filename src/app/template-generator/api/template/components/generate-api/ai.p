@@ -427,7 +427,7 @@ const AddNextComponents: React.FC = () => {
                 delete r._id
                 return r
             })
-    
+            console.log('udpateData : ', updateData)
             const addedTesta = await addTesta(updateData).unwrap()
             setTesta([addedTesta]) // Example: update store, you might need a different strategy
             toggleAddModal(false)

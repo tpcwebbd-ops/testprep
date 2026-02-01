@@ -208,8 +208,8 @@ ${optionsArray.map(opt => `        { label: '${opt.label}', value: '${opt.value}
 import ColorPickerField from '@/components/dashboard-ui/ColorPickerField'
 import DateRangePickerField from '@/components/dashboard-ui/DateRangePickerField'
 import DynamicSelectField from '@/components/dashboard-ui/DynamicSelectField'
-import ImageUploadManagerSingle from '@/components/dashboard-ui/ImageUploadManagerSingle'
-import ImageUploadManager from '@/components/dashboard-ui/ImageUploadManager'
+import ImageUploadManagerSingle from '@/components/dashboard-ui/imageBB/ImageUploadManagerSingle'
+import ImageUploadManager from '@/components/dashboard-ui/imageBB/ImageUploadManager'
 import InputFieldForEmail from '@/components/dashboard-ui/InputFieldForEmail'
 import InputFieldForPasscode from '@/components/dashboard-ui/InputFieldForPasscode'
 import InputFieldForPassword from '@/components/dashboard-ui/InputFieldForPassword'
@@ -279,13 +279,13 @@ const AddNextComponents: React.FC = () => {
         try {
             const updateData = { ...new${singularPascalCase} }
             delete updateData._id
-            // if (updateData.students) {
-            //     updateData.students = updateData.students.map((i: StringArrayData) => {
-            //         const r = { ...i }
-            //         delete r._id
-            //         return r
-            //     })
-            // }
+            if (updateData.students) {
+                updateData.students = updateData.students.map((i: StringArrayData) => {
+                    const r = { ...i }
+                    delete r._id
+                    return r
+                })
+            }
             ${hasReadonlyEmail ? `updateData['${readonlyEmailKey}'] = author_email` : ''}
             const added${singularPascalCase} = await add${pluralPascalCase}(updateData).unwrap()
             set${pluralPascalCase}([added${singularPascalCase}])
@@ -307,9 +307,9 @@ const AddNextComponents: React.FC = () => {
 ${dynamicVariablesContent}
   useEffect(() => {
     const updateDefaultData = { ...${defaultInstanceName} };
-     updateDefaultData.area = areaOptions[0].value;
-         setNew${singularPascalCase}(updateDefaultData)
-  }, [${defaultInstanceName}]);
+    // updateDefaultData.area = areaOptions[0].value;
+     setNew${singularPascalCase}(updateDefaultData);
+  }, []);
 
     return (
         <Dialog open={isAddModalOpen} onOpenChange={toggleAddModal}>

@@ -84,7 +84,6 @@ const ResetPassword = () => {
     setLoading(true);
 
     try {
-    
       const { error } = await authClient.resetPassword({
         newPassword,
         token,

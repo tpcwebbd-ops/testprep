@@ -15,6 +15,7 @@ import { IAccessManagements, defaultAccessManagements } from '../store/data/data
 import { useAccessManagementsStore } from '../store/store';
 import { useUpdateAccessManagementsMutation } from '@/redux/features/accessManagements/accessManagementsSlice';
 import { formatDuplicateKeyError, handleError, handleSuccess, isApiErrorResponse } from './utils';
+import { logger } from 'better-auth';
 
 interface RoleItem {
   id: string;
@@ -71,8 +72,8 @@ const EditNextComponents: React.FC = () => {
     if (!selectedAccessManagements) return;
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { _id, createdAt, updatedAt, ...updateData } = editedAccessManagement;
+      logger.info(JSON.stringify({ _id, createdAt, updatedAt }));
 
       await updateAccessManagements({
         id: selectedAccessManagements._id,

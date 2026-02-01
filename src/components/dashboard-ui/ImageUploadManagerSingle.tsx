@@ -1,234 +1,257 @@
 'use client';
 
-import React, { useMemo, useState, useRef } from 'react';
 import Image from 'next/image';
-import { X, UploadCloud, Loader2, ImageIcon, Ghost, RefreshCcw, Search, CheckCircle2, Zap } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Plus, X, UploadCloud, RefreshCw, Image as ImageIcon } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { useEffect, useState, useCallback } from 'react';
 import imageCompression from 'browser-image-compression';
 
+import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-
-import { useGetMediasQuery, useAddMediaMutation } from '@/redux/features/media/mediaSlice';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 
 interface InternalImageDialogProps {
   onImageSelect: (newImage: string) => void;
   selectedImage: string;
+  maxSizeMB?: number;
+  maxWidthOrHeight?: number;
 }
 
-const InternalImageVault = ({ onImageSelect, selectedImage }: InternalImageDialogProps) => {
-  const { data: response, isLoading: isFetching } = useGetMediasQuery({});
-  const [addMedia, { isLoading: isAdding }] = useAddMediaMutation();
-  const [isUploadingLocal, setIsUploadingLocal] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+const InternalImageDialog = ({ onImageSelect, selectedImage, maxSizeMB = 1, maxWidthOrHeight = 1920 }: InternalImageDialogProps) => {
+  const [allAvailableImages, setAllAvailableImages] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const fetchImages = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/media');
+      if (!response.ok) throw new Error('Failed to fetch images.');
+      const data = await response.json();
 
-  const availableImages = useMemo(() => {
-    if (!response?.data) return [];
-    return (
-      response.data
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .filter((item: any) => item.contentType === 'image' && item.status === 'active')
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .filter((item: any) => (item.name || '').toLowerCase().includes(searchQuery.toLowerCase()))
-    );
-  }, [response, searchQuery]);
+      if (!data?.data || !Array.isArray(data.data)) {
+        setAllAvailableImages([]);
+        return;
+      }
+
+      const imageUrls: string[] = data.data.map((i: { url: string }) => i.url);
+      setAllAvailableImages(imageUrls);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Could not fetch images.');
+      setAllAvailableImages([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchImages();
+  }, [fetchImages]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setIsUploadingLocal(true);
+    setIsLoading(true);
     try {
-      const options = { maxSizeMB: 1, maxWidthOrHeight: 1920, useWebWorker: true };
+      const options = {
+        maxSizeMB,
+        maxWidthOrHeight,
+        useWebWorker: true,
+        fileType: 'image/jpeg' as const,
+      };
+
       const compressedFile = await imageCompression(file, options);
+
       const formData = new FormData();
       formData.append('image', compressedFile);
 
-      const res = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_IMGBB_API_KEY}`, {
+      const response = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_IMGBB_API_KEY}`, {
         method: 'POST',
         body: formData,
       });
 
-      const data = await res.json();
+      const data = await response.json();
       if (data.success) {
-        await addMedia({
-          url: data.data.url,
-          name: file.name,
-          contentType: 'image',
-          status: 'active',
-        }).unwrap();
-        toast.success('Asset synchronized to vault');
-        onImageSelect(data.data.url);
+        const newImageUrl = data.data.url;
+        await fetch('/api/media', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            delete_url: data.data.delete_url,
+            url: newImageUrl,
+            display_url: data.data.display_url,
+          }),
+        });
+        toast.success('Image uploaded successfully!');
+        onImageSelect(newImageUrl);
+        setAllAvailableImages(prev => [newImageUrl, ...prev]);
+      } else {
+        throw new Error(data.error.message || 'Image upload failed.');
       }
-    } catch {
-      toast.error('Vault uplink failed');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Cannot upload the image.');
     } finally {
-      setIsUploadingLocal(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
+      setIsLoading(false);
+      e.target.value = '';
     }
   };
 
   return (
-    <div className="flex flex-col h-[85vh] md:h-[70vh] backdrop-blur-[150px] rounded-xl overflow-hidden border border-white/10 bg-black/40">
-      <DialogHeader className="p-6 border-b border-white/5">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/20" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              placeholder="SEARCH VAULT..."
-              className="w-full bg-white/5 border border-white/10 rounded-lg py-2 pl-10 pr-4 text-[10px] font-black uppercase tracking-[0.2em] text-white focus:outline-none focus:border-indigo-500/50 transition-colors placeholder:text-white/20"
-            />
-          </div>
-          <div className="space-y-1 hidden">
-            <DialogTitle></DialogTitle>
-            <DialogDescription></DialogDescription>
-          </div>
-        </div>
-      </DialogHeader>
-
-      <ScrollArea className="flex-1 p-8">
-        {isFetching ? (
-          <div className="flex flex-col items-center justify-center py-32 gap-6">
-            <div className="relative">
-              <div className="w-16 h-16 border-2 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin" />
-              <Zap className="absolute inset-0 m-auto w-6 h-6 text-indigo-500/40" />
-            </div>
-            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 animate-pulse">Syncing Vault Data...</span>
-          </div>
-        ) : availableImages.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-            <AnimatePresence mode="popLayout">
-              {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                availableImages.map((item: any, idx: number) => {
-                  const isSelected = selectedImage === item.url;
-                  return (
-                    <motion.div
-                      key={item.url}
-                      initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      transition={{ delay: idx * 0.03 }}
-                      onClick={() => onImageSelect(item.url)}
-                      className={`relative aspect-square rounded-2xl overflow-hidden border-2 cursor-pointer transition-all duration-500 group
-                      ${isSelected ? 'border-indigo-500 scale-95 shadow-[0_0_40px_rgba(99,102,241,0.3)]' : 'border-white/5 hover:border-white/20 hover:scale-105'}
-                    `}
-                    >
-                      <Image
-                        src={item.url}
-                        fill
-                        alt="Vault Item"
-                        className="object-cover transition-transform duration-1000 group-hover:scale-110"
-                        unoptimized
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-3">
-                        <span className="text-[8px] font-black uppercase tracking-widest text-white/60 truncate">{item.name || 'Image_DETECTED'}</span>
-                      </div>
-                      {isSelected && (
-                        <div className="absolute inset-0 bg-indigo-500/20 flex items-center justify-center backdrop-blur-[2px]">
-                          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="bg-indigo-500 text-white rounded-full p-2.5 shadow-2xl">
-                            <CheckCircle2 className="w-6 h-6" />
-                          </motion.div>
-                        </div>
-                      )}
-                    </motion.div>
-                  );
-                })
-              }
-            </AnimatePresence>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-32 opacity-20 space-y-6">
-            <Ghost className="w-20 h-20 animate-bounce" />
-            <div className="text-center">
-              <h3 className="text-2xl font-black uppercase tracking-[0.4em]">Zero Assets</h3>
-              <p className="text-[10px] font-bold uppercase tracking-widest mt-2">The quadrant appears to be empty</p>
-            </div>
-          </div>
-        )}
-      </ScrollArea>
-      <div className="flex items-center gap-4 justify-end w-full p-4 border-t border-white/5">
-        <input type="file" ref={fileInputRef} accept="image/*" className="hidden" onChange={handleImageUpload} />
-
-        <Button variant="outlineGlassy" size="sm" disabled={isUploadingLocal || isAdding} onClick={() => fileInputRef.current?.click()}>
-          {isUploadingLocal || isAdding ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UploadCloud className="w-3.5 h-3.5" />}
-          {isAdding ? 'Uploading...' : 'Upload'}
+    <ScrollArea className="w-full h-[60vh] p-4 bg-white/5 backdrop-blur-md rounded-xl">
+      <header className="flex justify-between items-center border-b border-white/10 pb-3 mb-4">
+        <h2 className="text-white/90 font-semibold">Select an Image</h2>
+        <Button asChild variant="outline" className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20 transition mr-8 text-white/90">
+          <label htmlFor="single-image-upload" className="cursor-pointer flex items-center gap-2">
+            <UploadCloud className="w-4 h-4" />
+            Upload
+          </label>
         </Button>
-      </div>
-    </div>
+        <Input id="single-image-upload" type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={isLoading} />
+      </header>
+
+      {isLoading ? (
+        <div className="flex justify-center items-center h-48 text-white/70">Loading images...</div>
+      ) : allAvailableImages.length > 0 ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+          {allAvailableImages.map(imageUrl => {
+            const isSelected = selectedImage === imageUrl;
+            return (
+              <div
+                key={imageUrl}
+                onClick={() => onImageSelect(imageUrl)}
+                className={`
+                  relative w-full aspect-square rounded-xl overflow-hidden
+                  bg-white/10 backdrop-blur-sm
+                  border border-white/10 shadow
+                  transition-all duration-300
+                  ${isSelected ? 'ring-2 ring-emerald-400/70 scale-[0.98]' : 'cursor-pointer hover:scale-[1.05] hover:shadow-xl'}
+                `}
+              >
+                <Image src={imageUrl} fill alt="Media" className="object-cover" />
+                {isSelected && (
+                  <div className="absolute inset-0 bg-emerald-500/20 flex items-center justify-center">
+                    <div className="bg-emerald-500 text-white rounded-full p-1 shadow-lg">
+                      <Plus className="w-4 h-4" />
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="text-center text-white/60 py-10">No images found.</div>
+      )}
+    </ScrollArea>
   );
 };
 
-export default function ImageUploadManagerSingle({
-  value,
-  onChange,
-  label = 'Single Image',
-}: {
+interface ImageUploadManagerProps {
   value: string;
-  onChange: (val: string) => void;
+  onChange: (newValue: string) => void;
   label?: string;
-}) {
+  maxSizeMB?: number;
+  maxWidthOrHeight?: number;
+}
+
+export default function ImageUploadManagerSingle({ value, onChange, label = 'Image', maxSizeMB = 1, maxWidthOrHeight = 1920 }: ImageUploadManagerProps) {
   const [isOpen, setIsOpen] = useState(false);
 
+  const handleImageSelect = (newImageUrl: string) => {
+    onChange(newImageUrl);
+    setIsOpen(false);
+  };
+
+  const handleRemoveImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onChange('');
+  };
+
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between px-1">
-        <h4 className="text-sm text-white/40 ">{label}</h4>
+    <div className="w-full flex flex-col gap-3">
+      <div className="flex items-center justify-between">
+        <h2 className="text-white/90 font-semibold drop-shadow">{label}</h2>
+
         {value && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={e => {
-              e.stopPropagation();
-              onChange('');
-            }}
-            className="h-6 text-red-400/60 hover:text-red-400 text-[9px] font-black uppercase tracking-widest bg-red-500/5 hover:bg-red-500/10"
-          >
-            <X className="w-3 h-3 mr-1" /> Remove
+          <Button variant="ghost" size="sm" onClick={() => onChange('')} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 transition h-8">
+            Clear Selection
           </Button>
         )}
       </div>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <div className="group relative w-full aspect-video rounded-xl backdrop-blur-[120px] transition-all duration-700 cursor-pointer overflow-hidden flex flex-col items-center justify-center gap-4 border border-white/5 hover:border-white/10">
+          <div
+            className={`
+              group relative w-full min-h-[220px] rounded-xl overflow-hidden
+              bg-white/5 backdrop-blur-md
+              border border-white/20 shadow-inner
+              flex items-center justify-center
+              transition-all duration-300 cursor-pointer
+              ${!value ? 'hover:bg-white/10 hover:border-white/30' : ''}
+            `}
+          >
             {value ? (
               <>
-                <Image src={value} fill alt="Selected Image" className="object-cover transition-transform duration-1000 group-hover:scale-110" unoptimized />
-                <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center backdrop-blur-sm">
-                  <div className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-white/10 border border-white/20 text-[10px] font-black uppercase tracking-[0.2em] text-white scale-90 group-hover:scale-100 transition-transform">
-                    <RefreshCcw className="w-4 h-4 animate-[spin_4s_linear_infinite]" />
-                    Change Image
+                {value && (
+                  <div
+                    className="
+              relative w-full max-w-sm aspect-square rounded-xl overflow-hidden
+              bg-white/10 border border-white/10 backdrop-blur-sm
+              shadow-lg
+              transition-all duration-300 group
+            "
+                  >
+                    <Image src={value} alt="Selected image" fill className="object-cover" />
+
+                    <button
+                      onClick={handleRemoveImage}
+                      className="
+                absolute top-2 right-2 bg-red-600 text-white w-8 h-8
+                rounded-full flex items-center justify-center
+                opacity-0 group-hover:opacity-100 transition-opacity
+                shadow-lg hover:bg-red-700
+              "
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                  <div className="flex gap-2">
+                    <Button variant="secondary" size="sm" className="bg-white/90 text-black hover:bg-white">
+                      <RefreshCw className="w-4 h-4 mr-2" /> Change
+                    </Button>
+                    <Button variant="destructive" size="sm" onClick={handleRemoveImage}>
+                      <X className="w-4 h-4 mr-2" /> Remove
+                    </Button>
                   </div>
                 </div>
               </>
             ) : (
-              <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 3, repeat: Infinity }} className="flex flex-col items-center gap-5">
-                <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:scale-110 group-hover:bg-indigo-500/10 group-hover:border-indigo-500/30 transition-all duration-500">
-                  <ImageIcon className="w-8 h-8 text-white/20 group-hover:text-indigo-400" />
+              <div className="flex flex-col items-center gap-3 text-white/50 group-hover:text-white/80 transition-colors">
+                <div className="p-4 rounded-full bg-white/5 border border-white/10 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <ImageIcon className="w-8 h-8" />
                 </div>
-                <div className="text-center space-y-1">
-                  <p className="text-xl text-white/40 group-hover:text-white transition-colors">No Image Found</p>
-                  <p className="text-sm text-white/60 group-hover:text-white transition-colors">Please Select One</p>
+                <div className="text-center">
+                  <p className="font-medium">Click to select an image</p>
+                  <p className="text-xs opacity-70">Supports JPG, PNG, WEBP</p>
                 </div>
-              </motion.div>
+              </div>
             )}
           </div>
         </DialogTrigger>
-        <DialogContent className="bg-transparent border-none p-0 shadow-none overflow-hidden max-w-4xl w-[95vw]">
-          <InternalImageVault
-            selectedImage={value}
-            onImageSelect={url => {
-              onChange(url);
-              setIsOpen(false);
-            }}
-          />
+
+        <DialogContent
+          className="
+            max-w-3xl p-0 rounded-2xl
+            bg-white/10 backdrop-blur-lg
+            border border-white/20 shadow-2xl
+            transition-all duration-300
+          "
+        >
+          <InternalImageDialog onImageSelect={handleImageSelect} selectedImage={value} maxSizeMB={maxSizeMB} maxWidthOrHeight={maxWidthOrHeight} />
         </DialogContent>
       </Dialog>
     </div>

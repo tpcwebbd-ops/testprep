@@ -135,7 +135,8 @@ function EditorMenuBar({ editor }: { editor: Editor | null }) {
 
 export default function RichTextEditorField() {
     const content: string = ''
-    const onChange = (content: string) => { 
+    const onChange = (content: string) => {
+        console.log('content : ', content)
     }
     const editor = useEditor({
         extensions: [

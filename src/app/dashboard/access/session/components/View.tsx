@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { logger } from 'better-auth';
 import { formatDuplicateKeyError, isApiErrorResponse } from '@/components/common/utils';
 
 import { ISessions, defaultSessions } from '../store/data/data';
@@ -36,9 +37,9 @@ const ViewNextComponents: React.FC = () => {
       if (isApiErrorResponse(error)) {
         errMessage = formatDuplicateKeyError(error.data.message) || 'API error';
       } else if (error instanceof Error) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         errMessage = error.message;
       }
+      logger.error(JSON.stringify(errMessage));
       return 'Invalid';
     }
   };

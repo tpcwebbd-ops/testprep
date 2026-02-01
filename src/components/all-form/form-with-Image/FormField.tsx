@@ -49,7 +49,8 @@ const FormFieldForm7 = ({ data, onSubmit }: Form7Props) => {
     if (!file) return;
 
     const url = URL.createObjectURL(file);
- 
+    console.log('📂 File Selected:', file.name);
+    console.log('🔗 Local Path:', url);
 
     callback(url, file.name);
     toast.success('File Attached');

@@ -202,8 +202,8 @@ ${optionsArray.map(opt => `        { label: '${opt.label}', value: '${opt.value}
 import ColorPickerField from '@/components/dashboard-ui/ColorPickerField'
 import DateRangePickerField from '@/components/dashboard-ui/DateRangePickerField'
 import DynamicSelectField from '@/components/dashboard-ui/DynamicSelectField'
-import ImageUploadManagerSingle from '@/components/dashboard-ui/ImageUploadManagerSingle'
-import ImageUploadManager from '@/components/dashboard-ui/ImageUploadManager'
+import ImageUploadManagerSingle from '@/components/dashboard-ui/imageBB/ImageUploadManagerSingle'
+import ImageUploadManager from '@/components/dashboard-ui/imageBB/ImageUploadManager'
 import InputFieldForEmail from '@/components/dashboard-ui/InputFieldForEmail'
 import InputFieldForPasscode from '@/components/dashboard-ui/InputFieldForPasscode'
 import InputFieldForPassword from '@/components/dashboard-ui/InputFieldForPassword'
@@ -281,13 +281,13 @@ const EditNextComponents: React.FC = () => {
             delete updateData.updatedAt
 
             // Normalize StringArray items (remove nested _id)
-            // if (updateData.students) {
-            //     updateData.students = updateData.students.map((i: StringArrayData) => {
-            //         const r = { ...i }
-            //         delete r._id
-            //         return r
-            //     })
-            // }
+            if (updateData.students) {
+                updateData.students = updateData.students.map((i: StringArrayData) => {
+                    const r = { ...i }
+                    delete r._id
+                    return r
+                })
+            }
 
             await update${pluralPascalCase}({
                 id: selected${pluralPascalCase}._id,

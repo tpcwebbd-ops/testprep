@@ -106,7 +106,6 @@ export const useFetchSidebar = (email: string | null | undefined) => {
 
     // Filter the master list based on permissions
     const finalFilteredSidebar = filterSidebarItems(masterSidebarList);
-    // const finalFilteredSidebar = defaultDashboardSidebarData;
 
     // Set data (or default if filter results in empty list)
     setSidebarData(finalFilteredSidebar.length > 0 ? finalFilteredSidebar : defaultDashboardSidebarData);

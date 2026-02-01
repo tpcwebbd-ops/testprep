@@ -15,11 +15,9 @@ export default function Home() {
   const [value, setValue] = useState<string>('');
   const [valueM, setValueM] = useState<string[]>([]);
   const onChangeImage = (url: string) => {
-  
     setValue(url);
   };
   const onChangeImageM = (newValues: string[]) => {
- 
     setValueM(newValues);
   };
   return (

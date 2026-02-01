@@ -103,7 +103,7 @@ export const generateViewComponentFile = (inputJsonFile: string): string => {
             <h3 className="text-white font-medium mb-2">${label}</h3>
             {selected${pluralPascalCase}['${key}'] ? (
               <div className="relative w-full h-48 rounded-lg overflow-hidden border border-white/20 bg-white/10 backdrop-blur-lg">
-                <Image src={selected${pluralPascalCase}['${key}']} fill className="object-cover" alt="${label}" />
+                <Image src={selected${pluralPascalCase}['${key}'].url} fill className="object-cover" alt="${label}" />
               </div>
             ) : (
               <p className="text-white/70 text-sm">No image.</p>
@@ -117,9 +117,9 @@ export const generateViewComponentFile = (inputJsonFile: string): string => {
             <h3 className="text-white font-medium mb-2">${label}</h3>
             {Array.isArray(selected${pluralPascalCase}['${key}']) && selected${pluralPascalCase}['${key}'].length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {selected${pluralPascalCase}['${key}'].map((img: string, i: number) => (
+                {selected${pluralPascalCase}['${key}'].map((val: { url: string; name: string }, i: number) => (
                   <div key={i} className="relative h-32 rounded-lg overflow-hidden border border-white/20 bg-white/10 backdrop-blur-lg">
-                    <Image src={img} fill className="object-cover" alt={\`${label} \${i + 1}\`} />
+                    <Image src={val.url} fill className="object-cover" alt={val.name || \`${label} \${i + 1}\`} />
                   </div>
                 ))}
               </div>
@@ -143,7 +143,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { StringArrayData } from './others-field-type/types';
- 
+import { logger } from 'better-auth';
 import { formatDuplicateKeyError, isApiErrorResponse } from '@/components/common/utils';
 
 import { ${interfaceName}, ${defaultInstanceName} } from '../store/data/data';

@@ -71,8 +71,8 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
   }
 
   const handleExport = () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const processedData = data.map(row => {
+      logger.info(JSON.stringify(row))
       const newRow: ${interfaceName} = { ...default${pluralPascalCase} }
       return newRow
     })

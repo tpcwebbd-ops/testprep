@@ -73,10 +73,7 @@ const AddNextComponents: React.FC = () => {
 
   return (
     <Dialog open={isAddModalOpen} onOpenChange={toggleAddModal}>
-      <DialogContent
-        className="sm:max-w-[600px] bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl 
-                   rounded-2xl text-white transition-all duration-300"
-      >
+      <DialogContent className="sm:max-w-[600px] bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl mt-10 rounded-2xl text-white transition-all duration-300">
         <DialogHeader className="border-b border-white/10 pb-3">
           <DialogTitle className="text-lg font-semibold tracking-wide text-white/90">Add Access for User</DialogTitle>
         </DialogHeader>
@@ -98,7 +95,7 @@ const AddNextComponents: React.FC = () => {
           </div>
 
           {/* 👥 User list */}
-          <ScrollArea className="h-[400px] rounded-xl border border-white/10 bg-white/5 backdrop-blur-md shadow-inner p-3">
+          <ScrollArea className="h-[300px] rounded-xl border border-white/10 bg-white/5 backdrop-blur-md shadow-inner p-3">
             {isFetching ? (
               <p className="text-center text-sm text-white/60">Loading users...</p>
             ) : isError ? (

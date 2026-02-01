@@ -167,7 +167,6 @@ const Modal = ({
 
 // --- Main Page Component ---
 const FooterManager = () => {
- 
   // RTK Query Hooks
   const { data: footers = [], isLoading, isError, refetch } = useGetFootersQuery();
   const [addFooter, { isLoading: isAdding }] = useAddFooterMutation();
@@ -434,7 +433,6 @@ const FooterManager = () => {
       </div>
     );
   }
- 
   return (
     <div className="min-h-screen bg-neutral-950 text-gray-200 p-4 md:p-8 font-sans selection:bg-violet-500/30 relative">
       <div className="fixed inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />

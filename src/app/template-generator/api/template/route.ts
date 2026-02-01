@@ -40,8 +40,8 @@ export async function POST(request: NextRequest) {
     generateAllOtherComponents(data);
 
     return NextResponse.json({ message: 'file found' }, { status: 200 });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {
-    console.log(e);
     return NextResponse.json({ message: 'Error creating file' }, { status: 500 });
   }
 }

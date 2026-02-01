@@ -26,7 +26,7 @@ import { ${interfaceName}, default${pluralPascalCase} } from '../store/data/data
 import { use${pluralPascalCase}Store } from '../store/store';
 import { useDelete${pluralPascalCase}Mutation } from '${reduxPath}';
 import { handleSuccess, handleError } from './utils';
-import { CustomApiError } from '@/app/api/utils/utils';
+
 const DeleteNextComponents: React.FC = () => {
   const {
     toggleDeleteModal,
@@ -46,12 +46,10 @@ const DeleteNextComponents: React.FC = () => {
       handleSuccess('Delete Successful');
       toggleDeleteModal(false);
       setSelected${pluralPascalCase}(default${pluralPascalCase} as ${interfaceName});
+    } catch (error) {
+      console.error('Failed to delete ${singularPascalCase}:', error);
+      handleError('Failed to delete item. Please try again.');
     }
-      catch (err) {
-            const error = err as CustomApiError;
-            const errorMessage = error.data?.message ?? error.message ?? 'An unexpected error occurred during deletion';
-            handleError(errorMessage);
-          }
   };
 
   const handleCancel = () => {

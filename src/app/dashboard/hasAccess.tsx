@@ -102,7 +102,6 @@ const HasAccess = ({ children }: { children: React.ReactNode }) => {
       router.push('/login');
     }
   }, [isPending, isAuthenticated, router]);
-
   const isUniversalRoute = currentPath === '/dashboard' || currentPath === '/dashboard/profile';
 
   const hasPermission = useMemo(() => {
@@ -136,9 +135,6 @@ const HasAccess = ({ children }: { children: React.ReactNode }) => {
       }
     });
 
-    // console.log('currentPath', currentPath);
-    // console.log('allowedPaths', allowedPaths);
-
     // 4. CHECK PERMISSION Logic (Exact Match OR Sub-path Match)
 
     // A. Check for Exact Match
@@ -160,7 +156,12 @@ const HasAccess = ({ children }: { children: React.ReactNode }) => {
   }, [isAuthenticated, isPending, isUniversalRoute, isAccessLoading, isRolesLoading, userAccessManagementQuery, allRolesQuery, currentPath]);
 
   const shouldShowLoading = isPending || (!isUniversalRoute && isAuthenticated && (isAccessLoading || isRolesLoading));
-
+  // // ! Un comment to access without Authorization.
+  // return (
+  //   <main>
+  //     <div className="lg:p-10 p-4 pb-12 animate-in fade-in duration-500">{children}</div>
+  //   </main>
+  // );
   if (shouldShowLoading) {
     return <LoadingOverlay />;
   }

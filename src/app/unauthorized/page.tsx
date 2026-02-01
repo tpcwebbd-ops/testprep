@@ -2,7 +2,7 @@
 |-----------------------------------------
 | setting up Page for the App
 | @author: Toufiquer Rahman<toufiquer.0@gmail.com>
-| @copyright: TestPrep Center-webapp, August, 2025
+| @copyright: App Generator-webapp, August, 2025
 |-----------------------------------------
 */
 import Link from 'next/link';

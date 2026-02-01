@@ -8,8 +8,8 @@ import FooterServer from '@/components/common/FooterServer';
 import PWAPopup from '@/components/common/PWAPopUp';
 
 export const metadata: Metadata = {
-  title: 'TestPrep Center',
-  description: 'Achieve your desired IELTS band score',
+  title: 'App Generator',
+  description: 'Build apps faster',
   manifest: '/manifest.json',
   icons: {
     apple: '/icons/icon-192x192.png',
