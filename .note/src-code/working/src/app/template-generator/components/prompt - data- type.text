@@ -1,0 +1,202 @@
+Act as a seniour NextJs developer in typescript
+
+here is example of allDataType.
+```
+    const allDataType = [
+        'STRING',
+        'EMAIL',
+        'PASSWOR',
+        'PASSCOD',
+        'SELECT',
+        'DYNAMICSELECT',
+        'IMAGES',
+        'IMAGE ',
+        'DESCRIPTION',
+        'INTNUMBER',
+        'FLOATNUMBER',
+        'BOOLEAN',
+        'DATE ',
+        'TIME',
+        'DATERANGE',
+        'TIMERANGE',
+        'COLOEPICKER',
+        'PHONE',
+        'URL',
+        'RICHTEXT',
+        'AUTOCOMPLETE',
+        'RADIOBUTTON',
+        'CHECKBOX',
+        'MULTICHECKBOX',
+    ]
+
+    ```
+
+
+   and here is  Databasetype and mongooseSchema Schema relationship
+-----------------------------------------------------
+  STRING : String,
+  EMAIL : String,
+  PASSWOR : String,
+  PASSCOD : String,
+  SELECT : String,
+  MULTISELECT : String[],
+  DYNAMICSELECT : String,
+  MULTIDYNAMICSELECT : String[],
+  IMAGES : String,
+  IMAGE  : String,
+  DESCRIPTION : String,
+  INTNUMBER : Number,
+  FLOATNUMBER : Number,
+  BOOLEAN : boolean,
+  DATE  : Date,
+  TIME : String,
+  DATERANGE : {start: String, end: String},
+  TIMERANGE : {start: String, end: String},
+  COLOEPICKER : String,
+  PHONE : String,
+  URL : String,
+  RICHTEXT : String,
+  AUTOCOMPLETE : String,
+  RADIOBUTTON : Boolean,
+  CHECKBOX : String,
+  MULTICHECKBOX : String,
+
+
+
+  and here is mongoose Schema example 
+
+
+  ```const mySchema = new Schema({
+  STRING: {
+    type: String, 
+    trim: true
+  },
+  EMAIL: {
+    type: String, 
+    unique: true,
+    trim: true,
+    lowercase: true,
+    match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address']
+  },
+  PASSWORD: {
+    type: String, 
+    select: false // Hides this field from query results by default for security
+  },
+  PASSCODE: {
+    type: String, 
+    select: false
+  },
+  SELECT: {
+    type: String, 
+    enum: ['Option 1', 'Option 2', 'Option 3'] // Example options
+  },
+  DYNAMICSELECT: {
+    type: Schema.Types.ObjectId,
+    ref: 'AnotherModel' // Example of a dynamic reference to another model
+  },
+  IMAGES: [{
+    type: String // Array of URLs to images
+  }],
+  IMAGE: {
+    type: String // URL to a single image
+  },
+  DESCRIPTION: {
+    type: String,
+    trim: true
+  },
+  INTNUMBER: {
+    type: Number,
+    validate: {
+      validator: Number.isInteger,
+      message: '{VALUE} is not an integer value'
+    }
+  },
+  FLOATNUMBER: {
+    type: Number
+  },
+  BOOLEAN: {
+    type: Boolean,
+    default: false
+  },
+  DATE: {
+    type: Date,
+    default: Date.now
+  },
+  TIME: {
+    type: String // Can be stored as a string in 'HH:MM:SS' format
+  },
+  DATERANGE: {
+    start: { type: Date },
+    end: { type: Date }
+  },
+  TIMERANGE: {
+    start: { type: String }, // 'HH:MM:SS'
+    end: { type: String }   // 'HH:MM:SS'
+  },
+  COLORPICKER: {
+    type: String,
+    match: [/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, 'Please fill a valid color hex code']
+  },
+  PHONE: {
+    type: String,
+    validate: {
+      validator: function(v) {
+        return /\d{3}-\d{3}-\d{4}/.test(v);
+      },
+      message: props => `${props.value} is not a valid phone number!`
+    }
+  },
+  URL: {
+    type: String,
+    trim: true
+  },
+  RICHTEXT: {
+    type: String
+  },
+  AUTOCOMPLETE: {
+    type: String
+  },
+  RADIOBUTTON: {
+    type: String,
+    enum: ['Choice A', 'Choice B', 'Choice C'] // Example choices
+  },
+  CHECKBOX: {
+    type: Boolean,
+    default: false
+  },
+  MULTICHECKBOX: [{
+    type: String // An array of strings representing the selected options
+  }]
+}, {
+  timestamps: true // Automatically adds createdAt and updatedAt fields. [8, 15]
+});```
+
+
+
+Now I want to update the allDataType. 
+
+Here is example of updated allDataType[
+        {
+            name: 'STRING',
+            mongooseSchema: '  STRING: {
+                type: String, 
+                trim: true
+            }',
+            ui: '<InputFieldForString/>'
+        },
+        {
+            name: 'EMAIL',
+            mongooseSchema: '    EMAIL: {
+                type: String, 
+                trim: true,
+                lowercase: true,
+                match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address']
+            }',
+            ui: '<InputFieldForEmail/>'
+        },
+        ...
+]
+
+
+
+Now please update addDataType and implement all keys from old allDataType to new allDataType.
