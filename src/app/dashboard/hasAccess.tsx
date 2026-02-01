@@ -156,12 +156,13 @@ const HasAccess = ({ children }: { children: React.ReactNode }) => {
   }, [isAuthenticated, isPending, isUniversalRoute, isAccessLoading, isRolesLoading, userAccessManagementQuery, allRolesQuery, currentPath]);
 
   const shouldShowLoading = isPending || (!isUniversalRoute && isAuthenticated && (isAccessLoading || isRolesLoading));
-  // // ! Un comment to access without Authorization.
-  // return (
-  //   <main>
-  //     <div className="lg:p-10 p-4 pb-12 animate-in fade-in duration-500">{children}</div>
-  //   </main>
-  // );
+  if (process.env.NEXT_PUBLIC_AuthorizationEnable === 'false') {
+    return (
+      <main>
+        <div className="lg:p-10 p-4 pb-12 animate-in fade-in duration-500">{children}</div>
+      </main>
+    );
+  }
   if (shouldShowLoading) {
     return <LoadingOverlay />;
   }
