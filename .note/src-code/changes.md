@@ -1,0 +1,18 @@
+### Changes for App Generator
+
+- 1. .env.local
+     Add AuthorizationEnable=true in .env.local
+     NEXT_PUBLIC_AuthorizationEnable=true
+
+- 2. route.ts
+     if (process.env.AuthorizationEnable === 'true') {
+     }
+- 3. dashboard/hasAccess.tsx
+     if (process.env.NEXT_PUBLIC_AuthorizationEnable === 'false') {
+     return (
+     <main>
+     <div className="lg:p-10 p-4 pb-12 animate-in fade-in duration-500">{children}</div>
+     </main>
+     );
+     }
+- 4.
