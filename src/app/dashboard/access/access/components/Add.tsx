@@ -73,7 +73,7 @@ const AddNextComponents: React.FC = () => {
 
   return (
     <Dialog open={isAddModalOpen} onOpenChange={toggleAddModal}>
-      <DialogContent className="sm:max-w-[600px] bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl mt-10 rounded-2xl text-white transition-all duration-300">
+      <DialogContent className="sm:max-w-[600px] bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl mt-10 rounded-sm text-white transition-all duration-300">
         <DialogHeader className="border-b border-white/10 pb-3">
           <DialogTitle className="text-lg font-semibold tracking-wide text-white/90">Add Access for User</DialogTitle>
         </DialogHeader>
@@ -90,29 +90,29 @@ const AddNextComponents: React.FC = () => {
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               className="bg-white/10 border border-white/20 placeholder:text-white/40 text-white 
-                         rounded-xl focus-visible:ring-0 focus:border-white/40 backdrop-blur-md"
+                         rounded-sm focus-visible:ring-0 focus:border-white/40 backdrop-blur-md"
             />
           </div>
 
           {/* 👥 User list */}
-          <ScrollArea className="h-[300px] rounded-xl border border-white/10 bg-white/5 backdrop-blur-md shadow-inner p-3">
+          <ScrollArea className="h-[300px] rounded-sm border border-white/40 bg-white/5 backdrop-blur-md shadow-inner">
             {isFetching ? (
-              <p className="text-center text-sm text-white/60">Loading users...</p>
+              <p className="text-center text-sm text-white/60 p-3 ">Loading users...</p>
             ) : isError ? (
-              <p className="text-center text-sm text-red-400">Failed to fetch users.</p>
+              <p className="text-center text-sm text-red-400 p-3 ">Failed to fetch users.</p>
             ) : users.length === 0 ? (
-              <p className="text-center text-sm text-white/50">No users found.</p>
+              <p className="text-center text-sm text-white/50 p-3 ">No users found.</p>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-2 py-2">
                 {users.map((user: { _id: string; name: string; email: string }) => (
                   <div
                     key={user._id}
-                    className="flex justify-between items-center p-3 rounded-xl border border-white/10 
+                    className="flex justify-between items-center rounded-sm border border-white/10 p-3 py-1 mx-2 
                                bg-white/10 hover:bg-white/20 backdrop-blur-md transition-all duration-200 shadow-sm"
                   >
                     <div>
                       <p className="font-medium text-white/90">{user.name}</p>
-                      <p className="text-xs text-purple-50 ">{user.email}</p>
+                      <p className="text-xs text-white/70 ">{user.email}</p>
                     </div>
                     <Button size="sm" variant="outlineWater" disabled={isAdding} onClick={() => handleAddAccessManagement(user)}>
                       {isAdding ? 'Adding...' : 'Add'}
@@ -125,7 +125,7 @@ const AddNextComponents: React.FC = () => {
         </div>
 
         <DialogFooter className="mt-4 border-t border-white/10 pt-3">
-          <Button variant="outlineWater" onClick={() => toggleAddModal(false)} className="border-white/30 text-white/80 hover:bg-white/20">
+          <Button variant="outlineWater" size="sm" onClick={() => toggleAddModal(false)} className="border-white/30 text-white/80 hover:bg-white/20">
             Close
           </Button>
         </DialogFooter>
