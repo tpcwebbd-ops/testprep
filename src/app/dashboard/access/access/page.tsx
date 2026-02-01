@@ -13,12 +13,9 @@ import EditFile from './components/Edit';
 import ViewFile from './components/View';
 import SearchBox from './components/SearchBox';
 import DeleteFile from './components/Delete';
-import BulkEditFile from './components/BulkEdit';
 import TooManyRequests from './components/TooManyRequest';
 import BulkDeleteFile from './components/BulkDelete';
 import ViewAccessManagementsTable from './components/TableView';
-import BulkUpdateAccessManagements from './components/BulkUpdate';
-import BulkDynamicUpdateAccessManagements from './components/BulkDynamicUpdate';
 
 import { useAccessManagementsStore } from './store/store';
 import { useGetAccessManagementsQuery } from '@/redux/features/accessManagements/accessManagementsSlice';
@@ -80,7 +77,7 @@ const MainNextPage: React.FC = () => {
     handleSuccess('Filter Cleared!');
   };
 
-  const modals = [AddFile, ViewFile, BulkDeleteFile, BulkEditFile, EditFile, DeleteFile, BulkUpdateAccessManagements, BulkDynamicUpdateAccessManagements];
+  const modals = [AddFile, ViewFile, BulkDeleteFile, EditFile, DeleteFile];
 
   let renderUI = (
     <div className="container mx-auto p-4">

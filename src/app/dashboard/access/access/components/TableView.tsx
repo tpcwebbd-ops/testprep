@@ -2,7 +2,7 @@
 
 import { format } from 'date-fns';
 import React, { useState, useMemo } from 'react';
-import { MoreHorizontalIcon, EyeIcon, PencilIcon, TrashIcon, DownloadIcon } from 'lucide-react';
+import { MoreHorizontalIcon, EyeIcon, PencilIcon, TrashIcon } from 'lucide-react';
 
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -27,7 +27,6 @@ import { pageLimitArr } from '../store/store-constant';
 import { useAccessManagementsStore } from '../store/store';
 import { useGetAccessManagementsQuery } from '@/redux/features/accessManagements/accessManagementsSlice';
 import Pagination from './Pagination';
-import ExportDialog from './ExportDialog';
 
 type DisplayableAccessManagementsKeys = 'user_name' | 'user_email' | 'assign_role' | 'given_by_email' | 'createdAt';
 type ColumnVisibilityState = Record<DisplayableAccessManagementsKeys, boolean>;
@@ -39,13 +38,10 @@ const ViewTableNextComponents: React.FC = () => {
     direction: 'asc' | 'desc';
   } | null>(null);
 
-  const [isExportDialogOpen, setExportDialogOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const {
     setSelectedAccessManagements,
-    toggleBulkEditModal,
-    toggleBulkUpdateModal,
     toggleViewModal,
     queryPramsLimit,
     queryPramsPage,
@@ -279,15 +275,6 @@ const ViewTableNextComponents: React.FC = () => {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <Button size="sm" variant="outlineWater" onClick={() => setExportDialogOpen(true)} disabled={bulkData.length === 0}>
-              <DownloadIcon className="w-4 h-4 mr-1" /> Export
-            </Button>
-            <Button size="sm" variant="outlineWater" onClick={() => toggleBulkUpdateModal(true)} disabled={bulkData.length === 0}>
-              <PencilIcon className="w-4 h-4 mr-1" /> B.Update
-            </Button>
-            <Button size="sm" variant="outlineWater" onClick={() => toggleBulkEditModal(true)} disabled={bulkData.length === 0}>
-              <PencilIcon className="w-4 h-4 mr-1" /> B.Edit
-            </Button>
             <Button size="sm" variant="destructive" onClick={() => toggleBulkDeleteModal(true)} disabled={bulkData.length === 0}>
               <TrashIcon className="w-4 h-4 mr-1" /> B.Delete
             </Button>
@@ -340,15 +327,6 @@ const ViewTableNextComponents: React.FC = () => {
                   </DropdownMenuContent>
                 </DropdownMenu>
 
-                <Button size="sm" variant="outlineWater" onClick={() => setExportDialogOpen(true)} disabled={bulkData.length === 0}>
-                  <DownloadIcon className="w-4 h-4 mr-1" /> Export
-                </Button>
-                <Button size="sm" variant="outlineWater" onClick={() => toggleBulkUpdateModal(true)} disabled={bulkData.length === 0}>
-                  <PencilIcon className="w-4 h-4 mr-1" /> B.Update
-                </Button>
-                <Button size="sm" variant="outlineWater" onClick={() => toggleBulkEditModal(true)} disabled={bulkData.length === 0}>
-                  <PencilIcon className="w-4 h-4 mr-1" /> B.Edit
-                </Button>
                 <Button size="sm" variant="destructive" onClick={() => toggleBulkDeleteModal(true)} disabled={bulkData.length === 0}>
                   <TrashIcon className="w-4 h-4 mr-1" /> B.Delete
                 </Button>
@@ -413,14 +391,6 @@ const ViewTableNextComponents: React.FC = () => {
           </SelectContent>
         </Select>
       </div>
-
-      <ExportDialog
-        isOpen={isExportDialogOpen}
-        onOpenChange={setExportDialogOpen}
-        headers={tableHeaders}
-        data={bulkData}
-        fileName={`Exported_AccessManagements_${new Date().toISOString()}.xlsx`}
-      />
     </div>
   );
 };
