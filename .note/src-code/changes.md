@@ -15,4 +15,6 @@
      </main>
      );
      }
-- 4. update dashboard/access/access/components/Add.tsx
+- 4. update dashboard/access/access/components/Add.tsx 
+- 5. remove summery from Access/page.tsx 
+- 6. remove filter from Access/page.tsx 

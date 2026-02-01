@@ -19,7 +19,6 @@ import BulkDeleteFile from './components/BulkDelete';
 import ViewAccessManagementsTable from './components/TableView';
 import BulkUpdateAccessManagements from './components/BulkUpdate';
 import BulkDynamicUpdateAccessManagements from './components/BulkDynamicUpdate';
-import FilterDialog, { FilterPayload } from './components/FilterDialog';
 
 import { useAccessManagementsStore } from './store/store';
 import { useGetAccessManagementsQuery } from '@/redux/features/accessManagements/accessManagementsSlice';
@@ -27,7 +26,6 @@ import { handleSuccess } from './components/utils';
 import { logger } from 'better-auth';
 const MainNextPage: React.FC = () => {
   const [hashSearchText, setHashSearchText] = useState('');
-  const [isFilterModalOpen, setFilterModalOpen] = useState(false);
 
   const { toggleAddModal, queryPramsLimit, queryPramsPage, queryPramsQ, setQueryPramsPage, setQueryPramsQ } = useAccessManagementsStore();
 
@@ -75,20 +73,6 @@ const MainNextPage: React.FC = () => {
     }
   };
 
-  const handleFilter = () => {
-    setFilterModalOpen(true);
-  };
-
-  const handleApplyFilter = (filter: FilterPayload) => {
-    const { start, end } = filter.value;
-    const filterQuery = `createdAt:range:${start}_${end}`;
-
-    setQueryPramsQ(filterQuery);
-    setQueryPramsPage(1);
-    refetch();
-    handleSuccess('Filter Applied!');
-  };
-
   const handleClearFilter = () => {
     setQueryPramsQ('');
     setQueryPramsPage(1);
@@ -103,12 +87,6 @@ const MainNextPage: React.FC = () => {
       <div className="flex flex-col md:flex-row gap-2 justify-between items-center mb-6">
         <h1 className="h2 w-full">AccessManagement Management {isSuccess && <sup className="text-xs">(total:{getResponseData?.data?.total || '00'})</sup>}</h1>
         <div className="w-full flex flex-col md:flex-row gap-2 item-center justify-end">
-          <Button size="sm" variant="outlineWater" onClick={handleFilter} disabled={isLoading}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-filter-right mr-1" viewBox="0 0 16 16">
-              <path d="M14 10.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 .5-.5m0-3a.5.5 0 0 0-.5-.5h-7a.5.5 0 0 0 0 1h7a.5.5 0 0 0 .5-.5m0-3a.5.5 0 0 0-.5-.5h-11a.5.5 0 0 0 0 1h11a.5.5 0 0 0 .5-.5" />
-            </svg>
-            Filter
-          </Button>
           <Button
             size="sm"
             variant="outlineWater"
@@ -143,8 +121,6 @@ const MainNextPage: React.FC = () => {
       {modals.map((ModalComponent, index) => (
         <ModalComponent key={index} />
       ))}
-
-      <FilterDialog isOpen={isFilterModalOpen} onOpenChange={setFilterModalOpen} onApplyFilter={handleApplyFilter} onClearFilter={handleClearFilter} />
     </div>
   );
 
