@@ -36,7 +36,6 @@ export const apiSlice = createApi({
     'Footer',
     'tagTypeFormSubmission',
     'tagTypeMedia',
-    'tagTypeCourse',
     'tagTypeAssignments',
   ],
   reducerPath: 'api',
