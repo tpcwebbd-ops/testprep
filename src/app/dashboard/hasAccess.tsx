@@ -8,6 +8,7 @@ import { useSession } from '@/lib/auth-client';
 import { useGetAccessManagementsQuery } from '@/redux/features/accessManagements/accessManagementsSlice';
 import { useGetRolesQuery } from '@/redux/features/roles/rolesSlice';
 import { Button } from '@/components/ui/button';
+import TooManyRequests from './posts/components/TooManyRequest';
 
 const LoadingOverlay = () => (
   <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden">
@@ -87,12 +88,19 @@ const HasAccess = ({ children }: { children: React.ReactNode }) => {
   const user = session?.data?.user;
   const email = user?.email || '';
 
-  const { data: userAccessManagementQuery, isLoading: isAccessLoading } = useGetAccessManagementsQuery(
-    { user_email: email ?? '', page: 1, limit: 100 },
-    { skip: !email },
-  );
+  const {
+    data: userAccessManagementQuery,
+    isLoading: isAccessLoading,
+    isError: isAccessError,
+    error: accessManagementError,
+  } = useGetAccessManagementsQuery({ user_email: email ?? '', page: 1, limit: 100 }, { skip: !email });
 
-  const { data: allRolesQuery, isLoading: isRolesLoading } = useGetRolesQuery({
+  const {
+    data: allRolesQuery,
+    isLoading: isRolesLoading,
+    isError: isRolesError,
+    error: rolesError,
+  } = useGetRolesQuery({
     page: 1,
     limit: 100,
   });
@@ -172,6 +180,11 @@ const HasAccess = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (!hasPermission) {
+    const roleStatus = rolesError as { status: number };
+    const accessManagementStatus = accessManagementError as { status: number };
+    if (roleStatus?.status === 429 || accessManagementStatus?.status === 429) {
+      return <TooManyRequests />;
+    }
     return (
       <main>
         <UnauthorizedView />

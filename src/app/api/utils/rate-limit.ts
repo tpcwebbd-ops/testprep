@@ -8,7 +8,7 @@
 
 import { NextResponse } from 'next/server';
 
-export const RATE_LIMIT = 100; // 50 requests
+export const RATE_LIMIT = 1; // 50 requests
 export const TIME_WINDOW = 60 * 1000; // 1 minute
 
 export const rateLimitMap = new Map<string, { count: number; timer: NodeJS.Timeout }>();
