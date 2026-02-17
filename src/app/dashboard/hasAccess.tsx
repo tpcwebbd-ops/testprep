@@ -164,7 +164,11 @@ const HasAccess = ({ children }: { children: React.ReactNode }) => {
   if (shouldShowLoading) {
     return <LoadingOverlay />;
   }
-
+  return (
+    <main>
+      <div className="lg:p-10 p-4 pb-12 animate-in fade-in duration-500">{children}</div>
+    </main>
+  );
   if (!isAuthenticated) {
     return null;
   }

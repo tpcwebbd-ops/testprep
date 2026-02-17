@@ -6,7 +6,7 @@ import {
   //    handleTokenVerify,
   IResponse,
 } from '@/app/api/utils/jwt-verify';
-import { isUserHasAccessByRole, IWantAccess } from '@/app/api/utils/is-user-has-access-by-role';
+// import { isUserHasAccessByRole, IWantAccess } from '@/app/api/utils/is-user-has-access-by-role';
 
 // GET all Roles
 export async function GET(req: Request) {
@@ -16,13 +16,13 @@ export async function GET(req: Request) {
   //    const tokenResponse = handleTokenVerify(req);
   //   if (tokenResponse) return tokenResponse;
 
-  const wantToAccess: IWantAccess = {
-    db_name: 'Role',
-    access: 'read',
-  };
-  const isAccess = await isUserHasAccessByRole(wantToAccess);
+  // const wantToAccess: IWantAccess = {
+  //   db_name: 'Role',
+  //   access: 'read',
+  // };
+  // const isAccess = await isUserHasAccessByRole(wantToAccess);
 
-  if (isAccess) return isAccess;
+  // if (isAccess) return isAccess;
 
   const id = new URL(req.url).searchParams.get('id');
   const result: IResponse = id ? await getRoleById(req) : await getRoles(req);
@@ -37,13 +37,13 @@ export async function POST(req: Request) {
   //    const tokenResponse = handleTokenVerify(req);
   //    if (tokenResponse) return tokenResponse;
 
-  const wantToAccess: IWantAccess = {
-    db_name: 'Role',
-    access: 'create',
-  };
-  const isAccess = await isUserHasAccessByRole(wantToAccess);
+  // const wantToAccess: IWantAccess = {
+  //   db_name: 'Role',
+  //   access: 'create',
+  // };
+  // const isAccess = await isUserHasAccessByRole(wantToAccess);
 
-  if (isAccess) return isAccess;
+  // if (isAccess) return isAccess;
 
   const result = await createRole(req);
   return formatResponse(result.data, result.message, result.status);
@@ -56,13 +56,13 @@ export async function PUT(req: Request) {
 
   //    const tokenResponse = handleTokenVerify(req);
   //    if (tokenResponse) return tokenResponse;
-  const wantToAccess: IWantAccess = {
-    db_name: 'Role',
-    access: 'update',
-  };
-  const isAccess = await isUserHasAccessByRole(wantToAccess);
+  // const wantToAccess: IWantAccess = {
+  //   db_name: 'Role',
+  //   access: 'update',
+  // };
+  // const isAccess = await isUserHasAccessByRole(wantToAccess);
 
-  if (isAccess) return isAccess;
+  // if (isAccess) return isAccess;
 
   const isBulk = new URL(req.url).searchParams.get('bulk') === 'true';
   const result = isBulk ? await bulkUpdateRoles(req) : await updateRole(req);
@@ -78,13 +78,13 @@ export async function DELETE(req: Request) {
   //    const tokenResponse = handleTokenVerify(req);
   //    if (tokenResponse) return tokenResponse;
 
-  const wantToAccess: IWantAccess = {
-    db_name: 'Role',
-    access: 'delete',
-  };
-  const isAccess = await isUserHasAccessByRole(wantToAccess);
+  // const wantToAccess: IWantAccess = {
+  //   db_name: 'Role',
+  //   access: 'delete',
+  // };
+  // const isAccess = await isUserHasAccessByRole(wantToAccess);
 
-  if (isAccess) return isAccess;
+  // if (isAccess) return isAccess;
 
   const isBulk = new URL(req.url).searchParams.get('bulk') === 'true';
   const result = isBulk ? await bulkDeleteRoles(req) : await deleteRole(req);
