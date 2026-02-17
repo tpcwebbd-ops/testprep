@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { useParams, usePathname } from 'next/navigation';
 import { useGetCoursesQuery } from '@/redux/features/course/courseSlice';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import {
@@ -19,6 +20,7 @@ import {
   ArrowRight,
   CheckCircle,
   AlertCircle,
+  SearchX,
 } from 'lucide-react';
 
 /*
@@ -40,14 +42,14 @@ interface ContentData {
   url?: string; // For videos
   questions?: Question[]; // For direct assignments
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any; // To handle nested "0", "1" assignment objects
+  [key: string]: any;
 }
 
 interface CourseContentItem {
   id: string;
   key: string;
   name: string;
-  type: string; // 'Videos', 'Assignments', 'video'
+  type: string;
   heading?: string;
   data: ContentData;
 }
@@ -67,7 +69,6 @@ interface EnrichedCourse extends Course {
   progressPercentage: number;
 }
 
-// Discriminated Union for Content Payload
 type VideoPayload = { url: string; description: string };
 type QuizPayload = { questions: Question[] };
 
@@ -90,7 +91,13 @@ const extractYoutubeId = (url: string) => {
   return match && match[2].length === 11 ? match[2] : null;
 };
 
-// Helper to normalize content data with strict typing
+const toKebabCase = (str: string): string => {
+  return str
+    .toLowerCase()
+    .trim()
+    .replace(/[\s_]+/g, '-');
+};
+
 const parseContentItem = (item: CourseContentItem): ParsedContent => {
   const typeStr = item.type.toLowerCase();
 
@@ -110,18 +117,22 @@ const parseContentItem = (item: CourseContentItem): ParsedContent => {
     if (Array.isArray(item.data.questions)) {
       questions = item.data.questions;
     } else {
-      // Search for nested objects containing questions using unknown + type narrowing
       Object.values(item.data).forEach((val: unknown) => {
-        // Safe type check for the nested structure
         if (val && typeof val === 'object' && 'questions' in val && Array.isArray((val as { questions: unknown[] }).questions)) {
           questions = [...questions, ...(val as { questions: Question[] }).questions];
         }
       });
     }
 
-    // Fallback if empty (mocking questions for demo if data is missing)
     if (questions.length === 0) {
-      questions = [{ id: 'mock1', question: 'Is this a placeholder question?', options: ['Yes', 'No'], correctAnswer: 'Yes' }];
+      questions = [
+        {
+          id: 'mock1',
+          question: 'Is this a placeholder question?',
+          options: ['Yes', 'No'],
+          correctAnswer: 'Yes',
+        },
+      ];
     }
 
     return { type: 'QUIZ', payload: { questions } };
@@ -136,19 +147,16 @@ const parseContentItem = (item: CourseContentItem): ParsedContent => {
 |-----------------------------------------
 */
 
-// --- Video Player Component ---
 const VideoPlayer = ({ url, onComplete }: { url: string; onComplete: () => void }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const youtubeId = extractYoutubeId(url);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  // Auto-complete logic
   useEffect(() => {
     let timer: NodeJS.Timeout;
     if (isPlaying) {
       timer = setTimeout(() => {
-        // Enable this line to auto-complete after 5s
-        // onComplete();
+        // onComplete(); // Auto-complete disabled for UX preference
       }, 5000);
     }
     return () => clearTimeout(timer);
@@ -195,7 +203,6 @@ const VideoPlayer = ({ url, onComplete }: { url: string; onComplete: () => void 
   );
 };
 
-// --- Quiz Component ---
 const QuizPlayer = ({ questions, onComplete }: { questions: Question[]; onComplete: () => void }) => {
   const [currentQIndex, setCurrentQIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -291,9 +298,7 @@ const QuizPlayer = ({ questions, onComplete }: { questions: Question[]; onComple
   );
 };
 
-// --- Active Task Modal Overlay ---
 const ActiveTaskOverlay = ({ item, onClose, onComplete }: { item: CourseContentItem; onClose: () => void; onComplete: () => void }) => {
-  // Use the parsed object which has the discriminated union type
   const parsedContent = parseContentItem(item);
 
   return (
@@ -359,8 +364,17 @@ const LevelNode = ({
 
   const nodeVariants: Variants = {
     hidden: { scale: 0, opacity: 0, y: 50 },
-    visible: { scale: 1, opacity: 1, y: 0, transition: { type: 'spring', stiffness: 260, damping: 20, delay: index * 0.1 } },
-    hover: { scale: 1.15, y: -8, transition: { type: 'spring', stiffness: 400, damping: 10 } },
+    visible: {
+      scale: 1,
+      opacity: 1,
+      y: 0,
+      transition: { type: 'spring', stiffness: 260, damping: 20, delay: index * 0.1 },
+    },
+    hover: {
+      scale: 1.15,
+      y: -8,
+      transition: { type: 'spring', stiffness: 400, damping: 10 },
+    },
   };
 
   return (
@@ -368,7 +382,9 @@ const LevelNode = ({
       {!isLast && (
         <div className="absolute top-[4.5rem] md:top-20 left-1/2 -ml-[1px] w-0.5 h-20 md:h-28 -z-10">
           <motion.div
-            className={`w-full h-full border-l-2 border-dashed transition-colors duration-500 ${status === 'completed' ? 'border-emerald-400' : 'border-slate-300'}`}
+            className={`w-full h-full border-l-2 border-dashed transition-colors duration-500 ${
+              status === 'completed' ? 'border-emerald-400' : 'border-slate-300'
+            }`}
             initial={{ scaleY: 0, originY: 0 }}
             animate={{ scaleY: 1 }}
             transition={{ delay: index * 0.15 + 0.3, duration: 0.4 }}
@@ -380,7 +396,9 @@ const LevelNode = ({
         {status === 'current' && (
           <>
             <motion.div
-              animate={{ boxShadow: ['0 0 0 0px rgba(59, 130, 246, 0.4)', '0 0 0 20px rgba(59, 130, 246, 0)'] }}
+              animate={{
+                boxShadow: ['0 0 0 0px rgba(59, 130, 246, 0.4)', '0 0 0 20px rgba(59, 130, 246, 0)'],
+              }}
               transition={{ duration: 2, repeat: Infinity }}
               className="absolute inset-0 rounded-full bg-blue-500 opacity-20"
             />
@@ -452,7 +470,9 @@ const LevelNode = ({
         initial={{ opacity: 0, x: isLeft ? -20 : 20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.5 + index * 0.1 }}
-        className={`absolute top-4 md:top-6 ${isLeft ? 'right-[calc(100%+1rem)] md:right-[calc(52%+14rem)] text-right' : 'left-[calc(100%+14rem)] md:left-[calc(52%+1rem)] text-left'} min-w-[140px] z-0 hidden sm:block`}
+        className={`absolute top-4 md:top-6 ${
+          isLeft ? 'right-[calc(100%+1rem)] md:right-[calc(52%+14rem)] text-right' : 'left-[calc(100%+14rem)] md:left-[calc(52%+1rem)] text-left'
+        } min-w-[140px] z-0 hidden sm:block`}
       >
         <h3 className={`font-bold text-sm ${status === 'completed' ? 'text-emerald-600' : status === 'current' ? 'text-blue-600' : 'text-slate-400'}`}>
           {course.courseDay}
@@ -606,7 +626,9 @@ const ContentModal = ({
                               </h4>
                               <div className="flex items-center gap-2 text-xs mt-1">
                                 <span
-                                  className={`px-2 py-0.5 rounded font-semibold capitalize ${isCompleted ? 'bg-emerald-200/50 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}
+                                  className={`px-2 py-0.5 rounded font-semibold capitalize ${
+                                    isCompleted ? 'bg-emerald-200/50 text-emerald-700' : 'bg-slate-100 text-slate-500'
+                                  }`}
                                 >
                                   {item.type}
                                 </span>
@@ -650,20 +672,35 @@ const ContentModal = ({
 };
 
 const Page = () => {
+  const pathName = usePathname();
+
+  // Assuming the route is [...]/[slug]/page.tsx, params.slug will hold "free-course"
+  // If the directory structure differs (e.g. [...]/[courseId]/page.tsx), adjust keys accordingly.
+  // We use type casting or optional chaining to safely access 'slug' or 'courseId'.
+  const courseTypeSlug = pathName.split('/')[3] || ('' as string);
+
   const { data: coursesData, isLoading, error } = useGetCoursesQuery({ page: 1, limit: 1000, q: '' });
   const [selectedCourse, setSelectedCourse] = useState<EnrichedCourse | null>(null);
-
-  // Initialize with some data for demo or pull from DB
   const [completedContentIds, setCompletedContentIds] = useState<string[]>(['video-video-uid-1-1766560822726']);
 
   const gameLevels = useMemo<EnrichedCourse[]>(() => {
     if (!coursesData) return [];
 
-    // Safety check for unknown API structure structure
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const rawCourses: Course[] = Array.isArray(coursesData) ? coursesData : (coursesData as any).courses || [];
 
-    const sorted = [...rawCourses].sort((a, b) => getDayNumber(a.courseDay) - getDayNumber(b.courseDay));
+    // 2. Filter Logic: Match kebab-case param with normalized courseName
+    let filteredCourses = rawCourses;
+    if (courseTypeSlug) {
+      filteredCourses = rawCourses.filter(c => toKebabCase(c.courseName) === courseTypeSlug);
+    }
+    console.log('pathName', pathName.split('/')[3]);
+    console.log('rawCourses', rawCourses);
+    console.log('courseTypeSlug', courseTypeSlug);
+    console.log('filteredCourses', filteredCourses);
+    console.log('filteredCourses', filteredCourses);
+
+    const sorted = [...filteredCourses].sort((a, b) => getDayNumber(a.courseDay) - getDayNumber(b.courseDay));
 
     let isPrevCompleted = true;
 
@@ -688,7 +725,7 @@ const Page = () => {
 
       return { ...course, status, progressPercentage };
     });
-  }, [coursesData, completedContentIds]);
+  }, [coursesData, completedContentIds, courseTypeSlug]);
 
   const handleNodeClick = (course: EnrichedCourse) => {
     setSelectedCourse(course);
@@ -700,15 +737,27 @@ const Page = () => {
     }
   };
 
-  if (isLoading) return <div className="min-h-screen flex items-center justify-center text-blue-500 font-bold">Loading Map...</div>;
-  if (error) return <div className="min-h-screen flex items-center justify-center text-red-500">Error loading courses.</div>;
+  if (isLoading)
+    return (
+      <div className="min-h-screen flex items-center justify-center text-blue-500 font-bold bg-slate-50">
+        <div className="animate-bounce mr-2">
+          <Zap size={24} />
+        </div>
+        Loading Map...
+      </div>
+    );
+
+  if (error) return <div className="min-h-screen flex items-center justify-center text-red-500 bg-slate-50 font-medium">Error loading courses.</div>;
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 overflow-x-hidden relative pb-20 select-none">
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div
           className="absolute top-0 left-0 w-full h-full opacity-[0.03]"
-          style={{ backgroundImage: 'radial-gradient(#475569 1px, transparent 1px)', backgroundSize: '30px 30px' }}
+          style={{
+            backgroundImage: 'radial-gradient(#475569 1px, transparent 1px)',
+            backgroundSize: '30px 30px',
+          }}
         />
         <motion.div
           animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
@@ -730,30 +779,44 @@ const Page = () => {
                 Campaign Mode
               </span>
             </div>
-            <h1 className="text-4xl md:text-6xl font-black text-slate-800 tracking-tight mb-2">LEARNING QUEST</h1>
+            <h1 className="text-4xl md:text-6xl font-black text-slate-800 tracking-tight mb-2 uppercase">
+              {courseTypeSlug ? courseTypeSlug.replace(/-/g, ' ') : 'Learning Quest'}
+            </h1>
             <p className="text-slate-500 font-medium">Complete tasks to unlock new days</p>
           </motion.div>
         </header>
 
         <div className="flex flex-col items-center relative min-h-[500px]">
-          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="mb-8 z-20">
-            <div className="bg-emerald-500 text-white px-6 py-2 rounded-full font-bold shadow-lg shadow-emerald-200 flex items-center gap-2">
-              <Play size={16} fill="white" /> START
-            </div>
-            <div className="h-8 w-0.5 bg-emerald-300 mx-auto mt-2" />
-          </motion.div>
+          {gameLevels.length > 0 ? (
+            <>
+              <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="mb-8 z-20">
+                <div className="bg-emerald-500 text-white px-6 py-2 rounded-full font-bold shadow-lg shadow-emerald-200 flex items-center gap-2">
+                  <Play size={16} fill="white" /> START
+                </div>
+                <div className="h-8 w-0.5 bg-emerald-300 mx-auto mt-2" />
+              </motion.div>
 
-          <div className="w-full relative">
-            {gameLevels.map((course, index) => (
-              <LevelNode key={course._id} course={course} index={index} onClick={handleNodeClick} isLast={index === gameLevels.length - 1} />
-            ))}
-          </div>
+              <div className="w-full relative">
+                {gameLevels.map((course, index) => (
+                  <LevelNode key={course._id} course={course} index={index} onClick={handleNodeClick} isLast={index === gameLevels.length - 1} />
+                ))}
+              </div>
 
-          {gameLevels.length > 0 && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }} className="mt-8 flex flex-col items-center opacity-50">
-              <div className="h-8 w-0.5 border-l-2 border-dotted border-slate-300 mb-2" />
-              <Trophy size={40} className="text-slate-400" />
-              <span className="text-xs font-bold text-slate-400 mt-2 uppercase tracking-widest">Victory</span>
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }} className="mt-8 flex flex-col items-center opacity-50">
+                <div className="h-8 w-0.5 border-l-2 border-dotted border-slate-300 mb-2" />
+                <Trophy size={40} className="text-slate-400" />
+                <span className="text-xs font-bold text-slate-400 mt-2 uppercase tracking-widest">Victory</span>
+              </motion.div>
+            </>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center py-20 bg-white/50 backdrop-blur-sm rounded-3xl p-8 border border-slate-200 shadow-xl"
+            >
+              <SearchX size={60} className="text-slate-300 mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-slate-600">No Courses Found</h3>
+              <p className="text-slate-500">We couldn&apos;t find any courses matching &quot;{courseTypeSlug}&quot;</p>
             </motion.div>
           )}
         </div>
