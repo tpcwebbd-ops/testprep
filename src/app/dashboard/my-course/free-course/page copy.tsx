@@ -23,6 +23,12 @@ import {
 } from 'lucide-react';
 import { useGetCoursesQuery } from '@/redux/features/course/courseSlice';
 
+/*
+|-----------------------------------------
+| Types & Interfaces
+|-----------------------------------------
+*/
+
 interface Question {
   id: string;
   question: string;
@@ -75,6 +81,12 @@ type ParsedContent =
   | { type: 'TEXT'; payload: TextPayload }
   | { type: 'DOCUMENT'; payload: DocPayload }
   | { type: 'UNKNOWN'; payload: null };
+
+/*
+|-----------------------------------------
+| Helper Functions & Constants
+|-----------------------------------------
+*/
 
 const ITEM_HEIGHT = 300;
 const LOGICAL_WIDTH = 200;
@@ -155,6 +167,12 @@ const parseContentItem = (item: CourseContentItem): ParsedContent => {
 
   return { type: 'UNKNOWN', payload: null };
 };
+
+/*
+|-----------------------------------------
+| Sub-Components
+|-----------------------------------------
+*/
 
 const VideoPlayer = ({ url, onComplete }: { url: string; onComplete: () => void }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -696,16 +714,11 @@ const TimelineItem = ({
             <div className="absolute top-1/2 -translate-y-1/2 flex justify-end pr-16 w-[30%]" style={{ left: 0 }}>
               <div className="text-right">
                 <h3 className="text-3xl font-black text-white drop-shadow-lg">{course.courseDay}</h3>
-                <div className="flex flex-col items-end gap-2 mt-2">
-                  <p
-                    className={`text-sm font-bold uppercase tracking-widest ${status === 'completed' ? 'text-emerald-400' : status === 'current' ? 'text-blue-400' : 'text-slate-500'}`}
-                  >
-                    {status}
-                  </p>
-                  <span className="text-[10px] font-bold px-2 py-1 rounded-md bg-white/5 border border-white/10 text-white/50 tracking-widest shadow-sm">
-                    PHASE {index + 1} / {totalItems}
-                  </span>
-                </div>
+                <p
+                  className={`text-sm font-bold mt-1 uppercase tracking-widest ${status === 'completed' ? 'text-emerald-400' : status === 'current' ? 'text-blue-400' : 'text-slate-500'}`}
+                >
+                  {status}
+                </p>
               </div>
             </div>
             <div className="absolute top-1/2 -translate-y-1/2 pl-16 w-[70%]" style={{ left: '30%' }}>
@@ -735,16 +748,11 @@ const TimelineItem = ({
             <div className="absolute top-1/2 -translate-y-1/2 pl-16 w-[30%]" style={{ left: '70%' }}>
               <div className="text-left">
                 <h3 className="text-3xl font-black text-white drop-shadow-lg">{course.courseDay}</h3>
-                <div className="flex flex-col items-start gap-2 mt-2">
-                  <p
-                    className={`text-sm font-bold uppercase tracking-widest ${status === 'completed' ? 'text-emerald-400' : status === 'current' ? 'text-blue-400' : 'text-slate-500'}`}
-                  >
-                    {status}
-                  </p>
-                  <span className="text-[10px] font-bold px-2 py-1 rounded-md bg-white/5 border border-white/10 text-white/50 tracking-widest shadow-sm">
-                    PHASE {index + 1} / {totalItems}
-                  </span>
-                </div>
+                <p
+                  className={`text-sm font-bold mt-1 uppercase tracking-widest ${status === 'completed' ? 'text-emerald-400' : status === 'current' ? 'text-blue-400' : 'text-slate-500'}`}
+                >
+                  {status}
+                </p>
               </div>
             </div>
           </>
@@ -774,16 +782,11 @@ const TimelineItem = ({
 
         <div className="mb-4">
           <h3 className="text-2xl font-black text-white">{course.courseDay}</h3>
-          <div className="flex items-center gap-3 mt-2">
-            <p
-              className={`text-xs font-bold uppercase tracking-widest ${status === 'completed' ? 'text-emerald-400' : status === 'current' ? 'text-blue-400' : 'text-slate-500'}`}
-            >
-              {status}
-            </p>
-            <span className="text-[10px] font-bold px-2 py-1 rounded-md bg-white/5 border border-white/10 text-white/50 tracking-widest shadow-sm">
-              PHASE {index + 1} / {totalItems}
-            </span>
-          </div>
+          <p
+            className={`text-xs font-bold uppercase tracking-widest ${status === 'completed' ? 'text-emerald-400' : status === 'current' ? 'text-blue-400' : 'text-slate-500'}`}
+          >
+            {status}
+          </p>
         </div>
         <TimelineCard
           course={course}
@@ -880,6 +883,12 @@ const TimelineCard = ({
     </div>
   </motion.button>
 );
+
+/*
+|-----------------------------------------
+| Separated Map Core Logic (Hooks Safety)
+|-----------------------------------------
+*/
 
 const CourseMapContent = ({ coursesData, courseTypeSlug }: { coursesData: unknown; courseTypeSlug: string }) => {
   const [selectedCourse, setSelectedCourse] = useState<EnrichedCourse | null>(null);
@@ -979,6 +988,10 @@ const CourseMapContent = ({ coursesData, courseTypeSlug }: { coursesData: unknow
 
   return (
     <>
+      {/* 
+        This wrapper is *always* rendered, and the ref is unconditionally attached to it.
+        This prevents Framer Motion's "Target ref is defined but not hydrated" error!
+      */}
       <div ref={containerRef} className="flex flex-col items-center relative min-h-[500px] w-full">
         {gameLevels.length > 0 ? (
           <div className="relative w-full max-w-5xl">
@@ -1144,6 +1157,12 @@ const CourseMapContent = ({ coursesData, courseTypeSlug }: { coursesData: unknow
     </>
   );
 };
+
+/*
+|-----------------------------------------
+| Main Layout Entry Point
+|-----------------------------------------
+*/
 
 const Page = () => {
   const pathName = usePathname();

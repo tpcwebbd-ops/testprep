@@ -1,782 +1,287 @@
-look at the page.tsx 
+
+
+and here is media/page.tsx 
 ```
 'use client';
 
-import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { useGetCoursesQuery } from '@/redux/features/course/courseSlice';
-import { motion, AnimatePresence, Variants } from 'framer-motion';
-import {
-  Lock,
-  Check,
-  Star,
-  Play,
-  FileText,
-  X,
-  ChevronRight,
-  Trophy,
-  Sparkles,
-  Zap,
-  Award,
-  RotateCcw,
-  ArrowRight,
-  CheckCircle,
-  AlertCircle,
-} from 'lucide-react';
+import React, { useState, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Video, ImageIcon, FileText, FileCode, Music, Database, LayoutGrid } from 'lucide-react';
+import { toast } from 'react-toastify';
 
-/*
-|-----------------------------------------
-| Types & Interfaces
-|-----------------------------------------
-*/
+import ImageUploadManagerSingle from '@/components/dashboard-ui/media/ImageUploadManagerSingle';
+import VideoUploadMangerSingle from '@/components/dashboard-ui/media/VideoUploadMangerSingle';
+import VideoUploadManger from '@/components/dashboard-ui/media/VideoUploadManger';
+import ImageUploadManager from '@/components/dashboard-ui/media/ImageUploadManager';
 
-interface Question {
-  id: string;
-  question: string;
-  options: string[];
-  correctAnswer: string;
+import { CustomLink } from '@/components/dashboard-ui/LinkButton';
+import PdfUploadManagerSingle from '@/components/dashboard-ui/PdfUploadManagerSingle';
+import DocxUploadManagerSingle from '@/components/dashboard-ui/DocxUploadManagerSingle';
+import AudioUploadManagerSingle from '@/components/dashboard-ui/AudioUploadManagerSingle';
+import PdfUploadManager from '@/components/dashboard-ui/PdfUploadManager';
+import DocxUploadManager from '@/components/dashboard-ui/DocxUploadManager';
+import AudioUploadManager from '@/components/dashboard-ui/AudioUploadManager';
+
+type TabType = 'image' | 'video' | 'pdf' | 'docx' | 'audio';
+
+interface TabConfig {
+  id: TabType;
+  label: string;
+  icon: React.ElementType;
 }
 
-interface ContentData {
-  uid?: string;
-  name?: string;
-  url?: string; // For videos
-  questions?: Question[]; // For direct assignments
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any; // To handle nested "0", "1" assignment objects
-}
+const tabs: TabConfig[] = [
+  { id: 'image', label: 'Image', icon: ImageIcon },
+  { id: 'video', label: 'Video', icon: Video },
+  { id: 'pdf', label: 'PDF', icon: FileText },
+  { id: 'docx', label: 'DOCX', icon: FileCode },
+  { id: 'audio', label: 'Audio', icon: Music },
+];
 
-interface CourseContentItem {
-  id: string;
-  key: string;
-  name: string;
-  type: string; // 'Videos', 'Assignments', 'video'
-  heading?: string;
-  data: ContentData;
-}
+export default function AssetManagementPage() {
+  const [activeTab, setActiveTab] = useState<TabType>('image');
 
-interface Course {
-  _id: string;
-  courseName: string;
-  courseDay: string;
-  isActive: boolean;
-  content: CourseContentItem[];
-  createdAt?: string;
-  updatedAt?: string;
-}
+  const [singleImage, setSingleImage] = useState<string>('');
+  const [multipleImages, setMultipleImages] = useState<string[]>([]);
 
-interface EnrichedCourse extends Course {
-  status: 'locked' | 'current' | 'completed';
-  progressPercentage: number;
-}
+  const [singleVideo, setSingleVideo] = useState<string>('');
+  const [multipleVideos, setMultipleVideos] = useState<string[]>([]);
 
-// Discriminated Union for Content Payload
-type VideoPayload = { url: string; description: string };
-type QuizPayload = { questions: Question[] };
+  const [singlePdf, setSinglePdf] = useState<string>('');
+  const [multiplePdfs, setMultiplePdfs] = useState<string[]>([]);
 
-type ParsedContent = { type: 'VIDEO'; payload: VideoPayload } | { type: 'QUIZ'; payload: QuizPayload } | { type: 'UNKNOWN'; payload: null };
+  const [singleDocx, setSingleDocx] = useState<string>('');
+  const [multipleDocxs, setMultipleDocxs] = useState<string[]>([]);
 
-/*
-|-----------------------------------------
-| Helper Functions
-|-----------------------------------------
-*/
-
-const getDayNumber = (dayStr: string): number => {
-  const match = dayStr.match(/\d+/);
-  return match ? parseInt(match[0], 10) : 999;
-};
-
-const extractYoutubeId = (url: string) => {
-  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-  const match = url.match(regExp);
-  return match && match[2].length === 11 ? match[2] : null;
-};
-
-// Helper to normalize content data with strict typing
-const parseContentItem = (item: CourseContentItem): ParsedContent => {
-  const typeStr = item.type.toLowerCase();
-
-  if (typeStr.includes('video')) {
-    return {
-      type: 'VIDEO',
-      payload: {
-        url: item.data.url || '',
-        description: item.data.description || '',
-      },
-    };
-  }
-
-  if (typeStr.includes('assignment')) {
-    let questions: Question[] = [];
-
-    if (Array.isArray(item.data.questions)) {
-      questions = item.data.questions;
-    } else {
-      // Search for nested objects containing questions using unknown + type narrowing
-      Object.values(item.data).forEach((val: unknown) => {
-        // Safe type check for the nested structure
-        if (val && typeof val === 'object' && 'questions' in val && Array.isArray((val as { questions: unknown[] }).questions)) {
-          questions = [...questions, ...(val as { questions: Question[] }).questions];
-        }
-      });
-    }
-
-    // Fallback if empty (mocking questions for demo if data is missing)
-    if (questions.length === 0) {
-      questions = [{ id: 'mock1', question: 'Is this a placeholder question?', options: ['Yes', 'No'], correctAnswer: 'Yes' }];
-    }
-
-    return { type: 'QUIZ', payload: { questions } };
-  }
-
-  return { type: 'UNKNOWN', payload: null };
-};
-
-/*
-|-----------------------------------------
-| Sub-Components
-|-----------------------------------------
-*/
-
-// --- Video Player Component ---
-const VideoPlayer = ({ url, onComplete }: { url: string; onComplete: () => void }) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const youtubeId = extractYoutubeId(url);
-  const [isPlaying, setIsPlaying] = useState(false);
-
-  // Auto-complete logic
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (isPlaying) {
-      timer = setTimeout(() => {
-        // Enable this line to auto-complete after 5s
-        // onComplete();
-      }, 5000);
-    }
-    return () => clearTimeout(timer);
-  }, [isPlaying, onComplete]);
+  const [singleAudio, setSingleAudio] = useState<string>('');
+  const [multipleAudios, setMultipleAudios] = useState<string[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleUpdate = useCallback((type: string, isMultiple: boolean, value: string | string[]) => {
+    toast.success(`Vault Synced: ${type.toUpperCase()} ${isMultiple ? 'Collection' : 'Node'}`);
+  }, []);
 
   return (
-    <div className="w-full aspect-video bg-black rounded-xl overflow-hidden relative group">
-      {youtubeId ? (
-        <iframe
-          className="w-full h-full"
-          src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&enablejsapi=1`}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          onLoad={() => setIsPlaying(true)}
-        />
-      ) : (
-        <video ref={videoRef} src={url} controls className="w-full h-full" onPlay={() => setIsPlaying(true)} onEnded={onComplete} />
-      )}
-
-      {!isPlaying && !youtubeId && (
-        <div
-          className="absolute inset-0 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all cursor-pointer"
-          onClick={() => {
-            videoRef.current?.play();
-            setIsPlaying(true);
-          }}
-        >
-          <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/40 shadow-xl">
-            <Play fill="white" className="text-white ml-1" size={32} />
-          </div>
-        </div>
-      )}
-
-      <motion.button
-        initial={{ y: 50, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 2 }}
-        onClick={onComplete}
-        className="absolute bottom-4 right-4 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 shadow-lg z-20"
-      >
-        <CheckCircle size={16} /> Mark as Watched
-      </motion.button>
-    </div>
-  );
-};
-
-// --- Quiz Component ---
-const QuizPlayer = ({ questions, onComplete }: { questions: Question[]; onComplete: () => void }) => {
-  const [currentQIndex, setCurrentQIndex] = useState(0);
-  const [selectedOption, setSelectedOption] = useState<string | null>(null);
-  const [score, setScore] = useState(0);
-  const [showResult, setShowResult] = useState(false);
-  const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
-
-  const currentQ = questions[currentQIndex];
-
-  const handleOptionSelect = (opt: string) => {
-    if (isCorrect !== null) return;
-    setSelectedOption(opt);
-    const correct = opt === currentQ.correctAnswer;
-    setIsCorrect(correct);
-    if (correct) setScore(s => s + 1);
-  };
-
-  const handleNext = () => {
-    setSelectedOption(null);
-    setIsCorrect(null);
-    if (currentQIndex < questions.length - 1) {
-      setCurrentQIndex(prev => prev + 1);
-    } else {
-      setShowResult(true);
-      setTimeout(onComplete, 1500);
-    }
-  };
-
-  if (showResult) {
-    return (
-      <div className="flex flex-col items-center justify-center h-64 text-center">
-        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
-          <Trophy className="text-emerald-600" size={40} />
-        </motion.div>
-        <h3 className="text-2xl font-bold text-slate-800">Quiz Completed!</h3>
-        <p className="text-slate-500 font-medium">
-          You scored {score} out of {questions.length}
-        </p>
-        <p className="text-emerald-600 font-bold mt-2 animate-pulse">Assignment Marked Complete!</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex flex-col h-full max-h-[60vh]">
-      <div className="flex justify-between items-center mb-4 text-sm font-bold text-slate-400">
-        <span>
-          Question {currentQIndex + 1} / {questions.length}
-        </span>
-        <span>Score: {score}</span>
+    <div className="min-h-screen relative overflow-hidden bg-black/5">
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] bg-indigo-500/5 blur-[150px] rounded-full" />
+        <div className="absolute bottom-[-20%] left-[-10%] w-[800px] h-[800px] bg-blue-500/5 blur-[150px] rounded-full" />
       </div>
 
-      <div className="mb-6">
-        <h3 className="text-lg md:text-xl font-bold text-slate-800 mb-4">{currentQ.question}</h3>
-        <div className="space-y-3">
-          {currentQ.options.map((opt, idx) => (
-            <button
-              key={idx}
-              onClick={() => handleOptionSelect(opt)}
-              disabled={isCorrect !== null}
-              className={`w-full p-4 rounded-xl text-left font-medium transition-all border-2 flex justify-between items-center
-                ${
-                  selectedOption === opt
-                    ? opt === currentQ.correctAnswer
-                      ? 'bg-emerald-50 border-emerald-500 text-emerald-700'
-                      : 'bg-red-50 border-red-500 text-red-700'
-                    : isCorrect !== null && opt === currentQ.correctAnswer
-                      ? 'bg-emerald-50 border-emerald-500 text-emerald-700'
-                      : 'bg-white border-slate-200 hover:border-blue-300 text-slate-600'
-                }
-              `}
-            >
-              {opt}
-              {selectedOption === opt && (opt === currentQ.correctAnswer ? <Check size={20} /> : <X size={20} />)}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="mt-auto">
-        <button
-          onClick={handleNext}
-          disabled={isCorrect === null}
-          className={`w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all
-            ${isCorrect !== null ? 'bg-blue-600 text-white shadow-lg shadow-blue-200 hover:bg-blue-700' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}
-          `}
-        >
-          {currentQIndex === questions.length - 1 ? 'Finish Quiz' : 'Next Question'}
-          <ArrowRight size={18} />
-        </button>
-      </div>
-    </div>
-  );
-};
-
-// --- Active Task Modal Overlay ---
-const ActiveTaskOverlay = ({ item, onClose, onComplete }: { item: CourseContentItem; onClose: () => void; onComplete: () => void }) => {
-  // Use the parsed object which has the discriminated union type
-  const parsedContent = parseContentItem(item);
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 50, scale: 0.9 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: 50, scale: 0.9 }}
-      className="absolute inset-0 z-50 bg-white flex flex-col"
-    >
-      <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-        <div className="flex items-center gap-3">
-          <button onClick={onClose} className="p-2 hover:bg-slate-200 rounded-full transition">
-            <RotateCcw size={18} className="text-slate-500" />
-          </button>
-          <div className="flex flex-col">
-            <span className="text-xs font-bold text-blue-500 uppercase tracking-wider">{item.type}</span>
-            <h3 className="font-bold text-slate-800 line-clamp-1">{item.heading || item.name}</h3>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex-1 p-4 md:p-8 overflow-y-auto bg-slate-50/50 flex flex-col items-center justify-center">
-        <div className="w-full max-w-2xl bg-white p-4 md:p-6 rounded-2xl shadow-xl border border-slate-100">
-          {parsedContent.type === 'VIDEO' && <VideoPlayer url={parsedContent.payload.url} onComplete={onComplete} />}
-
-          {parsedContent.type === 'QUIZ' && <QuizPlayer questions={parsedContent.payload.questions} onComplete={onComplete} />}
-
-          {parsedContent.type === 'UNKNOWN' && (
-            <div className="text-center py-10">
-              <AlertCircle size={40} className="mx-auto text-amber-500 mb-2" />
-              <p>Content type not supported.</p>
-              <button onClick={onComplete} className="mt-4 underline text-blue-500">
-                Skip & Mark Complete
-              </button>
+      <div className="container mx-auto relative z-10 px-4 py-8 md:py-12">
+        <div className="w-full flex flex-col md:flex-row items-center justify-between mb-12 gap-6">
+          <nav className="w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
+            <div className="flex items-center gap-2 whitespace-nowrap">
+              {tabs.map(tab => {
+                const Icon = tab.icon;
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`
+                    relative flex items-center gap-2 px-6 py-3 rounded-xl transition-all duration-500 border
+                    ${
+                      isActive
+                        ? 'bg-indigo-500/10 border-indigo-500/50 text-white shadow-[0_0_20px_rgba(99,102,241,0.2)]'
+                        : 'bg-white/5 border-white/5 text-white/40 hover:bg-white/10 hover:border-white/20'
+                    }
+                  `}
+                  >
+                    <Icon className={`w-4 h-4 transition-colors ${isActive ? 'text-indigo-400' : 'text-white/20'}`} />
+                    <span className="font-black tracking-widest text-[10px] uppercase">{tab.label}</span>
+                  </button>
+                );
+              })}
             </div>
-          )}
+          </nav>
+          <CustomLink href="/dashboard/media" variant="outlineGlassy" size="sm">
+            MEDIA CENTER
+          </CustomLink>
         </div>
-      </div>
-    </motion.div>
-  );
-};
 
-/*
-|-----------------------------------------
-| Main Components
-|-----------------------------------------
-*/
-
-const LevelNode = ({
-  course,
-  index,
-  onClick,
-  isLast,
-}: {
-  course: EnrichedCourse;
-  index: number;
-  onClick: (course: EnrichedCourse) => void;
-  isLast: boolean;
-}) => {
-  const isLeft = index % 2 === 0;
-  const { status, progressPercentage } = course;
-  const [isHovered, setIsHovered] = useState(false);
-
-  const nodeVariants: Variants = {
-    hidden: { scale: 0, opacity: 0, y: 50 },
-    visible: { scale: 1, opacity: 1, y: 0, transition: { type: 'spring', stiffness: 260, damping: 20, delay: index * 0.1 } },
-    hover: { scale: 1.15, y: -8, transition: { type: 'spring', stiffness: 400, damping: 10 } },
-  };
-
-  return (
-    <div className={`relative flex w-full ${isLeft ? 'justify-start md:justify-end md:pr-[52%]' : 'justify-end md:justify-start md:pl-[52%]'} mb-16 md:mb-24`}>
-      {!isLast && (
-        <div className="absolute top-[4.5rem] md:top-20 left-1/2 -ml-[1px] w-0.5 h-20 md:h-28 -z-10">
+        <AnimatePresence mode="wait">
           <motion.div
-            className={`w-full h-full border-l-2 border-dashed transition-colors duration-500 ${status === 'completed' ? 'border-emerald-400' : 'border-slate-300'}`}
-            initial={{ scaleY: 0, originY: 0 }}
-            animate={{ scaleY: 1 }}
-            transition={{ delay: index * 0.15 + 0.3, duration: 0.4 }}
-          />
-        </div>
-      )}
-
-      <div className="relative group">
-        {status === 'current' && (
-          <>
-            <motion.div
-              animate={{ boxShadow: ['0 0 0 0px rgba(59, 130, 246, 0.4)', '0 0 0 20px rgba(59, 130, 246, 0)'] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="absolute inset-0 rounded-full bg-blue-500 opacity-20"
-            />
-            <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-full blur opacity-75 animate-pulse" />
-          </>
-        )}
-
-        <motion.button
-          variants={nodeVariants}
-          initial="hidden"
-          animate="visible"
-          whileHover={status !== 'locked' ? 'hover' : undefined}
-          whileTap={status !== 'locked' ? { scale: 0.95 } : undefined}
-          onClick={() => status !== 'locked' && onClick(course)}
-          onHoverStart={() => setIsHovered(true)}
-          onHoverEnd={() => setIsHovered(false)}
-          disabled={status === 'locked'}
-          className={`
-            relative z-10 flex flex-col items-center justify-center
-            w-20 h-20 md:w-28 md:h-28 rounded-full border-4 shadow-xl 
-            transition-all duration-300 overflow-hidden bg-white
-            ${
-              status === 'completed'
-                ? 'border-emerald-500 text-emerald-600'
-                : status === 'current'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-slate-300 text-slate-400 grayscale bg-slate-100'
-            }
-          `}
-        >
-          {status === 'current' && (
-            <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 100 100">
-              <circle cx="50" cy="50" r="46" fill="transparent" stroke="#e2e8f0" strokeWidth="8" />
-              <motion.circle
-                cx="50"
-                cy="50"
-                r="46"
-                fill="transparent"
-                stroke="#3b82f6"
-                strokeWidth="8"
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: progressPercentage / 100 }}
-                transition={{ duration: 1, ease: 'easeOut' }}
-                strokeLinecap="round"
-                className="drop-shadow-md"
-              />
-            </svg>
-          )}
-
-          <div className="relative z-10 flex flex-col items-center">
-            {status === 'completed' ? (
-              <Check size={32} strokeWidth={4} />
-            ) : status === 'locked' ? (
-              <Lock size={28} />
-            ) : (
-              <Play size={32} fill="currentColor" className={isHovered ? 'scale-110 transition-transform' : ''} />
-            )}
-
-            <div
-              className={`mt-1 text-[10px] md:text-xs font-black uppercase tracking-widest ${status === 'completed' ? 'text-emerald-700' : 'text-slate-500'}`}
-            >
-              {getDayNumber(course.courseDay)}
-            </div>
-          </div>
-        </motion.button>
-      </div>
-
-      <motion.div
-        initial={{ opacity: 0, x: isLeft ? -20 : 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 0.5 + index * 0.1 }}
-        className={`absolute top-4 md:top-6 ${isLeft ? 'right-[calc(100%+1rem)] md:right-[calc(52%+14rem)] text-right' : 'left-[calc(100%+14rem)] md:left-[calc(52%+1rem)] text-left'} min-w-[140px] z-0 hidden sm:block`}
-      >
-        <h3 className={`font-bold text-sm ${status === 'completed' ? 'text-emerald-600' : status === 'current' ? 'text-blue-600' : 'text-slate-400'}`}>
-          {course.courseDay}
-        </h3>
-        <p className="text-xs text-slate-500 font-semibold truncate max-w-[150px]">{course.courseName}</p>
-        <div className="flex items-center gap-1 text-[10px] text-slate-400 mt-1 justify-end">
-          {status === 'completed' && <Star size={10} className="text-yellow-400 fill-yellow-400" />}
-          {course.content.length} Tasks
-        </div>
-      </motion.div>
-    </div>
-  );
-};
-
-const ContentModal = ({
-  course,
-  isOpen,
-  onClose,
-  completedContentIds,
-  onTaskComplete,
-}: {
-  course: EnrichedCourse | null;
-  isOpen: boolean;
-  onClose: () => void;
-  completedContentIds: string[];
-  onTaskComplete: (contentId: string) => void;
-}) => {
-  const [activeTask, setActiveTask] = useState<CourseContentItem | null>(null);
-
-  if (!isOpen || !course) return null;
-
-  const courseContentIds = course.content.map(c => c.id);
-  const completedInThisCourse = courseContentIds.filter(id => completedContentIds.includes(id)).length;
-  const progress = course.content.length > 0 ? (completedInThisCourse / course.content.length) * 100 : 0;
-
-  const handleTaskClick = (item: CourseContentItem) => {
-    setActiveTask(item);
-  };
-
-  const handleTaskFinish = () => {
-    if (activeTask) {
-      onTaskComplete(activeTask.id);
-      setActiveTask(null);
-    }
-  };
-
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40"
-          />
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0, y: 50 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.9, opacity: 0, y: 50 }}
-            className="fixed inset-0 m-auto z-50 w-[95%] sm:w-[90%] max-w-3xl h-[85vh] bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col"
+            key={activeTab}
+            initial={{ opacity: 0, scale: 0.98, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.98, y: -20 }}
+            transition={{ type: 'spring', stiffness: 100, damping: 20 }}
+            className="grid grid-cols-1 lg:grid-cols-2 gap-10"
           >
-            <div
-              className={`p-6 md:p-8 text-white relative overflow-hidden shrink-0 transition-colors duration-500
-              ${progress === 100 ? 'bg-gradient-to-br from-emerald-500 to-green-600' : 'bg-gradient-to-br from-blue-600 to-indigo-700'}
-            `}
-            >
-              <button onClick={onClose} className="absolute top-4 right-4 bg-white/20 hover:bg-white/30 p-2 rounded-full backdrop-blur-md transition">
-                <X size={20} />
-              </button>
-
-              <div className="relative z-10">
-                <div className="flex items-center gap-2 mb-2 opacity-90">
-                  {progress === 100 ? <Award size={18} className="text-yellow-300" /> : <Zap size={18} className="text-blue-200" />}
-                  <span className="text-xs font-bold uppercase tracking-wider">{course.courseName}</span>
+            <section className="space-y-6">
+              <div className="flex items-center gap-4 px-2">
+                <div className="p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
+                  <Database className="w-4 h-4 text-indigo-400" />
                 </div>
-                <h2 className="text-3xl md:text-4xl font-black mb-4">{course.courseDay}</h2>
+                <div>
+                  <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-white">Primary Asset</h3>
+                  <p className="text-[8px] font-bold text-white/20 uppercase tracking-widest">Single Entry Node</p>
+                </div>
+              </div>
 
-                <div className="bg-black/20 h-3 rounded-full overflow-hidden backdrop-blur-sm border border-white/10">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${progress}%` }}
-                    className={`h-full ${progress === 100 ? 'bg-white' : 'bg-yellow-400'}`}
+              <div className="bg-white/[0.02] backdrop-blur-3xl border border-white/5 p-8 rounded-[2.5rem] shadow-2xl transition-all duration-500 hover:border-white/10">
+                {activeTab === 'image' && (
+                  <ImageUploadManagerSingle
+                    value={singleImage}
+                    onChange={val => {
+                      setSingleImage(val);
+                      handleUpdate('image', false, val);
+                    }}
                   />
-                </div>
-                <div className="flex justify-between mt-2 text-xs font-medium opacity-80">
-                  <span>
-                    {completedInThisCourse} / {course.content.length} Completed
-                  </span>
-                  <span>{Math.round(progress)}%</span>
-                </div>
-              </div>
-              <Sparkles className="absolute bottom-0 right-0 text-white/10 w-32 h-32 -mb-8 -mr-8" />
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-4 bg-slate-50 relative">
-              <AnimatePresence mode="wait">
-                {activeTask ? (
-                  <ActiveTaskOverlay key="active-task" item={activeTask} onClose={() => setActiveTask(null)} onComplete={handleTaskFinish} />
-                ) : (
-                  <div className="space-y-3 pb-20">
-                    {course.content.length === 0 ? (
-                      <div className="text-center py-20 opacity-50">
-                        <Lock size={48} className="mx-auto mb-2" />
-                        <p>Content locked or coming soon.</p>
-                      </div>
-                    ) : (
-                      course.content.map((item, idx) => {
-                        const isCompleted = completedContentIds.includes(item.id);
-                        return (
-                          <motion.div
-                            key={item.id}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: idx * 0.05 }}
-                            onClick={() => handleTaskClick(item)}
-                            className={`
-                              group flex items-center p-4 rounded-xl border-2 cursor-pointer transition-all
-                              ${
-                                isCompleted
-                                  ? 'bg-emerald-50/50 border-emerald-200 hover:bg-emerald-50'
-                                  : 'bg-white border-slate-200 hover:border-blue-400 hover:shadow-md'
-                              }
-                            `}
-                          >
-                            <div
-                              className={`
-                              w-12 h-12 rounded-full flex items-center justify-center mr-4 shrink-0 transition-transform group-hover:scale-110
-                              ${
-                                isCompleted
-                                  ? 'bg-emerald-500 text-white'
-                                  : item.type.toLowerCase().includes('video')
-                                    ? 'bg-red-100 text-red-500'
-                                    : 'bg-blue-100 text-blue-500'
-                              }
-                            `}
-                            >
-                              {isCompleted ? (
-                                <Check size={20} strokeWidth={3} />
-                              ) : item.type.toLowerCase().includes('video') ? (
-                                <Play size={20} fill="currentColor" />
-                              ) : (
-                                <FileText size={20} />
-                              )}
-                            </div>
-
-                            <div className="flex-1 min-w-0">
-                              <h4 className={`font-bold text-sm md:text-base truncate ${isCompleted ? 'text-emerald-900' : 'text-slate-800'}`}>
-                                {item.heading || item.name}
-                              </h4>
-                              <div className="flex items-center gap-2 text-xs mt-1">
-                                <span
-                                  className={`px-2 py-0.5 rounded font-semibold capitalize ${isCompleted ? 'bg-emerald-200/50 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}
-                                >
-                                  {item.type}
-                                </span>
-                                {item.data?.totalMarks && (
-                                  <span className="text-orange-500 flex items-center gap-1 font-bold">
-                                    <Trophy size={10} /> {item.data.totalMarks} pts
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-
-                            <div
-                              className={`
-                              w-8 h-8 rounded-full flex items-center justify-center transition-colors
-                              ${isCompleted ? 'text-emerald-500' : 'text-slate-300 group-hover:text-blue-500'}
-                            `}
-                            >
-                              <ChevronRight size={20} />
-                            </div>
-                          </motion.div>
-                        );
-                      })
-                    )}
-                  </div>
                 )}
-              </AnimatePresence>
-            </div>
-
-            {!activeTask && (
-              <div className="p-4 border-t bg-white shrink-0 z-10">
-                <button onClick={onClose} className="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition">
-                  Back to Map
-                </button>
+                {activeTab === 'video' && (
+                  <VideoUploadMangerSingle
+                    value={singleVideo}
+                    onChange={val => {
+                      setSingleVideo(val);
+                      handleUpdate('video', false, val);
+                    }}
+                  />
+                )}
+                {activeTab === 'pdf' && (
+                  <PdfUploadManagerSingle
+                    value={singlePdf}
+                    onChange={val => {
+                      setSinglePdf(val);
+                      handleUpdate('pdf', false, val);
+                    }}
+                  />
+                )}
+                {activeTab === 'docx' && (
+                  <DocxUploadManagerSingle
+                    value={singleDocx}
+                    onChange={val => {
+                      setSingleDocx(val);
+                      handleUpdate('docx', false, val);
+                    }}
+                  />
+                )}
+                {activeTab === 'audio' && (
+                  <AudioUploadManagerSingle
+                    value={singleAudio}
+                    onChange={val => {
+                      setSingleAudio(val);
+                      handleUpdate('audio', false, val);
+                    }}
+                  />
+                )}
               </div>
-            )}
+            </section>
+
+            <section className="space-y-6">
+              <div className="flex items-center gap-4 px-2">
+                <div className="p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
+                  <LayoutGrid className="w-4 h-4 text-indigo-400" />
+                </div>
+                <div>
+                  <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-white">Gallery Cluster</h3>
+                  <p className="text-[8px] font-bold text-white/20 uppercase tracking-widest">Multi-Asset Data Grid</p>
+                </div>
+              </div>
+
+              <div className="bg-white/[0.02] backdrop-blur-3xl border border-white/5 p-8 rounded-[2.5rem] shadow-2xl transition-all duration-500 hover:border-white/10">
+                {activeTab === 'image' && (
+                  <ImageUploadManager
+                    value={multipleImages}
+                    onChange={val => {
+                      setMultipleImages(val);
+                      handleUpdate('image', true, val);
+                    }}
+                  />
+                )}
+                {activeTab === 'video' && (
+                  <VideoUploadManger
+                    value={multipleVideos}
+                    onChange={val => {
+                      setMultipleVideos(val);
+                      handleUpdate('video', true, val);
+                    }}
+                  />
+                )}
+                {activeTab === 'pdf' && (
+                  <PdfUploadManager
+                    value={multiplePdfs}
+                    onChange={val => {
+                      setMultiplePdfs(val);
+                      handleUpdate('pdf', true, val);
+                    }}
+                  />
+                )}
+                {activeTab === 'docx' && (
+                  <DocxUploadManager
+                    value={multipleDocxs}
+                    onChange={val => {
+                      setMultipleDocxs(val);
+                      handleUpdate('docx', true, val);
+                    }}
+                  />
+                )}
+                {activeTab === 'audio' && (
+                  <AudioUploadManager
+                    value={multipleAudios}
+                    onChange={val => {
+                      setMultipleAudios(val);
+                      handleUpdate('audio', true, val);
+                    }}
+                  />
+                )}
+              </div>
+            </section>
           </motion.div>
-        </>
-      )}
-    </AnimatePresence>
-  );
-};
-
-const Page = () => {
-  const { data: coursesData, isLoading, error } = useGetCoursesQuery({ page: 1, limit: 1000, q: '' });
-  const [selectedCourse, setSelectedCourse] = useState<EnrichedCourse | null>(null);
-  console.log('coursesData', coursesData);
-  // Initialize with some data for demo or pull from DB
-  const [completedContentIds, setCompletedContentIds] = useState<string[]>(['video-video-uid-1-1766560822726']);
-
-  const gameLevels = useMemo<EnrichedCourse[]>(() => {
-    if (!coursesData) return [];
-
-    // Safety check for unknown API structure structure
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const rawCourses: Course[] = Array.isArray(coursesData) ? coursesData : (coursesData as any).courses || [];
-
-    const sorted = [...rawCourses].sort((a, b) => getDayNumber(a.courseDay) - getDayNumber(b.courseDay));
-
-    let isPrevCompleted = true;
-
-    return sorted.map(course => {
-      const totalContent = course.content.length;
-      const completedCount = course.content.filter(c => completedContentIds.includes(c.id)).length;
-      const isComplete = totalContent > 0 && completedCount === totalContent;
-      const progressPercentage = totalContent > 0 ? (completedCount / totalContent) * 100 : 0;
-
-      let status: 'locked' | 'current' | 'completed' = 'locked';
-
-      if (isComplete) {
-        status = 'completed';
-        isPrevCompleted = true;
-      } else if (isPrevCompleted) {
-        status = 'current';
-        isPrevCompleted = false;
-      } else {
-        status = 'locked';
-        isPrevCompleted = false;
-      }
-
-      return { ...course, status, progressPercentage };
-    });
-  }, [coursesData, completedContentIds]);
-
-  const handleNodeClick = (course: EnrichedCourse) => {
-    setSelectedCourse(course);
-  };
-
-  const handleTaskComplete = (contentId: string) => {
-    if (!completedContentIds.includes(contentId)) {
-      setCompletedContentIds(prev => [...prev, contentId]);
-    }
-  };
-
-  if (isLoading) return <div className="min-h-screen flex items-center justify-center text-blue-500 font-bold">Loading Map...</div>;
-  if (error) return <div className="min-h-screen flex items-center justify-center text-red-500">Error loading courses.</div>;
-
-  return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 overflow-x-hidden relative pb-20 select-none">
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div
-          className="absolute top-0 left-0 w-full h-full opacity-[0.03]"
-          style={{ backgroundImage: 'radial-gradient(#475569 1px, transparent 1px)', backgroundSize: '30px 30px' }}
-        />
-        <motion.div
-          animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
-          transition={{ duration: 10, repeat: Infinity }}
-          className="absolute -top-[20%] -right-[20%] w-[800px] h-[800px] bg-blue-300/20 rounded-full blur-[100px]"
-        />
-        <motion.div
-          animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}
-          transition={{ duration: 15, repeat: Infinity }}
-          className="absolute -bottom-[20%] -left-[20%] w-[800px] h-[800px] bg-purple-300/20 rounded-full blur-[100px]"
-        />
+        </AnimatePresence>
       </div>
-
-      <div className="relative z-10 max-w-3xl mx-auto px-4 py-8 md:py-16">
-        <header className="text-center mb-20 relative">
-          <motion.div initial={{ y: -50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="inline-block">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <span className="bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1 rounded-full border border-blue-200 uppercase tracking-widest">
-                Campaign Mode
-              </span>
-            </div>
-            <h1 className="text-4xl md:text-6xl font-black text-slate-800 tracking-tight mb-2">LEARNING QUEST</h1>
-            <p className="text-slate-500 font-medium">Complete tasks to unlock new days</p>
-          </motion.div>
-        </header>
-
-        <div className="flex flex-col items-center relative min-h-[500px]">
-          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="mb-8 z-20">
-            <div className="bg-emerald-500 text-white px-6 py-2 rounded-full font-bold shadow-lg shadow-emerald-200 flex items-center gap-2">
-              <Play size={16} fill="white" /> START
-            </div>
-            <div className="h-8 w-0.5 bg-emerald-300 mx-auto mt-2" />
-          </motion.div>
-
-          <div className="w-full relative">
-            {gameLevels.map((course, index) => (
-              <LevelNode key={course._id} course={course} index={index} onClick={handleNodeClick} isLast={index === gameLevels.length - 1} />
-            ))}
-          </div>
-
-          {gameLevels.length > 0 && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }} className="mt-8 flex flex-col items-center opacity-50">
-              <div className="h-8 w-0.5 border-l-2 border-dotted border-slate-300 mb-2" />
-              <Trophy size={40} className="text-slate-400" />
-              <span className="text-xs font-bold text-slate-400 mt-2 uppercase tracking-widest">Victory</span>
-            </motion.div>
-          )}
-        </div>
-      </div>
-
-      <ContentModal
-        course={selectedCourse}
-        isOpen={!!selectedCourse}
-        onClose={() => setSelectedCourse(null)}
-        completedContentIds={completedContentIds}
-        onTaskComplete={handleTaskComplete}
-      />
-    </main>
+    </div>
   );
-};
+}
 
-export default Page;
 ```
-
-and here is url = "http://localhost:3000/dashboard/my-course/free-course" 
-
-Now Your task is 
-1. get "free-course" from params.
-2. filter courseName by the params.
+Now compy color-combination and style form this page.tsx
+Now Your taks is generate a page.tsx with the design, color-combination and implement those features as my following instructions. 
+System / Instruction Prompt:
+You are an expert Frontend Developer specializing in React, Next.js (App Router), Tailwind CSS, and Framer Motion.
+Your task is to build a visually stunning, highly interactive "Gamified Learning Quest" page component. The page acts as a "Campaign Mode" map for an online course, where users progress through daily modules represented as nodes on a winding, glowing path.
+Strict Technical Requirements:
+Use Next.js (App router) with the 'use client' directive.
+Use TypeScript strictly. Define comprehensive interfaces for all data structures (Course, CourseContentItem, ParsedContent, Questions, etc.). Do not leave any any types that could cause build errors.
+Use Tailwind CSS for styling.
+Use Framer Motion extensively for all animations (page transitions, scroll-linked path drawing, hover effects, modal pops, and a mastery celebration particle effect).
+Use Lucide React for icons.
+Import useGetCoursesQuery from @/redux/features/course/courseSlice to fetch the course data.
+DO NOT include a single comment in the generated codebase.
+Ensure the layout is flawlessly responsive across mobile, tablet, and desktop. On desktop, timeline items alternate left and right. On mobile, they align to the left.
+Visual & UI Theme:
+Background: Deep dark space theme (bg-slate-950) with subtle backdrop blurs, starry texture overlays, and large, blurred glowing orbs (mix-blend-screen).
+Gamified Elements: Badges, progress bars, and high-contrast gradients.
+States:
+Locked: Slate/grey colors, disabled states, Lock icon.
+Current: Pulsing blue/indigo neon effects, Zap icon.
+Completed: Emerald/teal gradients, checkmarks, Award icon.
+Glassmorphism: Modals and cards should use semi-transparent backgrounds with backdrop-blur and subtle borders.
+Core Features & Components to Build:
+Data Fetching & Parsing:
+Fetch data using useGetCoursesQuery({ page: 1, limit: 1000, q: '' }). Show a spinning loader while loading.
+Extract the course category from the URL using usePathname().split('/')[3]. Filter the fetched courses by matching the kebab-cased category name to the course name.
+Sort courses chronologically by extracting the day number from courseDay (e.g., "Day 1").
+The Winding Path (Timeline):
+Calculate node states: A node is "completed" if all its tasks are done. The first uncompleted node is "current". All subsequent nodes are "locked".
+Use an SVG <path> and framer-motion's useScroll and useSpring to create a winding timeline line that fills with a neon gradient as the user scrolls down the page.
+Alternate the layout of timeline cards (Left 30% / Right 70% then Right 70% / Left 30%) on desktop.
+Timeline Cards:
+Display the Day number, Course Title, Status, and total assignments.
+When hovering over an unlocked card, slightly scale it up and lift it on the Y-axis.
+Clicking a "current" or "completed" card opens the ContentModal.
+Course Content Modal:
+A large centered glassmorphic modal with an animated progress bar at the top indicating the completion percentage of the selected day's tasks.
+Display a list of tasks. Tasks can be Videos, Quizzes, Text, or Documents.
+Clicking a task opens the ActiveTaskOverlay.
+Include a "Complete Today's Module" button at the bottom, which is only enabled when all tasks in the modal are marked as completed.
+Active Task Overlay (Task Players):
+Renders over the task list.
+Video Player: Should detect if the URL is a YouTube link and render an iframe, otherwise render a native <video>. Include a custom "Play" overlay cover. Contains a "Complete Video Task" button.
+Quiz Player: Renders multiple-choice questions one by one with an interactive progress bar. Validate answers (green for correct, red for incorrect). Show a score/results screen at the end with a "Complete Assignment" button.
+Generic Viewers: For text and documents, show an icon and a description with a "Complete Task" button.
+Mastery Celebration:
+If the user completes the final available module, reveal a massive "Complete Course" button at the bottom of the timeline.
+Clicking it triggers a spectacular, fullscreen AnimatePresence celebration with a spinning glowing backdrop, floating particle arrays, and a giant Trophy icon stating "Mastery Achieved".
+Data Interfaces (Reference):
+Ensure your code parses unstructured backend content safely into distinct VIDEO, QUIZ, TEXT, and DOCUMENT types based on string matching the content's type field, mapping questions and URLs accordingly.
