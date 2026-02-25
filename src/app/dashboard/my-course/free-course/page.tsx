@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useRef } from 'react';
 import { usePathname } from 'next/navigation';
-import { motion, AnimatePresence, useScroll, useSpring, Variants } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 import {
   Lock,
   Check,
@@ -76,10 +76,11 @@ type ParsedContent =
   | { type: 'DOCUMENT'; payload: DocPayload }
   | { type: 'UNKNOWN'; payload: null };
 
-const ITEM_HEIGHT = 300;
+const ITEM_HEIGHT = 200;
 const LOGICAL_WIDTH = 200;
 const CENTER_X = 100;
 const SWAY_AMPLITUDE = 40;
+const SVG_Y_OFFSET = 16;
 
 const getDayNumber = (dayStr: string): number => {
   const match = dayStr.match(/\d+/);
@@ -163,7 +164,7 @@ const VideoPlayer = ({ url, onComplete }: { url: string; onComplete: () => void 
 
   return (
     <div className="flex flex-col h-full w-full">
-      <div className="w-full aspect-video bg-black rounded-xl overflow-hidden relative group shrink-0 shadow-2xl">
+      <div className="w-full aspect-video bg-black rounded-sm overflow-hidden relative group shrink-0 shadow-2xl">
         {youtubeId ? (
           <iframe
             className="w-full h-full"
@@ -184,18 +185,18 @@ const VideoPlayer = ({ url, onComplete }: { url: string; onComplete: () => void 
               setIsPlaying(true);
             }}
           >
-            <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/40 shadow-xl hover:scale-110 transition-transform">
-              <Play fill="white" className="text-white ml-1" size={32} />
+            <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/40 shadow-xl hover:scale-110 transition-transform">
+              <Play fill="white" className="text-white ml-1" size={24} />
             </div>
           </div>
         )}
       </div>
-      <div className="mt-auto pt-8">
+      <div className="mt-auto pt-4">
         <button
           onClick={onComplete}
-          className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl font-bold text-lg flex items-center justify-center gap-2 shadow-lg shadow-blue-500/30 transition-all transform hover:-translate-y-1"
+          className="w-full py-4 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white rounded-sm font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-violet-500/30 transition-all transform hover:-translate-y-1"
         >
-          <CheckCircle size={24} /> Complete Video Task
+          <CheckCircle size={20} /> Complete Video Task
         </button>
       </div>
     </div>
@@ -236,19 +237,19 @@ const QuizPlayer = ({ questions, onComplete }: { questions: Question[]; onComple
           initial={{ scale: 0, rotate: -180 }}
           animate={{ scale: 1, rotate: 0 }}
           transition={{ type: 'spring', bounce: 0.5 }}
-          className="w-32 h-32 bg-emerald-100 rounded-full flex items-center justify-center mb-6 shadow-2xl shadow-emerald-200"
+          className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mb-4 shadow-2xl shadow-emerald-200"
         >
-          <Trophy className="text-emerald-500" size={64} />
+          <Trophy className="text-emerald-500" size={40} />
         </motion.div>
-        <h3 className="text-4xl font-black text-slate-800 mb-2">Quiz Completed!</h3>
-        <p className="text-xl text-slate-500 font-medium mb-12">
+        <h3 className="text-xl font-black text-zinc-800 mb-2">Quiz Completed!</h3>
+        <p className="text-sm text-zinc-500 font-medium mb-4">
           You scored <span className="text-emerald-600 font-bold">{score}</span> out of {questions.length}
         </p>
         <button
           onClick={onComplete}
-          className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white rounded-xl font-bold text-lg flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/30 transition-all transform hover:-translate-y-1"
+          className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white rounded-sm font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/30 transition-all transform hover:-translate-y-1"
         >
-          <CheckCircle size={24} /> Complete Assignment
+          <CheckCircle size={20} /> Complete Assignment
         </button>
       </div>
     );
@@ -256,29 +257,29 @@ const QuizPlayer = ({ questions, onComplete }: { questions: Question[]; onComple
 
   return (
     <div className="flex flex-col h-full relative">
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex justify-between items-center mb-4">
         <div className="flex gap-2">
           {questions.map((_, idx) => (
             <div
               key={idx}
               className={`h-2 rounded-full transition-all duration-500 ${
-                idx === currentQIndex ? 'w-8 bg-blue-500' : idx < currentQIndex ? 'w-4 bg-emerald-400' : 'w-4 bg-slate-200'
+                idx === currentQIndex ? 'w-8 bg-violet-500' : idx < currentQIndex ? 'w-4 bg-emerald-400' : 'w-4 bg-zinc-200'
               }`}
             />
           ))}
         </div>
-        <span className="text-sm font-bold text-slate-400 bg-slate-100 px-3 py-1 rounded-full">Score: {score}</span>
+        <span className="text-xs font-bold text-zinc-400 bg-zinc-100 px-3 py-1 rounded-full">Score: {score}</span>
       </div>
 
-      <div className="mb-6 flex-1">
-        <h3 className="text-2xl md:text-3xl font-bold text-slate-800 mb-8 leading-tight">{currentQ.question}</h3>
-        <div className="space-y-4">
+      <div className="mb-4 flex-1">
+        <h3 className="text-base md:text-lg font-bold text-zinc-800 mb-4 leading-tight">{currentQ.question}</h3>
+        <div className="space-y-3">
           {currentQ.options.map((opt, idx) => (
             <button
               key={idx}
               onClick={() => handleOptionSelect(opt)}
               disabled={isCorrect !== null}
-              className={`w-full p-5 rounded-2xl text-left font-semibold text-lg transition-all border-2 flex justify-between items-center group
+              className={`w-full p-4 rounded-sm text-left font-semibold text-sm transition-all border-2 flex justify-between items-center group
                 ${
                   selectedOption === opt
                     ? opt === currentQ.correctAnswer
@@ -286,32 +287,32 @@ const QuizPlayer = ({ questions, onComplete }: { questions: Question[]; onComple
                       : 'bg-red-50 border-red-500 text-red-700 shadow-md'
                     : isCorrect !== null && opt === currentQ.correctAnswer
                       ? 'bg-emerald-50 border-emerald-500 text-emerald-700'
-                      : 'bg-white border-slate-200 hover:border-blue-300 text-slate-600 hover:shadow-md hover:-translate-y-0.5'
+                      : 'bg-white border-zinc-200 hover:border-violet-300 text-zinc-600 hover:shadow-md hover:-translate-y-0.5'
                 }
               `}
             >
               {opt}
               {selectedOption === opt &&
-                (opt === currentQ.correctAnswer ? <Check size={24} className="text-emerald-600" /> : <X size={24} className="text-red-600" />)}
+                (opt === currentQ.correctAnswer ? <Check size={20} className="text-emerald-600" /> : <X size={20} className="text-red-600" />)}
             </button>
           ))}
         </div>
       </div>
 
-      <div className="mt-auto pt-6">
+      <div className="mt-auto pt-4">
         <button
           onClick={handleNext}
           disabled={isCorrect === null}
-          className={`w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all
+          className={`w-full py-4 rounded-sm font-bold text-sm flex items-center justify-center gap-2 transition-all
             ${
               isCorrect !== null
-                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30 hover:bg-blue-500 hover:-translate-y-1'
-                : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/30 hover:bg-violet-500 hover:-translate-y-1'
+                : 'bg-zinc-100 text-zinc-400 cursor-not-allowed'
             }
           `}
         >
           {currentQIndex === questions.length - 1 ? 'See Results' : 'Next Question'}
-          <ArrowRight size={20} />
+          <ArrowRight size={16} />
         </button>
       </div>
     </div>
@@ -320,23 +321,23 @@ const QuizPlayer = ({ questions, onComplete }: { questions: Question[]; onComple
 
 const GenericViewer = ({ title, icon, onComplete }: { title: string; icon: React.ReactNode; onComplete: () => void }) => {
   return (
-    <div className="flex flex-col h-full items-center justify-center text-center">
+    <div className="flex flex-col h-full items-center justify-center text-center p-4">
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        className="w-32 h-32 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mb-8 shadow-inner"
+        className="w-24 h-24 bg-violet-50 text-violet-500 rounded-full flex items-center justify-center mb-4 shadow-inner"
       >
         {icon}
       </motion.div>
-      <h3 className="text-3xl font-bold text-slate-800 mb-4">{title}</h3>
-      <p className="text-slate-500 text-lg mb-12 max-w-md">
+      <h3 className="text-lg font-bold text-zinc-800 mb-4">{title}</h3>
+      <p className="text-zinc-500 text-sm mb-4 max-w-md">
         Review the materials carefully. Once you have understood the content, mark this task as complete to continue your journey.
       </p>
       <button
         onClick={onComplete}
-        className="w-full max-w-md py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl font-bold text-lg flex items-center justify-center gap-2 shadow-lg shadow-blue-500/30 transition-all transform hover:-translate-y-1"
+        className="w-full max-w-md py-4 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white rounded-sm font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-violet-500/30 transition-all transform hover:-translate-y-1"
       >
-        <CheckCircle size={24} /> Complete Task
+        <CheckCircle size={20} /> Complete Task
       </button>
     </div>
   );
@@ -350,36 +351,36 @@ const ActiveTaskOverlay = ({ item, onClose, onComplete }: { item: CourseContentI
       initial={{ opacity: 0, scale: 0.95, y: 20 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95, y: 20 }}
-      className="absolute inset-0 z-50 bg-slate-50 flex flex-col"
+      className="absolute inset-0 z-50 bg-zinc-50 flex flex-col"
     >
-      <div className="p-4 md:p-6 border-b border-slate-200 bg-white flex justify-between items-center shadow-sm z-10">
+      <div className="p-4 border-b border-zinc-200 bg-white flex justify-between items-center shadow-sm z-10">
         <div className="flex items-center gap-4">
-          <button onClick={onClose} className="p-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full transition-all hover:-rotate-90">
-            <X size={20} />
+          <button onClick={onClose} className="p-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-600 rounded-full transition-all hover:-rotate-90">
+            <X size={16} />
           </button>
           <div className="flex flex-col">
-            <span className="text-xs font-black text-blue-500 uppercase tracking-widest">{item.type}</span>
-            <h3 className="font-bold text-slate-800 text-lg line-clamp-1">{item.heading || item.name}</h3>
+            <span className="text-xs font-black text-violet-500 uppercase tracking-widest">{item.type}</span>
+            <h3 className="font-bold text-zinc-800 text-sm line-clamp-1">{item.heading || item.name}</h3>
           </div>
         </div>
       </div>
 
-      <div className="flex-1 p-4 md:p-8 overflow-y-auto bg-slate-50 flex flex-col items-center">
-        <div className="w-full max-w-3xl bg-white p-6 md:p-10 rounded-3xl shadow-xl border border-slate-100 min-h-full flex flex-col">
+      <div className="flex-1 p-4 overflow-y-auto bg-zinc-50 flex flex-col items-center">
+        <div className="w-full max-w-3xl bg-white p-4 rounded-sm shadow-xl border border-zinc-100 min-h-full flex flex-col">
           {parsedContent.type === 'VIDEO' && <VideoPlayer url={parsedContent.payload.url} onComplete={onComplete} />}
 
           {parsedContent.type === 'QUIZ' && <QuizPlayer questions={parsedContent.payload.questions} onComplete={onComplete} />}
 
-          {parsedContent.type === 'TEXT' && <GenericViewer title="Reading Material" icon={<BookOpen size={64} />} onComplete={onComplete} />}
+          {parsedContent.type === 'TEXT' && <GenericViewer title="Reading Material" icon={<BookOpen size={40} />} onComplete={onComplete} />}
 
-          {parsedContent.type === 'DOCUMENT' && <GenericViewer title="Document Review" icon={<FileBadge size={64} />} onComplete={onComplete} />}
+          {parsedContent.type === 'DOCUMENT' && <GenericViewer title="Document Review" icon={<FileBadge size={40} />} onComplete={onComplete} />}
 
           {parsedContent.type === 'UNKNOWN' && (
-            <div className="flex flex-col items-center justify-center text-center py-20 flex-1">
-              <AlertCircle size={64} className="text-amber-400 mb-6" />
-              <h3 className="text-2xl font-bold text-slate-700 mb-2">Unsupported Content</h3>
-              <p className="text-slate-500 mb-8 max-w-sm">This content format is not fully supported in this view.</p>
-              <button onClick={onComplete} className="px-8 py-3 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded-xl font-bold transition-colors">
+            <div className="flex flex-col items-center justify-center text-center py-4 flex-1">
+              <AlertCircle size={40} className="text-amber-400 mb-4" />
+              <h3 className="text-base font-bold text-zinc-700 mb-2">Unsupported Content</h3>
+              <p className="text-zinc-500 text-sm mb-4 max-w-sm">This content format is not fully supported in this view.</p>
+              <button onClick={onComplete} className="px-4 py-2 bg-amber-100 text-amber-700 hover:bg-amber-200 rounded-sm font-bold text-sm transition-colors">
                 Mark Complete Anyway
               </button>
             </div>
@@ -423,20 +424,20 @@ const ContentModal = ({
 
   const getTaskIcon = (type: string) => {
     const t = type.toLowerCase();
-    if (t.includes('video')) return <Play size={24} className="ml-1" fill="currentColor" />;
-    if (t.includes('assignment') || t.includes('quiz')) return <FileText size={24} />;
-    if (t.includes('text') || t.includes('article')) return <BookOpen size={24} />;
-    if (t.includes('doc') || t.includes('pdf')) return <FileBadge size={24} />;
-    return <Star size={24} />;
+    if (t.includes('video')) return <Play size={20} className="ml-1" fill="currentColor" />;
+    if (t.includes('assignment') || t.includes('quiz')) return <FileText size={20} />;
+    if (t.includes('text') || t.includes('article')) return <BookOpen size={20} />;
+    if (t.includes('doc') || t.includes('pdf')) return <FileBadge size={20} />;
+    return <Star size={20} />;
   };
 
   const getTaskColor = (type: string) => {
     const t = type.toLowerCase();
     if (t.includes('video')) return 'bg-red-50 text-red-500 border-red-200';
-    if (t.includes('assignment') || t.includes('quiz')) return 'bg-blue-50 text-blue-500 border-blue-200';
+    if (t.includes('assignment') || t.includes('quiz')) return 'bg-violet-50 text-violet-500 border-violet-200';
     if (t.includes('text') || t.includes('article')) return 'bg-purple-50 text-purple-500 border-purple-200';
     if (t.includes('doc') || t.includes('pdf')) return 'bg-orange-50 text-orange-500 border-orange-200';
-    return 'bg-slate-50 text-slate-500 border-slate-200';
+    return 'bg-zinc-50 text-zinc-500 border-zinc-200';
   };
 
   return (
@@ -448,58 +449,58 @@ const ContentModal = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => !activeTask && onClose()}
-            className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-40"
+            className="fixed inset-0 bg-zinc-950/80 backdrop-blur-md z-40"
           />
           <motion.div
             initial={{ scale: 0.9, opacity: 0, y: 50 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 50 }}
-            className="fixed inset-0 m-auto z-50 w-[95%] sm:w-[90%] max-w-4xl h-[90vh] bg-white rounded-[2rem] shadow-2xl overflow-hidden flex flex-col"
+            className="fixed inset-0 m-auto z-50 w-[95%] sm:w-[90%] max-w-4xl h-[90vh] bg-white rounded-sm shadow-2xl overflow-hidden flex flex-col"
           >
             <div className="relative shrink-0 overflow-hidden">
               <div
                 className={`absolute inset-0 transition-colors duration-700 ${
-                  progress === 100 ? 'bg-gradient-to-br from-emerald-500 to-teal-600' : 'bg-gradient-to-br from-indigo-900 to-blue-800'
+                  progress === 100 ? 'bg-gradient-to-br from-emerald-500 to-teal-600' : 'bg-gradient-to-br from-violet-900 to-fuchsia-800'
                 }`}
               />
               <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]" />
 
-              <div className="relative p-8 md:p-10 text-white flex flex-col md:flex-row md:items-end justify-between gap-6">
+              <div className="relative p-4 text-white flex flex-col md:flex-row md:items-end justify-between gap-4">
                 {!activeTask && (
                   <button
                     onClick={onClose}
-                    className="absolute top-6 right-6 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center backdrop-blur-md transition-all z-20"
+                    className="absolute top-4 right-4 w-8 h-8 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center backdrop-blur-md transition-all z-20"
                   >
-                    <X size={20} />
+                    <X size={16} />
                   </button>
                 )}
 
                 <div className="z-10 relative w-full">
-                  <div className="flex items-center gap-3 mb-4 opacity-90">
+                  <div className="flex items-center gap-2 mb-4 opacity-90">
                     {progress === 100 ? (
-                      <div className="bg-white/20 p-2 rounded-lg backdrop-blur-sm">
-                        <Award size={20} className="text-yellow-300" />
+                      <div className="bg-white/20 p-2 rounded-sm backdrop-blur-sm">
+                        <Award size={16} className="text-yellow-300" />
                       </div>
                     ) : (
-                      <div className="bg-white/20 p-2 rounded-lg backdrop-blur-sm">
-                        <Zap size={20} className="text-blue-200" />
+                      <div className="bg-white/20 p-2 rounded-sm backdrop-blur-sm">
+                        <Zap size={16} className="text-violet-200" />
                       </div>
                     )}
-                    <span className="text-sm font-bold uppercase tracking-widest">{course.courseName}</span>
+                    <span className="text-xs font-bold uppercase tracking-widest">{course.courseName}</span>
                   </div>
-                  <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tight">{course.courseDay}</h2>
+                  <h2 className="text-2xl font-black mb-4 tracking-tight">{course.courseDay}</h2>
 
-                  <div className="w-full bg-black/30 h-4 rounded-full overflow-hidden backdrop-blur-sm border border-white/20 shadow-inner">
+                  <div className="w-full bg-black/30 h-2 rounded-full overflow-hidden backdrop-blur-sm border border-white/20 shadow-inner">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${progress}%` }}
                       transition={{ duration: 1, type: 'spring' }}
-                      className={`h-full relative overflow-hidden ${progress === 100 ? 'bg-gradient-to-r from-emerald-300 to-white' : 'bg-gradient-to-r from-blue-400 to-indigo-300'}`}
+                      className={`h-full relative overflow-hidden ${progress === 100 ? 'bg-gradient-to-r from-emerald-300 to-white' : 'bg-gradient-to-r from-violet-400 to-fuchsia-300'}`}
                     >
                       <div className="absolute inset-0 bg-white/20 animate-pulse" />
                     </motion.div>
                   </div>
-                  <div className="flex justify-between mt-3 text-sm font-bold opacity-90">
+                  <div className="flex justify-between mt-2 text-xs font-bold opacity-90">
                     <span>
                       {completedInThisCourse} of {course.content.length} Tasks Complete
                     </span>
@@ -509,16 +510,16 @@ const ContentModal = ({
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto bg-slate-50 relative p-4 md:p-8">
+            <div className="flex-1 overflow-y-auto bg-zinc-50 relative p-4">
               <AnimatePresence mode="wait">
                 {activeTask ? (
                   <ActiveTaskOverlay key="active-task" item={activeTask} onClose={() => setActiveTask(null)} onComplete={handleTaskFinish} />
                 ) : (
-                  <div className="grid gap-4 max-w-3xl mx-auto pb-24">
+                  <div className="grid gap-4 max-w-3xl mx-auto pb-4">
                     {course.content.length === 0 ? (
-                      <div className="text-center py-20 opacity-50 flex flex-col items-center">
-                        <Lock size={64} className="mb-4 text-slate-300" />
-                        <p className="text-xl font-medium">Content locked or coming soon.</p>
+                      <div className="text-center py-4 opacity-50 flex flex-col items-center">
+                        <Lock size={40} className="mb-4 text-zinc-300" />
+                        <p className="text-sm font-medium">Content locked or coming soon.</p>
                       </div>
                     ) : (
                       course.content.map((item, idx) => {
@@ -533,38 +534,38 @@ const ContentModal = ({
                             transition={{ delay: idx * 0.1 }}
                             onClick={() => setActiveTask(item)}
                             className={`
-                              group relative overflow-hidden flex items-center p-5 rounded-2xl cursor-pointer transition-all duration-300 border-2
+                              group relative overflow-hidden flex items-center p-4 rounded-sm cursor-pointer transition-all duration-300 border-2
                               ${
                                 isCompleted
                                   ? 'bg-emerald-50/80 border-emerald-200 hover:border-emerald-300 shadow-sm'
-                                  : 'bg-white border-slate-100 hover:border-blue-400 hover:shadow-xl hover:-translate-y-1'
+                                  : 'bg-white border-zinc-100 hover:border-violet-400 hover:shadow-xl hover:-translate-y-1'
                               }
                             `}
                           >
                             <div
                               className={`
-                              w-16 h-16 rounded-xl flex items-center justify-center mr-6 shrink-0 transition-transform duration-500 group-hover:scale-110 shadow-sm border
+                              w-12 h-12 rounded-sm flex items-center justify-center mr-4 shrink-0 transition-transform duration-500 group-hover:scale-110 shadow-sm border
                               ${isCompleted ? 'bg-gradient-to-br from-emerald-400 to-emerald-500 text-white border-emerald-400 shadow-emerald-200' : colors}
                             `}
                             >
-                              {isCompleted ? <Check size={32} strokeWidth={3} /> : getTaskIcon(item.type)}
+                              {isCompleted ? <Check size={24} strokeWidth={3} /> : getTaskIcon(item.type)}
                             </div>
 
                             <div className="flex-1 min-w-0 pr-4">
                               <h4
-                                className={`font-bold text-lg md:text-xl truncate mb-1 transition-colors ${isCompleted ? 'text-emerald-900' : 'text-slate-800 group-hover:text-blue-700'}`}
+                                className={`font-bold text-sm truncate mb-1 transition-colors ${isCompleted ? 'text-emerald-900' : 'text-zinc-800 group-hover:text-violet-700'}`}
                               >
                                 {item.heading || item.name}
                               </h4>
-                              <div className="flex flex-wrap items-center gap-2 text-xs md:text-sm">
+                              <div className="flex flex-wrap items-center gap-2 text-xs">
                                 <span
-                                  className={`px-3 py-1 rounded-full font-bold uppercase tracking-wider ${isCompleted ? 'bg-emerald-200/50 text-emerald-800' : 'bg-slate-100 text-slate-500'}`}
+                                  className={`px-2 py-1 rounded-full font-bold uppercase tracking-wider ${isCompleted ? 'bg-emerald-200/50 text-emerald-800' : 'bg-zinc-100 text-zinc-500'}`}
                                 >
                                   {item.type}
                                 </span>
                                 {item.data?.totalMarks && (
-                                  <span className="flex items-center gap-1 font-bold text-orange-500 bg-orange-50 px-3 py-1 rounded-full">
-                                    <Trophy size={14} /> {item.data.totalMarks} Points
+                                  <span className="flex items-center gap-1 font-bold text-orange-500 bg-orange-50 px-2 py-1 rounded-full">
+                                    <Trophy size={12} /> {item.data.totalMarks} Points
                                   </span>
                                 )}
                               </div>
@@ -572,11 +573,11 @@ const ContentModal = ({
 
                             <div
                               className={`
-                              w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300
-                              ${isCompleted ? 'text-emerald-500 bg-emerald-100' : 'text-slate-300 bg-slate-50 group-hover:bg-blue-100 group-hover:text-blue-600'}
+                              w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300
+                              ${isCompleted ? 'text-emerald-500 bg-emerald-100' : 'text-zinc-300 bg-zinc-50 group-hover:bg-violet-100 group-hover:text-violet-600'}
                             `}
                             >
-                              <ChevronRight size={24} className={isCompleted ? '' : 'group-hover:translate-x-1 transition-transform'} />
+                              <ChevronRight size={16} className={isCompleted ? '' : 'group-hover:translate-x-1 transition-transform'} />
                             </div>
                           </motion.div>
                         );
@@ -588,26 +589,26 @@ const ContentModal = ({
             </div>
 
             {!activeTask && (
-              <div className="p-6 border-t border-slate-200 bg-white shrink-0 z-20 shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
+              <div className="p-4 border-t border-zinc-200 bg-white shrink-0 z-20 shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
                 <button
                   onClick={onDayComplete}
                   disabled={!allTasksCompleted}
                   className={`
-                    w-full py-5 rounded-2xl font-black text-lg tracking-wide uppercase transition-all duration-500 flex items-center justify-center gap-3
+                    w-full py-4 rounded-sm font-black text-sm tracking-wide uppercase transition-all duration-500 flex items-center justify-center gap-2
                     ${
                       allTasksCompleted
                         ? 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white shadow-xl shadow-emerald-500/30 transform hover:-translate-y-1'
-                        : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                        : 'bg-zinc-100 text-zinc-400 cursor-not-allowed'
                     }
                   `}
                 >
                   {allTasksCompleted ? (
                     <>
-                      <CheckCircle size={24} /> Complete Today&apos;s Module
+                      <CheckCircle size={20} /> Complete Today&apos;s Module
                     </>
                   ) : (
                     <>
-                      <Lock size={24} /> Complete All Tasks to Finish Day
+                      <Lock size={20} /> Complete All Tasks to Finish Day
                     </>
                   )}
                 </button>
@@ -652,14 +653,14 @@ const TimelineItem = ({
 
   const statusColors = {
     completed: 'from-emerald-900 via-emerald-800 to-teal-900 border-emerald-500 shadow-emerald-500/20 text-emerald-100',
-    current: 'from-blue-900 via-indigo-900 to-violet-900 border-blue-500 shadow-blue-500/30 text-blue-100',
-    locked: 'from-slate-900 via-slate-800 to-slate-900 border-slate-700 text-slate-400 opacity-80',
+    current: 'from-zinc-900 via-violet-950 to-zinc-900 border-violet-500 shadow-violet-500/30 text-violet-100',
+    locked: 'from-zinc-900 via-zinc-800 to-zinc-900 border-zinc-700 text-zinc-400 opacity-80',
   };
 
   const getGradientClass = statusColors[status];
 
   return (
-    <div className="relative w-full md:mb-0 mb-16 last:mb-0" style={{ height: 'auto', minHeight: '300px' }}>
+    <div className="relative w-full md:mb-0 mb-4 last:mb-0" style={{ height: 'auto', minHeight: `${ITEM_HEIGHT}px` }}>
       <div className="hidden md:block absolute w-full top-0" style={{ height: ITEM_HEIGHT }}>
         <div className="absolute top-1/2 -translate-y-1/2 z-20 flex items-center justify-center" style={{ left: `calc(${dotPosition} - 12px)` }}>
           <motion.div
@@ -673,20 +674,20 @@ const TimelineItem = ({
                 status === 'completed'
                   ? 'bg-emerald-500 border-emerald-200 shadow-[0_0_20px_rgba(16,185,129,0.8)]'
                   : status === 'current'
-                    ? 'bg-blue-500 border-blue-200 shadow-[0_0_20px_rgba(59,130,246,0.8)]'
-                    : 'bg-slate-700 border-slate-500'
+                    ? 'bg-violet-500 border-violet-200 shadow-[0_0_20px_rgba(139,92,246,0.8)]'
+                    : 'bg-zinc-700 border-zinc-500'
               }
             `}
           >
             {status === 'completed' && <Check size={12} strokeWidth={4} className="text-white" />}
-            {status === 'locked' && <Lock size={10} strokeWidth={3} className="text-slate-400" />}
+            {status === 'locked' && <Lock size={10} strokeWidth={3} className="text-zinc-400" />}
           </motion.div>
           {status === 'current' && (
             <motion.div
               initial={{ scale: 1, opacity: 0.8 }}
               animate={{ scale: 2.5, opacity: 0 }}
               transition={{ duration: 1.5, repeat: Infinity }}
-              className="absolute w-6 h-6 bg-blue-500 rounded-full"
+              className="absolute w-6 h-6 bg-violet-500 rounded-full"
             />
           )}
         </div>
@@ -695,14 +696,14 @@ const TimelineItem = ({
           <>
             <div className="absolute top-1/2 -translate-y-1/2 flex justify-end pr-16 w-[30%]" style={{ left: 0 }}>
               <div className="text-right">
-                <h3 className="text-3xl font-black text-white drop-shadow-lg">{course.courseDay}</h3>
+                <h3 className="text-lg font-black text-white drop-shadow-lg">{course.courseDay}</h3>
                 <div className="flex flex-col items-end gap-2 mt-2">
                   <p
-                    className={`text-sm font-bold uppercase tracking-widest ${status === 'completed' ? 'text-emerald-400' : status === 'current' ? 'text-blue-400' : 'text-slate-500'}`}
+                    className={`text-xs font-bold uppercase tracking-widest ${status === 'completed' ? 'text-emerald-400' : status === 'current' ? 'text-violet-400' : 'text-zinc-500'}`}
                   >
                     {status}
                   </p>
-                  <span className="text-[10px] font-bold px-2 py-1 rounded-md bg-white/5 border border-white/10 text-white/50 tracking-widest shadow-sm">
+                  <span className="text-[10px] font-bold px-2 py-1 rounded-sm bg-white/5 border border-white/10 text-white/50 tracking-widest shadow-sm">
                     PHASE {index + 1} / {totalItems}
                   </span>
                 </div>
@@ -734,14 +735,14 @@ const TimelineItem = ({
             </div>
             <div className="absolute top-1/2 -translate-y-1/2 pl-16 w-[30%]" style={{ left: '70%' }}>
               <div className="text-left">
-                <h3 className="text-3xl font-black text-white drop-shadow-lg">{course.courseDay}</h3>
+                <h3 className="text-lg font-black text-white drop-shadow-lg">{course.courseDay}</h3>
                 <div className="flex flex-col items-start gap-2 mt-2">
                   <p
-                    className={`text-sm font-bold uppercase tracking-widest ${status === 'completed' ? 'text-emerald-400' : status === 'current' ? 'text-blue-400' : 'text-slate-500'}`}
+                    className={`text-xs font-bold uppercase tracking-widest ${status === 'completed' ? 'text-emerald-400' : status === 'current' ? 'text-violet-400' : 'text-zinc-500'}`}
                   >
                     {status}
                   </p>
-                  <span className="text-[10px] font-bold px-2 py-1 rounded-md bg-white/5 border border-white/10 text-white/50 tracking-widest shadow-sm">
+                  <span className="text-[10px] font-bold px-2 py-1 rounded-sm bg-white/5 border border-white/10 text-white/50 tracking-widest shadow-sm">
                     PHASE {index + 1} / {totalItems}
                   </span>
                 </div>
@@ -758,8 +759,8 @@ const TimelineItem = ({
             status === 'completed'
               ? 'bg-emerald-500 border-emerald-200 shadow-[0_0_15px_rgba(16,185,129,0.8)]'
               : status === 'current'
-                ? 'bg-blue-500 border-blue-200 shadow-[0_0_15px_rgba(59,130,246,0.8)]'
-                : 'bg-slate-700 border-slate-500'
+                ? 'bg-violet-500 border-violet-200 shadow-[0_0_15px_rgba(139,92,246,0.8)]'
+                : 'bg-zinc-700 border-zinc-500'
           }
         `}
         />
@@ -768,19 +769,19 @@ const TimelineItem = ({
             initial={{ scale: 1, opacity: 0.8 }}
             animate={{ scale: 2, opacity: 0 }}
             transition={{ duration: 1.5, repeat: Infinity }}
-            className="absolute left-4 top-10 w-4 h-4 -translate-x-1/2 bg-blue-500 rounded-full z-10"
+            className="absolute left-4 top-10 w-4 h-4 -translate-x-1/2 bg-violet-500 rounded-full z-10"
           />
         )}
 
         <div className="mb-4">
-          <h3 className="text-2xl font-black text-white">{course.courseDay}</h3>
-          <div className="flex items-center gap-3 mt-2">
+          <h3 className="text-lg font-black text-white">{course.courseDay}</h3>
+          <div className="flex items-center gap-2 mt-2">
             <p
-              className={`text-xs font-bold uppercase tracking-widest ${status === 'completed' ? 'text-emerald-400' : status === 'current' ? 'text-blue-400' : 'text-slate-500'}`}
+              className={`text-xs font-bold uppercase tracking-widest ${status === 'completed' ? 'text-emerald-400' : status === 'current' ? 'text-violet-400' : 'text-zinc-500'}`}
             >
               {status}
             </p>
-            <span className="text-[10px] font-bold px-2 py-1 rounded-md bg-white/5 border border-white/10 text-white/50 tracking-widest shadow-sm">
+            <span className="text-[10px] font-bold px-2 py-1 rounded-sm bg-white/5 border border-white/10 text-white/50 tracking-widest shadow-sm">
               PHASE {index + 1} / {totalItems}
             </span>
           </div>
@@ -825,7 +826,7 @@ const TimelineCard = ({
     onClick={() => status !== 'locked' && onClick()}
     disabled={status === 'locked'}
     className={`
-      relative w-full max-w-lg p-6 md:p-8 rounded-3xl border border-white/10 shadow-2xl overflow-hidden group text-left
+      relative w-full max-w-lg p-4 rounded-sm border border-white/10 shadow-2xl overflow-hidden group text-left
       bg-gradient-to-br ${gradient} backdrop-blur-md
       ${status !== 'locked' ? 'cursor-pointer' : 'cursor-not-allowed'}
     `}
@@ -835,7 +836,7 @@ const TimelineCard = ({
     {status === 'current' && (
       <div className="absolute top-0 left-0 w-full h-1 bg-white/10">
         <motion.div
-          className="h-full bg-blue-400 shadow-[0_0_10px_rgba(96,165,250,0.8)]"
+          className="h-full bg-violet-400 shadow-[0_0_10px_rgba(167,139,250,0.8)]"
           initial={{ width: 0 }}
           animate={{ width: `${progress}%` }}
           transition={{ duration: 1 }}
@@ -844,34 +845,34 @@ const TimelineCard = ({
     )}
 
     <div className={`flex flex-col h-full relative z-10 ${align === 'right' && 'items-end text-right'}`}>
-      <div className={`flex items-center gap-3 mb-4 ${align === 'right' && 'flex-row-reverse'}`}>
+      <div className={`flex items-center gap-2 mb-4 ${align === 'right' && 'flex-row-reverse'}`}>
         <div
           className={`
-          w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg
+          w-10 h-10 rounded-sm flex items-center justify-center shadow-lg
           ${
             status === 'completed'
               ? 'bg-emerald-400/20 text-emerald-300'
               : status === 'current'
-                ? 'bg-blue-400/20 text-blue-300'
-                : 'bg-slate-700/50 text-slate-500'
+                ? 'bg-violet-400/20 text-violet-300'
+                : 'bg-zinc-700/50 text-zinc-500'
           }
         `}
         >
-          {status === 'completed' ? <Award size={24} /> : status === 'locked' ? <Lock size={24} /> : <Zap size={24} />}
+          {status === 'completed' ? <Award size={20} /> : status === 'locked' ? <Lock size={20} /> : <Zap size={20} />}
         </div>
         <div>
-          <h4 className="text-2xl font-black text-white tracking-tight">{course.courseName}</h4>
-          <span className="text-sm font-semibold opacity-80">{course.content.length} Assignments</span>
+          <h4 className="text-base font-black text-white tracking-tight">{course.courseName}</h4>
+          <span className="text-xs font-semibold opacity-80">{course.content.length} Assignments</span>
         </div>
       </div>
 
-      <p className={`text-base leading-relaxed line-clamp-2 mt-2 ${status === 'locked' ? 'text-slate-500' : 'text-slate-300'}`}>
+      <p className={`text-xs leading-relaxed line-clamp-2 mt-2 ${status === 'locked' ? 'text-zinc-500' : 'text-zinc-300'}`}>
         {course.content.length > 0 ? course.content[0].heading || `Explore the materials for ${course.courseDay}` : 'No content available yet.'}
       </p>
 
       {status !== 'locked' && (
         <div
-          className={`mt-6 flex items-center gap-2 text-sm font-bold uppercase tracking-wider ${status === 'completed' ? 'text-emerald-300' : 'text-blue-300'}`}
+          className={`mt-4 flex items-center gap-2 text-xs font-bold uppercase tracking-wider ${status === 'completed' ? 'text-emerald-300' : 'text-violet-300'}`}
         >
           {status === 'completed' ? 'Review Content' : 'Continue Module'}
           <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
@@ -885,18 +886,6 @@ const CourseMapContent = ({ coursesData, courseTypeSlug }: { coursesData: unknow
   const [selectedCourse, setSelectedCourse] = useState<EnrichedCourse | null>(null);
   const [completedContentIds, setCompletedContentIds] = useState<string[]>([]);
   const [showCelebration, setShowCelebration] = useState(false);
-
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start center', 'end end'],
-  });
-
-  const pathLength = useSpring(scrollYProgress, {
-    stiffness: 400,
-    damping: 90,
-  });
 
   const gameLevels = useMemo<EnrichedCourse[]>(() => {
     const rawData = coursesData as { courses?: Course[] } | Course[];
@@ -936,17 +925,30 @@ const CourseMapContent = ({ coursesData, courseTypeSlug }: { coursesData: unknow
 
   const allCourseCompleted = gameLevels.length > 0 && gameLevels.every(level => level.status === 'completed');
 
-  const totalHeight = Math.max(gameLevels.length * ITEM_HEIGHT + 200, 800);
+  const totalHeight = Math.max(gameLevels.length * ITEM_HEIGHT + 200, 600);
+
+  const getProgressRatio = () => {
+    if (gameLevels.length === 0) return 0;
+    if (allCourseCompleted) return 1;
+
+    const activeIndex = gameLevels.findIndex(level => level.status === 'current');
+    const targetIndex = activeIndex !== -1 ? activeIndex : 0;
+
+    const nodeY = targetIndex * ITEM_HEIGHT + ITEM_HEIGHT / 2 + SVG_Y_OFFSET;
+    return nodeY / totalHeight;
+  };
+
+  const progressRatio = getProgressRatio();
 
   const generatePath = () => {
     let path = `M ${CENTER_X} 0 `;
-    path += `L ${CENTER_X} 40 `;
+    path += `L ${CENTER_X} ${SVG_Y_OFFSET} `;
 
     gameLevels.forEach((_, index) => {
       const isEven = index % 2 === 0;
       const targetX = isEven ? CENTER_X - SWAY_AMPLITUDE : CENTER_X + SWAY_AMPLITUDE;
-      const currentY = index * ITEM_HEIGHT + ITEM_HEIGHT / 2 + 40;
-      const prevY = index === 0 ? 40 : (index - 1) * ITEM_HEIGHT + ITEM_HEIGHT / 2 + 40;
+      const currentY = index * ITEM_HEIGHT + ITEM_HEIGHT / 2 + SVG_Y_OFFSET;
+      const prevY = index === 0 ? SVG_Y_OFFSET : (index - 1) * ITEM_HEIGHT + ITEM_HEIGHT / 2 + SVG_Y_OFFSET;
       const prevX = index === 0 ? CENTER_X : isEven ? CENTER_X + SWAY_AMPLITUDE : CENTER_X - SWAY_AMPLITUDE;
 
       const cp1Y = prevY + (currentY - prevY) * 0.5;
@@ -955,7 +957,7 @@ const CourseMapContent = ({ coursesData, courseTypeSlug }: { coursesData: unknow
       path += `C ${prevX} ${cp1Y}, ${targetX} ${cp2Y}, ${targetX} ${currentY} `;
     });
 
-    const lastY = (gameLevels.length > 0 ? gameLevels.length - 1 : 0) * ITEM_HEIGHT + ITEM_HEIGHT / 2 + 40;
+    const lastY = (gameLevels.length > 0 ? gameLevels.length - 1 : 0) * ITEM_HEIGHT + ITEM_HEIGHT / 2 + SVG_Y_OFFSET;
     const lastX = (gameLevels.length > 0 ? gameLevels.length - 1 : 0) % 2 === 0 ? CENTER_X - SWAY_AMPLITUDE : CENTER_X + SWAY_AMPLITUDE;
 
     path += `C ${lastX} ${lastY + 100}, ${CENTER_X} ${lastY + 100}, ${CENTER_X} ${totalHeight}`;
@@ -979,7 +981,7 @@ const CourseMapContent = ({ coursesData, courseTypeSlug }: { coursesData: unknow
 
   return (
     <>
-      <div ref={containerRef} className="flex flex-col items-center relative min-h-[500px] w-full">
+      <div className="flex flex-col items-center relative min-h-[500px] w-full">
         {gameLevels.length > 0 ? (
           <div className="relative w-full max-w-5xl">
             <div className="absolute left-0 top-0 w-full hidden md:block pointer-events-none z-0">
@@ -991,14 +993,14 @@ const CourseMapContent = ({ coursesData, courseTypeSlug }: { coursesData: unknow
               >
                 <defs>
                   <linearGradient id="pathGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stopColor="#818cf8" stopOpacity="0.2" />
-                    <stop offset="20%" stopColor="#6366f1" />
-                    <stop offset="50%" stopColor="#3b82f6" />
-                    <stop offset="80%" stopColor="#10b981" />
-                    <stop offset="100%" stopColor="#10b981" stopOpacity="0.2" />
+                    <stop offset="0%" stopColor="#c084fc" stopOpacity="0.2" />
+                    <stop offset="20%" stopColor="#a855f7" />
+                    <stop offset="50%" stopColor="#d946ef" />
+                    <stop offset="80%" stopColor="#06b6d4" />
+                    <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.2" />
                   </linearGradient>
                   <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
-                    <feGaussianBlur stdDeviation="8" result="coloredBlur" />
+                    <feGaussianBlur stdDeviation="6" result="coloredBlur" />
                     <feMerge>
                       <feMergeNode in="coloredBlur" />
                       <feMergeNode in="SourceGraphic" />
@@ -1009,23 +1011,40 @@ const CourseMapContent = ({ coursesData, courseTypeSlug }: { coursesData: unknow
                 <path d={generatePath()} fill="none" stroke="rgba(255, 255, 255, 0.05)" strokeWidth="4" strokeLinecap="round" />
 
                 <motion.path
-                  style={{ pathLength }}
+                  animate={{ pathLength: progressRatio }}
+                  initial={{ pathLength: 0 }}
+                  transition={{ duration: 1.5, type: 'spring', bounce: 0.2 }}
                   d={generatePath()}
                   fill="none"
                   stroke="url(#pathGradient)"
                   strokeWidth="8"
                   strokeLinecap="round"
-                  strokeOpacity="0.6"
                   filter="url(#neonGlow)"
                 />
 
-                <motion.path style={{ pathLength }} d={generatePath()} fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" />
+                <motion.path
+                  animate={{ pathLength: progressRatio }}
+                  initial={{ pathLength: 0 }}
+                  transition={{ duration: 1.5, type: 'spring', bounce: 0.2 }}
+                  d={generatePath()}
+                  fill="none"
+                  stroke="white"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
               </svg>
             </div>
 
-            <div className="absolute left-[22px] top-10 bottom-10 w-1 bg-gradient-to-b from-indigo-500/20 via-blue-500/50 to-emerald-500/20 md:hidden z-0 rounded-full" />
+            <div className="absolute left-[22px] top-4 bottom-4 w-1 bg-zinc-800 md:hidden z-0 rounded-full overflow-hidden">
+              <motion.div
+                className="w-full bg-gradient-to-b from-violet-500 via-fuchsia-500 to-emerald-500"
+                initial={{ height: 0 }}
+                animate={{ height: `${progressRatio * 100}%` }}
+                transition={{ duration: 1.5, type: 'spring', bounce: 0.2 }}
+              />
+            </div>
 
-            <div className="relative pt-[40px] z-10 w-full">
+            <div className="relative pt-4 z-10 w-full">
               {gameLevels.map((course, index) => (
                 <TimelineItem key={course._id} course={course} index={index} totalItems={gameLevels.length} onClick={setSelectedCourse} />
               ))}
@@ -1035,28 +1054,28 @@ const CourseMapContent = ({ coursesData, courseTypeSlug }: { coursesData: unknow
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="mt-32 flex flex-col items-center justify-center relative z-20"
+              className="mt-8 flex flex-col items-center justify-center relative z-20"
             >
               <div className="relative group w-full max-w-sm">
                 <div
-                  className={`absolute -inset-1 rounded-3xl blur-xl opacity-50 transition-all duration-500 ${allCourseCompleted ? 'bg-gradient-to-r from-emerald-400 to-cyan-400 group-hover:opacity-100 animate-pulse' : 'bg-slate-800'}`}
+                  className={`absolute -inset-1 rounded-sm blur-xl opacity-50 transition-all duration-500 ${allCourseCompleted ? 'bg-gradient-to-r from-emerald-400 to-cyan-400 group-hover:opacity-100 animate-pulse' : 'bg-zinc-800'}`}
                 />
                 <button
                   disabled={!allCourseCompleted}
                   onClick={triggerCelebration}
                   className={`
-                      relative w-full py-6 rounded-2xl font-black text-2xl uppercase tracking-widest transition-all duration-500 flex flex-col items-center justify-center gap-2 border-2
+                      relative w-full py-4 rounded-sm font-black text-lg uppercase tracking-widest transition-all duration-500 flex flex-col items-center justify-center gap-2 border-2
                       ${
                         allCourseCompleted
-                          ? 'bg-slate-900 border-emerald-400 text-white shadow-2xl hover:bg-slate-800 hover:scale-105'
-                          : 'bg-slate-900 border-slate-800 text-slate-600 cursor-not-allowed'
+                          ? 'bg-zinc-900 border-emerald-400 text-white shadow-2xl hover:bg-zinc-800 hover:scale-105'
+                          : 'bg-zinc-900 border-zinc-800 text-zinc-600 cursor-not-allowed'
                       }
                     `}
                 >
-                  <Trophy size={48} className={allCourseCompleted ? 'text-emerald-400 mb-2' : 'text-slate-700 mb-2'} />
+                  <Trophy size={32} className={allCourseCompleted ? 'text-emerald-400 mb-2' : 'text-zinc-700 mb-2'} />
                   Complete Course
                   {!allCourseCompleted && (
-                    <span className="text-xs font-bold text-slate-500 mt-2 normal-case tracking-normal">Finish all modules to unlock</span>
+                    <span className="text-xs font-bold text-zinc-500 mt-2 normal-case tracking-normal">Finish all modules to unlock</span>
                   )}
                 </button>
               </div>
@@ -1066,11 +1085,11 @@ const CourseMapContent = ({ coursesData, courseTypeSlug }: { coursesData: unknow
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center py-24 px-8 bg-slate-900/50 backdrop-blur-md rounded-3xl border border-slate-800 shadow-2xl max-w-lg w-full"
+            className="text-center py-4 px-4 bg-zinc-900/50 backdrop-blur-md rounded-sm border border-zinc-800 shadow-2xl max-w-lg w-full"
           >
-            <SearchX size={80} className="text-slate-600 mx-auto mb-8" />
-            <h3 className="text-3xl font-bold text-white mb-4">No Quests Found</h3>
-            <p className="text-slate-400 text-lg">The realm of &quot;{courseTypeSlug}&quot; is currently empty. Check back soon for new adventures.</p>
+            <SearchX size={60} className="text-zinc-600 mx-auto mb-4" />
+            <h3 className="text-xl font-bold text-white mb-4">No Quests Found</h3>
+            <p className="text-xs text-zinc-400">The realm of &quot;{courseTypeSlug}&quot; is currently empty. Check back soon for new adventures.</p>
           </motion.div>
         )}
       </div>
@@ -1090,7 +1109,7 @@ const CourseMapContent = ({ coursesData, courseTypeSlug }: { coursesData: unknow
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/90 backdrop-blur-xl overflow-hidden pointer-events-none"
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-zinc-950/90 backdrop-blur-xl overflow-hidden pointer-events-none"
           >
             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-30 animate-spin-slow" />
             <motion.div
@@ -1098,20 +1117,20 @@ const CourseMapContent = ({ coursesData, courseTypeSlug }: { coursesData: unknow
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 1.5, opacity: 0 }}
               transition={{ type: 'spring', bounce: 0.5, duration: 1 }}
-              className="relative flex flex-col items-center text-center z-10"
+              className="relative flex flex-col items-center text-center z-10 p-4"
             >
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
                 className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-emerald-400 to-cyan-400 rounded-full blur-[100px] opacity-50"
               />
-              <Trophy size={160} className="text-yellow-400 mb-8 drop-shadow-[0_0_50px_rgba(250,204,21,0.8)]" />
-              <h1 className="text-6xl md:text-8xl font-black text-white mb-6 uppercase tracking-widest drop-shadow-2xl">
+              <Trophy size={100} className="text-yellow-400 mb-4 drop-shadow-[0_0_50px_rgba(250,204,21,0.8)]" />
+              <h1 className="text-3xl md:text-4xl font-black text-white mb-4 uppercase tracking-widest drop-shadow-2xl">
                 Mastery
                 <br />
                 Achieved
               </h1>
-              <p className="text-2xl text-emerald-300 font-bold tracking-wide">You have conquered the entire course!</p>
+              <p className="text-base text-emerald-300 font-bold tracking-wide">You have conquered the entire course!</p>
             </motion.div>
 
             {Array.from({ length: 50 }).map((_, i) => (
@@ -1153,39 +1172,38 @@ const Page = () => {
 
   if (isLoading)
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950 text-white">
+      <div className="min-h-screen flex items-center justify-center bg-zinc-950 text-white p-4">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-          className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full"
+          className="w-12 h-12 border-4 border-violet-500 border-t-transparent rounded-full"
         />
       </div>
     );
 
-  if (error) return <div className="min-h-screen flex items-center justify-center bg-slate-950 text-red-500 font-bold text-2xl">Error loading course map.</div>;
+  if (error)
+    return <div className="min-h-screen flex items-center justify-center bg-zinc-950 text-red-500 font-bold text-lg p-4">Error loading course map.</div>;
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white overflow-x-hidden relative pb-32">
+    <main className="min-h-screen bg-zinc-950 text-white overflow-x-hidden relative pb-4">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[120px] mix-blend-screen" />
-        <div className="absolute bottom-1/3 right-1/4 w-[800px] h-[800px] bg-indigo-600/10 rounded-full blur-[150px] mix-blend-screen" />
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-violet-600/10 rounded-full blur-[120px] mix-blend-screen" />
+        <div className="absolute bottom-1/3 right-1/4 w-[800px] h-[800px] bg-fuchsia-600/10 rounded-full blur-[150px] mix-blend-screen" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20" />
       </div>
 
-      <div className="relative z-10 max-w-6xl mx-auto px-4 py-20">
-        <header className="text-center mb-32 relative">
+      <div className="relative z-10 max-w-6xl mx-auto px-4 py-4">
+        <header className="text-center mb-8 relative">
           <motion.div initial={{ y: -50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.8 }} className="inline-block">
-            <div className="flex items-center justify-center gap-2 mb-6">
-              <span className="bg-indigo-500/20 text-indigo-300 text-sm font-black px-6 py-2 rounded-full border border-indigo-500/30 uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(99,102,241,0.2)]">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <span className="bg-violet-500/20 text-violet-300 text-xs font-black px-4 py-2 rounded-full border border-violet-500/30 uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(139,92,246,0.2)]">
                 Campaign Mode
               </span>
             </div>
-            <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-6 uppercase bg-clip-text text-transparent bg-gradient-to-b from-white via-indigo-100 to-indigo-400 drop-shadow-lg">
-              {courseTypeSlug ? courseTypeSlug.replace(/-/g, ' ') : 'Learning Quest'}
+            <h1 className="text-2xl md:text-3xl font-black tracking-tight mb-4 uppercase bg-clip-text text-transparent bg-gradient-to-b from-white via-violet-100 to-violet-400 drop-shadow-lg">
+              {courseTypeSlug ? courseTypeSlug.replace(/-/g, ' ') : 'Courses'}
             </h1>
-            <p className="text-xl text-indigo-200/70 font-medium max-w-2xl mx-auto leading-relaxed">
-              Embark on your learning journey. Complete daily modules, unlock new challenges, and achieve mastery.
-            </p>
+            <p className="text-sm text-violet-200/70 font-medium max-w-2xl mx-auto leading-relaxed">Finish your daily task to complete your journey.</p>
           </motion.div>
         </header>
 
