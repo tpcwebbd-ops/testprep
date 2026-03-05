@@ -185,7 +185,7 @@ const VideoPlayer = ({ url, onComplete }: { url: string; onComplete: () => void 
           </div>
         )}
       </div>
-      <div className="mt-auto pt-4">
+      <div className="mt-auto pt-6">
         <button
           onClick={onComplete}
           className="w-full py-4 bg-[#0a2711] border border-emerald-700 hover:bg-emerald-900 hover:border-emerald-500 text-[#ff8a8a] hover:text-white rounded-lg font-bold text-base flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(4,120,87,0.1)] transition-all transform hover:-translate-y-1"
@@ -277,7 +277,7 @@ const QuizPlayer = ({ questions, onComplete }: { questions: Question[]; onComple
               key={idx}
               onClick={() => handleOptionSelect(opt)}
               disabled={isCorrect !== null}
-              className={`w-full p-4 rounded-lg text-left font-medium text-base transition-all border-2 flex justify-between items-center group
+              className={`w-full p-5 rounded-lg text-left font-medium text-base transition-all border-2 flex justify-between items-center group
                 ${
                   selectedOption === opt
                     ? opt === currentQ.correctAnswer
@@ -297,7 +297,7 @@ const QuizPlayer = ({ questions, onComplete }: { questions: Question[]; onComple
         </div>
       </div>
 
-      <div className="mt-auto pt-4">
+      <div className="mt-auto pt-6">
         <button
           onClick={handleNext}
           disabled={isCorrect === null}
@@ -319,7 +319,7 @@ const QuizPlayer = ({ questions, onComplete }: { questions: Question[]; onComple
 
 const GenericViewer = ({ title, icon, onComplete }: { title: string; icon: React.ReactNode; onComplete: () => void }) => {
   return (
-    <div className="flex flex-col h-full items-center justify-center text-center p-4">
+    <div className="flex flex-col h-full items-center justify-center text-center p-6">
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -351,7 +351,7 @@ const ActiveTaskOverlay = ({ item, onClose, onComplete }: { item: CourseContentI
       exit={{ opacity: 0, scale: 0.98, y: 10 }}
       className="absolute inset-0 z-50 bg-[#020b05] flex flex-col"
     >
-      <div className="p-4 border-b border-emerald-900/50 bg-[#031208] flex justify-between items-center shadow-md z-10">
+      <div className="p-5 border-b border-emerald-900/50 bg-[#031208] flex justify-between items-center shadow-md z-10">
         <div className="flex items-center gap-4">
           <button
             onClick={onClose}
@@ -366,21 +366,21 @@ const ActiveTaskOverlay = ({ item, onClose, onComplete }: { item: CourseContentI
         </div>
       </div>
 
-      <div className="flex-1 p-4 overflow-y-auto bg-[#020b05] flex flex-col items-center">
-        <div className="w-full max-w-4xl bg-[#031208] border border-emerald-900/50 p-4 rounded-xl shadow-[0_0_50px_rgba(4,120,87,0.05)] min-h-full flex flex-col">
+      <div className="flex-1 p-4 md:p-8 overflow-y-auto bg-[#020b05] flex flex-col items-center">
+        <div className="w-full max-w-4xl bg-[#031208] border border-emerald-900/50 p-6 md:p-10 rounded-xl shadow-[0_0_50px_rgba(4,120,87,0.05)] min-h-full flex flex-col">
           {parsedContent.type === 'VIDEO' && <VideoPlayer url={parsedContent.payload.url} onComplete={onComplete} />}
           {parsedContent.type === 'QUIZ' && <QuizPlayer questions={parsedContent.payload.questions} onComplete={onComplete} />}
           {parsedContent.type === 'TEXT' && <GenericViewer title="Data Archive Reading" icon={<BookOpen size={48} />} onComplete={onComplete} />}
           {parsedContent.type === 'DOCUMENT' && <GenericViewer title="Encrypted File Review" icon={<FileBadge size={48} />} onComplete={onComplete} />}
 
           {parsedContent.type === 'UNKNOWN' && (
-            <div className="flex flex-col items-center justify-center text-center py-4 flex-1">
+            <div className="flex flex-col items-center justify-center text-center py-8 flex-1">
               <AlertCircle size={64} className="text-amber-500/80 mb-6" />
               <h3 className="text-xl font-bold text-amber-200 mb-4">Unrecognized Protocol</h3>
               <p className="text-amber-200/50 text-base mb-8 max-w-md">The data format cannot be decrypted by current interface modules.</p>
               <button
                 onClick={onComplete}
-                className="px-4 py-3 bg-[#1a1305] border border-amber-900/50 text-amber-400 hover:bg-[#2a1d05] rounded-lg font-bold text-sm transition-colors"
+                className="px-6 py-3 bg-[#1a1305] border border-amber-900/50 text-amber-400 hover:bg-[#2a1d05] rounded-lg font-bold text-sm transition-colors"
               >
                 Override & Continue
               </button>
@@ -460,11 +460,13 @@ const ContentModal = ({
             className="fixed inset-0 m-auto z-50 w-[95%] sm:w-[90%] max-w-5xl h-[90vh] bg-[#020b05] border border-emerald-900/50 rounded-xl shadow-[0_0_50px_rgba(4,120,87,0.1)] overflow-hidden flex flex-col"
           >
             <div className="relative shrink-0 overflow-hidden border-b border-emerald-900/50 bg-[#031208]">
-              <div className="relative p-4 flex flex-col md:flex-row md:items-end justify-between gap-6">
+              <div className="absolute inset-0 opacity-10 bg-[linear-gradient(to_right,#047857_1px,transparent_1px),linear-gradient(to_bottom,#047857_1px,transparent_1px)] bg-[size:24px_24px]" />
+
+              <div className="relative p-6 md:p-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
                 {!activeTask && (
                   <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 w-10 h-10 bg-[#0a2711] hover:bg-emerald-900 border border-emerald-800 text-emerald-400 rounded-lg flex items-center justify-center transition-all z-20"
+                    className="absolute top-6 right-6 w-10 h-10 bg-[#0a2711] hover:bg-emerald-900 border border-emerald-800 text-emerald-400 rounded-lg flex items-center justify-center transition-all z-20"
                   >
                     <X size={20} />
                   </button>
@@ -472,7 +474,7 @@ const ContentModal = ({
 
                 <div className="z-10 relative w-full">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="bg-[#0a2711] border border-emerald-800 p-2 rounded-lg">
+                    <div className="bg-[#0a2711] border border-emerald-800 p-2.5 rounded-lg">
                       {progress === 100 ? <Award size={20} className="text-emerald-400" /> : <Zap size={20} className="text-emerald-500" />}
                     </div>
                     <span className="text-sm font-black text-[#ff8a8a] uppercase tracking-[0.2em]">{course.courseName}</span>
@@ -499,14 +501,14 @@ const ContentModal = ({
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto relative p-4">
+            <div className="flex-1 overflow-y-auto relative p-4 md:p-8">
               <AnimatePresence mode="wait">
                 {activeTask ? (
                   <ActiveTaskOverlay key="active-task" item={activeTask} onClose={() => setActiveTask(null)} onComplete={handleTaskFinish} />
                 ) : (
-                  <div className="grid gap-4 max-w-4xl mx-auto pb-4">
+                  <div className="grid gap-4 max-w-4xl mx-auto pb-6">
                     {course.content.length === 0 ? (
-                      <div className="text-center py-4 flex flex-col items-center bg-[#031208] border border-emerald-900/30 rounded-xl">
+                      <div className="text-center py-12 flex flex-col items-center bg-[#031208] border border-emerald-900/30 rounded-xl">
                         <Lock size={48} className="mb-6 text-emerald-900" />
                         <p className="text-base font-medium text-emerald-700">Sector heavily encrypted. Access denied.</p>
                       </div>
@@ -523,7 +525,7 @@ const ContentModal = ({
                             transition={{ delay: idx * 0.1 }}
                             onClick={() => setActiveTask(item)}
                             className={`
-                              group relative overflow-hidden flex items-center p-4 rounded-xl cursor-pointer transition-all duration-300 border
+                              group relative overflow-hidden flex items-center p-5 md:p-6 rounded-xl cursor-pointer transition-all duration-300 border
                               ${
                                 isCompleted
                                   ? 'bg-[#031208] border-emerald-800 hover:border-emerald-600'
@@ -537,7 +539,7 @@ const ContentModal = ({
                               {isCompleted ? <Check size={28} strokeWidth={3} /> : getTaskIcon(item.type)}
                             </div>
 
-                            <div className="flex-1 min-w-0 pr-4">
+                            <div className="flex-1 min-w-0 pr-6">
                               <h4
                                 className={`font-bold text-lg truncate mb-2 transition-colors ${isCompleted ? 'text-emerald-400' : 'text-emerald-100 group-hover:text-[#ff8a8a]'}`}
                               >
@@ -572,12 +574,12 @@ const ContentModal = ({
             </div>
 
             {!activeTask && (
-              <div className="p-4 border-t border-emerald-900/50 bg-[#031208] shrink-0 z-20">
+              <div className="p-6 md:p-8 border-t border-emerald-900/50 bg-[#031208] shrink-0 z-20">
                 <button
                   onClick={onDayComplete}
                   disabled={!allTasksCompleted}
                   className={`
-                    w-full py-4 rounded-xl font-black text-base tracking-[0.2em] uppercase transition-all duration-500 flex items-center justify-center gap-3 border
+                    w-full py-5 rounded-xl font-black text-base tracking-[0.2em] uppercase transition-all duration-500 flex items-center justify-center gap-3 border
                     ${
                       allTasksCompleted
                         ? 'bg-[#0a2711] border-emerald-500 text-[#ff8a8a] shadow-[0_0_30px_rgba(4,120,87,0.3)] hover:bg-[#062611] hover:text-white transform hover:-translate-y-1'
@@ -637,7 +639,7 @@ const TimelineRow = ({
   };
 
   return (
-    <div className="relative flex flex-col md:flex-row items-stretch md:items-center w-full mb-12 group z-10">
+    <div className="relative flex flex-col md:flex-row items-stretch md:items-center w-full mb-12 md:mb-16 group z-10">
       <div className="hidden md:block absolute left-[39px] top-[80px] bottom-[-64px] w-[2px] bg-emerald-900/40 z-0 last:hidden" />
       <div className="md:hidden absolute left-[31px] top-[64px] bottom-[-48px] w-[2px] bg-emerald-900/40 z-0 last:hidden" />
 
@@ -694,13 +696,13 @@ const TimelineRow = ({
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: '-100px' }}
-        className="w-full md:w-[600px] shrink-0 z-10 ml-12 md:ml-0"
+        className="w-full md:w-[600px] shrink-0 z-10 pl-16 md:pl-0"
       >
         <button
           onClick={() => !isLocked && onClick(course)}
           disabled={isLocked}
           className={`
-            w-full text-left p-4 rounded-xl border-2 transition-all duration-300 relative overflow-hidden flex flex-col
+            w-full text-left p-6 md:p-8 rounded-xl border-2 transition-all duration-300 relative overflow-hidden flex flex-col
             ${
               isCompleted
                 ? 'bg-[#062611] border-emerald-600 hover:border-emerald-400 shadow-[0_0_30px_rgba(4,120,87,0.15)] cursor-pointer hover:-translate-y-1'
@@ -808,7 +810,7 @@ const CourseMapContent = ({ coursesData, courseTypeSlug }: { coursesData: unknow
 
   return (
     <>
-      <div className="flex flex-col items-center relative min-h-[500px] w-full pt-4">
+      <div className="flex flex-col items-center relative min-h-[500px] w-full pt-10">
         {gameLevels.length > 0 ? (
           <div className="relative w-full max-w-5xl mx-auto flex flex-col">
             {gameLevels.map((course, index) => (
@@ -829,7 +831,7 @@ const CourseMapContent = ({ coursesData, courseTypeSlug }: { coursesData: unknow
                   disabled={!allCourseCompleted}
                   onClick={triggerCelebration}
                   className={`
-                      relative w-full py-4 rounded-xl font-black text-xl uppercase tracking-[0.2em] transition-all duration-500 flex flex-col items-center justify-center gap-4 border-2
+                      relative w-full py-8 rounded-xl font-black text-xl uppercase tracking-[0.2em] transition-all duration-500 flex flex-col items-center justify-center gap-4 border-2
                       ${
                         allCourseCompleted
                           ? 'bg-[#062611] border-emerald-400 text-emerald-400 shadow-[0_0_40px_rgba(16,185,129,0.3)] hover:bg-[#0a2711] hover:text-white hover:-translate-y-2'
@@ -850,7 +852,7 @@ const CourseMapContent = ({ coursesData, courseTypeSlug }: { coursesData: unknow
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center py-4 px-4 bg-[#031208] border border-emerald-900/30 rounded-2xl shadow-2xl max-w-lg w-full"
+            className="text-center py-16 px-8 bg-[#031208] border border-emerald-900/30 rounded-2xl shadow-2xl max-w-lg w-full"
           >
             <SearchX size={80} className="text-emerald-900 mx-auto mb-6" />
             <h3 className="text-2xl font-black text-emerald-700 mb-4 tracking-widest uppercase">Void Sector</h3>
@@ -878,6 +880,7 @@ const CourseMapContent = ({ coursesData, courseTypeSlug }: { coursesData: unknow
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[100] flex items-center justify-center bg-[#000502]/95 backdrop-blur-xl overflow-hidden pointer-events-none"
           >
+            <div className="absolute inset-0 opacity-20 bg-[linear-gradient(to_right,#047857_1px,transparent_1px),linear-gradient(to_bottom,#047857_1px,transparent_1px)] bg-[size:40px_40px]" />
             <motion.div
               initial={{ scale: 0.5, y: 100 }}
               animate={{ scale: 1, y: 0 }}
@@ -955,18 +958,19 @@ const Page = () => {
     );
 
   return (
-    <main className="min-h-screen text-emerald-50 overflow-x-hidden relative pb-4 font-sans">
+    <main className="min-h-screen bg-[#010804] text-emerald-50 overflow-x-hidden relative pb-20 font-sans">
       <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#064e3b20_1px,transparent_1px),linear-gradient(to_bottom,#064e3b20_1px,transparent_1px)] bg-[size:32px_32px]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-transparent via-[#010804]/80 to-[#010804]" />
       </div>
 
-      <div className="relative z-10 max-w-6xl mx-auto px-4 py-4">
+      <div className="relative z-10 max-w-6xl mx-auto px-6 py-12">
         <header className="mb-16 relative">
           <motion.div
             initial={{ x: -50, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.8 }}
-            className="inline-block border-l-4 border-emerald-500 pl-4"
+            className="inline-block border-l-4 border-emerald-500 pl-6"
           >
             <div className="flex items-center gap-3 mb-4">
               <span className="bg-[#0a2711] text-emerald-400 text-xs font-black px-4 py-1.5 rounded-md border border-emerald-800 uppercase tracking-[0.3em] shadow-[0_0_20px_rgba(4,120,87,0.3)]">
