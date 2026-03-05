@@ -1,5 +1,3 @@
-Look at the page.tsx 
-```
 'use client';
 
 import React, { useState, useMemo, useRef } from 'react';
@@ -1216,9 +1214,3 @@ const Page = () => {
 };
 
 export default Page;
-
-```
-
-Update the page.tsx with the following instructions.
-1. Update the UI as Images.
-2. and implement all dynamic features such as clear one step and then unlock the second one. 
