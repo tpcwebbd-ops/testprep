@@ -19,6 +19,7 @@ export const apiSlice = createApi({
     'FooterSettings',
     'tagTypeSidebars',
     'tagTypeProfile',
+    'tagTypeCourses',
     'tagTypePageBuilder',
     'Footer',
     'tagTypeFormSubmission',
