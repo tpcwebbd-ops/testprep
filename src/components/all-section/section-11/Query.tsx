@@ -1,8 +1,17 @@
+/*
+|-----------------------------------------
+| setting up Query for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import React, { useRef, useEffect, useState, useMemo } from 'react';
-import { motion, useInView } from 'framer-motion';
 import Image from 'next/image';
+import { motion, useInView } from 'framer-motion';
+import React, { useRef, useEffect, useState, useMemo } from 'react';
+
 import { ISection11Data, defaultDataSection11, Section11Props, IStory } from './data';
 
 const SnakeLine = ({ count, viewportHeight }: { count: number; viewportHeight: number }) => {
@@ -97,7 +106,6 @@ const ReelStory = ({ item, index }: { item: IStory; index: number }) => {
 
   return (
     <section ref={ref} className="h-screen w-full snap-center snap-always flex items-center justify-center relative overflow-hidden">
-      {/* Central Marker */}
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:flex items-center justify-center z-30 pointer-events-none">
         <motion.div
           animate={isInView ? { scale: [1, 1.5, 1], opacity: 1 } : { scale: 0, opacity: 0 }}
@@ -113,7 +121,6 @@ const ReelStory = ({ item, index }: { item: IStory; index: number }) => {
       <div
         className={`w-full max-w-7xl mx-auto px-4 md:px-12 flex flex-col ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'} items-center justify-between h-full py-20 md:py-0`}
       >
-        {/* Image Side */}
         <div
           className={`w-full md:w-[45%] h-[40vh] md:h-full flex items-center justify-center ${isEven ? 'md:justify-end md:pr-16' : 'md:justify-start md:pl-16'}`}
         >
@@ -138,7 +145,6 @@ const ReelStory = ({ item, index }: { item: IStory; index: number }) => {
           </motion.div>
         </div>
 
-        {/* Text Side */}
         <div
           className={`w-full md:w-[45%] flex flex-col justify-center items-center md:items-start text-center md:text-left ${isEven ? 'md:pl-16' : 'md:pr-16 md:items-end md:text-right'}`}
         >
@@ -190,12 +196,6 @@ const ClientSection11: React.FC<Section11Props> = ({ data }) => {
         <div className="absolute bottom-0 right-[-10%] w-[50vw] h-[50vw] bg-purple-900/10 rounded-full blur-[120px]" />
       </div>
 
-      {/* 
-         We treat this section as a scrollable container itself. 
-         If placed in a larger page, it should probably be a fixed height or handle its own scroll.
-         Based on the original design, it was a full page component. 
-         Here we adapt it to be a section that contains full-screen height children.
-      */}
       <div className="w-full">
         <div className="relative w-full">
           {vpHeight > 0 && <SnakeLine count={sectionData.stories.length} viewportHeight={vpHeight} />}

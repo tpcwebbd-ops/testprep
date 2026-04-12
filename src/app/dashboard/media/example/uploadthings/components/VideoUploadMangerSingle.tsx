@@ -1,31 +1,39 @@
+/*
+|-----------------------------------------
+| setting up VideoUploadMangerSingle for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import React, { useMemo, useState, useEffect } from 'react';
 import {
   X,
-  Loader2,
-  Ghost,
-  RefreshCcw,
-  Search,
-  CheckCircle2,
   Zap,
-  MonitorPlay,
   Film,
+  Plus,
+  Ghost,
+  Search,
+  Loader2,
+  VideoIcon,
+  RefreshCcw,
+  MonitorPlay,
   ChevronLeft,
+  CheckCircle2,
   ChevronRight,
   Clapperboard,
-  VideoIcon,
-  Plus,
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
+import { motion, AnimatePresence } from 'framer-motion';
+import React, { useMemo, useState, useEffect } from 'react';
 
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { UploadButton } from '@/lib/uploadthing';
-
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useGetMediasQuery, useAddMediaMutation } from '@/redux/features/media/mediaSlice';
+import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+
 
 interface MediaItem {
   _id: string;

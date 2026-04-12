@@ -1,3 +1,11 @@
+/*
+|-----------------------------------------
+| setting up PWAPopUp for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -20,7 +28,6 @@ interface ConfigState {
   laterBtn: ButtonConfig;
 }
 
-// Default configuration used if API is not found
 const defaultConfig: ConfigState = {
   isEnabled: true,
   title: 'Install Application',
@@ -41,7 +48,6 @@ export default function PWAPopUp() {
   const [config, setConfig] = useState<ConfigState>(defaultConfig);
   const [isConfigLoaded, setIsConfigLoaded] = useState(false);
 
-  // 1. Initialize & Fetch Configuration
   useEffect(() => {
     setIsMounted(true);
 
@@ -50,7 +56,6 @@ export default function PWAPopUp() {
         const res = await fetch('/api/pwa-pop-up');
         if (res.ok) {
           const data = await res.json();
-          // If data exists, use it; otherwise fallback to default
           if (data && !data.error) {
             setConfig(data);
           }
@@ -59,7 +64,6 @@ export default function PWAPopUp() {
       } catch (error) {
         console.warn('PWA Config fetch failed, using default settings.');
       } finally {
-        // Mark config as loaded regardless of success/failure
         setIsConfigLoaded(true);
       }
     };
@@ -67,12 +71,9 @@ export default function PWAPopUp() {
     fetchConfig();
   }, []);
 
-  // 2. Capture the PWA Install Event
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
-      // Prevent the mini-infobar from appearing on mobile
       e.preventDefault();
-      // Stash the event so it can be triggered later.
       setDeferredPrompt(e as BeforeInstallPromptEvent);
     };
 
@@ -83,36 +84,26 @@ export default function PWAPopUp() {
     };
   }, []);
 
-  // 3. Determine Visibility based on Logic
   useEffect(() => {
-    // Wait for config and mount
     if (!isConfigLoaded || !isMounted) return;
 
-    // If admin disabled it, do not show
     if (!config.isEnabled) return;
 
-    // Only show if the browser fired the install event (app is installable)
     if (!deferredPrompt) return;
 
-    // Check "Maybe Later" timer
     const nextShowTime = localStorage.getItem('pwa_popup_next_show');
     const now = new Date().getTime();
 
-    // Show if no timer exists OR if current time is past the timer
     if (!nextShowTime || now > parseInt(nextShowTime, 10)) {
       setIsVisible(true);
     }
   }, [isConfigLoaded, isMounted, deferredPrompt, config.isEnabled]);
 
-  // Handler: Install Button
-  // Logic: Installs app. On success, it will not pop up again (browser stops firing event).
   const handleInstall = async () => {
     if (!deferredPrompt) return;
 
-    // Show the install prompt
     await deferredPrompt.prompt();
 
-    // Wait for the user to respond to the prompt
     const { outcome } = await deferredPrompt.userChoice;
 
     if (outcome === 'accepted') {
@@ -121,21 +112,16 @@ export default function PWAPopUp() {
     }
   };
 
-  // Handler: Cross Button
-  // Logic: Close now. Re-appears on next render (no localStorage set).
   const handleCross = () => {
     setIsVisible(false);
   };
 
-  // Handler: Maybe Later
-  // Logic: Close now. Re-appears after 24 hours.
   const handleMaybeLater = () => {
-    const nextShow = new Date().getTime() + 24 * 60 * 60 * 1000; // 24 Hours
+    const nextShow = new Date().getTime() + 24 * 60 * 60 * 1000;
     localStorage.setItem('pwa_popup_next_show', nextShow.toString());
     setIsVisible(false);
   };
 
-  // Helper for dynamic styles
   const getSizeClasses = (size: string) => {
     switch (size) {
       case 'small':
@@ -166,7 +152,6 @@ export default function PWAPopUp() {
     <AnimatePresence>
       {isVisible && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-          {/* Backdrop Blur */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -176,7 +161,6 @@ export default function PWAPopUp() {
             onClick={handleCross}
           />
 
-          {/* Modal Content */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -185,7 +169,6 @@ export default function PWAPopUp() {
             className="relative w-full max-w-md"
           >
             <div className="relative overflow-hidden bg-[#0F0F11] border border-white/10 shadow-2xl rounded-3xl p-6 md:p-8 isolate">
-              {/* Cross Button (Top Right) */}
               <div className="absolute top-0 right-0 p-4 z-20">
                 <button
                   onClick={handleCross}
@@ -195,13 +178,11 @@ export default function PWAPopUp() {
                 </button>
               </div>
 
-              {/* Background Effects */}
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-32 bg-gradient-to-b from-indigo-500/10 to-transparent pointer-events-none -z-10" />
               <div className="absolute -top-24 -left-24 w-48 h-48 bg-purple-500/20 rounded-full blur-3xl -z-10" />
               <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-indigo-500/20 rounded-full blur-3xl -z-10" />
 
               <div className="flex flex-col items-center text-center">
-                {/* Icon */}
                 <div className="relative mb-6 group">
                   <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-2xl blur opacity-40 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
                   <div className="relative w-20 h-20 rounded-2xl bg-[#0F0F11] flex items-center justify-center border border-white/10 shadow-xl">
@@ -212,13 +193,10 @@ export default function PWAPopUp() {
                   </div>
                 </div>
 
-                {/* Content from API or Default */}
                 <h3 className="text-2xl font-bold text-white mb-2">{config.title}</h3>
                 <p className="text-gray-400 text-sm leading-relaxed mb-8 max-w-[280px]">{config.description}</p>
 
-                {/* Buttons */}
                 <div className="w-full space-y-3">
-                  {/* 1. Install Button */}
                   <button
                     onClick={handleInstall}
                     style={{ backgroundColor: config.installBtn.bgColor, color: config.installBtn.textColor }}
@@ -229,7 +207,6 @@ export default function PWAPopUp() {
                     {config.installBtn.animation === 'none' && <Zap className="w-3 h-3 fill-current hidden group-hover:block animate-bounce" />}
                   </button>
 
-                  {/* 2. Maybe Later Button */}
                   <button
                     onClick={handleMaybeLater}
                     style={{ backgroundColor: config.laterBtn.bgColor, color: config.laterBtn.textColor }}

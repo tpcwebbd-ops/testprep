@@ -1,5 +1,14 @@
+/*
+|-----------------------------------------
+| setting up Query for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import Image from 'next/image';
 import { Calendar, Users } from 'lucide-react';
+
 import { defaultDataSection4, ISection4Data, Section4Props } from './data';
 
 const QuerySection4 = ({ data }: Section4Props) => {

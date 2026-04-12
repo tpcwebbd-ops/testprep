@@ -1,8 +1,17 @@
+/*
+|-----------------------------------------
+| setting up Query for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronDown, Quote, Sparkles } from 'lucide-react';
+
 import { ISection10Data, defaultDataSection10, Section10Props } from './data';
 
 const ClientSection10: React.FC<Section10Props> = ({ data }) => {
@@ -18,7 +27,6 @@ const ClientSection10: React.FC<Section10Props> = ({ data }) => {
 
   return (
     <section className="relative h-screen w-full snap-center flex flex-col items-center justify-center bg-zinc-950 overflow-hidden z-20">
-      {/* Background Ambience */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[120px] mix-blend-screen animate-pulse" />
         <div
@@ -34,7 +42,6 @@ const ClientSection10: React.FC<Section10Props> = ({ data }) => {
         />
       </div>
 
-      {/* Main Content */}
       <div className="relative z-10 text-center px-4 max-w-5xl mx-auto">
         <motion.div
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -43,7 +50,6 @@ const ClientSection10: React.FC<Section10Props> = ({ data }) => {
           transition={{ duration: 0.8, ease: 'easeOut' }}
           className="flex flex-col items-center"
         >
-          {/* Decorative Icon */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -53,7 +59,6 @@ const ClientSection10: React.FC<Section10Props> = ({ data }) => {
             <Quote className="w-8 h-8 text-indigo-400" />
           </motion.div>
 
-          {/* Typography */}
           <h1 className="text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter text-white mb-8 leading-[0.9]">
             {sectionData.title}
             <br />
@@ -64,7 +69,6 @@ const ClientSection10: React.FC<Section10Props> = ({ data }) => {
 
           <p className="text-xl md:text-2xl text-zinc-400 max-w-xl mx-auto mb-16 font-light leading-relaxed">{sectionData.description}</p>
 
-          {/* Scroll Indicator */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -79,7 +83,6 @@ const ClientSection10: React.FC<Section10Props> = ({ data }) => {
         </motion.div>
       </div>
 
-      {/* Floating Particles/Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {[...Array(3)].map((_, i) => (
           <motion.div

@@ -1,6 +1,13 @@
-// SelectField.tsx
+/*
+|-----------------------------------------
+| setting up SelectField for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
 
 import * as React from 'react';
+
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface SelectFieldProps {

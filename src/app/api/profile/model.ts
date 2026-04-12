@@ -1,3 +1,11 @@
+/*
+|-----------------------------------------
+| setting up Model for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import mongoose, { Schema } from 'mongoose';
 
 const profileSchema = new Schema(
@@ -6,18 +14,18 @@ const profileSchema = new Schema(
       type: String,
       required: true,
       unique: true,
-      trim: true
+      trim: true,
     },
     phone: {
       type: String,
       trim: true,
-      default: ''
+      default: '',
     },
     bio: {
       type: String,
       trim: true,
       maxlength: 500,
-      default: ''
+      default: '',
     },
     address: {
       street: { type: String, default: '' },
@@ -28,22 +36,22 @@ const profileSchema = new Schema(
     },
     dateOfBirth: {
       type: Date,
-      default: null
+      default: null,
     },
     gender: {
       type: String,
       enum: ['male', 'female', 'other', 'not_specified'],
-      default: 'not_specified'
+      default: 'not_specified',
     },
     occupation: {
       type: String,
       trim: true,
-      default: ''
+      default: '',
     },
     website: {
       type: String,
       trim: true,
-      default: ''
+      default: '',
     },
     socialLinks: {
       facebook: { type: String, default: '' },

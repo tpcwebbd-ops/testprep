@@ -1,44 +1,45 @@
+/*
+|-----------------------------------------
+| setting up Page for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
+import { toast } from 'react-toastify';
 import { useEffect, useState, useMemo } from 'react';
 import { Plus, Edit, Trash2, Eye, ExternalLink, FolderOpen, Layout, X, AlertTriangle, RefreshCw, Database } from 'lucide-react';
+
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-// Assuming IPage is in your utils, but I will define a local interface to ensure TS works with the fix
 import { useGetPagesQuery, useAddPageMutation, useUpdatePageMutation, useDeletePageMutation } from '@/redux/features/page-builder/pageBuilderSlice';
-import { toast } from 'sonner';
 
-// Normalized Interface to handle inconsistent API data
 interface IPage {
   _id: string;
-  pageName: string; // Normalized name
-  path: string; // Normalized path
+  pageName: string;
+  path: string;
   isActive: boolean;
-  // Original data preservation if needed
   [key: string]: unknown;
 }
 
 const Page = () => {
-  // Redux hooks
-  // Added 'refetch' to manually reload data if needed
   const { data: pagesData, isLoading, error, refetch } = useGetPagesQuery({ page: 1, limit: 100 });
 
   const [addPage, { isLoading: isAdding }] = useAddPageMutation();
   const [updatePage] = useUpdatePageMutation();
   const [deletePage] = useDeletePageMutation();
 
-  // Local state
   const [pages, setPages] = useState<IPage[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [pageToDelete, setPageToDelete] = useState<IPage | null>(null);
   const [formData, setFormData] = useState({ pageName: '', path: '' });
 
-  // Sync Redux data to local state with Normalization and Flattening
   useEffect(() => {
-    // FIX: Access .data.pages instead of just .pages
     const rawPages = pagesData?.data?.pages || [];
 
     if (rawPages.length > 0) {
@@ -47,7 +48,6 @@ const Page = () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const extractPages = (list: any[]) => {
         list.forEach(item => {
-          // 1. Normalize the data (Handle pageTitle vs pageName, path vs pagePath)
           const normalizedPage: IPage = {
             ...item,
             _id: item._id,
@@ -58,7 +58,6 @@ const Page = () => {
 
           normalizedList.push(normalizedPage);
 
-          // 2. Check for sub-pages and recurse
           if (item.subPage && Array.isArray(item.subPage) && item.subPage.length > 0) {
             extractPages(item.subPage);
           }
@@ -70,13 +69,11 @@ const Page = () => {
     }
   }, [pagesData]);
 
-  // Group pages by path segments using useMemo for performance
   const groupedPages = useMemo(() => {
     return pages.reduce((groups: Record<string, IPage[]>, page) => {
       if (!page.path) return groups;
 
       const parts = page.path.split('/').filter(Boolean);
-      // If path is "/" it goes to Root, otherwise grab the first segment
       const groupKey = parts.length > 0 ? `/${parts[0]}` : 'Root Pages';
 
       if (!groups[groupKey]) groups[groupKey] = [];
@@ -85,7 +82,6 @@ const Page = () => {
     }, {});
   }, [pages]);
 
-  // Handlers
   const handleSavePage = async () => {
     if (!formData.pageName || !formData.path) {
       toast.error('Please fill in all fields');
@@ -105,7 +101,6 @@ const Page = () => {
       toast.success('Page created successfully');
       setFormData({ pageName: '', path: '' });
       setIsAddDialogOpen(false);
-      // Optional: refetch is automatic with tags, but good for safety
     } catch (err) {
       toast.error('Failed to create page');
       console.error('Error creating page:', err);
@@ -150,7 +145,6 @@ const Page = () => {
     if (!page._id) return;
 
     try {
-      // Optimistic update locally
       const updatedStatus = !page.isActive;
       setPages(prev => prev.map(p => (p._id === page._id ? { ...p, isActive: updatedStatus } : p)));
 
@@ -161,14 +155,12 @@ const Page = () => {
 
       toast.success(`Page ${updatedStatus ? 'activated' : 'deactivated'}`);
     } catch (err) {
-      // Revert on failure
       setPages(prev => prev.map(p => (p._id === page._id ? { ...p, isActive: !page.isActive } : p)));
       toast.error('Failed to update page status');
       console.error('Error updating page:', err);
     }
   };
 
-  // --- LOADING STATE ---
   if (isLoading) {
     return (
       <main className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-purple-950 pt-[90px] pb-20 px-4 md:px-8">
@@ -188,7 +180,6 @@ const Page = () => {
     );
   }
 
-  // --- ERROR STATE ---
   if (error) {
     const errorMessage =
       'status' in error ? `Error ${error.status}: ${JSON.stringify(error.data)}` : 'message' in error ? error.message : 'An unexpected error occurred';
@@ -223,7 +214,6 @@ const Page = () => {
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-purple-950 pt-[90px] pb-20 px-4 md:px-8">
       <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6">
           <div>
             <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">Page Management</h1>
@@ -240,7 +230,6 @@ const Page = () => {
           </div>
         </div>
 
-        {/* No Data Found State */}
         {pages.length === 0 ? (
           <div className="animate-in fade-in zoom-in-95 duration-700 flex flex-col items-center justify-center min-h-[50vh] border-2 border-dashed border-white/10 rounded-2xl bg-white/5 backdrop-blur-sm p-12">
             <div className="relative mb-6">
@@ -257,7 +246,6 @@ const Page = () => {
             </Button>
           </div>
         ) : (
-          /* Grouped Pages Display */
           <div className="space-y-10">
             {Object.entries(groupedPages).map(([groupName, groupPages]) => (
               <div key={groupName} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -354,7 +342,6 @@ const Page = () => {
         )}
       </div>
 
-      {/* Add Page Modal */}
       {isAddDialogOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-slate-900 border border-white/10 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
@@ -402,7 +389,6 @@ const Page = () => {
         </div>
       )}
 
-      {/* Delete Confirmation Popup */}
       {isDeleteDialogOpen && pageToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-slate-900 border border-red-500/20 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">

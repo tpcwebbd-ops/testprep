@@ -1,10 +1,20 @@
+/*
+|-----------------------------------------
+| setting up PreferencesTab for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import React from 'react';
+import { Loader2, Save, Settings, Heart } from 'lucide-react';
+
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Save, Settings, Heart } from 'lucide-react';
+
 import { ProfileFormData } from './types';
 
 interface PreferencesTabProps {
@@ -31,9 +41,7 @@ const PreferencesTab: React.FC<PreferencesTabProps> = ({
           <Settings className="w-6 h-6" />
           Preferences
         </CardTitle>
-        <CardDescription className="text-white/60">
-          Manage your account preferences
-        </CardDescription>
+        <CardDescription className="text-white/60">Manage your account preferences</CardDescription>
       </CardHeader>
 
       <CardContent className="p-6">
@@ -92,12 +100,7 @@ const PreferencesTab: React.FC<PreferencesTabProps> = ({
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 pt-4">
-            <Button
-              onClick={onUpdateProfile}
-              disabled={!hasProfileChanges || isUpdatingProfile}
-              variant="outlineWater"
-              className="flex-1 sm:flex-initial"
-            >
+            <Button onClick={onUpdateProfile} disabled={!hasProfileChanges || isUpdatingProfile} variant="outlineWater" className="flex-1 sm:flex-initial">
               {isUpdatingProfile ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -112,12 +115,7 @@ const PreferencesTab: React.FC<PreferencesTabProps> = ({
             </Button>
 
             {hasProfileChanges && (
-              <Button
-                onClick={onResetProfile}
-                disabled={isUpdatingProfile}
-                variant="outlineDefault"
-                className="flex-1 sm:flex-initial"
-              >
+              <Button onClick={onResetProfile} disabled={isUpdatingProfile} variant="outlineDefault" className="flex-1 sm:flex-initial">
                 Reset
               </Button>
             )}

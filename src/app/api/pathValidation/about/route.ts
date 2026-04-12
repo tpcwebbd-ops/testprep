@@ -1,10 +1,13 @@
+/*
+|-----------------------------------------
+| setting up Route for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import { NextResponse } from 'next/server';
 
-/**
- * ✅ Validates that all paths start with "/about"
- * Method: POST
- * Body: { paths: string[] }
- */
 export async function POST(req: Request) {
   try {
     const body = await req.json();

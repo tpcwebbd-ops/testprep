@@ -1,15 +1,22 @@
+/*
+|-----------------------------------------
+| setting up Mutation for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { Save, Link as LinkIcon, Type, LayoutTemplate, Search, MousePointer2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+
+import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-
-// Import icon resources
+import { Button } from '@/components/ui/button';
 import { iconMap, iconOptions } from '@/components/all-icons/all-icons-jsx';
-import { cn } from '@/lib/utils';
 
 import type { Button1FormProps, IButton1Data } from './data';
 import { defaultDataSection19 } from './data';
@@ -28,7 +35,6 @@ const MutationSection18 = ({ data, onSubmit }: Button1FormProps) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  // Filter icons based on search - No slicing/limit as requested
   const filteredIcons = useMemo(() => {
     if (!iconSearch) return iconOptions;
     return iconOptions.filter(name => name.toLowerCase().includes(iconSearch.toLowerCase()));
@@ -36,7 +42,6 @@ const MutationSection18 = ({ data, onSubmit }: Button1FormProps) => {
 
   return (
     <div className="min-h-[400px] w-full max-w-3xl mx-auto bg-zinc-950 text-zinc-100 font-sans border border-zinc-800 overflow-hidden shadow-2xl">
-      {/* Header */}
       <div className="p-6 border-b border-zinc-800 bg-zinc-900/80 backdrop-blur flex items-center gap-3">
         <div className="p-2 bg-indigo-500/10 rounded-lg">
           <LayoutTemplate className="text-indigo-400" size={24} />
@@ -48,7 +53,6 @@ const MutationSection18 = ({ data, onSubmit }: Button1FormProps) => {
       </div>
 
       <div className="p-4 md:p-8 space-y-8">
-        {/* Form Fields */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
             <Label className="text-zinc-400 flex items-center gap-2">
@@ -74,7 +78,6 @@ const MutationSection18 = ({ data, onSubmit }: Button1FormProps) => {
             />
           </div>
 
-          {/* New Tab Toggle */}
           <div className="flex items-center justify-between p-4 bg-zinc-900/30 border border-zinc-800 rounded-xl md:col-span-2">
             <div className="space-y-0.5">
               <Label className="text-zinc-300">Open in New Tab</Label>
@@ -83,7 +86,6 @@ const MutationSection18 = ({ data, onSubmit }: Button1FormProps) => {
             <Switch checked={formData.isNewTab} onCheckedChange={checked => updateField('isNewTab', checked)} />
           </div>
 
-          {/* Icon Selector (Spans Full Width) */}
           <div className="space-y-4 md:col-span-2">
             <div className="flex items-center justify-between">
               <Label className="text-zinc-400 flex items-center gap-2">
@@ -94,7 +96,6 @@ const MutationSection18 = ({ data, onSubmit }: Button1FormProps) => {
               </span>
             </div>
 
-            {/* Search Bar */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
               <Input
@@ -105,7 +106,6 @@ const MutationSection18 = ({ data, onSubmit }: Button1FormProps) => {
               />
             </div>
 
-            {/* Icon Grid */}
             <div className="bg-zinc-900/30 border border-zinc-800 rounded-xl p-3 h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-transparent">
               {filteredIcons.length > 0 ? (
                 <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-2">
@@ -145,7 +145,6 @@ const MutationSection18 = ({ data, onSubmit }: Button1FormProps) => {
           </div>
         </div>
 
-        {/* Footer Action */}
         <div className="pt-6 border-t border-zinc-800 flex justify-end">
           <Button onClick={() => onSubmit(formData)} variant="outlineGlassy" className="w-full">
             <Save className="w-5 h-5 mr-2" />

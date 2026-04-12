@@ -1,7 +1,16 @@
+/*
+|-----------------------------------------
+| setting up Query for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import React from 'react';
 import { FileText, Target, BookOpen, Star, Zap, Shield, Award, HelpCircle } from 'lucide-react';
+
 import { defaultDataSection36, ISection36Data, Section36Props } from './data';
 
 const iconMap: { [key: string]: React.ElementType } = {
@@ -42,7 +51,6 @@ const QuerySection36 = ({ data }: Section36Props) => {
                 key={idx}
                 className="bg-white rounded-[2rem] p-8 shadow-xl hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 border border-white/60 group relative overflow-hidden"
               >
-                {/* Background Decoration */}
                 <div
                   className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${card.gradient} opacity-[0.03] rounded-bl-[4rem] group-hover:opacity-[0.08] transition-opacity`}
                 />
@@ -59,7 +67,6 @@ const QuerySection36 = ({ data }: Section36Props) => {
 
                 <p className="text-slate-600 leading-relaxed text-sm md:text-base">{card.description}</p>
 
-                {/* Bottom Border Accent */}
                 <div className={`absolute bottom-0 left-0 h-1 w-0 bg-gradient-to-r ${card.gradient} group-hover:w-full transition-all duration-500 ease-out`} />
               </div>
             );

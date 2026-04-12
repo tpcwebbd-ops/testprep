@@ -1,10 +1,17 @@
-import { handleRateLimit } from '@/app/api/utils/rate-limit';
-import { getRoles, createRole, updateRole, deleteRole, getRoleById, bulkUpdateRoles, bulkDeleteRoles } from './controller';
+/*
+|-----------------------------------------
+| setting up Route for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
 
+import { handleRateLimit } from '@/app/api/utils/rate-limit';
 import { formatResponse, IResponse } from '@/app/api/utils/jwt-verify';
 import { isUserHasAccessByRole, IWantAccess } from '@/app/api/utils/is-user-has-access-by-role';
 
-// GET all Roles
+import { getRoles, createRole, updateRole, deleteRole, getRoleById, bulkUpdateRoles, bulkDeleteRoles } from './controller';
+
 export async function GET(req: Request) {
   const rateLimitResponse = handleRateLimit(req);
   if (rateLimitResponse) return rateLimitResponse;
@@ -21,7 +28,6 @@ export async function GET(req: Request) {
   return formatResponse(result.data, result.message, result.status);
 }
 
-// CREATE Role
 export async function POST(req: Request) {
   const rateLimitResponse = handleRateLimit(req);
   if (rateLimitResponse) return rateLimitResponse;
@@ -37,10 +43,9 @@ export async function POST(req: Request) {
   return formatResponse(result.data, result.message, result.status);
 }
 
-// UPDATE Role
 export async function PUT(req: Request) {
   const rateLimitResponse = handleRateLimit(req);
-  if (rateLimitResponse) return rateLimitResponse; 
+  if (rateLimitResponse) return rateLimitResponse;
   if (process.env.AuthorizationEnable === 'true') {
     const wantToAccess: IWantAccess = {
       db_name: 'roles',
@@ -55,10 +60,9 @@ export async function PUT(req: Request) {
   return formatResponse(result.data, result.message, result.status);
 }
 
-// DELETE Role
 export async function DELETE(req: Request) {
   const rateLimitResponse = handleRateLimit(req);
-  if (rateLimitResponse) return rateLimitResponse; 
+  if (rateLimitResponse) return rateLimitResponse;
   if (process.env.AuthorizationEnable === 'true') {
     const wantToAccess: IWantAccess = {
       db_name: 'roles',

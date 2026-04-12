@@ -1,5 +1,14 @@
+/*
+|-----------------------------------------
+| setting up Query for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import Image from 'next/image';
 import { Users, MessageSquare, Rocket } from 'lucide-react';
+
 import { defaultDataSection6, ISection6Data, Section6Props } from './data';
 
 const ClientSection6 = ({ data }: Section6Props) => {

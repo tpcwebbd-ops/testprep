@@ -1,3 +1,11 @@
+/*
+|-----------------------------------------
+| setting up AllIconsJsx for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import {
   ShieldCheck,
   FolderKanban,
@@ -103,7 +111,6 @@ import {
   LucideIcon,
 } from 'lucide-react';
 
-// Changed type to LucideIcon (or React.ElementType) so they can be rendered as components
 export const iconMap: Record<string, LucideIcon> = {
   ShieldCheck,
   FolderKanban,

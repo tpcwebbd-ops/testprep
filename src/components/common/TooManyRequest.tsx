@@ -1,3 +1,11 @@
+/*
+|-----------------------------------------
+| setting up TooManyRequest for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import React, { useState, useEffect } from 'react';

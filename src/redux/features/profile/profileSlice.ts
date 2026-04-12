@@ -1,7 +1,13 @@
-// This file is use for rest api
+/*
+|-----------------------------------------
+| setting up ProfileSlice for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import { apiSlice } from '@/redux/api/apiSlice';
 
-// Use absolute paths with leading slash to ensure consistent behavior
 export const profileApi = apiSlice.injectEndpoints({
   endpoints: builder => ({
     getProfileByUserId: builder.query({
@@ -39,10 +45,4 @@ export const profileApi = apiSlice.injectEndpoints({
   }),
 });
 
-export const {
-  useGetProfileByUserIdQuery,
-  useGetProfileByIdQuery,
-  useCreateProfileMutation,
-  useUpdateProfileMutation,
-  useDeleteProfileMutation,
-} = profileApi;
+export const { useGetProfileByUserIdQuery, useGetProfileByIdQuery, useCreateProfileMutation, useUpdateProfileMutation, useDeleteProfileMutation } = profileApi;

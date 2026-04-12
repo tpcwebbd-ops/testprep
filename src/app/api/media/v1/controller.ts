@@ -1,8 +1,18 @@
-import { withDB } from '@/app/api/utils/db';
-import Media from './model';
-import { formatResponse, IResponse } from '@/app/api/utils/utils';
+/*
+|-----------------------------------------
+| setting up Controller for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import { FilterQuery } from 'mongoose';
 import { UTApi } from 'uploadthing/server';
+
+import { withDB } from '@/app/api/utils/db';
+import { formatResponse, IResponse } from '@/app/api/utils/utils';
+
+import Media from './model';
 
 interface MongoError extends Error {
   code?: number;
@@ -121,6 +131,7 @@ export async function deleteMedia(req: Request): Promise<IResponse> {
         if (fileKey) {
           await utapi.deleteFiles(fileKey);
         }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         return formatResponse({ deletedCount: 0 }, 'Failed to delete storage file', 500);
       }

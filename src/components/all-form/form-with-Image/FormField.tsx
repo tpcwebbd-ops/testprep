@@ -1,20 +1,24 @@
 /*
 |-----------------------------------------
-| FormField - Form 7 (Documents)
+| setting up FormField for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
 |-----------------------------------------
 */
+
 'use client';
 
+import Image from 'next/image';
+import { toast } from 'react-toastify';
 import { useState, useEffect, ChangeEvent } from 'react';
+import { Trash2, FileText, CheckCircle, Files, Plus, UploadCloud } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Trash2, FileText, CheckCircle, Files, Plus, UploadCloud } from 'lucide-react';
-import { toast } from 'sonner';
 
 import type { IForm7Data, IOtherDoc } from './data';
 import { defaultDataForm7 } from './data';
-import Image from 'next/image';
 
 export interface Form7Props {
   data?: IForm7Data;

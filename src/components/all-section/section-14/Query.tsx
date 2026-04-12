@@ -1,9 +1,18 @@
+/*
+|-----------------------------------------
+| setting up Query for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
+import Image from 'next/image';
 import React, { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
 import { CalendarDays, MapPin, ArrowUpRight, Users, XCircle } from 'lucide-react';
+
 import { ISection14Data, defaultDataSection14, Section14Props } from './data';
 
 const ClientSection14: React.FC<Section14Props> = ({ data }) => {
@@ -20,10 +29,8 @@ const ClientSection14: React.FC<Section14Props> = ({ data }) => {
     }
   }, [data]);
 
-  // Extract unique categories from events or use predefined ones, ensuring 'All' is first
   const filterCategories = useMemo(() => {
     const predefined = sectionData.categories || [];
-    // Ensure we have "All"
     return ['All', ...predefined];
   }, [sectionData.categories]);
 
@@ -34,7 +41,6 @@ const ClientSection14: React.FC<Section14Props> = ({ data }) => {
 
   return (
     <section className="relative w-full py-24 md:py-32 bg-zinc-950 overflow-hidden selection:bg-rose-500/30 selection:text-rose-100 min-h-screen">
-      {/* Background Ambience */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 right-0 w-[50vw] h-[50vw] bg-rose-600/10 rounded-full blur-[120px]" />
         <div className="absolute bottom-0 left-0 w-[40vw] h-[40vw] bg-orange-600/10 rounded-full blur-[120px]" />
@@ -42,7 +48,6 @@ const ClientSection14: React.FC<Section14Props> = ({ data }) => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12">
           <div className="max-w-2xl space-y-6">
             <motion.div
@@ -77,7 +82,6 @@ const ClientSection14: React.FC<Section14Props> = ({ data }) => {
           </div>
         </div>
 
-        {/* Filter Tabs */}
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-12 flex flex-wrap gap-2">
           {filterCategories.map(category => (
             <button
@@ -101,7 +105,6 @@ const ClientSection14: React.FC<Section14Props> = ({ data }) => {
           ))}
         </motion.div>
 
-        {/* Events Grid */}
         <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 min-h-[400px]">
           <AnimatePresence mode="popLayout">
             {filteredEvents.map(event => (
@@ -116,7 +119,6 @@ const ClientSection14: React.FC<Section14Props> = ({ data }) => {
                 onMouseEnter={() => setHoveredEvent(event.id)}
                 onMouseLeave={() => setHoveredEvent(null)}
               >
-                {/* Image Container */}
                 <div className="relative h-64 w-full overflow-hidden">
                   {event.image ? (
                     <Image src={event.image} alt={event.title} fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
@@ -127,7 +129,6 @@ const ClientSection14: React.FC<Section14Props> = ({ data }) => {
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-zinc-900/20 to-transparent opacity-80" />
 
-                  {/* Badge */}
                   <div className="absolute top-4 left-4">
                     <span className="px-3 py-1 rounded-full bg-zinc-950/80 border border-zinc-800 backdrop-blur-md text-xs font-bold text-white uppercase tracking-wider">
                       {event.category}
@@ -135,9 +136,7 @@ const ClientSection14: React.FC<Section14Props> = ({ data }) => {
                   </div>
                 </div>
 
-                {/* Content */}
                 <div className="flex flex-col flex-grow p-6 md:p-8 pt-2 relative">
-                  {/* Date Float */}
                   <div className="absolute -top-10 right-8 bg-zinc-950 border border-zinc-800 rounded-2xl p-3 text-center min-w-[70px] shadow-xl group-hover:border-rose-500/50 transition-colors z-10">
                     <div className="text-xs text-zinc-500 uppercase font-bold tracking-wider mb-0.5 whitespace-nowrap">
                       {event.date.includes(',') ? event.date.split(',')[0].split(' ')[0] : 'DATE'}

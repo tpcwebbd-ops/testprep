@@ -1,10 +1,18 @@
-import { withDB } from '@/app/api/utils/db';
+/*
+|-----------------------------------------
+| setting up Controller for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import { FilterQuery } from 'mongoose';
+
+import { withDB } from '@/app/api/utils/db';
 
 import Role from './model';
 import { IResponse } from '../../utils/utils';
 
-// Helper to format responses
 const formatResponse = (data: unknown, message: string, status: number): IResponse => ({
   data,
   message,
@@ -12,7 +20,6 @@ const formatResponse = (data: unknown, message: string, status: number): IRespon
   ok: status >= 200 && status < 300,
 });
 
-// CREATE Role
 export async function createRole(req: Request): Promise<IResponse> {
   return withDB(async () => {
     try {
@@ -26,12 +33,11 @@ export async function createRole(req: Request): Promise<IResponse> {
         const err = error as { keyValue?: Record<string, unknown> };
         return formatResponse(null, `Duplicate key error: ${JSON.stringify(err.keyValue)}`, 400);
       }
-      throw error; // Re-throw other errors to be handled by `withDB`
+      throw error;
     }
   });
 }
 
-// GET single Role by ID
 export async function getRoleById(req: Request): Promise<IResponse> {
   return withDB(async () => {
     const id = new URL(req.url).searchParams.get('id');
@@ -44,7 +50,6 @@ export async function getRoleById(req: Request): Promise<IResponse> {
   });
 }
 
-// GET all Roles with pagination and intelligent search
 export async function getRoles(req: Request): Promise<IResponse> {
   return withDB(async () => {
     const url = new URL(req.url);
@@ -56,7 +61,6 @@ export async function getRoles(req: Request): Promise<IResponse> {
     let searchFilter: FilterQuery<unknown> = {};
 
     if (searchQuery) {
-      // Check for date range filter format first
       if (searchQuery.startsWith('createdAt:range:')) {
         const datePart = searchQuery.split(':')[2];
         const [startDateString, endDateString] = datePart.split('_');
@@ -64,27 +68,24 @@ export async function getRoles(req: Request): Promise<IResponse> {
         if (startDateString && endDateString) {
           const startDate = new Date(startDateString);
           const endDate = new Date(endDateString);
-          // To ensure the range is inclusive, set the time to the end of the day
+
           endDate.setUTCHours(23, 59, 59, 999);
 
           searchFilter = {
             createdAt: {
-              $gte: startDate, // Greater than or equal to the start date
-              $lte: endDate, // Less than or equal to the end date
+              $gte: startDate,
+              $lte: endDate,
             },
           };
         }
       } else {
-        // Fallback to original generic search logic
         const orConditions: FilterQuery<unknown>[] = [];
 
-        // Add regex search conditions for all string-like fields
         const stringFields = ['name', 'email'];
         stringFields.forEach(field => {
           orConditions.push({ [field]: { $regex: searchQuery, $options: 'i' } });
         });
 
-        // If the query is a valid number, add equality checks for all number fields
         const numericQuery = parseFloat(searchQuery);
         if (!isNaN(numericQuery)) {
           const numberFields: string[] = [];
@@ -116,7 +117,6 @@ export async function getRoles(req: Request): Promise<IResponse> {
   });
 }
 
-// UPDATE single Role by ID
 export async function updateRole(req: Request): Promise<IResponse> {
   return withDB(async () => {
     try {
@@ -130,12 +130,11 @@ export async function updateRole(req: Request): Promise<IResponse> {
         const err = error as { keyValue?: Record<string, unknown> };
         return formatResponse(null, `Duplicate key error: ${JSON.stringify(err.keyValue)}`, 400);
       }
-      throw error; // Re-throw other errors to be handled by `withDB`
+      throw error;
     }
   });
 }
 
-// BULK UPDATE Roles
 export async function bulkUpdateRoles(req: Request): Promise<IResponse> {
   return withDB(async () => {
     const updates: { id: string; updateData: Record<string, unknown> }[] = await req.json();
@@ -158,7 +157,6 @@ export async function bulkUpdateRoles(req: Request): Promise<IResponse> {
   });
 }
 
-// DELETE single Role by ID
 export async function deleteRole(req: Request): Promise<IResponse> {
   return withDB(async () => {
     const { id } = await req.json();
@@ -168,7 +166,6 @@ export async function deleteRole(req: Request): Promise<IResponse> {
   });
 }
 
-// BULK DELETE Roles
 export async function bulkDeleteRoles(req: Request): Promise<IResponse> {
   return withDB(async () => {
     const { ids }: { ids: string[] } = await req.json();

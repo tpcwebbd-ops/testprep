@@ -1,4 +1,11 @@
-import { logger } from 'better-auth';
+/*
+|-----------------------------------------
+| setting up Route for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import { revalidatePath } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -19,8 +26,8 @@ export async function POST(request: NextRequest) {
     revalidatePath('/', 'layout');
 
     return NextResponse.json({ message: 'Revalidated all pages', revalidated: true }, { status: 200 });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (err) {
-    logger.error(JSON.stringify(err))
     return NextResponse.json({ message: 'Error revalidating', revalidated: false }, { status: 500 });
   }
 }

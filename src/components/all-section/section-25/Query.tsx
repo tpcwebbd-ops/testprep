@@ -1,12 +1,22 @@
+/*
+|-----------------------------------------
+| setting up Query for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { defaultDataSection25, ISliderData, SliderProps } from './data';
 import Image from 'next/image';
+import { useState, useEffect, useCallback } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+
+import { defaultDataSection25, ISliderData, SliderProps } from './data';
 
 const QuerySection25 = ({ data }: SliderProps) => {
   let sliderData = defaultDataSection25;
@@ -26,13 +36,10 @@ const QuerySection25 = ({ data }: SliderProps) => {
 
   const totalSlides = slides.length;
 
-  // --- Navigation Logic ---
-
   const nextSlide = useCallback(() => {
     setCurrentIndex(prev => {
-      // If we are at the end
       if (prev >= totalSlides - itemsPerSlide) {
-        return infiniteLoop ? 0 : prev; // Loop back to 0 or stay
+        return infiniteLoop ? 0 : prev;
       }
       return prev + 1;
     });
@@ -47,7 +54,6 @@ const QuerySection25 = ({ data }: SliderProps) => {
     });
   }, [totalSlides, itemsPerSlide, infiniteLoop]);
 
-  // --- Autoplay ---
   useEffect(() => {
     if (!isAutoplay || isPaused) return;
 
@@ -58,7 +64,6 @@ const QuerySection25 = ({ data }: SliderProps) => {
     return () => clearInterval(interval);
   }, [isAutoplay, isPaused, autoplaySpeed, nextSlide]);
 
-  // --- Touch / Swipe Support ---
   const minSwipeDistance = 50;
   const onTouchStart = (e: React.TouchEvent) => {
     setTouchEnd(null);
@@ -74,7 +79,6 @@ const QuerySection25 = ({ data }: SliderProps) => {
     if (isRightSwipe) prevSlide();
   };
 
-  // --- Styles Maps ---
   const heightClass = {
     auto: 'h-auto aspect-video',
     'fixed-sm': 'h-[300px]',
@@ -83,7 +87,6 @@ const QuerySection25 = ({ data }: SliderProps) => {
     screen: 'h-screen',
   }[height];
 
-  // Navigation Position Classes
   const getNavClasses = () => {
     switch (navPosition) {
       case 'middle-outside':
@@ -99,7 +102,6 @@ const QuerySection25 = ({ data }: SliderProps) => {
   };
   const navClasses = getNavClasses();
 
-  // Item Width Calculation
   const itemWidthPercent = 100 / itemsPerSlide;
 
   if (!slides.length) return <div className="p-10 text-center text-gray-500">No slides configured.</div>;
@@ -116,13 +118,10 @@ const QuerySection25 = ({ data }: SliderProps) => {
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
-      {/* Viewport */}
       <div className={cn('overflow-hidden w-full rounded-xl bg-gray-900', heightClass)}>
-        {/* Track */}
         <div className="flex h-full transition-transform duration-500 ease-out" style={{ transform: `translateX(-${currentIndex * itemWidthPercent}%)` }}>
           {slides.map(slide => (
             <div key={slide.id} className="flex-shrink-0 h-full relative px-1" style={{ width: `${itemWidthPercent}%` }}>
-              {/* Image Background */}
               <div className="relative w-full h-full overflow-hidden rounded-lg">
                 {slide.image ? (
                   <Image
@@ -136,7 +135,6 @@ const QuerySection25 = ({ data }: SliderProps) => {
                   <div className="w-full h-full bg-gray-800 flex items-center justify-center text-gray-600">No Image</div>
                 )}
 
-                {/* Text Overlay */}
                 {(slide.title || slide.description) && (
                   <div
                     className="absolute inset-0 flex flex-col justify-end p-8"
@@ -146,7 +144,6 @@ const QuerySection25 = ({ data }: SliderProps) => {
                       {slide.title && <h3 className="text-2xl md:text-4xl font-bold text-white drop-shadow-md">{slide.title}</h3>}
                       {slide.description && <p className="text-sm md:text-base text-gray-200 drop-shadow-sm line-clamp-3">{slide.description}</p>}
 
-                      {/* Slide Button */}
                       {slide.buttonText && (
                         <Button asChild size="sm" className="mt-4 bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-sm">
                           <Link href={slide.buttonLink || '#'}>{slide.buttonText}</Link>
@@ -161,7 +158,6 @@ const QuerySection25 = ({ data }: SliderProps) => {
         </div>
       </div>
 
-      {/* Navigation Arrows */}
       {totalSlides > itemsPerSlide && (
         <>
           <Button
@@ -173,7 +169,6 @@ const QuerySection25 = ({ data }: SliderProps) => {
               navClasses.container,
               navClasses.prev,
               showArrowsOnHover ? 'opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0' : 'opacity-100',
-              // Disable if not infinite and at start
               !infiniteLoop && currentIndex === 0 && 'opacity-30 cursor-not-allowed hover:bg-black/30',
             )}
             disabled={!infiniteLoop && currentIndex === 0}
@@ -199,7 +194,6 @@ const QuerySection25 = ({ data }: SliderProps) => {
         </>
       )}
 
-      {/* Pagination Indicators (Dots) */}
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
         {Array.from({ length: Math.ceil(totalSlides - itemsPerSlide + 1) }).map((_, idx) => (
           <button

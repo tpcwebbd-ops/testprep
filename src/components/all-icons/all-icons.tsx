@@ -1,3 +1,11 @@
+/*
+|-----------------------------------------
+| setting up AllIcons for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import {
   ShieldCheck,
   FolderKanban,
@@ -207,4 +215,3 @@ export const iconMap: Record<string, React.ReactNode> = {
 };
 
 export const iconOptions = Object.keys(iconMap);
-

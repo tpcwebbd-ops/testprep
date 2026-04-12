@@ -1,8 +1,29 @@
-import { NextResponse } from 'next/server';
-import * as footerController from './controller';
+/*
+|-----------------------------------------
+| setting up Route for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
 
-export async function GET() {
+import { NextResponse } from 'next/server';
+
+import * as footerController from './controller';
+import { handleRateLimit } from '../../utils/rate-limit';
+import { isUserHasAccessByRole, IWantAccess } from '../../utils/is-user-has-access-by-role';
+
+export async function GET(req: Request) {
   try {
+    const rateLimitResponse = handleRateLimit(req);
+    if (rateLimitResponse) return rateLimitResponse;
+    if (process.env.AuthorizationEnable === 'true') {
+      const wantToAccess: IWantAccess = {
+        db_name: 'footer editor',
+        access: 'read',
+      };
+      const isAccess = await isUserHasAccessByRole(wantToAccess);
+      if (isAccess) return isAccess;
+    }
     const footers = await footerController.getFooters();
     return NextResponse.json(footers);
   } catch (error) {
@@ -13,6 +34,17 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
+    const rateLimitResponse = handleRateLimit(req);
+    if (rateLimitResponse) return rateLimitResponse;
+    if (process.env.AuthorizationEnable === 'true') {
+      const wantToAccess: IWantAccess = {
+        db_name: 'footer editor',
+        access: 'create',
+      };
+      const isAccess = await isUserHasAccessByRole(wantToAccess);
+      if (isAccess) return isAccess;
+    }
+
     const body = await req.json();
     const newFooter = await footerController.createFooter(body);
     return NextResponse.json(newFooter, { status: 201 });
@@ -24,6 +56,16 @@ export async function POST(req: Request) {
 
 export async function PUT(req: Request) {
   try {
+    const rateLimitResponse = handleRateLimit(req);
+    if (rateLimitResponse) return rateLimitResponse;
+    if (process.env.AuthorizationEnable === 'true') {
+      const wantToAccess: IWantAccess = {
+        db_name: 'footer editor',
+        access: 'update',
+      };
+      const isAccess = await isUserHasAccessByRole(wantToAccess);
+      if (isAccess) return isAccess;
+    }
     const body = await req.json();
     const { _id, ...updateData } = body;
 
@@ -39,6 +81,16 @@ export async function PUT(req: Request) {
 
 export async function DELETE(req: Request) {
   try {
+    const rateLimitResponse = handleRateLimit(req);
+    if (rateLimitResponse) return rateLimitResponse;
+    if (process.env.AuthorizationEnable === 'true') {
+      const wantToAccess: IWantAccess = {
+        db_name: 'footer editor',
+        access: 'delete',
+      };
+      const isAccess = await isUserHasAccessByRole(wantToAccess);
+      if (isAccess) return isAccess;
+    }
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
 

@@ -1,42 +1,50 @@
+/*
+|-----------------------------------------
+| setting up Page for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import { useState, useEffect, Suspense, useMemo } from 'react';
-import { useSearchParams } from 'next/navigation';
 import {
+  Eye,
   Edit,
-  GripVertical,
   Plus,
   Save,
-  Trash2,
-  AlertTriangle,
-  Eye,
-  ArrowUpDown,
-  ArrowUp,
-  ArrowDown,
   Type,
   Layers,
-  ChevronDown,
+  Trash2,
+  Search,
+  ArrowUp,
+  ArrowDown,
+  RefreshCw,
   LayoutGrid,
   FolderOpen,
-  RefreshCw,
-  Search,
+  ArrowUpDown,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
+  GripVertical,
   ExternalLink,
+  AlertTriangle,
 } from 'lucide-react';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent, DragOverlay, DragStartEvent } from '@dnd-kit/core';
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { toast } from 'react-toastify';
+import { useSearchParams } from 'next/navigation';
+import { useState, useEffect, Suspense, useMemo } from 'react';
+
 import { CSS } from '@dnd-kit/utilities';
-
-import { AllSections, AllSectionsKeys, allSectionCagegory } from '@/components/all-section/all-section-index/all-sections';
-import { AllForms, AllFormsKeys } from '@/components/all-form/all-form-index/all-form';
-
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ItemType, PageContent } from '../utils';
+import { AllForms, AllFormsKeys } from '@/components/all-form/all-form-index/all-form';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useGetPagesQuery, useUpdatePageMutation } from '@/redux/features/page-builder/pageBuilderSlice';
-import { toast } from 'react-toastify';
+import { AllSections, AllSectionsKeys, allSectionCagegory } from '@/components/all-section/all-section-index/all-sections';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent, DragOverlay, DragStartEvent } from '@dnd-kit/core';
+
+import { ItemType, PageContent } from '../utils';
 
 interface SectionConfig {
   category: string;
@@ -587,7 +595,6 @@ function EditPageContent() {
               );
             })}
           </div>
-          {/* ADDED pointer-events-auto and pr-4 HERE */}
           <div className="w-full flex items-center justify-end gap-2 pointer-events-auto pr-4">
             <Button size="sm" variant="outlineGlassy" className="min-w-1" onClick={() => handlePreviewPage(currentPage.path)} title="Preview Page">
               <Eye className="h-4 w-4" />
@@ -610,7 +617,6 @@ function EditPageContent() {
       </div>
 
       <Dialog open={!!activeAddType} onOpenChange={() => setActiveAddType(null)}>
-        {/* ... (rest of the dialog content remains unchanged) */}
         <DialogContent
           className={`
             p-0 overflow-hidden bg-slate-950/95 backdrop-blur-3xl border-white/10 shadow-2xl text-white gap-0 flex flex-col max-w-[90vw] min-w-[90vw] h-[85vh] mt-10
@@ -621,7 +627,6 @@ function EditPageContent() {
               const meta = COMPONENT_MAP[activeAddType];
               const isSectionMode = activeAddType === 'section';
 
-              // Pagination Logic
               const dataSource = isSectionMode ? filteredSectionKeys : meta.keys;
               const totalItems = dataSource.length;
               const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
@@ -797,7 +802,6 @@ function EditPageContent() {
             })()}
         </DialogContent>
       </Dialog>
-      {/* ... (rest of the dialogs remain unchanged) ... */}
       <Dialog open={!!sectionPreviewKey} onOpenChange={() => setSectionPreviewKey(null)}>
         <DialogContent className="max-w-[90vw] p-0 bg-slate-950 border-white/10 flex flex-col min-w-[90vw] h-[80vh] mt-10 text-white">
           {sectionPreviewKey &&

@@ -1,3 +1,11 @@
+/*
+|-----------------------------------------
+| setting up Controller for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import BrandSettings, { IBrandSettings } from './model';
 
 const DEFAULT_SETTINGS = {
@@ -24,7 +32,7 @@ export const getBrandSettings = async () => {
 };
 
 export const updateBrandSettings = async (data: Partial<IBrandSettings>) => {
-  try { 
+  try {
     const settings = await BrandSettings.findOneAndUpdate({}, { $set: data }, { new: true, upsert: true, runValidators: true });
 
     return settings;

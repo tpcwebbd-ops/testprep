@@ -1,5 +1,14 @@
+/*
+|-----------------------------------------
+| setting up Query for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import React from 'react';
 import { BookOpen, Award, Play, Zap, Star, Globe, Monitor, HelpCircle } from 'lucide-react';
+
 import { defaultDataSection32, ISection32Data, Section32Props } from './data';
 
 const iconMap: { [key: string]: React.ReactNode } = {
@@ -40,7 +49,6 @@ const QuerySection32 = ({ data }: Section32Props) => {
                 key={idx}
                 className="group relative bg-white rounded-2xl p-8 shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-slate-100 overflow-hidden"
               >
-                {/* Hover Gradient Overlay */}
                 <div className={`absolute inset-0 bg-gradient-to-br ${card.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
 
                 <div
@@ -55,7 +63,6 @@ const QuerySection32 = ({ data }: Section32Props) => {
 
                 <p className="text-slate-500 text-sm leading-relaxed group-hover:text-slate-600">{card.description}</p>
 
-                {/* Bottom decorative line */}
                 <div
                   className={`absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r ${card.gradient} group-hover:w-full transition-all duration-500 ease-in-out`}
                 />

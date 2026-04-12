@@ -1,14 +1,22 @@
+/*
+|-----------------------------------------
+| setting up FormField for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import { toast } from 'react-toastify';
 import { usePathname } from 'next/navigation';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { Loader2, CheckCircle2, AlertCircle, Clock, Save, Eraser, FileText, User, Phone, Plus, Trash2, FolderOpen, Image as ImageIcon } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { toast } from 'sonner';
-
 import ImageUploadManagerSingle from '@/components/dashboard-ui/ImageUploadManagerSingle';
 
 import type { IForm7Data, IOtherDoc } from './data';
@@ -46,12 +54,6 @@ const FormFieldForm7 = ({ data, onSubmit }: Form7Props) => {
   const [errorMessage, setErrorMessage] = useState<string>('');
   const pathname = usePathname();
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-
-  // useEffect(() => {
-  //   if (data) {
-  //     setFormData(JSON.parse(JSON.stringify(data)));
-  //   }
-  // }, [data]);
 
   useEffect(() => {
     const storedCooldown = localStorage.getItem(COOLDOWN_KEY);

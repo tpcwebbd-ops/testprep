@@ -1,44 +1,44 @@
+/*
+|-----------------------------------------
+| setting up Page for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { PlusIcon, XIcon, Settings2, RefreshCcw, Filter } from 'lucide-react';
-import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 import { IoReloadCircleOutline } from 'react-icons/io5';
+import { PlusIcon, XIcon, Settings2, RefreshCcw, Filter } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
+import { useGetVerificationsQuery } from '@/redux/features/verifications/verificationsSlice';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 
 import AddFile from './components/Add';
 import EditFile from './components/Edit';
 import ViewFile from './components/View';
-import SearchBox from './components/SearchBox';
+import Summary from './components/Summary';
 import DeleteFile from './components/Delete';
+import SearchBox from './components/SearchBox';
 import BulkEditFile from './components/BulkEdit';
-import TooManyRequests from './components/TooManyRequest';
+import { handleSuccess } from './components/utils';
 import BulkDeleteFile from './components/BulkDelete';
+import { useVerificationsStore } from './store/store';
+import TooManyRequests from './components/TooManyRequest';
 import ViewVerificationsTable from './components/TableView';
 import BulkUpdateVerifications from './components/BulkUpdate';
-import BulkDynamicUpdateVerifications from './components/BulkDynamicUpdate';
 import FilterDialog, { FilterPayload } from './components/FilterDialog';
-import Summary from './components/Summary';
-
-import { useVerificationsStore } from './store/store';
-import { useGetVerificationsQuery } from '@/redux/features/verifications/verificationsSlice';
-import { handleSuccess } from './components/utils';
+import BulkDynamicUpdateVerifications from './components/BulkDynamicUpdate';
 
 const MainNextPage: React.FC = () => {
   const [hashSearchText, setHashSearchText] = useState('');
   const [isFilterModalOpen, setFilterModalOpen] = useState(false);
 
-  const {
-    toggleAddModal,
-    queryPramsLimit,
-    queryPramsPage,
-    queryPramsQ,
-    setQueryPramsPage,
-    setQueryPramsQ,
-  } = useVerificationsStore();
+  const { toggleAddModal, queryPramsLimit, queryPramsPage, queryPramsQ, setQueryPramsPage, setQueryPramsQ } = useVerificationsStore();
 
   const {
     data: getResponseData,
@@ -53,13 +53,10 @@ const MainNextPage: React.FC = () => {
         data,
         isSuccess,
         isLoading,
-        status:
-          'status' in (error || {})
-            ? (error as FetchBaseQueryError).status
-            : status,
+        status: 'status' in (error || {}) ? (error as FetchBaseQueryError).status : status,
         error,
       }),
-    }
+    },
   );
 
   const activeFilter = useMemo(() => {
@@ -105,31 +102,15 @@ const MainNextPage: React.FC = () => {
     handleSuccess('Filter Cleared!');
   };
 
-  const modals = [
-    AddFile,
-    ViewFile,
-    BulkDeleteFile,
-    BulkEditFile,
-    EditFile,
-    DeleteFile,
-    BulkUpdateVerifications,
-    BulkDynamicUpdateVerifications,
-  ];
+  const modals = [AddFile, ViewFile, BulkDeleteFile, BulkEditFile, EditFile, DeleteFile, BulkUpdateVerifications, BulkDynamicUpdateVerifications];
 
   let renderUI = (
     <div className="container mx-auto md:p-4">
-      {/* Header + Toolbar */}
       <div className="flex flex-col md:flex-row gap-2 justify-between items-center mb-6">
         <h1 className="h2 w-full text-white">
-          Verification Management{' '}
-          {isSuccess && (
-            <sup className="text-xs text-gray-300">
-              (total:{getResponseData?.data?.total || '00'})
-            </sup>
-          )}
+          Verification Management {isSuccess && <sup className="text-xs text-gray-300">(total:{getResponseData?.data?.total || '00'})</sup>}
         </h1>
 
-        {/* Mobile Sheet Toolbar */}
         <div className="w-full flex md:hidden justify-end">
           <Sheet>
             <SheetTrigger asChild>
@@ -138,10 +119,7 @@ const MainNextPage: React.FC = () => {
               </Button>
             </SheetTrigger>
 
-            <SheetContent
-              side="bottom"
-              className="p-6 space-y-5 bg-white/10 backdrop-blur-xl border-t border-white/20 shadow-lg rounded-t-2xl"
-            >
+            <SheetContent side="bottom" className="p-6 space-y-5 bg-white/10 backdrop-blur-xl border-t border-white/20 shadow-lg rounded-t-2xl">
               <SheetHeader>
                 <SheetTitle className="text-white text-lg font-medium text-center">Verification Actions</SheetTitle>
               </SheetHeader>
@@ -174,7 +152,6 @@ const MainNextPage: React.FC = () => {
           </Sheet>
         </div>
 
-        {/* Desktop Toolbar */}
         <div className="hidden md:flex flex-row gap-2 items-center justify-end w-full">
           <Summary />
           <Button size="sm" variant="outlineWater" onClick={handleFilter} disabled={isLoading}>
@@ -197,12 +174,14 @@ const MainNextPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Search + Filter UI */}
       <SearchBox onSearch={handleSearch} placeholder="Search here ..." autoFocus={false} />
 
       {activeFilter.isApplied && (
         <div className="flex items-center justify-start my-4">
-          <Badge variant="secondary" className="flex items-center gap-2 pl-3 pr-1 py-1 text-sm font-normal bg-white/10 backdrop-blur-xl border border-white/20 text-white shadow-md">
+          <Badge
+            variant="secondary"
+            className="flex items-center gap-2 pl-3 pr-1 py-1 text-sm font-normal bg-white/10 backdrop-blur-xl border border-white/20 text-white shadow-md"
+          >
             <span>{activeFilter.displayText}</span>
             <Button
               aria-label="Clear filter"
@@ -217,17 +196,14 @@ const MainNextPage: React.FC = () => {
         </div>
       )}
 
-      {/* Table View (Glassmorphism card) */}
       <div className="bg-white/5 backdrop-blur-md md:p-4 rounded-2xl shadow-md border border-white/10">
         <ViewVerificationsTable />
       </div>
 
-      {/* Modals */}
       {modals.map((ModalComponent, index) => (
         <ModalComponent key={index} />
       ))}
 
-      {/* Filter Dialog */}
       <FilterDialog isOpen={isFilterModalOpen} onOpenChange={setFilterModalOpen} onApplyFilter={handleApplyFilter} onClearFilter={handleClearFilter} />
     </div>
   );

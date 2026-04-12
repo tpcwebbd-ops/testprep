@@ -1,15 +1,24 @@
+/*
+|-----------------------------------------
+| setting up Mutation for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Trash2, Clock, Layout, Tag, Link as LinkIcon, Palette, Save, Settings2, RotateCcw } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { cn } from '@/lib/utils';
+
 import { defaultDataSection26, ITagItem, ITagSliderData, STYLE_PRESETS, TagSliderFormProps, TagStyle } from './data';
 
 const ScrollArea = ({ children, className }: { children: React.ReactNode; className?: string }) => {
@@ -69,9 +78,7 @@ const MutationTagSlider26 = ({ data, onSubmit }: TagSliderFormProps) => {
 
   return (
     <div className="min-h-[600px] w-full max-w-5xl mx-auto bg-zinc-950 text-zinc-100 font-sans selection:bg-blue-500/30 flex flex-col lg:flex-row rounded-3xl border border-zinc-800 overflow-hidden shadow-2xl">
-      {/* --- RIGHT PANEL: EDITOR --- */}
       <div className="lg:w-1/2 bg-zinc-950 relative flex flex-col h-[600px] lg:h-auto">
-        {/* Tabs */}
         <div className="flex border-b border-zinc-800">
           <button
             onClick={() => setActiveTab('content')}
@@ -102,7 +109,6 @@ const MutationTagSlider26 = ({ data, onSubmit }: TagSliderFormProps) => {
             </div>
 
             {activeTab === 'content' ? (
-              /* --- TAB 1: TAG LIST --- */
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-zinc-500">Total: {formData.tags.length} tags</span>
@@ -150,9 +156,7 @@ const MutationTagSlider26 = ({ data, onSubmit }: TagSliderFormProps) => {
                 </div>
               </div>
             ) : (
-              /* --- TAB 2: CONFIGURATION --- */
               <div className="space-y-8">
-                {/* Style Selector */}
                 <section className="space-y-3">
                   <Label className="flex items-center gap-2 text-sm font-bold text-zinc-400 uppercase tracking-wider">
                     <Palette size={14} /> Visual Style
@@ -167,7 +171,6 @@ const MutationTagSlider26 = ({ data, onSubmit }: TagSliderFormProps) => {
                           formData.tagStyle === style ? 'border-blue-500 ring-1 ring-blue-500/50' : 'border-zinc-800 hover:border-zinc-600',
                         )}
                       >
-                        {/* Mini Preview of the style inside the button */}
                         <div className="absolute inset-0 flex items-center justify-center bg-zinc-950">
                           <div className={cn('px-3 py-1 rounded-full text-xs font-medium', STYLE_PRESETS[style as TagStyle])}>
                             {style.charAt(0).toUpperCase() + style.slice(1)}
@@ -180,7 +183,6 @@ const MutationTagSlider26 = ({ data, onSubmit }: TagSliderFormProps) => {
 
                 <div className="w-full h-px bg-zinc-800/50" />
 
-                {/* Layout Controls */}
                 <section className="space-y-4">
                   <Label className="flex items-center gap-2 text-sm font-bold text-zinc-400 uppercase tracking-wider">
                     <Layout size={14} /> Layout
@@ -218,14 +220,12 @@ const MutationTagSlider26 = ({ data, onSubmit }: TagSliderFormProps) => {
                   </div>
                 </section>
 
-                {/* Behavior Controls */}
                 <section className="space-y-4">
                   <Label className="flex items-center gap-2 text-sm font-bold text-zinc-400 uppercase tracking-wider">
                     <Clock size={14} /> Behavior
                   </Label>
 
                   <div className="space-y-3">
-                    {/* Autoplay Toggle */}
                     <div className="flex items-center justify-between p-3 bg-zinc-900/30 border border-zinc-800 rounded-xl">
                       <div className="text-xs">
                         <p className="text-zinc-200 font-medium">Autoplay</p>
@@ -245,7 +245,6 @@ const MutationTagSlider26 = ({ data, onSubmit }: TagSliderFormProps) => {
                       </div>
                     </div>
 
-                    {/* Other Toggles */}
                     <div className="grid grid-cols-2 gap-3">
                       <div className="flex items-center justify-between p-3 bg-zinc-900/30 border border-zinc-800 rounded-xl">
                         <span className="text-xs text-zinc-300">Infinite Loop</span>
@@ -261,7 +260,6 @@ const MutationTagSlider26 = ({ data, onSubmit }: TagSliderFormProps) => {
               </div>
             )}
 
-            {/* Footer Action */}
             <div className="pt-6 border-t border-zinc-800 flex justify-end">
               <Button onClick={() => onSubmit(formData)} variant="outlineGlassy" className="w-full">
                 <Save className="w-5 h-5 mr-2" />
@@ -272,7 +270,6 @@ const MutationTagSlider26 = ({ data, onSubmit }: TagSliderFormProps) => {
         </ScrollArea>
       </div>
 
-      {/* Global CSS for hiding scrollbar */}
       <style>{`
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }

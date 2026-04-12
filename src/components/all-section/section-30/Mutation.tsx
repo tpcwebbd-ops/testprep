@@ -1,8 +1,15 @@
+/*
+|-----------------------------------------
+| setting up Mutation for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import { useState } from 'react';
 import { Search, Save } from 'lucide-react';
-// import { iconMap, iconOptions } from '@/components/all-icons/all-icons';
 import { iconMap, iconOptions } from '@/components/all-icons/all-icons-jsx';
 import { defaultDataSection30, IDefaultDataSection30, IDefaultDataSection30Props } from './data';
 
@@ -24,13 +31,11 @@ const MutationSection30 = ({ data, onSubmit }: IDefaultDataSection30Props) => {
     }
   };
 
-  // Safe retrieval of the component
   const SelectedIcon = localData.iconName ? iconMap[localData.iconName] : null;
 
   return (
     <div className="w-full max-w-6xl mx-auto p-6 font-sans">
       <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100 flex flex-col md:flex-row h-[80vh] md:h-[600px]">
-        {/* PREVIEW PANEL */}
         <div className="w-full md:w-1/3 bg-slate-50 border-r border-slate-100 flex flex-col p-8 items-center justify-center relative overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:20px_20px] opacity-50" />
 
@@ -39,7 +44,6 @@ const MutationSection30 = ({ data, onSubmit }: IDefaultDataSection30Props) => {
 
             <div className="w-40 h-40 rounded-3xl bg-white shadow-xl shadow-indigo-500/10 flex items-center justify-center border border-indigo-50 transform transition-all duration-500 hover:scale-105 hover:rotate-3">
               {SelectedIcon ? (
-                // Now works because SelectedIcon is a Component
                 <SelectedIcon className="w-20 h-20 text-indigo-600 transition-all duration-300 drop-shadow-sm" strokeWidth={1.5} />
               ) : (
                 <span className="text-slate-300 text-xs font-medium uppercase tracking-widest">No Selection</span>
@@ -61,7 +65,6 @@ const MutationSection30 = ({ data, onSubmit }: IDefaultDataSection30Props) => {
           </div>
         </div>
 
-        {/* SELECTION PANEL */}
         <div className="w-full md:w-2/3 flex flex-col bg-white">
           <div className="p-6 border-b border-slate-100 bg-white/80 backdrop-blur-sm z-10 sticky top-0">
             <div className="relative group">
@@ -99,7 +102,6 @@ const MutationSection30 = ({ data, onSubmit }: IDefaultDataSection30Props) => {
                       `}
                       title={iconName}
                     >
-                      {/* Render small version for grid */}
                       <IconComponent className={`w-6 h-6 ${isSelected ? 'animate-pulse' : ''}`} />
                       <span
                         className={`text-[9px] mt-2 max-w-[90%] truncate px-1 font-medium ${isSelected ? 'text-indigo-200' : 'text-slate-400 group-hover:text-indigo-400'}`}

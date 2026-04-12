@@ -1,14 +1,22 @@
+/*
+|-----------------------------------------
+| setting up Page for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ImageIcon, Database, LayoutGrid, Upload, VideoIcon } from 'lucide-react';
 
-import { CustomLink } from '@/components/common/LinkButton';
 import { Button } from '@/components/ui/button';
+import { CustomLink } from '@/components/common/LinkButton';
 
-import ImageUploadManagerSingle from './components/ImageUploadManagerSingle';
 import ImageUploadManager from './components/ImageUploadManager';
+import ImageUploadManagerSingle from './components/ImageUploadManagerSingle';
 
 type TabType = 'image';
 

@@ -1,18 +1,28 @@
+/*
+|-----------------------------------------
+| setting up Mutation for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
+import React, { useState, useEffect } from 'react';
+import { Save, Plus, Trash2, Search, Image as ImageIcon, User, Calendar, Clock, Tag, Star, LayoutList, Sparkles, Layers, X } from 'lucide-react';
+
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Save, Plus, Trash2, Search, Image as ImageIcon, User, Calendar, Clock, Tag, Star, LayoutList, Sparkles, Layers, X } from 'lucide-react';
-import { BlogPost, defaultDataSection17, ISection17Data } from './data';
-import ImageUploadManagerSingle from '@/components/dashboard-ui/ImageUploadManagerSingle';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import Image from 'next/image';
+import { Textarea } from '@/components/ui/textarea';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import ImageUploadManagerSingle from '@/components/dashboard-ui/ImageUploadManagerSingle';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+import { BlogPost, defaultDataSection17, ISection17Data } from './data';
 
 export interface Section17FormProps {
   data?: ISection17Data;
@@ -20,7 +30,6 @@ export interface Section17FormProps {
 }
 
 const MutationSection17 = ({ data, onSubmit }: Section17FormProps) => {
-  // Initialize with proper data structure
   const [sectionData, setSectionData] = useState<ISection17Data>(defaultDataSection17);
   const [activePostId, setActivePostId] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -36,14 +45,12 @@ const MutationSection17 = ({ data, onSubmit }: Section17FormProps) => {
       });
 
       if (data.allData && data.allData.length > 0) {
-        // Preserve active selection or default to first
         setActivePostId(prev => {
           const exists = data.allData.find(p => p.id === prev);
           return exists ? prev : data.allData[0].id;
         });
       }
     } else {
-      // Fallback
       setActivePostId(defaultDataSection17.allData[0]?.id || '');
     }
   }, [data]);
@@ -51,9 +58,7 @@ const MutationSection17 = ({ data, onSubmit }: Section17FormProps) => {
   const activePost = sectionData.allData.find(p => p.id === activePostId) || sectionData.allData[0];
   const activeIndex = sectionData.allData.findIndex(p => p.id === activePostId);
 
-  // --- Post Handlers ---
   const handleAddPost = () => {
-    // Default to first available category (excluding 'All') or fallback
     const defaultCat = sectionData.categories.find(c => c !== 'All') || 'General';
 
     const newPost: BlogPost = {
@@ -92,7 +97,6 @@ const MutationSection17 = ({ data, onSubmit }: Section17FormProps) => {
     }
   };
 
-  // --- Content Updates ---
   const updatePost = (field: keyof BlogPost, value: unknown) => {
     const updatedPosts = [...sectionData.allData];
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -117,7 +121,6 @@ const MutationSection17 = ({ data, onSubmit }: Section17FormProps) => {
     updatePost('tags', tags);
   };
 
-  // --- Category Management ---
   const handleAddCategory = () => {
     if (newCategory.trim() && !sectionData.categories.includes(newCategory.trim())) {
       setSectionData(prev => ({
@@ -142,14 +145,12 @@ const MutationSection17 = ({ data, onSubmit }: Section17FormProps) => {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans pb-32 relative overflow-hidden">
-      {/* Ambient Background */}
       <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute top-[-10%] left-[-5%] w-[40vw] h-[40vw] bg-indigo-900/10 rounded-full blur-[120px]" />
         <div className="absolute bottom-[-10%] right-[-5%] w-[40vw] h-[40vw] bg-purple-900/10 rounded-full blur-[120px]" />
       </div>
 
       <div className="max-w-[1600px] mx-auto p-4 md:p-6 space-y-6 relative z-10">
-        {/* Header */}
         <div className="flex flex-col items-center md:items-start mb-8">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -166,9 +167,7 @@ const MutationSection17 = ({ data, onSubmit }: Section17FormProps) => {
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
-          {/* LEFT SIDEBAR: Post List & Categories */}
           <div className="xl:col-span-3 space-y-6 xl:sticky xl:top-8 h-fit">
-            {/* 1. Category Manager */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -208,7 +207,6 @@ const MutationSection17 = ({ data, onSubmit }: Section17FormProps) => {
               </div>
             </motion.div>
 
-            {/* 2. Post List */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -282,9 +280,7 @@ const MutationSection17 = ({ data, onSubmit }: Section17FormProps) => {
             </motion.div>
           </div>
 
-          {/* MAIN EDITOR AREA */}
           <div className="xl:col-span-9 space-y-6">
-            {/* 1. Main Content Card */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -311,7 +307,6 @@ const MutationSection17 = ({ data, onSubmit }: Section17FormProps) => {
                   </div>
                 </div>
 
-                {/* Featured Toggle */}
                 <div className="bg-zinc-950/30 border border-white/5 p-4 rounded-2xl flex flex-col items-center gap-3 shrink-0 min-w-[100px]">
                   <Label className="text-zinc-400 text-[10px] uppercase font-bold tracking-wider">Featured</Label>
                   <Switch
@@ -333,9 +328,7 @@ const MutationSection17 = ({ data, onSubmit }: Section17FormProps) => {
               </div>
             </motion.div>
 
-            {/* 2. Metadata & Author Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Metadata */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -400,7 +393,6 @@ const MutationSection17 = ({ data, onSubmit }: Section17FormProps) => {
                 </div>
               </motion.div>
 
-              {/* Author */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -440,7 +432,6 @@ const MutationSection17 = ({ data, onSubmit }: Section17FormProps) => {
         </div>
       </div>
 
-      {/* Floating Dock - Save Button */}
       <div className="fixed bottom-6 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
         <motion.div
           initial={{ y: 100, opacity: 0 }}

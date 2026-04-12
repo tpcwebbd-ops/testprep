@@ -2,14 +2,14 @@
 |-----------------------------------------
 | setting up Page for the App
 | @author: Toufiquer Rahman<toufiquer.0@gmail.com>
-| @copyright: App Generator-webapp, August, 2025
+| @copyright: Toufiquer, April, 2026
 |-----------------------------------------
 */
+
+import React from 'react';
 import Link from 'next/link';
-import React from 'react'; // Import React to use its types
 
 const UnauthorizedPage = () => {
-  // By adding `: React.CSSProperties`, we tell TypeScript the exact shape this object should have.
   const pageStyle: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
@@ -21,7 +21,7 @@ const UnauthorizedPage = () => {
   };
 
   const containerStyle: React.CSSProperties = {
-    textAlign: 'center', // Now TypeScript knows 'center' is a valid value for textAlign
+    textAlign: 'center',
     backgroundColor: '#2d3748',
     padding: '40px',
     borderRadius: '8px',
@@ -67,7 +67,7 @@ const UnauthorizedPage = () => {
   return (
     <main style={pageStyle}>
       <div style={containerStyle}>
-        <div style={iconStyle}>{/* SVG code... */}</div>
+        <div style={iconStyle}></div>
         <h1 style={headingStyle}>Access Denied</h1>
         <p style={textStyle}>You are not authorized to view this page. It seems you&apos;ve stumbled upon a restricted area.</p>
         <p style={textStyle}>

@@ -1,28 +1,38 @@
+/*
+|-----------------------------------------
+| setting up Mutation for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import { useState, useEffect } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import ImageUploadManagerSingle from '@/components/dashboard-ui/ImageUploadManagerSingle';
+
 import {
-  Building2,
-  MapPin,
-  Save,
-  Image as ImageIcon,
-  GraduationCap,
-  CheckCircle2,
   X,
   Plus,
-  MousePointerClick,
-  LayoutDashboard,
+  Save,
   Users,
   Award,
+  MapPin,
+  Building2,
   DollarSign,
+  CheckCircle2,
+  GraduationCap,
+  LayoutDashboard,
+  MousePointerClick,
+  Image as ImageIcon,
 } from 'lucide-react';
 import type { ISection7Data } from './data';
 import { defaultDataSection7 } from './data';
-import ImageUploadManagerSingle from '@/components/dashboard-ui/ImageUploadManagerSingle';
 
 export interface Section7FormProps {
   data?: ISection7Data;
@@ -66,7 +76,6 @@ const MutationSection7 = ({ data, onSubmit }: Section7FormProps) => {
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 p-4 md:p-8 font-sans">
       <div className="max-w-7xl mx-auto bg-zinc-900/50 border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl">
-        {/* Header */}
         <div className="p-6 border-b border-zinc-800 bg-zinc-900/80 backdrop-blur flex items-center gap-3">
           <div className="p-2 bg-blue-500/10 rounded-lg">
             <Building2 className="text-blue-400" size={24} />
@@ -77,11 +86,8 @@ const MutationSection7 = ({ data, onSubmit }: Section7FormProps) => {
           </div>
         </div>
 
-        {/* Content Grid */}
         <div className="p-6 md:p-8 grid grid-cols-1 xl:grid-cols-3 gap-8">
-          {/* Left Column (Span 2) */}
           <div className="xl:col-span-2 space-y-8">
-            {/* General Info */}
             <div className="space-y-4">
               <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider flex items-center gap-2">
                 <LayoutDashboard size={16} /> General Information
@@ -166,14 +172,12 @@ const MutationSection7 = ({ data, onSubmit }: Section7FormProps) => {
               </div>
             </div>
 
-            {/* Academic Programs */}
             <div className="space-y-4">
               <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider flex items-center gap-2">
                 <GraduationCap size={16} /> Academic Programs
               </h3>
 
               <div className="bg-zinc-950/30 p-4 rounded-xl border border-zinc-800/50 grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Programs List */}
                 <div className="space-y-3">
                   <Label className="text-zinc-400">Degrees Offered</Label>
                   <div className="flex gap-2">
@@ -203,7 +207,6 @@ const MutationSection7 = ({ data, onSubmit }: Section7FormProps) => {
                   </div>
                 </div>
 
-                {/* Subjects List */}
                 <div className="space-y-3">
                   <Label className="text-zinc-400">Major Subjects</Label>
                   <div className="flex gap-2">
@@ -236,9 +239,7 @@ const MutationSection7 = ({ data, onSubmit }: Section7FormProps) => {
             </div>
           </div>
 
-          {/* Right Column */}
           <div className="space-y-6">
-            {/* Media */}
             <div className="space-y-4">
               <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider flex items-center gap-2">
                 <ImageIcon size={16} /> Media Assets
@@ -255,7 +256,6 @@ const MutationSection7 = ({ data, onSubmit }: Section7FormProps) => {
               </div>
             </div>
 
-            {/* Actions & Links */}
             <div className="space-y-4">
               <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider flex items-center gap-2">
                 <MousePointerClick size={16} /> Actions & Links
@@ -267,7 +267,6 @@ const MutationSection7 = ({ data, onSubmit }: Section7FormProps) => {
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
-                  {/* Primary */}
                   <div className="col-span-2 space-y-1">
                     <Label className="text-zinc-500 text-[10px] uppercase">Primary Button</Label>
                   </div>
@@ -288,7 +287,6 @@ const MutationSection7 = ({ data, onSubmit }: Section7FormProps) => {
                     />
                   </div>
 
-                  {/* Secondary */}
                   <div className="col-span-2 space-y-1 mt-1">
                     <Label className="text-zinc-500 text-[10px] uppercase">Secondary Button</Label>
                   </div>
@@ -312,7 +310,6 @@ const MutationSection7 = ({ data, onSubmit }: Section7FormProps) => {
               </div>
             </div>
 
-            {/* Features */}
             <div className="space-y-4">
               <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider flex items-center gap-2">
                 <CheckCircle2 size={16} /> Key Features
@@ -349,7 +346,6 @@ const MutationSection7 = ({ data, onSubmit }: Section7FormProps) => {
           </div>
         </div>
 
-        {/* Footer */}
         <div className="p-6 border-t border-zinc-800 bg-zinc-900/80 backdrop-blur flex justify-end">
           <Button onClick={handleSave} variant="outlineGlassy" size="sm">
             <Save className="w-5 h-5 mr-2" />

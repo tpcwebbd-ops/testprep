@@ -1,3 +1,11 @@
+/*
+|-----------------------------------------
+| setting up Data for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 export interface LogoProps {
   data?: ILogoData | string;
 }
@@ -14,23 +22,20 @@ export type NavPosition = 'middle-outside' | 'bottom-outside' | 'hidden';
 export interface ILogoData {
   logos: ILogoItem[];
 
-  // Responsive Settings (Items per view)
   responsive: {
-    mobile: number; // < 640px
-    tablet: number; // 640px - 1024px
-    desktop: number; // > 1024px
+    mobile: number;
+    tablet: number;
+    desktop: number;
   };
 
-  // Playback
   autoplaySpeed: number;
   isAutoplay: boolean;
   infiniteLoop: boolean;
   pauseOnHover: boolean;
 
-  // Layout & Nav
   navPosition: NavPosition;
   gap: 'sm' | 'md' | 'lg' | 'xl';
-  grayscale: boolean; // If true, logos are B&W until hovered
+  grayscale: boolean;
 }
 
 export const defaultDataSection27: ILogoData = {
@@ -51,7 +56,7 @@ export const defaultDataSection27: ILogoData = {
   isAutoplay: true,
   infiniteLoop: true,
   pauseOnHover: true,
-  navPosition: 'hidden', // Logos usually look best without arrows, but feature is supported
+  navPosition: 'hidden',
   gap: 'lg',
   grayscale: true,
 };

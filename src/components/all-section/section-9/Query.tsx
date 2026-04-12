@@ -1,11 +1,20 @@
+/*
+|-----------------------------------------
+| setting up Query for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+
+import React, { useMemo, useState } from 'react';
 import { ArrowRight, Sparkles } from 'lucide-react';
+
 import { ISection9Data, defaultDataSection9, Section9Props } from './data';
-import { logger } from 'better-auth';
 
 const ClientSection9: React.FC<Section9Props> = ({ data }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -14,15 +23,14 @@ const ClientSection9: React.FC<Section9Props> = ({ data }) => {
     if (!data) return defaultDataSection9;
     try {
       return typeof data === 'string' ? JSON.parse(data) : data;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
-      logger.info(JSON.stringify(e));
       return defaultDataSection9;
     }
   }, [data]);
 
   return (
     <section className="relative h-screen w-full snap-center flex items-center justify-center bg-zinc-950 overflow-hidden z-20">
-      {/* Background Elements */}
       <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-500/20 rounded-full blur-[120px] animate-pulse" />
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-violet-500/10 rounded-full blur-[100px] mix-blend-screen" />

@@ -1,16 +1,22 @@
+/*
+|-----------------------------------------
+| setting up Page for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import React, { useState } from 'react';
 import { Video, Database, LayoutGrid, Upload, VideoIcon } from 'lucide-react';
 
-import { CustomLink } from '@/components/common/LinkButton';
 import { Button } from '@/components/ui/button';
+import { CustomLink } from '@/components/common/LinkButton';
 import YouTubeVideoUploadManager from './components/YTVideoUploadManager';
 import YouTubeVideoUploadManagerSingle from './components/YTVideoUploadManagerSingle';
-// import YouTubeVideoUploadManager from './components/YouTubeVideoUploadManager';
-// import YouTubeVideoUploadManagerSingle from './components/YouTubeVideoUploadManagerSingle';
-  
+
 interface VideoAsset {
   url: string;
   name: string;

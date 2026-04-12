@@ -1,3 +1,11 @@
+/*
+|-----------------------------------------
+| setting up Data for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 export interface Form3Props {
   data?: IForm3Data | string;
 }
@@ -10,7 +18,7 @@ export interface IForm3Data {
   state: string;
   postalCode: string;
   country: string;
-  hasRefusalHistory: string; // 'Yes' or 'No'
+  hasRefusalHistory: string;
   submitButtonText: string;
 }
 

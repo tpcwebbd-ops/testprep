@@ -1,3 +1,11 @@
+/*
+|-----------------------------------------
+| setting up Data for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 export interface DescriptionProps {
   data?: IDescriptionData | string;
 }
@@ -7,10 +15,10 @@ export type DescAlign = 'left' | 'center' | 'right' | 'justify';
 export type DescPadding = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export interface IDescriptionData {
-  content: string; // Stores HTML string
+  content: string;
   textSize: DescSize;
   textAlign: DescAlign;
-  isGlobalUnderline: boolean; // Forces underline on everything
+  isGlobalUnderline: boolean;
   padding: DescPadding;
 }
 
@@ -38,7 +46,6 @@ export const defaultDataDescription: IDescriptionData = {
   isGlobalUnderline: false,
 };
 
-// --- Constants & Maps ---
 export const SIZE_MAP: Record<DescSize, string> = {
   xs: 'text-xs',
   sm: 'text-sm',
@@ -57,7 +64,6 @@ export const PADDING_MAP: Record<DescPadding, string> = {
   xl: 'p-12',
 };
 
-// 1. Map Size
 export const sizeClasses = {
   xs: 'text-xs',
   sm: 'text-sm',
@@ -67,7 +73,6 @@ export const sizeClasses = {
   '2xl': 'text-2xl',
 };
 
-// 2. Map Padding
 export const paddingClasses = {
   none: 'p-0',
   xs: 'p-2',
@@ -77,7 +82,6 @@ export const paddingClasses = {
   xl: 'p-12',
 };
 
-// 3. Map Alignment
 export const alignClasses = {
   left: 'text-left',
   center: 'text-center',

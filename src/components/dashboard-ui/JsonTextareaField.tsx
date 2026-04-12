@@ -1,17 +1,20 @@
-/* |-----------------------------------------
-| JSON Editor Textarea Field
-| Enhancements: Format button + safer syncing
-| Author: Toufiquer Rahman <toufiquer.0@gmail.com>
-|----------------------------------------- */
+/*
+|-----------------------------------------
+| setting up JsonTextareaField for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
 
 'use client';
 
-import React, { useState, useRef } from 'react';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
 import { Check, X, Code } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+
+import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 
 interface JsonTextareaFieldProps {
   id: string;
@@ -22,7 +25,7 @@ interface JsonTextareaFieldProps {
 const JsonTextareaField: React.FC<JsonTextareaFieldProps> = ({ id, value, onChange }) => {
   const [textValue, setTextValue] = useState<string>(value || '{}');
   const [error, setError] = useState<string | null>(null);
-  const lastValidRef = useRef<string>(''); // keep last valid JSON
+  const lastValidRef = useRef<string>('');
 
   const validateJson = (jsonText: string) => {
     try {
@@ -46,7 +49,7 @@ const JsonTextareaField: React.FC<JsonTextareaFieldProps> = ({ id, value, onChan
 
   const handleFormat = () => {
     try {
-      const parsedJson = JSON.parse(textValue); // Ensure consistent typing
+      const parsedJson = JSON.parse(textValue);
       const formattedJson = JSON.stringify(parsedJson, null, 2);
       setTextValue(formattedJson);
       lastValidRef.current = formattedJson;

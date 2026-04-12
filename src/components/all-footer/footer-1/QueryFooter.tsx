@@ -1,12 +1,20 @@
+/*
+|-----------------------------------------
+| setting up QueryFooter for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { motion, Variants } from 'framer-motion';
-import { BiLogoFacebookCircle, BiLogoLinkedin, BiLogoInstagram, BiLogoYoutube, BiWorld, BiRightArrowAlt } from 'react-icons/bi';
-import { BsTwitter, BsGithub } from 'react-icons/bs';
+import React, { useState } from 'react';
 import { HiOutlineMail } from 'react-icons/hi';
+import { motion, Variants } from 'framer-motion';
+import { BsTwitter, BsGithub } from 'react-icons/bs';
+import { BiLogoFacebookCircle, BiLogoLinkedin, BiLogoInstagram, BiLogoYoutube, BiWorld, BiRightArrowAlt } from 'react-icons/bi';
 
 interface ISocialLink {
   id: number;
@@ -108,7 +116,6 @@ const QueryFooter1 = ({ data }: QueryFooter1Props) => {
 
   return (
     <footer className="relative w-full bg-[#020617] text-slate-300 overflow-hidden font-sans border-t border-white/5">
-      {/* Background Pattern */}
       <div className="absolute inset-0 w-full h-full pointer-events-none opacity-20">
         <div
           className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:4rem_4rem]"
@@ -116,7 +123,6 @@ const QueryFooter1 = ({ data }: QueryFooter1Props) => {
         />
       </div>
 
-      {/* Animated Glow Effects */}
       <motion.div
         animate={{
           scale: [1, 1.1, 1],
@@ -142,7 +148,6 @@ const QueryFooter1 = ({ data }: QueryFooter1Props) => {
         className="relative z-10 max-w-7xl mx-auto px-6 pt-20 pb-10"
       >
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 mb-16">
-          {/* Brand Section */}
           <motion.div variants={itemVariants} className="lg:col-span-4 space-y-6">
             <Link href="/" className="inline-block">
               <div className="flex items-center gap-3 group cursor-pointer">
@@ -182,7 +187,6 @@ const QueryFooter1 = ({ data }: QueryFooter1Props) => {
             </div>
           </motion.div>
 
-          {/* Company Links */}
           <motion.div variants={itemVariants} className="lg:col-span-2 lg:col-start-6">
             <h3 className="text-white font-semibold mb-6 flex items-center gap-2">
               <span className="w-8 h-[2px] bg-blue-500 rounded-full" />
@@ -203,7 +207,6 @@ const QueryFooter1 = ({ data }: QueryFooter1Props) => {
             </ul>
           </motion.div>
 
-          {/* Contact Info */}
           <motion.div variants={itemVariants} className="lg:col-span-3">
             <h3 className="text-white font-semibold mb-6 flex items-center gap-2">
               <span className="w-8 h-[2px] bg-indigo-500 rounded-full" />
@@ -231,7 +234,6 @@ const QueryFooter1 = ({ data }: QueryFooter1Props) => {
             </ul>
           </motion.div>
 
-          {/* Newsletter */}
           <motion.div variants={itemVariants} className="lg:col-span-3">
             <h3 className="text-white font-semibold mb-6 flex items-center gap-2">
               <span className="w-8 h-[2px] bg-purple-500 rounded-full" />
@@ -251,7 +253,6 @@ const QueryFooter1 = ({ data }: QueryFooter1Props) => {
           </motion.div>
         </div>
 
-        {/* Footer Bottom */}
         <motion.div
           variants={itemVariants}
           className="pt-8 mt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500"

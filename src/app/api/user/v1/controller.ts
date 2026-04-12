@@ -1,4 +1,13 @@
+/*
+|-----------------------------------------
+| setting up Controller for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import mongoose, { FilterQuery } from 'mongoose';
+
 import User from './model';
 
 interface IResponse {
@@ -7,21 +16,18 @@ interface IResponse {
   status: number;
 }
 
-// ✅ Centralized response helper
 const formatResponse = (data: unknown, message: string, status: number): IResponse => ({
   data,
   message,
   status,
 });
 
-// ✅ Connect to MongoDB once and reuse
 async function connectDB() {
   if (mongoose.connection.readyState === 0) {
     await mongoose.connect(process.env.mongooseURI!);
   }
 }
 
-// ✅ CREATE User
 export async function createUser(req: Request): Promise<IResponse> {
   try {
     await connectDB();
@@ -33,11 +39,10 @@ export async function createUser(req: Request): Promise<IResponse> {
       const err = error as { keyValue?: Record<string, unknown> };
       return formatResponse(null, `Duplicate key error: ${JSON.stringify(err.keyValue)}`, 400);
     }
-    throw error; // Re-throw other errors to be handled by `withDB`
+    throw error;
   }
 }
 
-// ✅ GET single User by ID
 export async function getUserById(req: Request): Promise<IResponse> {
   await connectDB();
   const id = new URL(req.url).searchParams.get('id');
@@ -49,7 +54,6 @@ export async function getUserById(req: Request): Promise<IResponse> {
   return formatResponse(user, 'User fetched successfully', 200);
 }
 
-// ✅ GET all Users
 export async function getUsers(req: Request): Promise<IResponse> {
   await connectDB();
   const url = new URL(req.url);
@@ -72,7 +76,6 @@ export async function getUsers(req: Request): Promise<IResponse> {
   return formatResponse({ users, total, page, limit }, 'Users fetched successfully', 200);
 }
 
-// ✅ UPDATE User
 export async function updateUser(req: Request): Promise<IResponse> {
   await connectDB();
   const { id, ...updateData } = await req.json();
@@ -83,7 +86,6 @@ export async function updateUser(req: Request): Promise<IResponse> {
   return formatResponse(updatedUser, 'User updated successfully', 200);
 }
 
-// ✅ DELETE User
 export async function deleteUser(req: Request): Promise<IResponse> {
   await connectDB();
   const { id } = await req.json();

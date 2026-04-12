@@ -1,9 +1,19 @@
-import { NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+/*
+|-----------------------------------------
+| setting up IsUserHasAccessByRole for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import { headers } from 'next/headers';
+import { NextResponse } from 'next/server';
+
+import { auth } from '@/lib/auth';
 import connectDB from '@/app/api/utils/mongoose';
-import AccessManagement from '../accessManagements/v1/model';
+
 import Role from '../roles/v1/model';
+import AccessManagement from '../accessManagements/v1/model';
 
 export type PermissionAction = 'create' | 'read' | 'update' | 'delete';
 

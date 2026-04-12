@@ -1,14 +1,21 @@
+/*
+|-----------------------------------------
+| setting up QueryFooter for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import React, { useState } from 'react';
 import { motion, Variants } from 'framer-motion';
-import { BiLogoFacebookCircle, BiLogoLinkedin, BiLogoInstagram, BiLogoYoutube, BiWorld } from 'react-icons/bi';
 import { BsTwitterX, BsGithub } from 'react-icons/bs';
 import { Mail, MapPin, Phone, ArrowRight } from 'lucide-react';
+import { BiLogoFacebookCircle, BiLogoLinkedin, BiLogoInstagram, BiLogoYoutube, BiWorld } from 'react-icons/bi';
 
-// --- Types ---
 interface ISocialLink {
   id: number;
   platform: string;
@@ -69,7 +76,6 @@ interface QueryFooterProps {
 }
 
 const QueryFooter2 = ({ data }: QueryFooterProps) => {
-  // 1. Logic: Parse data or use default
   const parseInitData = data ? JSON.parse(data) : null;
   const [settings] = useState<IFooter2Data>(parseInitData || defaultDataFooter2);
 
@@ -84,7 +90,6 @@ const QueryFooter2 = ({ data }: QueryFooterProps) => {
     return <BiWorld size={22} />;
   };
 
-  // 2. Variants definition
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
@@ -107,7 +112,6 @@ const QueryFooter2 = ({ data }: QueryFooterProps) => {
 
   return (
     <footer className="relative pt-20 pb-10 overflow-hidden bg-slate-950 font-sans border-t border-white/5">
-      {/* BACKGROUND BLUR & GLOW EFFECTS */}
       <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-2xl z-0" />
       <div className="absolute -top-40 -left-40 w-96 h-96 bg-indigo-600/20 rounded-full blur-[120px] pointer-events-none z-0 mix-blend-screen" />
       <div className="absolute top-1/2 right-0 w-80 h-80 bg-purple-600/10 rounded-full blur-[100px] pointer-events-none z-0 mix-blend-screen" />
@@ -121,10 +125,8 @@ const QueryFooter2 = ({ data }: QueryFooterProps) => {
         viewport={{ once: true, margin: '-50px' }}
       >
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 mb-16">
-          {/* Brand Column */}
           <motion.div variants={itemVariants} className="lg:col-span-5 space-y-8">
             <Link href="/" className="inline-flex items-center gap-3 group">
-              {/* UPDATED: Image Rendering Logic */}
               {settings.logoUrl && (
                 <div className="relative p-2 bg-white/5 border border-white/10 rounded-xl backdrop-blur-sm group-hover:border-indigo-500/50 transition-all duration-300">
                   <Image
@@ -133,7 +135,7 @@ const QueryFooter2 = ({ data }: QueryFooterProps) => {
                     width={settings.logoWidth || 50}
                     height={50}
                     className="object-contain w-auto h-auto max-h-[50px]"
-                    unoptimized // Crucial for handling external/uploaded URLs
+                    unoptimized
                   />
                 </div>
               )}
@@ -158,7 +160,6 @@ const QueryFooter2 = ({ data }: QueryFooterProps) => {
             </div>
           </motion.div>
 
-          {/* Quick Links */}
           <motion.div variants={itemVariants} className="lg:col-span-3">
             <h3 className="text-white font-bold text-sm uppercase tracking-widest mb-8 flex items-center gap-2">
               <span className="w-8 h-0.5 bg-indigo-500 rounded-full"></span>
@@ -176,7 +177,6 @@ const QueryFooter2 = ({ data }: QueryFooterProps) => {
             </ul>
           </motion.div>
 
-          {/* Contact Info */}
           <motion.div variants={itemVariants} className="lg:col-span-4">
             <h3 className="text-white font-bold text-sm uppercase tracking-widest mb-8 flex items-center gap-2">
               <span className="w-8 h-0.5 bg-purple-500 rounded-full"></span>
@@ -232,7 +232,6 @@ const QueryFooter2 = ({ data }: QueryFooterProps) => {
           </motion.div>
         </div>
 
-        {/* Bottom Bar */}
         <motion.div
           variants={itemVariants}
           className="pt-8 mt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-slate-500"

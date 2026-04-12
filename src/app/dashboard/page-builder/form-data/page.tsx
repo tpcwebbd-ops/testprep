@@ -1,50 +1,58 @@
+/*
+|-----------------------------------------
+| setting up Page for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
 import {
+  X,
+  Eye,
   Plus,
+  Check,
+  Link2,
+  Layout,
   Trash2,
   Search,
-  X,
-  FileJson,
-  Check,
-  RefreshCw,
-  AlertTriangle,
-  Layout,
-  FileText,
-  ChevronLeft,
-  ChevronRight,
   Columns,
-  Eye,
   Calendar,
   Database,
+  FileJson,
+  FileText,
   ArrowLeft,
+  RefreshCw,
   AlertCircle,
-  Link2,
+  ChevronLeft,
+  ChevronRight,
+  AlertTriangle,
 } from 'lucide-react';
+import { toast } from 'react-toastify';
 import { motion, AnimatePresence } from 'framer-motion';
-import { toast } from 'sonner';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuSeparator,
+  DropdownMenuCheckboxItem,
 } from '@/components/ui/dropdown-menu';
-
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Textarea } from '@/components/ui/textarea';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { AllFormsKeys } from '@/components/all-form/all-form-index/all-form';
 import { useGetPagesQuery } from '@/redux/features/page-builder/pageBuilderSlice';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
 import {
   useGetFormSubmissionsQuery,
   useAddFormSubmissionMutation,
@@ -283,7 +291,7 @@ const FormSubmissionPage = () => {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950/20 to-slate-950 pt-[90px] pb-20 px-4 md:px-8 text-slate-200">
+    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950/20 to-slate-950 pt-[90px] pb-20 text-slate-200">
       <div className="max-w-[1600px] mx-auto space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-white/10 pb-6">
           <div className="space-y-2">
@@ -367,7 +375,7 @@ const FormSubmissionPage = () => {
               </Button>
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="max-w-[400px] md:max-w-full overflow-x-scroll md:overflow-x-auto">
               <table className="w-full text-sm text-left">
                 <thead className="bg-white/5 text-slate-300 uppercase font-medium text-xs">
                   <tr>

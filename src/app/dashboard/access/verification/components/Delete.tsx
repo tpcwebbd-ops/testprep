@@ -1,13 +1,22 @@
+/*
+|-----------------------------------------
+| setting up Delete for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import React from 'react';
+
 import { Button } from '@/components/ui/button';
+import { useDeleteVerificationsMutation } from '@/redux/features/verifications/verificationsSlice';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
-import { IVerifications, defaultVerifications } from '../store/data/data';
-import { useVerificationsStore } from '../store/store';
-import { useDeleteVerificationsMutation } from '@/redux/features/verifications/verificationsSlice';
 import { handleSuccess, handleError } from './utils';
+import { useVerificationsStore } from '../store/store';
+import { IVerifications, defaultVerifications } from '../store/data/data';
 
 const DeleteNextComponents: React.FC = () => {
   const { toggleDeleteModal, isDeleteModalOpen, selectedVerifications, setSelectedVerifications } = useVerificationsStore();

@@ -1,12 +1,21 @@
+/*
+|-----------------------------------------
+| setting up BulkDynamicUpdate for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import React, { useState } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useBulkUpdateVerificationsMutation } from '@/redux/features/verifications/verificationsSlice';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
-import { useVerificationsStore } from '../store/store';
-import { useBulkUpdateVerificationsMutation } from '@/redux/features/verifications/verificationsSlice';
-import { handleSuccess, handleError } from './utils';
 import DynamicDataSelect from './DynamicDataSelect';
+import { handleSuccess, handleError } from './utils';
+import { useVerificationsStore } from '../store/store';
 
 const BulkDynamicUpdateNextComponents: React.FC = () => {
   const [newItemTags, setNewItemTags] = useState<string[]>([]);
@@ -16,9 +25,7 @@ const BulkDynamicUpdateNextComponents: React.FC = () => {
 
   const handleBulkEditVerifications = async () => {
     if (!bulkData.length) return;
-    try {
-      // Note: This assumes the schema has a 'dataArr' field to be updated.
-      // This logic can be adapted if the target field is different.
+    try { 
       const newBulkData = bulkData.map(({ _id, ...rest }) => ({
         id: _id,
         updateData: { ...rest, dataArr: newItemTags },

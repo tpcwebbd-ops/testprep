@@ -1,14 +1,23 @@
+/*
+|-----------------------------------------
+| setting up HasAccess for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
+import { motion } from 'framer-motion';
 import React, { useEffect, useMemo } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { motion } from 'framer-motion';
 import { ShieldAlert, ArrowLeft, Lock } from 'lucide-react';
+
 import { useSession } from '@/lib/auth-client';
-import { useGetAccessManagementsQuery } from '@/redux/features/accessManagements/accessManagementsSlice';
-import { useGetRolesQuery } from '@/redux/features/roles/rolesSlice';
 import { Button } from '@/components/ui/button';
 import TooManyRequests from '@/components/common/TooManyRequest';
+import { useGetRolesQuery } from '@/redux/features/roles/rolesSlice';
+import { useGetAccessManagementsQuery } from '@/redux/features/accessManagements/accessManagementsSlice';
 
 const LoadingOverlay = () => (
   <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden">
@@ -113,20 +122,17 @@ const HasAccess = ({ children }: { children: React.ReactNode }) => {
   const isUniversalRoute = currentPath === '/dashboard' || currentPath === '/dashboard/profile';
 
   const hasPermission = useMemo(() => {
-    // 1. Basic Checks
     if (!isAuthenticated || isPending) return false;
     if (isUniversalRoute) return true;
     if (isAccessLoading || isRolesLoading) return false;
     if (isRolesError || isAccessError) return false;
 
-    // 2. Fetch User Roles
     const userRoles = userAccessManagementQuery?.data?.accessManagements?.[0]?.assign_role || [];
 
     if (!userRoles.length) return false;
 
     const allRoles = allRolesQuery?.data?.roles || [];
 
-    // 3. Match Roles
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const matchedRoles = allRoles.filter((role: any) => userRoles.includes(role.name));
 
@@ -144,17 +150,10 @@ const HasAccess = ({ children }: { children: React.ReactNode }) => {
       }
     });
 
-    // 4. CHECK PERMISSION Logic (Exact Match OR Sub-path Match)
-
-    // A. Check for Exact Match
     if (allowedPaths.has(currentPath)) {
       return true;
     }
 
-    // B. Check for Sub-route access
-    // Example: allowed = "/dashboard/page-builder"
-    // current = "/dashboard/page-builder/edit-page"
-    // condition: current starts with allowed + '/'
     for (const allowedPath of allowedPaths) {
       if (currentPath.startsWith(`${allowedPath}/`)) {
         return true;

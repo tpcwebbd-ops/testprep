@@ -1,7 +1,13 @@
-// This file is use for rest api
+/*
+|-----------------------------------------
+| setting up AccessManagementsSlice for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import { apiSlice } from '@/redux/api/apiSlice';
 
-// Use absolute paths with leading slash to ensure consistent behavior
 export const accessManagementsApi = apiSlice.injectEndpoints({
   endpoints: builder => ({
     getAccessManagements: builder.query({

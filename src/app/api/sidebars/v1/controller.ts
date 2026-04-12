@@ -1,7 +1,16 @@
-import { withDB } from '@/app/api/utils/db';
+/*
+|-----------------------------------------
+| setting up Controller for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import { FilterQuery } from 'mongoose';
 
-import Sidebar from "./model"
+import { withDB } from '@/app/api/utils/db';
+
+import Sidebar from './model';
 import { IResponse } from '../../utils/utils';
 
 const formatResponse = (data: unknown, message: string, status: number): IResponse => ({

@@ -1,15 +1,23 @@
+/*
+|-----------------------------------------
+| setting up Edit for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import React, { useEffect, useState } from 'react';
 
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import InputFieldForString from '@/components/dashboard-ui/InputFieldForString';
+import { useUpdateVerificationsMutation } from '@/redux/features/verifications/verificationsSlice';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
-import InputFieldForString from '@/components/dashboard-ui/InputFieldForString';
 
-import { IVerifications, defaultVerifications } from '../store/data/data';
 import { useVerificationsStore } from '../store/store';
-import { useUpdateVerificationsMutation } from '@/redux/features/verifications/verificationsSlice';
+import { IVerifications, defaultVerifications } from '../store/data/data';
 import { formatDuplicateKeyError, handleError, handleSuccess, isApiErrorResponse } from './utils';
 
 const EditNextComponents: React.FC = () => {

@@ -1,9 +1,18 @@
+/*
+|-----------------------------------------
+| setting up Query for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import React, { useMemo, useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
+import { motion, AnimatePresence } from 'framer-motion';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Calendar, Clock, ArrowRight, X, User, Quote as QuoteIcon, Sparkles, Hash } from 'lucide-react';
+
 import { ISection15Data, defaultDataSection15 } from './data';
 
 interface Section15Props {
@@ -14,12 +23,10 @@ const QuerySection15: React.FC<Section15Props> = ({ data }) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [selectedArticle, setSelectedArticle] = useState<any | null>(null);
 
-  // Parse data safely and ensure we handle both array (legacy) and single object (new) structures
   const sectionData: ISection15Data = useMemo(() => {
     if (!data) return defaultDataSection15[0];
     try {
       const parsed = typeof data === 'string' ? JSON.parse(data) : data;
-      // If parsed is an array (from old default), take the first item
       return Array.isArray(parsed) ? parsed[0] : parsed;
     } catch (e) {
       console.error('Failed to parse section data', e);
@@ -27,7 +34,6 @@ const QuerySection15: React.FC<Section15Props> = ({ data }) => {
     }
   }, [data]);
 
-  // Lock body scroll when modal is open
   useEffect(() => {
     if (selectedArticle) {
       document.body.style.overflow = 'hidden';
@@ -41,7 +47,6 @@ const QuerySection15: React.FC<Section15Props> = ({ data }) => {
 
   return (
     <section className="relative w-full py-24 bg-zinc-950 overflow-hidden min-h-screen font-sans selection:bg-indigo-500/30 selection:text-indigo-200">
-      {/* --- Ambient Background --- */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-indigo-900/10 rounded-full blur-[120px]" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] bg-purple-900/10 rounded-full blur-[120px]" />
@@ -49,7 +54,6 @@ const QuerySection15: React.FC<Section15Props> = ({ data }) => {
       </div>
 
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        {/* --- Section Header --- */}
         <div className="flex flex-col items-center text-center mb-20 space-y-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -71,7 +75,6 @@ const QuerySection15: React.FC<Section15Props> = ({ data }) => {
           </motion.h2>
         </div>
 
-        {/* --- Articles Grid --- */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {sectionData.allData &&
             sectionData.allData.map((article, index) => (
@@ -80,13 +83,11 @@ const QuerySection15: React.FC<Section15Props> = ({ data }) => {
         </div>
       </div>
 
-      {/* --- Full Article Modal --- */}
       <AnimatePresence>{selectedArticle && <ArticleModal article={selectedArticle} onClose={() => setSelectedArticle(null)} />}</AnimatePresence>
     </section>
   );
 };
 
-// --- Sub-Component: Grid Card ---
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ArticleCard = ({ article, index, onClick }: { article: any; index: number; onClick: () => void }) => {
   return (
@@ -99,7 +100,6 @@ const ArticleCard = ({ article, index, onClick }: { article: any; index: number;
       onClick={onClick}
       className="group cursor-pointer relative flex flex-col h-full bg-zinc-900/40 border border-zinc-800/60 rounded-[2rem] overflow-hidden hover:border-indigo-500/30 hover:bg-zinc-900/60 transition-all duration-500 hover:shadow-2xl hover:shadow-indigo-900/10"
     >
-      {/* Image Area */}
       <div className="relative h-64 w-full overflow-hidden">
         <motion.div layoutId={`hero-image-${article.id}`} className="w-full h-full relative">
           {article.heroImage ? (
@@ -112,7 +112,6 @@ const ArticleCard = ({ article, index, onClick }: { article: any; index: number;
           <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent opacity-60" />
         </motion.div>
 
-        {/* Category Badge */}
         <div className="absolute top-4 left-4 z-10">
           <span className="px-3 py-1 rounded-full bg-zinc-950/50 backdrop-blur-md border border-white/10 text-[10px] font-bold text-white uppercase tracking-wider">
             {article.category}
@@ -120,7 +119,6 @@ const ArticleCard = ({ article, index, onClick }: { article: any; index: number;
         </div>
       </div>
 
-      {/* Content Area */}
       <div className="flex flex-col flex-grow p-6 relative">
         <div className="space-y-3 mb-6">
           <motion.h3 layoutId={`title-${article.id}`} className="text-xl font-bold text-zinc-100 leading-snug group-hover:text-indigo-300 transition-colors">
@@ -129,7 +127,6 @@ const ArticleCard = ({ article, index, onClick }: { article: any; index: number;
           <p className="text-zinc-400 text-sm line-clamp-2 leading-relaxed">{article.subtitle}</p>
         </div>
 
-        {/* Footer Info */}
         <div className="mt-auto flex items-center justify-between pt-6 border-t border-zinc-800 group-hover:border-zinc-700/50 transition-colors">
           <div className="flex items-center gap-3">
             <div className="relative w-8 h-8 rounded-full overflow-hidden border border-zinc-700 bg-zinc-800">
@@ -156,7 +153,6 @@ const ArticleCard = ({ article, index, onClick }: { article: any; index: number;
   );
 };
 
-// --- Sub-Component: Full Article Modal ---
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ArticleModal = ({ article, onClose }: { article: any; onClose: () => void }) => {
   return (
@@ -166,15 +162,12 @@ const ArticleModal = ({ article, onClose }: { article: any; onClose: () => void 
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-[100] flex items-center justify-center p-0 md:p-4 overflow-hidden"
     >
-      {/* Backdrop */}
       <div className="absolute inset-0 bg-zinc-950/90 backdrop-blur-xl" onClick={onClose} />
 
-      {/* Modal Container */}
       <motion.div
         layoutId={`card-container-${article.id}`}
         className="relative w-full h-full md:h-[90vh] md:max-w-5xl bg-zinc-950 md:rounded-3xl border border-white/5 shadow-2xl overflow-hidden flex flex-col"
       >
-        {/* Close Button */}
         <button
           onClick={onClose}
           className="absolute top-6 right-6 z-50 p-2 rounded-full bg-black/20 backdrop-blur-md border border-white/10 text-white hover:bg-white/20 transition-all hover:rotate-90 duration-300"
@@ -183,7 +176,6 @@ const ArticleModal = ({ article, onClose }: { article: any; onClose: () => void 
         </button>
 
         <div className="flex-1 overflow-y-auto scrollbar-hide">
-          {/* Hero Section */}
           <div className="relative w-full h-[50vh] min-h-[400px]">
             <motion.div layoutId={`hero-image-${article.id}`} className="w-full h-full relative">
               {article.heroImage && <Image src={article.heroImage} alt={article.title} fill className="object-cover" priority />}
@@ -227,9 +219,7 @@ const ArticleModal = ({ article, onClose }: { article: any; onClose: () => void 
             </div>
           </div>
 
-          {/* Article Body */}
           <div className="px-6 md:px-12 py-12 max-w-4xl mx-auto space-y-12 pb-24">
-            {/* Introduction/Subtitle */}
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -239,13 +229,11 @@ const ArticleModal = ({ article, onClose }: { article: any; onClose: () => void 
               {article.subtitle}
             </motion.p>
 
-            {/* Dynamic Content Rendering */}
             <div className="space-y-8">
               {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
               {article.content && article.content.map((block: any, i: number) => <ContentBlock key={i} block={block} index={i} />)}
             </div>
 
-            {/* Footer Tags */}
             <div className="pt-12 border-t border-white/10 mt-12">
               <p className="text-zinc-500 text-sm font-bold uppercase tracking-wider mb-4">Related Topics</p>
               <div className="flex flex-wrap gap-2">
@@ -267,7 +255,6 @@ const ArticleModal = ({ article, onClose }: { article: any; onClose: () => void 
   );
 };
 
-// --- Helper: Content Block Renderer ---
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ContentBlock = ({ block }: { block: any; index: number }) => {
   const commonAnim = {

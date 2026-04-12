@@ -1,8 +1,16 @@
+/*
+|-----------------------------------------
+| setting up TimeRangePickerField for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import * as React from 'react';
-import { Clock } from 'lucide-react';
 import { format } from 'date-fns';
+import { Clock } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { Label } from '@/components/ui/label';
@@ -21,7 +29,6 @@ export default function TimeRangePickerField({ id, label = 'Time Range', value, 
   const [openPicker, setOpenPicker] = React.useState<'start' | 'end' | null>(null);
   const wrapperRef = React.useRef<HTMLDivElement>(null);
 
-  // ✅ close popup when clicking outside
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
@@ -115,21 +122,13 @@ export default function TimeRangePickerField({ id, label = 'Time Range', value, 
   };
 
   return (
-    <div
-      ref={wrapperRef}
-      className={cn(
-        'relative grid w-full gap-1.5',
-        openPicker && 'mb-64', // ✅ Prevent overlap
-        className,
-      )}
-    >
+    <div ref={wrapperRef} className={cn('relative grid w-full gap-1.5', openPicker && 'mb-64', className)}>
       <div className="flex items-center text-white/90 drop-shadow-sm">
         <Clock className="mr-2 h-4 w-4" />
         <Label htmlFor={id}>{label}</Label>
       </div>
 
       <div className="flex items-center gap-2">
-        {/* Start time */}
         <div className="relative w-full">
           <Button
             variant="outline"
@@ -149,7 +148,6 @@ export default function TimeRangePickerField({ id, label = 'Time Range', value, 
 
         <span className="text-white/60">-</span>
 
-        {/* End time */}
         <div className="relative w-full">
           <Button
             variant="outline"

@@ -1,4 +1,11 @@
-// --- Types ---
+/*
+|-----------------------------------------
+| setting up Data for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 export interface QuickLink {
   id: number;
   title: string;
@@ -31,7 +38,7 @@ export interface IFooter2Data {
 
 export const defaultDataFooter2: IFooter2Data = {
   brandName: 'Nexus',
-  logoUrl: 'https://i.ibb.co.com/2mc3j65/l.jpg', // Placeholder
+  logoUrl: 'https://i.ibb.co.com/2mc3j65/l.jpg',
   logoWidth: 50,
   tagline: 'Crafting digital experiences that inspire and innovate. We build the future, one pixel at a time.',
   quickLinks: [

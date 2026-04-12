@@ -1,7 +1,13 @@
-// BooleanInputField.tsx - Glassmorphism Enhanced
+/*
+|-----------------------------------------
+| setting up BooleanInputField for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
 
-import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
+import { Switch } from '@/components/ui/switch';
 
 export function BooleanInputField({ id, checked, onCheckedChange }: { id: string; checked: boolean; onCheckedChange: (checked: boolean) => void }) {
   return (

@@ -1,18 +1,28 @@
+/*
+|-----------------------------------------
+| setting up Mutation for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
+import { motion } from 'framer-motion';
 import React, { useState, useEffect } from 'react';
 import { MapPin, Plus, Trash2, Save, Edit3, Eye, Phone, Mail, User, Clock, Layers, X, Crosshair, Sparkles } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { OfficeLocation, defaultDataSection18 } from './data';
 import ImageUploadManagerSingle from '@/components/dashboard-ui/ImageUploadManagerSingle';
-import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
 import QuerySection18 from './Query';
-import { motion } from 'framer-motion';
+import { OfficeLocation, defaultDataSection18 } from './data';
 
 export interface Section18FormProps {
   data?: OfficeLocation[];
@@ -24,7 +34,6 @@ const MutationSection18 = ({ data, onSubmit }: Section18FormProps) => {
   const [activeId, setActiveId] = useState<string>('');
   const [newFeature, setNewFeature] = useState('');
 
-  // Initialize Data
   useEffect(() => {
     if (data && Array.isArray(data) && data.length > 0) {
       setLocations(data);
@@ -32,7 +41,6 @@ const MutationSection18 = ({ data, onSubmit }: Section18FormProps) => {
         setActiveId(data[0].id);
       }
     } else {
-      // Reset to default if no data
       setLocations(defaultDataSection18);
       setActiveId(defaultDataSection18[0].id);
     }
@@ -41,9 +49,6 @@ const MutationSection18 = ({ data, onSubmit }: Section18FormProps) => {
   const activeLocation = locations.find(l => l.id === activeId) || locations[0];
   const activeIndex = locations.findIndex(l => l.id === activeId);
 
-  // --- Handlers ---
-
-  // Handle root level updates
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const updateField = (field: keyof OfficeLocation, value: any) => {
     const updated = [...locations];
@@ -51,7 +56,6 @@ const MutationSection18 = ({ data, onSubmit }: Section18FormProps) => {
     setLocations(updated);
   };
 
-  // Handle nested Contact updates
   const updateContact = (field: keyof OfficeLocation['contact'], value: string) => {
     const updated = [...locations];
     updated[activeIndex] = {
@@ -61,7 +65,6 @@ const MutationSection18 = ({ data, onSubmit }: Section18FormProps) => {
     setLocations(updated);
   };
 
-  // Handle nested Coordinate updates
   const updateCoords = (field: 'lat' | 'lng', value: string) => {
     const numValue = parseFloat(value);
     const updated = [...locations];
@@ -72,7 +75,6 @@ const MutationSection18 = ({ data, onSubmit }: Section18FormProps) => {
     setLocations(updated);
   };
 
-  // Handle Feature Array
   const addFeature = () => {
     if (!newFeature.trim()) return;
     const updated = [...locations];
@@ -121,7 +123,6 @@ const MutationSection18 = ({ data, onSubmit }: Section18FormProps) => {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans p-4 md:p-8 pb-32 relative overflow-hidden">
-      {/* Ambient Background */}
       <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute top-[-10%] left-[-5%] w-[40vw] h-[40vw] bg-blue-900/10 rounded-full blur-[120px]" />
         <div className="absolute bottom-[-10%] right-[-5%] w-[40vw] h-[40vw] bg-indigo-900/10 rounded-full blur-[120px]" />
@@ -129,7 +130,6 @@ const MutationSection18 = ({ data, onSubmit }: Section18FormProps) => {
 
       <div className="max-w-7xl mx-auto space-y-8 relative z-10">
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
-          {/* Sidebar List */}
           <div className="xl:col-span-3 space-y-4">
             <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-4 flex flex-col gap-3 h-[calc(100vh-200px)] backdrop-blur-sm shadow-xl">
               <Button onClick={handleAddLocation} className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-900/20">
@@ -169,7 +169,6 @@ const MutationSection18 = ({ data, onSubmit }: Section18FormProps) => {
             </div>
           </div>
 
-          {/* Main Editor */}
           <div className="xl:col-span-9">
             <Tabs defaultValue="edit" className="w-full">
               <div className="flex justify-center md:justify-start mb-6">
@@ -190,7 +189,6 @@ const MutationSection18 = ({ data, onSubmit }: Section18FormProps) => {
               </div>
 
               <TabsContent value="edit" className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                {/* Top Grid: Image & Basic Info */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-6 space-y-4 backdrop-blur-sm shadow-xl">
                     <Label className="text-zinc-500 text-xs uppercase font-bold tracking-wider">Location Image</Label>
@@ -242,9 +240,7 @@ const MutationSection18 = ({ data, onSubmit }: Section18FormProps) => {
                   </div>
                 </div>
 
-                {/* Middle Grid: Details & Contact */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  {/* Address & Coords */}
                   <div className="lg:col-span-1 bg-zinc-900/50 border border-zinc-800 rounded-3xl p-6 space-y-4 backdrop-blur-sm shadow-xl">
                     <h3 className="text-sm font-bold text-white flex items-center gap-2 border-b border-zinc-800/50 pb-3">
                       <MapPin size={14} className="text-blue-500" /> Location Data
@@ -283,7 +279,6 @@ const MutationSection18 = ({ data, onSubmit }: Section18FormProps) => {
                     </div>
                   </div>
 
-                  {/* Contact Info */}
                   <div className="lg:col-span-1 bg-zinc-900/50 border border-zinc-800 rounded-3xl p-6 space-y-4 backdrop-blur-sm shadow-xl">
                     <h3 className="text-sm font-bold text-white flex items-center gap-2 border-b border-zinc-800/50 pb-3">
                       <User size={14} className="text-blue-500" /> Contact Person
@@ -318,7 +313,6 @@ const MutationSection18 = ({ data, onSubmit }: Section18FormProps) => {
                     </div>
                   </div>
 
-                  {/* Schedule & Description */}
                   <div className="lg:col-span-1 bg-zinc-900/50 border border-zinc-800 rounded-3xl p-6 space-y-4 backdrop-blur-sm shadow-xl">
                     <h3 className="text-sm font-bold text-white flex items-center gap-2 border-b border-zinc-800/50 pb-3">
                       <Layers size={14} className="text-blue-500" /> Additional Info
@@ -344,7 +338,6 @@ const MutationSection18 = ({ data, onSubmit }: Section18FormProps) => {
                   </div>
                 </div>
 
-                {/* Bottom: Features */}
                 <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-6 backdrop-blur-sm shadow-xl">
                   <h3 className="text-sm font-bold text-white flex items-center gap-2 mb-4 border-b border-zinc-800/50 pb-3">
                     <Layers size={14} className="text-blue-500" /> Key Features
@@ -380,7 +373,6 @@ const MutationSection18 = ({ data, onSubmit }: Section18FormProps) => {
 
               <TabsContent value="preview" className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="border border-zinc-800 rounded-3xl overflow-hidden bg-black relative shadow-2xl">
-                  {/* Passing current state as data prop to Query component for accurate preview */}
                   <QuerySection18 data={JSON.stringify(locations)} />
                 </div>
               </TabsContent>
@@ -389,7 +381,6 @@ const MutationSection18 = ({ data, onSubmit }: Section18FormProps) => {
         </div>
       </div>
 
-      {/* Floating Dock - Save Button */}
       <div className="fixed bottom-6 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
         <motion.div
           initial={{ y: 100, opacity: 0 }}

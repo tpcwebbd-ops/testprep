@@ -1,18 +1,27 @@
+/*
+|-----------------------------------------
+| setting up Mutation for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from '@/components/ui/button';
+import { Save, Plus, Trash2, Activity, ShieldAlert, TrendingUp, Sparkles, LayoutTemplate, Badge as BadgeIcon } from 'lucide-react';
+
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Save, Plus, Trash2, Activity, ShieldAlert, TrendingUp, Sparkles, LayoutTemplate, Badge as BadgeIcon } from 'lucide-react';
-import { DashboardMetric, ModerationItem, defaultDataSection16 } from './data';
-import ImageUploadManagerSingle from '@/components/dashboard-ui/ImageUploadManagerSingle';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import ImageUploadManagerSingle from '@/components/dashboard-ui/ImageUploadManagerSingle';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-// Define the shape based on defaultDataSection16 with added header fields
+import { DashboardMetric, ModerationItem, defaultDataSection16 } from './data';
+
 interface ISection16Data {
   id?: string;
   badge?: string;
@@ -33,7 +42,7 @@ const MutationSection16 = ({ data, onSubmit }: Section16FormProps) => {
   useEffect(() => {
     if (data) {
       setFormData({
-        ...defaultDataSection16, // Ensure defaults for new fields
+        ...defaultDataSection16,
         ...data,
         metrics: data.metrics || defaultDataSection16.metrics,
         moderationQueue: data.moderationQueue || defaultDataSection16.moderationQueue,
@@ -41,12 +50,10 @@ const MutationSection16 = ({ data, onSubmit }: Section16FormProps) => {
     }
   }, [data]);
 
-  // --- Header Handlers ---
   const handleHeaderChange = (field: keyof ISection16Data, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  // --- Metrics Handlers ---
   const updateMetric = (index: number, field: keyof DashboardMetric, value: string | number | DashboardMetric['status']) => {
     const newMetrics = [...formData.metrics];
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -70,7 +77,6 @@ const MutationSection16 = ({ data, onSubmit }: Section16FormProps) => {
     setFormData(prev => ({ ...prev, metrics: newMetrics }));
   };
 
-  // --- Moderation Handlers ---
   const updateModItem = (index: number, field: string, value: string | number) => {
     const newQueue = [...formData.moderationQueue];
     if (field.includes('.')) {
@@ -111,14 +117,12 @@ const MutationSection16 = ({ data, onSubmit }: Section16FormProps) => {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans pb-32 relative overflow-hidden">
-      {/* Ambient Background */}
       <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute top-[-10%] left-[-5%] w-[40vw] h-[40vw] bg-emerald-900/10 rounded-full blur-[120px]" />
         <div className="absolute bottom-[-10%] right-[-5%] w-[40vw] h-[40vw] bg-cyan-900/10 rounded-full blur-[120px]" />
       </div>
 
       <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-8 relative z-10">
-        {/* Header */}
         <div className="flex flex-col items-center md:items-start text-center md:text-left mb-8">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -135,7 +139,6 @@ const MutationSection16 = ({ data, onSubmit }: Section16FormProps) => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Left Sidebar: Section Settings */}
           <div className="lg:col-span-4 space-y-6">
             <div className="bg-zinc-900/40 border border-white/5 rounded-3xl p-6 backdrop-blur-sm space-y-5">
               <div className="flex items-center gap-2 text-emerald-400 uppercase text-xs font-bold tracking-widest pb-2 border-b border-white/5">
@@ -173,7 +176,6 @@ const MutationSection16 = ({ data, onSubmit }: Section16FormProps) => {
             </div>
           </div>
 
-          {/* Right Area: Tabs for Metrics & Moderation */}
           <div className="lg:col-span-8">
             <Tabs defaultValue="metrics" className="w-full space-y-8">
               <div className="flex justify-center md:justify-start">
@@ -193,7 +195,6 @@ const MutationSection16 = ({ data, onSubmit }: Section16FormProps) => {
                 </TabsList>
               </div>
 
-              {/* --- METRICS TAB --- */}
               <TabsContent value="metrics" className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <AnimatePresence>
@@ -283,7 +284,6 @@ const MutationSection16 = ({ data, onSubmit }: Section16FormProps) => {
                 </div>
               </TabsContent>
 
-              {/* --- MODERATION TAB --- */}
               <TabsContent value="moderation" className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="text-lg font-bold text-zinc-300">Pending Review</h3>
@@ -303,7 +303,6 @@ const MutationSection16 = ({ data, onSubmit }: Section16FormProps) => {
                         key={item.id}
                         className="bg-zinc-900/40 border border-white/5 rounded-3xl p-6 flex flex-col lg:flex-row gap-8 items-start backdrop-blur-sm group hover:border-emerald-500/20 transition-colors"
                       >
-                        {/* Author Avatar Section */}
                         <div className="w-full lg:w-64 shrink-0 space-y-4">
                           <div className="flex flex-col items-center lg:items-start gap-4">
                             <div className="w-24 h-24 rounded-2xl bg-zinc-950 border border-white/10 overflow-hidden relative shadow-inner flex items-center justify-center">
@@ -333,7 +332,6 @@ const MutationSection16 = ({ data, onSubmit }: Section16FormProps) => {
                           </div>
                         </div>
 
-                        {/* Content Section */}
                         <div className="flex-1 w-full space-y-6 lg:border-l lg:border-white/5 lg:pl-8">
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                             <div className="space-y-2">
@@ -420,7 +418,6 @@ const MutationSection16 = ({ data, onSubmit }: Section16FormProps) => {
         </div>
       </div>
 
-      {/* Floating Dock - Save Button */}
       <div className="fixed bottom-6 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
         <motion.div
           initial={{ y: 100, opacity: 0 }}

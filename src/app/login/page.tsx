@@ -1,14 +1,24 @@
+/*
+|-----------------------------------------
+| setting up Page for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import React, { useState } from 'react';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2, Eye, EyeOff, AlertCircle, Sparkles } from 'lucide-react';
-import ContinueWithGoogleButton from '@/components/common/GoogleButton';
+
 import { signIn } from '@/lib/auth-client';
+
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import ContinueWithGoogleButton from '@/components/common/GoogleButton';
 
 const LoginPage = () => {
   const router = useRouter();
@@ -50,7 +60,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-500 via-purple-500 to-indigo-500 p-4 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-500 via-purple-500 to-indigo-500 p-4 relative overflow-hidden pt-12">
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-linear-to-br from-cyan-400/20 to-transparent rounded-full blur-3xl animate-pulse" />
         <div
@@ -65,7 +75,7 @@ const LoginPage = () => {
         transition={{ duration: 0.6, ease: 'easeOut' }}
         className="flex flex-col md:flex-row backdrop-blur-xl bg-white/10 rounded-2xl shadow-2xl overflow-hidden w-full max-w-4xl border border-white/20 relative z-10"
       >
-        <div className="flex-1 flex flex-col items-center justify-center text-white p-8 relative">
+        <div className="flex-1 flex flex-col items-center justify-center text-white py-4 md:py-8 p-8 relative">
           <motion.div
             animate={{
               y: [0, -10, 0],
@@ -87,11 +97,11 @@ const LoginPage = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.6 }}
-            className="text-3xl md:text-4xl font-semibold mt-4 text-center bg-linear-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent"
+            className="text-3xl hidden md:flex md:text-4xl font-semibold mt-4 text-center bg-linear-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent"
           >
             Welcome Back
           </motion.h2>
-          <p className="text-sm md:text-base mt-3 text-white/80 text-center max-w-sm leading-relaxed">
+          <p className="text-sm hidden md:flex md:text-base mt-3 text-white/80 text-center max-w-sm leading-relaxed">
             Securely access your account and manage your data effortlessly.
           </p>
         </div>

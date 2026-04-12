@@ -1,5 +1,12 @@
-// lib/features/footerSlice.ts
-import { apiSlice } from '@/redux/api/apiSlice'; // Ensure this path matches your project structure
+/*
+|-----------------------------------------
+| setting up FooterSlice for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
+import { apiSlice } from '@/redux/api/apiSlice';
 
 export interface DisabledPath {
   path: string;

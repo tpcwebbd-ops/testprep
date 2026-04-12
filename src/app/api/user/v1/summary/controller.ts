@@ -1,18 +1,24 @@
+/*
+|-----------------------------------------
+| setting up Controller for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import { withDB } from '@/app/api/utils/db';
-import User from '../model';
-import { logger } from 'better-auth';
 import { IResponse } from '@/app/api/utils/utils';
 
-// Helper to format responses
+import User from '../model';
+
 const formatResponse = (data: unknown, message: string, status: number): IResponse => ({
   data,
   message,
   status,
   ok: status >= 200 && status < 300,
 });
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function getUserSummary(req: Request): Promise<IResponse> {
-  logger.info(JSON.stringify(req));
   return withDB(async () => {
     const now = new Date();
     const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
@@ -25,7 +31,7 @@ export async function getUserSummary(req: Request): Promise<IResponse> {
           totalRecords: totalDocs,
           recordsLast24Hours: last24HoursDocs,
         },
-        monthlyTable: [], // No numeric fields to aggregate
+        monthlyTable: [],
         tableSummary: { totalMonths: 0 },
         pagination: { currentPage: 1, limit: 10, totalMonths: 0, totalPages: 0 },
       },

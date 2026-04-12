@@ -1,3 +1,11 @@
+/*
+|-----------------------------------------
+| setting up Route for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import { handleRateLimit } from '@/app/api/utils/rate-limit';
 import {
   getAccessManagements,
@@ -12,7 +20,6 @@ import {
 import { formatResponse, IResponse } from '@/app/api/utils/jwt-verify';
 import { isUserHasAccessByRole, IWantAccess } from '../../utils/is-user-has-access-by-role';
 
-// GET all AccessManagements
 export async function GET(req: Request) {
   const rateLimitResponse = handleRateLimit(req);
   if (rateLimitResponse) return rateLimitResponse;
@@ -30,7 +37,6 @@ export async function GET(req: Request) {
   return formatResponse(result.data, result.message, result.status);
 }
 
-// CREATE AccessManagement
 export async function POST(req: Request) {
   const rateLimitResponse = handleRateLimit(req);
   if (rateLimitResponse) return rateLimitResponse;
@@ -47,7 +53,6 @@ export async function POST(req: Request) {
   return formatResponse(result.data, result.message, result.status);
 }
 
-// UPDATE AccessManagement
 export async function PUT(req: Request) {
   const rateLimitResponse = handleRateLimit(req);
   if (rateLimitResponse) return rateLimitResponse;
@@ -65,7 +70,6 @@ export async function PUT(req: Request) {
   return formatResponse(result.data, result.message, result.status);
 }
 
-// DELETE AccessManagement
 export async function DELETE(req: Request) {
   const rateLimitResponse = handleRateLimit(req);
   if (rateLimitResponse) return rateLimitResponse;

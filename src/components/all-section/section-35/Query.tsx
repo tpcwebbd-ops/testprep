@@ -1,8 +1,17 @@
+/*
+|-----------------------------------------
+| setting up Query for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import React from 'react';
 import Link from 'next/link';
 import { ArrowRight, FileText, Clock, Target, PlayCircle, CheckCircle, Zap } from 'lucide-react';
+
 import { defaultDataSection35, ISection35Data, Section35Props } from './data';
 
 const iconMap: { [key: string]: React.ElementType } = {
@@ -34,12 +43,10 @@ const QuerySection35 = ({ data }: Section35Props) => {
     <div className="w-full bg-gradient-to-br from-red-50 to-orange-50 py-16 lg:py-24 px-4 sm:px-6">
       <div className="container mx-auto max-w-7xl">
         <div className="bg-white rounded-[2.5rem] shadow-2xl p-8 md:p-12 lg:p-16 border border-white/50 relative overflow-hidden">
-          {/* Subtle Background Pattern */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-orange-100/30 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-red-100/30 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
 
           <div className="grid lg:grid-cols-3 gap-12 lg:gap-8 items-center relative z-10">
-            {/* Left - Features */}
             <div className="space-y-8 order-2 lg:order-1">
               {features.map((feature, idx) => {
                 const Icon = iconMap[feature.iconName] || FileText;
@@ -59,10 +66,8 @@ const QuerySection35 = ({ data }: Section35Props) => {
               })}
             </div>
 
-            {/* Center - CTA */}
             <div className="text-center order-1 lg:order-2 mb-8 lg:mb-0">
               <div className="relative inline-block group cursor-pointer mb-8">
-                {/* Pulse Effects */}
                 <div className="absolute inset-0 bg-red-500 rounded-full opacity-20 animate-ping" />
                 <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-orange-500 rounded-full opacity-40 blur-lg group-hover:opacity-60 transition-opacity duration-500" />
 
@@ -82,7 +87,6 @@ const QuerySection35 = ({ data }: Section35Props) => {
               </div>
             </div>
 
-            {/* Right - Stats */}
             <div className="space-y-6 order-3">
               {stats.map((stat, idx) => (
                 <div

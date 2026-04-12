@@ -1,20 +1,28 @@
+/*
+|-----------------------------------------
+| setting up DefaultItems for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import {
+  Info,
+  Lock,
+  Menu,
+  User,
+  User2,
+  Users,
+  Phone,
+  Wrench,
   Settings,
   FileText,
-  Info,
-  Wrench,
-  Phone,
-  HelpCircle,
-  Menu,
-  Lock,
-  ScrollText,
   FileBadge,
+  ScrollText,
+  HelpCircle,
   ShieldCheck,
-  User,
-  Users,
   FolderKanban,
   FileSignature,
-  User2,
 } from 'lucide-react';
 
 export const getIconByIconName = (iName: string) => {

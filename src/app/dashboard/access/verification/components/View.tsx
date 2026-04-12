@@ -1,17 +1,25 @@
+/*
+|-----------------------------------------
+| setting up View for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import React, { useEffect } from 'react';
 import { format } from 'date-fns';
+
+import React, { useEffect } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { logger } from 'better-auth';
 import { formatDuplicateKeyError, isApiErrorResponse } from '@/components/common/utils';
-
-import { IVerifications, defaultVerifications } from '../store/data/data';
-import { useVerificationsStore } from '../store/store';
 import { useGetVerificationsByIdQuery } from '@/redux/features/verifications/verificationsSlice';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+
+import { useVerificationsStore } from '../store/store';
+import { IVerifications, defaultVerifications } from '../store/data/data';
 
 type Primitive = string | number | boolean | null | undefined;
 
@@ -37,9 +45,10 @@ const ViewNextComponents: React.FC = () => {
       if (isApiErrorResponse(error)) {
         errMessage = formatDuplicateKeyError(error.data.message) || 'API error';
       } else if (error instanceof Error) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         errMessage = error.message;
       }
-      logger.error(JSON.stringify(errMessage));
+
       return 'Invalid';
     }
   };

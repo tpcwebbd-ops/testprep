@@ -1,15 +1,26 @@
-import type { Metadata } from 'next';
-import './globals.css';
-import { ReduxProvider } from '@/redux/provider';
-import { ToastContainer } from 'react-toastify';
+/*
+|-----------------------------------------
+| setting up Layout for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import { Toaster } from 'sonner';
-import MenuComponentWithSession from '@/components/common/MenuWithSession';
-import FooterServer from '@/components/common/FooterServer';
+import type { Metadata } from 'next';
+import { ToastContainer } from 'react-toastify';
+
+import { ReduxProvider } from '@/redux/provider';
+
 import PWAPopup from '@/components/common/PWAPopUp';
+import FooterServer from '@/components/common/FooterServer';
+import MenuComponentWithSession from '@/components/common/MenuWithSession';
+
+import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'App Generator',
-  description: 'Build apps faster',
+  title: 'TestPrep Center',
+  description: 'Excel with TestPrep',
   manifest: '/manifest.json',
   icons: {
     apple: '/icons/icon-192x192.png',
@@ -22,7 +33,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en" className="scroll-smooth" data-scroll-behavior="smooth">
       <body className="antialiased font-sans bg-slate-50 text-slate-900 selection:bg-indigo-500 selection:text-white min-h-screen flex flex-col">
         <ReduxProvider>
           <MenuComponentWithSession />

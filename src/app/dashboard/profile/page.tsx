@@ -1,18 +1,28 @@
+/*
+|-----------------------------------------
+| setting up Page for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useSession } from '@/lib/auth-client';
+import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
+
+import { useSession } from '@/lib/auth-client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useUpdateUsersMutation, useGetUsersByIdQuery } from '@/redux/features/user/userSlice';
 import { useGetProfileByUserIdQuery, useUpdateProfileMutation } from '@/redux/features/profile/profileSlice';
-import { formatDuplicateKeyError, handleError, handleSuccess, isApiErrorResponse } from '@/app/dashboard/access/user/components/utils';
-import { Loader2 } from 'lucide-react';
-import { UserFormData, ProfileFormData } from './components/types';
+import { formatDuplicateKeyError, handleError, handleSuccess, isApiErrorResponse } from '@/app/dashboard/admin/users/components/utils';
+
 import AccountTab from './components/AccountTab';
+// import SocialLinksTab from './components/SocialLinksTab';
+// import PreferencesTab from './components/PreferencesTab';
 import PersonalInfoTab from './components/PersonalInfoTab';
-import SocialLinksTab from './components/SocialLinksTab';
-import PreferencesTab from './components/PreferencesTab';
+import { UserFormData, ProfileFormData } from './components/types';
 
 const ProfilePage: React.FC = () => {
   const session = useSession();
@@ -271,8 +281,8 @@ const ProfilePage: React.FC = () => {
         <TabsList className="grid w-full grid-cols-4 mb-6 bg-white/10 backdrop-blur-xl border border-white/20">
           <TabsTrigger value="account">Account</TabsTrigger>
           <TabsTrigger value="personal">Personal Info</TabsTrigger>
-          <TabsTrigger value="social">Social Links</TabsTrigger>
-          <TabsTrigger value="preferences">Preferences</TabsTrigger>
+          {/* <TabsTrigger value="social">Social Links</TabsTrigger>
+          <TabsTrigger value="preferences">Preferences</TabsTrigger> */}
         </TabsList>
 
         <TabsContent value="account">
@@ -299,7 +309,7 @@ const ProfilePage: React.FC = () => {
           />
         </TabsContent>
 
-        <TabsContent value="social">
+        {/* <TabsContent value="social">
           <SocialLinksTab
             profileFormData={profileFormData}
             hasProfileChanges={hasProfileChanges}
@@ -319,7 +329,7 @@ const ProfilePage: React.FC = () => {
             onUpdateProfile={handleUpdateProfile}
             onResetProfile={handleResetProfile}
           />
-        </TabsContent>
+        </TabsContent> */}
       </Tabs>
     </div>
   );

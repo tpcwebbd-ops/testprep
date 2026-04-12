@@ -1,15 +1,23 @@
+/*
+|-----------------------------------------
+| setting up Data for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 export interface IFeatureItem {
   title: string;
   subtitle: string;
-  iconName: string; // 'FileText' | 'Clock' | 'Target' etc.
-  iconColorClass: string; // e.g., 'text-red-500'
-  bgColorClass: string; // e.g., 'bg-red-100'
+  iconName: string;
+  iconColorClass: string;
+  bgColorClass: string;
 }
 
 export interface IStatItem {
   value: string;
   label: string;
-  colorClass: string; // e.g., 'text-red-500'
+  colorClass: string;
 }
 
 export interface ISection35Data {

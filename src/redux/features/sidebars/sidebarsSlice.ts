@@ -1,7 +1,15 @@
+/*
+|-----------------------------------------
+| setting up SidebarsSlice for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import { apiSlice } from '@/redux/api/apiSlice';
 
 export const sidebarsApi = apiSlice.injectEndpoints({
-  endpoints: (builder) => ({
+  endpoints: builder => ({
     getSidebars: builder.query({
       query: ({ page, limit, q }) => {
         let url = `/api/sidebars/v1?page=${page || 1}&limit=${limit || 100}`;
@@ -13,10 +21,10 @@ export const sidebarsApi = apiSlice.injectEndpoints({
       providesTags: [{ type: 'tagTypeSidebars', id: 'LIST' }],
     }),
     getSidebarById: builder.query({
-      query: (id) => `/api/sidebars/v1?id=${id}`,
+      query: id => `/api/sidebars/v1?id=${id}`,
     }),
     addSidebar: builder.mutation({
-      query: (newSidebar) => ({
+      query: newSidebar => ({
         url: '/api/sidebars/v1',
         method: 'POST',
         body: newSidebar,
@@ -40,7 +48,7 @@ export const sidebarsApi = apiSlice.injectEndpoints({
       invalidatesTags: [{ type: 'tagTypeSidebars' }],
     }),
     bulkUpdateSidebars: builder.mutation({
-      query: (bulkData) => ({
+      query: bulkData => ({
         url: `/api/sidebars/v1?bulk=true`,
         method: 'PUT',
         body: bulkData,
@@ -48,7 +56,7 @@ export const sidebarsApi = apiSlice.injectEndpoints({
       invalidatesTags: [{ type: 'tagTypeSidebars' }],
     }),
     bulkDeleteSidebars: builder.mutation({
-      query: (bulkData) => ({
+      query: bulkData => ({
         url: `/api/sidebars/v1?bulk=true`,
         method: 'DELETE',
         body: bulkData,

@@ -1,5 +1,14 @@
-import { alignMap, defaultDataSection23, IParagraphData, PADDING_MAP, ParagraphProps, sizeMap, weightMap } from './data';
+/*
+|-----------------------------------------
+| setting up Query for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import { cn } from '@/lib/utils';
+
+import { alignMap, defaultDataSection23, IParagraphData, PADDING_MAP, ParagraphProps, sizeMap, weightMap } from './data';
 
 const QuerySection23 = ({ data }: ParagraphProps) => {
   let paraData = defaultDataSection23;

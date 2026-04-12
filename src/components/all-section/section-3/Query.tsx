@@ -1,5 +1,14 @@
+/*
+|-----------------------------------------
+| setting up Query for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import Image from 'next/image';
 import { Shield, Clock, Award } from 'lucide-react';
+
 import { defaultDataSection3, ISection3Data, Section3Props } from './data';
 
 const QuerySection3 = ({ data }: Section3Props) => {

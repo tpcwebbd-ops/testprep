@@ -1,6 +1,13 @@
+/*
+|-----------------------------------------
+| setting up LoadingSkeleton for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import React from 'react';
 
-// Custom Skeleton component with calm colors and animations
 const Skeleton = ({ className = '' }) => {
   return (
     <div
@@ -27,15 +34,12 @@ const Skeleton = ({ className = '' }) => {
 export default function LoadingSkeleton() {
   const renderContent = (
     <div className="w-full max-w-6xl mx-auto p-6">
-      {/* Header Section */}
       <div className="mb-8">
         <Skeleton className="h-8 w-3/4 max-w-md rounded-lg mb-3" />
         <Skeleton className="h-4 w-1/2 max-w-sm rounded-md" />
       </div>
 
-      {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Sidebar */}
         <div className="lg:col-span-1 space-y-4">
           <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-100">
             <Skeleton className="h-16 w-16 rounded-full mb-4 mx-auto lg:mx-0" />
@@ -44,7 +48,6 @@ export default function LoadingSkeleton() {
             <Skeleton className="h-3 w-1/2 rounded-sm" />
           </div>
 
-          {/* Navigation Items */}
           <div className="hidden lg:block space-y-2">
             {[...Array(5)].map((_, i) => (
               <div key={i} className="flex items-center space-x-3 p-2">
@@ -55,9 +58,7 @@ export default function LoadingSkeleton() {
           </div>
         </div>
 
-        {/* Main Content Area */}
         <div className="lg:col-span-3 space-y-6">
-          {/* Featured Card */}
           <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
             <div className="flex flex-col sm:flex-row gap-4">
               <Skeleton className="h-24 w-full sm:w-32 rounded-xl flex-shrink-0" />
@@ -69,7 +70,6 @@ export default function LoadingSkeleton() {
             </div>
           </div>
 
-          {/* Content Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[...Array(4)].map((_, i) => (
               <div key={i} className="bg-white rounded-xl p-5 shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
@@ -90,7 +90,6 @@ export default function LoadingSkeleton() {
             ))}
           </div>
 
-          {/* List Items */}
           <div className="bg-white rounded-xl border border-slate-100 divide-y divide-slate-100">
             {[...Array(6)].map((_, i) => (
               <div key={i} className="p-4 flex items-center gap-4">
@@ -109,7 +108,6 @@ export default function LoadingSkeleton() {
         </div>
       </div>
 
-      {/* Bottom Actions */}
       <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
         <Skeleton className="h-10 w-full sm:w-32 rounded-lg" />
         <Skeleton className="h-10 w-full sm:w-32 rounded-lg" />

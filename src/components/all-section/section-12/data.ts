@@ -1,3 +1,11 @@
+/*
+|-----------------------------------------
+| setting up Data for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 export interface IMilestone {
   label: string;
   value: string;
@@ -9,9 +17,9 @@ export interface IExperienceItem {
   companyName: string;
   role: string;
   description: string;
-  lastAchievement: string; // The specific "Last Achievement" requested
-  highlightMilestone: IMilestone; // The "Highlight Milestone"
-  features: string[]; // "Some features" / Tech stack / Key skills
+  lastAchievement: string;
+  highlightMilestone: IMilestone;
+  features: string[];
 }
 
 export interface ISection12Data {

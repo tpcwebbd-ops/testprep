@@ -1,3 +1,11 @@
+/*
+|-----------------------------------------
+| setting up BulkUpdate for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import React from 'react';
@@ -5,13 +13,13 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useBulkUpdateVerificationsMutation } from '@/redux/features/verifications/verificationsSlice';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 import { IVerifications } from '../store/data/data';
+import { handleSuccess, handleError } from './utils';
 import { useVerificationsStore } from '../store/store';
 import { verificationsSelectorArr } from '../store/store-constant';
-import { useBulkUpdateVerificationsMutation } from '@/redux/features/verifications/verificationsSlice';
-import { handleSuccess, handleError } from './utils';
 
 const BulkUpdateVerifications: React.FC = () => {
   const { toggleBulkUpdateModal, isBulkUpdateModalOpen, bulkData, setBulkData } = useVerificationsStore();
@@ -78,7 +86,6 @@ const BulkUpdateVerifications: React.FC = () => {
           </div>
         )}
 
-        {/* List Preview */}
         <ScrollArea className="h-[300px] w-full rounded-xl border border-white/10 bg-white/5 backdrop-blur-md p-4 mt-3">
           <div className="flex flex-col gap-2">
             {bulkData.map((item, idx) => (

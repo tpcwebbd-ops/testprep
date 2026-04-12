@@ -1,11 +1,21 @@
+/*
+|-----------------------------------------
+| setting up Mutation for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Save, Type, AlignLeft, MessageSquare, LayoutTemplate, Sparkles, Quote, Globe } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Save, Type, AlignLeft, MessageSquare, LayoutTemplate, Sparkles, Quote, Globe } from 'lucide-react';
+
 import { ISection10Data, defaultDataSection10 } from './data';
 
 export interface Section10FormProps {
@@ -33,7 +43,6 @@ const MutationSection10 = ({ data, onSubmit }: Section10FormProps) => {
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 p-4 md:p-8 font-sans selection:bg-indigo-500/30">
       <div className="max-w-7xl mx-auto bg-zinc-900/50 border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl backdrop-blur-sm">
-        {/* Header Section */}
         <div className="p-6 border-b border-zinc-800 bg-zinc-900/80 backdrop-blur flex items-center gap-3 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-indigo-600/5 to-violet-600/5 pointer-events-none" />
           <div className="p-2 bg-indigo-500/10 rounded-lg border border-indigo-500/20 z-10">
@@ -46,7 +55,6 @@ const MutationSection10 = ({ data, onSubmit }: Section10FormProps) => {
         </div>
 
         <div className="p-6 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Configuration Panel */}
           <div className="lg:col-span-5 space-y-6">
             <div className="space-y-4">
               <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider flex items-center gap-2">
@@ -54,7 +62,6 @@ const MutationSection10 = ({ data, onSubmit }: Section10FormProps) => {
               </h3>
 
               <div className="bg-zinc-950/50 p-5 rounded-xl border border-zinc-800/50 space-y-5 shadow-inner">
-                {/* Primary Heading */}
                 <div className="space-y-2 group">
                   <Label className="text-zinc-400 text-xs font-medium flex items-center gap-2 group-focus-within:text-indigo-400 transition-colors">
                     <Type size={14} /> Primary Heading
@@ -69,7 +76,6 @@ const MutationSection10 = ({ data, onSubmit }: Section10FormProps) => {
                   </div>
                 </div>
 
-                {/* Sub Heading */}
                 <div className="space-y-2 group">
                   <Label className="text-zinc-400 text-xs font-medium flex items-center gap-2 group-focus-within:text-indigo-400 transition-colors">
                     <AlignLeft size={14} /> Sub Heading
@@ -84,7 +90,6 @@ const MutationSection10 = ({ data, onSubmit }: Section10FormProps) => {
                   </div>
                 </div>
 
-                {/* Description */}
                 <div className="space-y-2 group">
                   <Label className="text-zinc-400 text-xs font-medium flex items-center gap-2 group-focus-within:text-indigo-400 transition-colors">
                     <MessageSquare size={14} /> Description
@@ -102,7 +107,6 @@ const MutationSection10 = ({ data, onSubmit }: Section10FormProps) => {
             </div>
           </div>
 
-          {/* Preview Panel */}
           <div className="lg:col-span-7 space-y-6">
             <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider flex items-center gap-2">
               <Sparkles size={16} /> Live Preview
@@ -122,7 +126,6 @@ const MutationSection10 = ({ data, onSubmit }: Section10FormProps) => {
               </div>
 
               <div className="flex-1 rounded-b-xl relative overflow-hidden flex items-center justify-center">
-                {/* Background effects */}
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(99,102,241,0.1),rgba(0,0,0,0))]" />
                 <div
                   className="absolute inset-0 opacity-[0.05]"
@@ -146,7 +149,6 @@ const MutationSection10 = ({ data, onSubmit }: Section10FormProps) => {
           </div>
         </div>
 
-        {/* Footer Actions */}
         <div className="p-6 border-t border-zinc-800 bg-zinc-900/80 backdrop-blur flex justify-between items-center">
           <p className="text-xs text-zinc-500 hidden sm:block">
             Last updated: <span className="text-zinc-400">Just now</span>

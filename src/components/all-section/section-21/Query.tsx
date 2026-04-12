@@ -1,7 +1,17 @@
+/*
+|-----------------------------------------
+| setting up Query for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import Link from 'next/link';
-import { alignMap, defaultDataSection21, ITitleData, paddingMap, sizeMap, TitleProps } from './data';
-import { cn } from '@/lib/utils';
 import { ExternalLink } from 'lucide-react';
+
+import { cn } from '@/lib/utils';
+
+import { alignMap, defaultDataSection21, ITitleData, paddingMap, sizeMap, TitleProps } from './data';
 
 const QuerySection21 = ({ data }: TitleProps) => {
   let titleData = defaultDataSection21;
@@ -15,7 +25,6 @@ const QuerySection21 = ({ data }: TitleProps) => {
   const containerClasses = cn(
     'w-full h-full flex items-center bg-transparent transition-all duration-300 ease-in-out',
     paddingMap[titleData.padding] || 'p-6',
-    // If justified, we generally still want flex-col or block logic, but for a single title, block is safer
     titleData.textAlign === 'justify' ? 'block' : 'flex-col',
   );
 
@@ -24,11 +33,9 @@ const QuerySection21 = ({ data }: TitleProps) => {
     sizeMap[titleData.textSize] || 'text-4xl',
     alignMap[titleData.textAlign] || 'text-center',
     titleData.isUnderline && 'underline decoration-blue-500/50 decoration-4 underline-offset-8',
-    // Add a subtle hover effect if it's a link
     titleData.isLink && 'hover:text-blue-200 group-hover:scale-[1.01] origin-center',
   );
 
-  // Helper to render the content
   const Content = () => (
     <h2 className={textClasses}>
       {titleData.text}

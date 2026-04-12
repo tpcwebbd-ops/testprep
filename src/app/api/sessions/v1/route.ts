@@ -1,75 +1,82 @@
+/*
+|-----------------------------------------
+| setting up Route for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import { handleRateLimit } from '@/app/api/utils/rate-limit';
-import {
-    getSessions,
-    createSession,
-    updateSession,
-    deleteSession,
-    getSessionById,
-    bulkUpdateSessions,
-    bulkDeleteSessions,
-} from './controller';
+import { formatResponse, IResponse } from '@/app/api/utils/jwt-verify';
+import { isUserHasAccessByRole, IWantAccess } from '@/app/api/utils/is-user-has-access-by-role';
 
-import {
-    formatResponse,
-//    handleTokenVerify,
-    IResponse,
-} from '@/app/api/utils/jwt-verify';
+import { getSessions, createSession, updateSession, deleteSession, getSessionById, bulkUpdateSessions, bulkDeleteSessions } from './controller';
 
-// GET all Sessions
 export async function GET(req: Request) {
-    const rateLimitResponse = handleRateLimit(req);
-    if (rateLimitResponse) return rateLimitResponse;
+  const rateLimitResponse = handleRateLimit(req);
+  if (rateLimitResponse) return rateLimitResponse;
 
-//    const tokenResponse = handleTokenVerify(req);
-//   if (tokenResponse) return tokenResponse;
-
-    const id = new URL(req.url).searchParams.get('id');
-    const result: IResponse = id
-        ? await getSessionById(req)
-        : await getSessions(req);
-    return formatResponse(result.data, result.message, result.status);
+  if (process.env.AuthorizationEnable === 'true') {
+    const wantToAccess: IWantAccess = {
+      db_name: 'sessions',
+      access: 'read',
+    };
+    const isAccess = await isUserHasAccessByRole(wantToAccess);
+    if (isAccess) return isAccess;
+  }
+  const id = new URL(req.url).searchParams.get('id');
+  const result: IResponse = id ? await getSessionById(req) : await getSessions(req);
+  return formatResponse(result.data, result.message, result.status);
 }
 
-// CREATE Session
 export async function POST(req: Request) {
-    const rateLimitResponse = handleRateLimit(req);
-    if (rateLimitResponse) return rateLimitResponse;
+  const rateLimitResponse = handleRateLimit(req);
+  if (rateLimitResponse) return rateLimitResponse;
 
-//    const tokenResponse = handleTokenVerify(req);
-//    if (tokenResponse) return tokenResponse;
-
-    const result = await createSession(req);
-    return formatResponse(result.data, result.message, result.status);
+  if (process.env.AuthorizationEnable === 'true') {
+    const wantToAccess: IWantAccess = {
+      db_name: 'sessions',
+      access: 'create',
+    };
+    const isAccess = await isUserHasAccessByRole(wantToAccess);
+    if (isAccess) return isAccess;
+  }
+  const result = await createSession(req);
+  return formatResponse(result.data, result.message, result.status);
 }
 
-// UPDATE Session
 export async function PUT(req: Request) {
-    const rateLimitResponse = handleRateLimit(req);
-    if (rateLimitResponse) return rateLimitResponse;
+  const rateLimitResponse = handleRateLimit(req);
+  if (rateLimitResponse) return rateLimitResponse;
 
-//    const tokenResponse = handleTokenVerify(req);
-//    if (tokenResponse) return tokenResponse;
+  if (process.env.AuthorizationEnable === 'true') {
+    const wantToAccess: IWantAccess = {
+      db_name: 'sessions',
+      access: 'update',
+    };
+    const isAccess = await isUserHasAccessByRole(wantToAccess);
+    if (isAccess) return isAccess;
+  }
+  const isBulk = new URL(req.url).searchParams.get('bulk') === 'true';
+  const result = isBulk ? await bulkUpdateSessions(req) : await updateSession(req);
 
-    const isBulk = new URL(req.url).searchParams.get('bulk') === 'true';
-    const result = isBulk
-        ? await bulkUpdateSessions(req)
-        : await updateSession(req);
-
-    return formatResponse(result.data, result.message, result.status);
+  return formatResponse(result.data, result.message, result.status);
 }
 
-// DELETE Session
 export async function DELETE(req: Request) {
-    const rateLimitResponse = handleRateLimit(req);
-    if (rateLimitResponse) return rateLimitResponse;
+  const rateLimitResponse = handleRateLimit(req);
+  if (rateLimitResponse) return rateLimitResponse;
 
-//    const tokenResponse = handleTokenVerify(req);
-//    if (tokenResponse) return tokenResponse;
+  if (process.env.AuthorizationEnable === 'true') {
+    const wantToAccess: IWantAccess = {
+      db_name: 'sessions',
+      access: 'delete',
+    };
+    const isAccess = await isUserHasAccessByRole(wantToAccess);
+    if (isAccess) return isAccess;
+  }
+  const isBulk = new URL(req.url).searchParams.get('bulk') === 'true';
+  const result = isBulk ? await bulkDeleteSessions(req) : await deleteSession(req);
 
-    const isBulk = new URL(req.url).searchParams.get('bulk') === 'true';
-    const result = isBulk
-        ? await bulkDeleteSessions(req)
-        : await deleteSession(req);
-
-    return formatResponse(result.data, result.message, result.status);
+  return formatResponse(result.data, result.message, result.status);
 }

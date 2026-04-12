@@ -1,13 +1,20 @@
-import { NextResponse } from 'next/server';
-import { getUsers, createUser, updateUser, deleteUser, getUserById } from './controller';
-import { handleRateLimit } from '../../utils/rate-limit';
+/*
+|-----------------------------------------
+| setting up Route for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
 
-// ✅ Unified response handler
+import { NextResponse } from 'next/server';
+
+import { handleRateLimit } from '../../utils/rate-limit';
+import { getUsers, createUser, updateUser, deleteUser, getUserById } from './controller';
+
 const formatResponse = (data: unknown, message: string, status: number) => {
   return NextResponse.json({ data, message }, { status });
 };
 
-// ✅ GET
 export async function GET(req: Request) {
   const rateLimitResponse = handleRateLimit(req);
   if (rateLimitResponse) return rateLimitResponse;
@@ -17,7 +24,6 @@ export async function GET(req: Request) {
   return formatResponse(result.data, result.message, result.status);
 }
 
-// ✅ POST
 export async function POST(req: Request) {
   const rateLimitResponse = handleRateLimit(req);
   if (rateLimitResponse) return rateLimitResponse;
@@ -26,7 +32,6 @@ export async function POST(req: Request) {
   return formatResponse(result.data, result.message, result.status);
 }
 
-// ✅ PUT
 export async function PUT(req: Request) {
   const rateLimitResponse = handleRateLimit(req);
   if (rateLimitResponse) return rateLimitResponse;
@@ -35,7 +40,6 @@ export async function PUT(req: Request) {
   return formatResponse(result.data, result.message, result.status);
 }
 
-// ✅ DELETE
 export async function DELETE(req: Request) {
   const rateLimitResponse = handleRateLimit(req);
   if (rateLimitResponse) return rateLimitResponse;

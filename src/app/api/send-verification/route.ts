@@ -1,7 +1,15 @@
-// app/your-api-path/route.ts
-import { NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
+/*
+|-----------------------------------------
+| setting up Route for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import jwt from 'jsonwebtoken';
+import nodemailer from 'nodemailer';
+import { NextResponse } from 'next/server';
+
 import { formatResponse, IResponse } from '../utils/utils';
 
 const GMAIL_USER = process.env.GMAIL_USER!;

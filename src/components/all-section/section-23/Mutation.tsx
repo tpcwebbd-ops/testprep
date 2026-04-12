@@ -1,24 +1,33 @@
+/*
+|-----------------------------------------
+| setting up Mutation for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import React, { useState, useEffect } from 'react';
 import {
   Save,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  AlignJustify,
   Type,
+  Pilcrow,
+  Droplets,
+  AlignLeft,
+  RotateCcw,
+  AlignRight,
+  AlignCenter,
+  AlignJustify,
   MoveVertical,
   Underline as UnderlineIcon,
-  Droplets,
-  RotateCcw,
-  Pilcrow,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import React, { useState, useEffect } from 'react';
+
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 import type { IParagraphData, ParagraphFormProps } from './data';
@@ -43,7 +52,6 @@ const MutationSection23 = ({ data, onSubmit }: ParagraphFormProps) => {
 
   return (
     <div className="min-h-[600px] w-full max-w-5xl mx-auto bg-zinc-950 text-zinc-100 font-sans rounded-3xl border border-zinc-800 overflow-hidden shadow-2xl flex flex-col lg:flex-row">
-      {/* Right Panel: Controls */}
       <div className="lg:w-1/2 bg-zinc-950 p-6 lg:p-8 flex flex-col h-full overflow-y-auto">
         <div className="space-y-8">
           <div className="flex items-center justify-between">
@@ -112,7 +120,6 @@ const MutationSection23 = ({ data, onSubmit }: ParagraphFormProps) => {
                 <MoveVertical size={14} /> Layout & Style
               </Label>
 
-              {/* Alignment */}
               <div className="flex bg-zinc-900/50 p-1 rounded-xl border border-zinc-800 mb-4">
                 {[
                   { val: 'left', icon: AlignLeft },
@@ -169,7 +176,6 @@ const MutationSection23 = ({ data, onSubmit }: ParagraphFormProps) => {
             </div>
           </div>
 
-          {/* Footer Action */}
           <div className="pt-6 border-t border-zinc-800 flex justify-end">
             <Button onClick={() => onSubmit(formData)} variant="outlineGlassy" className="w-full">
               <Save className="w-5 h-5 mr-2" />

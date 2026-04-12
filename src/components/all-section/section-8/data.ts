@@ -1,3 +1,11 @@
+/*
+|-----------------------------------------
+| setting up Data for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 export interface ISection8Data {
   id: string;
   country: string;
@@ -19,8 +27,8 @@ export interface ISection8Data {
         tutionFees: string;
         duration: string;
       }[];
-      applyBtnParms: string[]; // [country, city, university, subject]
-      applyBtnParmsDegreeLevel: string[]; // [param1, param2, ...]
+      applyBtnParms: string[];
+      applyBtnParmsDegreeLevel: string[];
     }[];
     description: string;
   }[];

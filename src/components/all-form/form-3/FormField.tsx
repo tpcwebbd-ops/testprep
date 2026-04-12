@@ -1,13 +1,23 @@
+/*
+|-----------------------------------------
+| setting up FormField for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { Loader2, CheckCircle2, AlertCircle, Clock, Save, Eraser, MapPin, Globe } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+
 import type { IForm3Data } from './data';
 import { defaultDataForm3 } from './data';
 
@@ -38,12 +48,6 @@ const FormFieldForm3 = ({ data, onSubmit }: Form3Props) => {
   const [errorMessage, setErrorMessage] = useState<string>('');
   const pathname = usePathname();
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-
-  // useEffect(() => {
-  //   if (data) {
-  //     setFormData({ ...data });
-  //   }
-  // }, [data]);
 
   useEffect(() => {
     const storedCooldown = localStorage.getItem(COOLDOWN_KEY);

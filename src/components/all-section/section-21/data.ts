@@ -1,3 +1,11 @@
+/*
+|-----------------------------------------
+| setting up Data for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 export interface TitleProps {
   data?: ITitleData | string;
 }
@@ -14,7 +22,6 @@ export interface ITitleData {
   textAlign: TitleAlign;
   isUnderline: boolean;
   padding: TitlePadding;
-  // Link Feature
   isLink: boolean;
   url: string;
   isNewTab: boolean;
@@ -41,7 +48,6 @@ export const PADDINGS: Record<TitlePadding, string> = {
   '2xl': 'p-16',
 };
 
-// 1. Map Text Size
 export const sizeMap: Record<string, string> = {
   xs: 'text-xs',
   sm: 'text-sm',
@@ -50,7 +56,7 @@ export const sizeMap: Record<string, string> = {
   xl: 'text-xl',
   '2xl': 'text-2xl',
   '3xl': 'text-3xl',
-  '4xl': 'text-4xl md:text-5xl', // Responsive scaling
+  '4xl': 'text-4xl md:text-5xl',
   '5xl': 'text-5xl md:text-6xl',
   '6xl': 'text-6xl md:text-7xl',
   '7xl': 'text-7xl md:text-8xl',
@@ -58,7 +64,6 @@ export const sizeMap: Record<string, string> = {
   '9xl': 'text-9xl',
 };
 
-// 2. Map Alignment
 export const alignMap: Record<string, string> = {
   left: 'text-left',
   center: 'text-center',
@@ -66,7 +71,6 @@ export const alignMap: Record<string, string> = {
   justify: 'text-justify',
 };
 
-// 3. Map Padding
 export const paddingMap: Record<string, string> = {
   none: 'p-0',
   xs: 'p-2',
@@ -76,7 +80,6 @@ export const paddingMap: Record<string, string> = {
   xl: 'p-12',
   '2xl': 'p-16',
 };
-
 
 export interface TitleFormProps {
   data?: ITitleData;

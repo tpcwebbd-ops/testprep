@@ -1,22 +1,21 @@
 /*
 |-----------------------------------------
-| Static SSG Page (Server Component)
-| @description: Pre-renders pages based on URL path at BUILD TIME
+| setting up Page for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
 |-----------------------------------------
 */
 
+import { cache } from 'react';
 import { notFound } from 'next/navigation';
-import { cache } from 'react'; // Import cache
 import { Type, Layers } from 'lucide-react';
 
-// Import your existing component maps
-import { AllSections, AllSectionsKeys } from '@/components/all-section/all-section-index/all-sections';
-import { AllForms, AllFormsKeys } from '@/components/all-form/all-form-index/all-form';
-
 import { PageContent } from '@/app/dashboard/page-builder/utils';
+import { AllForms, AllFormsKeys } from '@/components/all-form/all-form-index/all-form';
+import { AllSections, AllSectionsKeys } from '@/components/all-section/all-section-index/all-sections';
+
 import { getAllPages } from '../api/page-builder/v1/controller';
 
-// --- Types ---
 interface PageApiResponse {
   data: {
     pages: NormalizedPage[];
@@ -44,8 +43,6 @@ const COMPONENT_MAP: Record<string, { collection: any; keys: string[]; label: st
   section: { collection: AllSections, keys: AllSectionsKeys, label: 'Sections', icon: Layers },
 };
 
-// --- Data Fetching Logic (Cached) ---
-// We use React cache() to ensure we fetch data once during build for all components
 const getCachedAllPages = cache(async (): Promise<NormalizedPage[]> => {
   try {
     const pagesData = (await getAllPages()) as unknown as PageApiResponse;
@@ -60,7 +57,6 @@ const getCachedAllPages = cache(async (): Promise<NormalizedPage[]> => {
   }
 });
 
-// --- Helper: Flatten Pages ---
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getNormalizedPages(rawPages: any[]): NormalizedPage[] {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -71,7 +67,6 @@ function getNormalizedPages(rawPages: any[]): NormalizedPage[] {
         ...item,
         _id: item._id,
         pageName: item.pageName || item.pageTitle || 'Untitled',
-        // Ensure path starts with / for consistent matching
         path: (item.path || item.pagePath || '#').startsWith('/') ? item.path || item.pagePath : '/' + (item.path || item.pagePath),
         content: item.content || [],
       };
@@ -86,9 +81,7 @@ function getNormalizedPages(rawPages: any[]): NormalizedPage[] {
   return flattenPages(rawPages);
 }
 
-// --- Component: SSR Item Renderer ---
 const SSRItemRenderer = ({ item }: { item: PageContent }) => {
-  // Check if type exists in our current map
   if (!item.type || !COMPONENT_MAP[item.type]) return null;
 
   const mapEntry = COMPONENT_MAP[item.type];
@@ -120,24 +113,17 @@ const SSRItemRenderer = ({ item }: { item: PageContent }) => {
   );
 };
 
-// --- Helper: Construct Path from Params ---
 const constructPathFromParams = (slugs: string[]) => {
   if (!slugs || slugs.length === 0) return '/';
   return '/' + slugs.join('/');
 };
 
-// --- STATIC GENERATION: generateStaticParams ---
-// This is the key function that makes it Static.
-// It tells Next.js which routes to build.
 export async function generateStaticParams() {
   const pages = await getCachedAllPages();
 
-  // 1. FILTER: Ignore the root path ('/') to avoid conflict with app/page.tsx
   const filteredPages = pages.filter(page => page.path !== '/' && page.path !== '');
 
-  // 2. MAP: Generate slugs for remaining pages
   return filteredPages.map(page => {
-    // Convert string path "/about/us" to array ["about", "us"]
     const slug = page.path.split('/').filter(Boolean);
 
     return {
@@ -146,12 +132,8 @@ export async function generateStaticParams() {
   });
 }
 
-// Optional: Control what happens for paths not returned by generateStaticParams
-// true (default): Dynamic render on first request, then static
-// false: 404 for any path not generated at build time
 export const dynamicParams = true;
 
-// --- Metadata Generator (SEO) ---
 export async function generateMetadata({ params }: { params: Promise<{ pageTitle: string[] }> }) {
   const resolvedParams = await params;
   const pathString = constructPathFromParams(resolvedParams.pageTitle);
@@ -168,23 +150,18 @@ export async function generateMetadata({ params }: { params: Promise<{ pageTitle
   };
 }
 
-// --- Main Page Component ---
 export default async function StaticPage({ params }: { params: Promise<{ pageTitle: string[] }> }) {
   const resolvedParams = await params;
   const pathString = constructPathFromParams(resolvedParams.pageTitle);
 
-  // 1. Fetch Data (Uses Cache)
   const pages = await getCachedAllPages();
 
-  // 2. Find the matching page
   const currentPage = pages.find(p => p.path === pathString);
 
-  // 3. Handle 404
   if (!currentPage) {
     notFound();
   }
 
-  // 4. Extract Content
   const items: PageContent[] = Array.isArray(currentPage.content) ? currentPage.content : [];
 
   return (

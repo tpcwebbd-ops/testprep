@@ -1,10 +1,20 @@
+/*
+|-----------------------------------------
+| setting up Query for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useState, useEffect, useCallback } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+
 import { defaultDataSection26, ITagSliderData, TagSliderProps } from './data';
 
 const QuerySection26 = ({ data }: TagSliderProps) => {
@@ -85,7 +95,6 @@ const QuerySection26 = ({ data }: TagSliderProps) => {
     hidden: { container: 'relative', prev: 'hidden', next: 'hidden', wrapper: '' },
   }[navPosition || 'middle-outside'];
 
-  // Calculate width percentage for each item
   const itemWidth = `${100 / safeItemsPerSlide}%`;
 
   if (tags.length === 0) return null;
@@ -97,7 +106,6 @@ const QuerySection26 = ({ data }: TagSliderProps) => {
       onMouseLeave={() => pauseOnHover && setIsPaused(false)}
     >
       <div className={navClasses.container}>
-        {/* Navigation Left */}
         {navPosition !== 'hidden' && totalItems > safeItemsPerSlide && (
           <Button
             variant="ghost"
@@ -114,7 +122,6 @@ const QuerySection26 = ({ data }: TagSliderProps) => {
           </Button>
         )}
 
-        {/* Carousel Window */}
         <div className={cn('overflow-hidden w-full', navClasses.wrapper)}>
           <div
             className="flex transition-transform duration-500 ease-in-out will-change-transform"
@@ -134,7 +141,6 @@ const QuerySection26 = ({ data }: TagSliderProps) => {
           </div>
         </div>
 
-        {/* Navigation Right */}
         {navPosition !== 'hidden' && totalItems > safeItemsPerSlide && (
           <Button
             variant="ghost"

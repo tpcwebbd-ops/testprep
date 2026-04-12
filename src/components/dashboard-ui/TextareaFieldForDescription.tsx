@@ -1,11 +1,18 @@
-// TextareaFieldForDescription.tsx
+/*
+|-----------------------------------------
+| setting up TextareaFieldForDescription for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
 
 'use client';
 
 import * as React from 'react';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
+
 import { cn } from '@/lib/utils';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 
 const TextareaFieldForDescription = ({
   id,

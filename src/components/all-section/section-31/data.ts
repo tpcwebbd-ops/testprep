@@ -1,3 +1,11 @@
+/*
+|-----------------------------------------
+| setting up Data for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 export interface ITestimonial {
   name: string;
   score: string;
@@ -7,7 +15,7 @@ export interface ITestimonial {
 export interface IStatItem {
   number: string;
   label: string;
-  iconName: string; // We store the icon name as a string to map it later
+  iconName: string;
 }
 
 export interface ISection31Data {

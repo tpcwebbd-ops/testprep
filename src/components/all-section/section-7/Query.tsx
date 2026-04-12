@@ -1,9 +1,18 @@
+/*
+|-----------------------------------------
+| setting up Query for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import React from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { MapPin, Award, Users, BookOpen, GraduationCap, CheckCircle2, ArrowRight, Globe, CalendarDays, Sparkles } from 'lucide-react';
+
 import { defaultDataSection7, ISection7Data } from './data';
 
 export interface Section7Props {

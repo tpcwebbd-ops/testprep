@@ -1,13 +1,22 @@
+/*
+|-----------------------------------------
+| setting up Query for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
+import Image from 'next/image';
 import React, { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
 import { TrendingUp, TrendingDown, Minus, AlertTriangle, CheckCircle, ShieldAlert, MoreHorizontal, X, Check, User, Activity } from 'lucide-react';
-import { DashboardMetric, ModerationItem, defaultDataSection16 } from './data';
+
 import { cn } from '@/lib/utils';
 
-// Update interface to include new header fields
+import { DashboardMetric, ModerationItem, defaultDataSection16 } from './data';
+
 interface ISection16Data {
   id?: string;
   badge?: string;
@@ -24,7 +33,6 @@ interface Section16Props {
 const QuerySection16: React.FC<Section16Props> = ({ data }) => {
   const [queue, setQueue] = useState<ModerationItem[]>([]);
 
-  // Parse data
   const sectionData: ISection16Data = useMemo(() => {
     let parsed = defaultDataSection16;
     if (data) {
@@ -34,7 +42,6 @@ const QuerySection16: React.FC<Section16Props> = ({ data }) => {
         console.error('Failed to parse section data', e);
       }
     }
-    // Update local state for queue when data changes
     if (parsed.moderationQueue) {
       setQueue(parsed.moderationQueue);
     }
@@ -47,19 +54,15 @@ const QuerySection16: React.FC<Section16Props> = ({ data }) => {
 
   return (
     <section className="relative w-full py-16 md:py-24 bg-zinc-950 overflow-hidden font-mono text-zinc-100 selection:bg-emerald-500/30 selection:text-emerald-200">
-      {/* --- Sci-Fi Background --- */}
       <div className="absolute inset-0 pointer-events-none">
-        {/* Grid Lines */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-zinc-950 via-transparent to-zinc-950" />
 
-        {/* Glows */}
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-500/5 rounded-full blur-[100px] animate-pulse" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/5 rounded-full blur-[100px] animate-pulse delay-700" />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 md:px-8 relative z-10 space-y-12">
-        {/* --- Header Section --- */}
         <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-8 border-b border-white/5 pb-8">
           <div>
             <motion.div
@@ -97,14 +100,12 @@ const QuerySection16: React.FC<Section16Props> = ({ data }) => {
           </div>
         </div>
 
-        {/* --- 1. Metrics Grid --- */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {sectionData.metrics?.map((metric, i) => (
             <MetricCard key={metric.id} metric={metric} index={i} />
           ))}
         </div>
 
-        {/* --- 2. Moderation Queue --- */}
         <div className="space-y-6 pt-8">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-bold flex items-center gap-2 text-zinc-200">
@@ -139,8 +140,6 @@ const QuerySection16: React.FC<Section16Props> = ({ data }) => {
     </section>
   );
 };
-
-// --- Sub-Components ---
 
 const MetricCard = ({ metric, index }: { metric: DashboardMetric; index: number }) => {
   const isStable = metric.status === 'stable';
@@ -182,7 +181,6 @@ const MetricCard = ({ metric, index }: { metric: DashboardMetric; index: number 
         <span className="text-[10px] text-zinc-600 font-sans">vs last hour</span>
       </div>
 
-      {/* Decoration */}
       <div
         className={cn(
           'absolute bottom-0 right-0 w-32 h-32 rounded-full blur-[80px] opacity-0 group-hover:opacity-20 transition-opacity duration-500 pointer-events-none',
@@ -207,7 +205,6 @@ const ModerationRow = ({ item, onAction }: { item: ModerationItem; onAction: (id
         isHighSeverity ? 'border-rose-500/20 shadow-[0_0_15px_-5px_rgba(244,63,94,0.1)]' : 'border-zinc-800',
       )}
     >
-      {/* Author */}
       <div className="flex md:flex-col items-center md:items-start gap-3 md:w-40 md:shrink-0 md:border-r border-white/5 md:pr-4">
         <div className="relative">
           <div className="w-10 h-10 rounded-full bg-zinc-800 overflow-hidden border border-zinc-700">
@@ -232,7 +229,6 @@ const ModerationRow = ({ item, onAction }: { item: ModerationItem; onAction: (id
         </div>
       </div>
 
-      {/* Content */}
       <div className="flex-1 space-y-2.5">
         <div className="flex flex-wrap items-center gap-2">
           <span
@@ -253,7 +249,6 @@ const ModerationRow = ({ item, onAction }: { item: ModerationItem; onAction: (id
         <p className="text-sm text-zinc-300 leading-relaxed font-sans bg-black/20 p-3 rounded-lg border border-white/5 shadow-inner">{item.content}</p>
       </div>
 
-      {/* Actions */}
       <div className="flex md:flex-col justify-end gap-2 md:pl-2 md:border-l border-white/5">
         <button
           onClick={() => onAction(item.id)}

@@ -1,10 +1,18 @@
-import { withDB } from '@/app/api/utils/db';
+/*
+|-----------------------------------------
+| setting up Controller for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import { FilterQuery } from 'mongoose';
+
+import { withDB } from '@/app/api/utils/db';
 
 import AccessManagement from './model';
 import { IResponse } from '../../utils/utils';
 
-// Helper to format responses
 const formatResponse = (data: unknown, message: string, status: number): IResponse => ({
   data,
   message,
@@ -12,7 +20,6 @@ const formatResponse = (data: unknown, message: string, status: number): IRespon
   ok: status >= 200 && status < 300,
 });
 
-// CREATE AccessManagement
 export async function createAccessManagement(req: Request): Promise<IResponse> {
   return withDB(async () => {
     try {
@@ -26,12 +33,11 @@ export async function createAccessManagement(req: Request): Promise<IResponse> {
         const err = error as { keyValue?: Record<string, unknown> };
         return formatResponse(null, `Duplicate key error: ${JSON.stringify(err.keyValue)}`, 400);
       }
-      throw error; // Re-throw other errors to be handled by `withDB`
+      throw error;
     }
   });
 }
 
-// GET single AccessManagement by ID
 export async function getAccessManagementById(req: Request): Promise<IResponse> {
   return withDB(async () => {
     const id = new URL(req.url).searchParams.get('id');
@@ -44,7 +50,6 @@ export async function getAccessManagementById(req: Request): Promise<IResponse> 
   });
 }
 
-// GET all AccessManagements with pagination and intelligent search
 export async function getAccessManagements(req: Request): Promise<IResponse> {
   return withDB(async () => {
     const url = new URL(req.url);
@@ -56,11 +61,9 @@ export async function getAccessManagements(req: Request): Promise<IResponse> {
 
     let searchFilter: FilterQuery<unknown> = {};
 
-    // If explicit email filter provided, use exact match on user_email
     if (searchQueryByEmail) {
       searchFilter = { user_email: searchQueryByEmail };
     } else if (searchQuery) {
-      // Check for date range filter format first
       if (searchQuery.startsWith('createdAt:range:')) {
         const datePart = searchQuery.split(':')[2];
         const [startDateString, endDateString] = datePart.split('_');
@@ -68,27 +71,24 @@ export async function getAccessManagements(req: Request): Promise<IResponse> {
         if (startDateString && endDateString) {
           const startDate = new Date(startDateString);
           const endDate = new Date(endDateString);
-          // To ensure the range is inclusive, set the time to the end of the day
+
           endDate.setUTCHours(23, 59, 59, 999);
 
           searchFilter = {
             createdAt: {
-              $gte: startDate, // Greater than or equal to the start date
-              $lte: endDate, // Less than or equal to the end date
+              $gte: startDate,
+              $lte: endDate,
             },
           };
         }
       } else {
-        // Fallback to original generic search logic
         const orConditions: FilterQuery<unknown>[] = [];
 
-        // Add regex search conditions for all string-like fields
         const stringFields = ['user_name', 'user_email', 'given_by_email'];
         stringFields.forEach(field => {
           orConditions.push({ [field]: { $regex: searchQuery, $options: 'i' } });
         });
 
-        // If the query is a valid number, add equality checks for all number fields
         const numericQuery = parseFloat(searchQuery);
         if (!isNaN(numericQuery)) {
           const numberFields: string[] = [];
@@ -120,7 +120,6 @@ export async function getAccessManagements(req: Request): Promise<IResponse> {
   });
 }
 
-// UPDATE single AccessManagement by ID
 export async function updateAccessManagement(req: Request): Promise<IResponse> {
   return withDB(async () => {
     try {
@@ -134,12 +133,11 @@ export async function updateAccessManagement(req: Request): Promise<IResponse> {
         const err = error as { keyValue?: Record<string, unknown> };
         return formatResponse(null, `Duplicate key error: ${JSON.stringify(err.keyValue)}`, 400);
       }
-      throw error; // Re-throw other errors to be handled by `withDB`
+      throw error;
     }
   });
 }
 
-// BULK UPDATE AccessManagements
 export async function bulkUpdateAccessManagements(req: Request): Promise<IResponse> {
   return withDB(async () => {
     const updates: { id: string; updateData: Record<string, unknown> }[] = await req.json();
@@ -162,7 +160,6 @@ export async function bulkUpdateAccessManagements(req: Request): Promise<IRespon
   });
 }
 
-// DELETE single AccessManagement by ID
 export async function deleteAccessManagement(req: Request): Promise<IResponse> {
   return withDB(async () => {
     const { id } = await req.json();
@@ -172,7 +169,6 @@ export async function deleteAccessManagement(req: Request): Promise<IResponse> {
   });
 }
 
-// BULK DELETE AccessManagements
 export async function bulkDeleteAccessManagements(req: Request): Promise<IResponse> {
   return withDB(async () => {
     const { ids }: { ids: string[] } = await req.json();

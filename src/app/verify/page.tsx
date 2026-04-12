@@ -1,17 +1,25 @@
+/*
+|-----------------------------------------
+| setting up Page for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { Loader2, CheckCircle, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const VerifyAccount = () => {
   const router = useRouter();
   const [code, setCode] = useState('');
+  const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [verified, setVerified] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [email, setEmail] = useState('');
   const [resending, setResending] = useState(false);
   const [resendDone, setResendDone] = useState(false);
 
@@ -19,7 +27,6 @@ const VerifyAccount = () => {
     e.preventDefault();
     setLoading(true);
 
-    // Simulate verification delay
     setTimeout(() => {
       setLoading(false);
       setVerified(true);
@@ -31,7 +38,6 @@ const VerifyAccount = () => {
     e.preventDefault();
     setResending(true);
 
-    // Simulate API call delay
     setTimeout(() => {
       setResending(false);
       setResendDone(true);
@@ -51,7 +57,6 @@ const VerifyAccount = () => {
         transition={{ duration: 0.6, ease: 'easeOut' }}
         className="flex flex-col md:flex-row backdrop-blur-xl bg-white/10 rounded-2xl shadow-2xl overflow-hidden w-full max-w-4xl border border-white/20"
       >
-        {/* ===== Left Side (Animation Part) ===== */}
         <div className="flex-1 flex flex-col items-center justify-center text-white p-8 relative overflow-hidden">
           <motion.div
             animate={{ rotate: [0, 8, -8, 0] }}
@@ -74,7 +79,6 @@ const VerifyAccount = () => {
             We’ve sent a verification code to your email. Enter it below to activate your account.
           </p>
 
-          {/* Soft glowing background animation */}
           <motion.div
             className="absolute bottom-10 left-1/2 -translate-x-1/2 h-28 w-28 bg-white/20 rounded-full blur-3xl"
             animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.6, 0.4] }}
@@ -82,7 +86,6 @@ const VerifyAccount = () => {
           />
         </div>
 
-        {/* ===== Right Side (Verification Form) ===== */}
         <div className="flex-1 bg-white/10 backdrop-blur-lg p-8 flex flex-col justify-center">
           <h2 className="text-2xl md:text-3xl font-semibold text-center text-white mb-6">Account Verification</h2>
 
@@ -143,7 +146,6 @@ const VerifyAccount = () => {
         </div>
       </motion.div>
 
-      {/* ===== Modal Section ===== */}
       <AnimatePresence>
         {showModal && (
           <motion.div
@@ -159,7 +161,6 @@ const VerifyAccount = () => {
               transition={{ duration: 0.3 }}
               className="relative bg-white/10 backdrop-blur-2xl p-6 rounded-xl shadow-xl border border-white/20 w-[90%] max-w-md text-white"
             >
-              {/* Close button */}
               <button onClick={() => setShowModal(false)} className="absolute top-3 right-3 text-white/80 hover:text-white">
                 <X size={20} />
               </button>

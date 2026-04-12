@@ -1,3 +1,11 @@
+/*
+|-----------------------------------------
+| setting up Model for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import mongoose, { Schema, Document, Model } from 'mongoose';
 
 export interface IBrandSettings extends Document {
@@ -70,7 +78,6 @@ const BrandSettingsSchema: Schema = new Schema(
     timestamps: true,
   },
 );
-// Check if model exists to prevent "OverwriteModelError" in Next.js hot reloading
 const BrandSettings: Model<IBrandSettings> = mongoose.models.BrandSettings || mongoose.model<IBrandSettings>('BrandSettings', BrandSettingsSchema);
 
 export default BrandSettings;

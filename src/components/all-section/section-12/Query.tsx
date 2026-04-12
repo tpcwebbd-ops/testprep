@@ -1,8 +1,17 @@
+/*
+|-----------------------------------------
+| setting up Query for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import React, { useMemo, useRef } from 'react';
 import { motion, useScroll, useSpring, useInView } from 'framer-motion';
 import { Briefcase, Trophy, Zap, Calendar, ArrowUpRight, CheckCircle2 } from 'lucide-react';
+
 import { ISection12Data, defaultDataSection12, Section12Props, IExperienceItem } from './data';
 
 const ExperienceCard = ({ item, index }: { item: IExperienceItem; index: number }) => {
@@ -17,17 +26,11 @@ const ExperienceCard = ({ item, index }: { item: IExperienceItem; index: number 
       transition={{ duration: 0.6, delay: index * 0.1 }}
       className="relative pl-8 md:pl-0"
     >
-      {/* Timeline connector for mobile */}
       <div className="absolute left-0 top-0 bottom-0 w-px bg-zinc-800 md:hidden">
         <div className="absolute top-8 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-emerald-500 ring-4 ring-zinc-950" />
       </div>
 
-      {/* 
-         UPDATED: Increased gap from md:gap-16 to md:gap-32 
-         to create more space around the central line 
-      */}
       <div className={`flex flex-col md:flex-row gap-8 md:gap-32 items-start group ${index % 2 === 0 ? '' : 'md:flex-row-reverse'}`}>
-        {/* Date / Year Side (Desktop) */}
         <div className={`hidden md:flex flex-col justify-center w-full md:w-5/12 ${index % 2 === 0 ? 'items-end text-right' : 'items-start text-left'}`}>
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-900 border border-zinc-800 text-emerald-400 font-mono text-sm font-bold shadow-xl transition-transform duration-300 group-hover:scale-105">
             <Calendar size={14} />
@@ -35,7 +38,6 @@ const ExperienceCard = ({ item, index }: { item: IExperienceItem; index: number 
           </div>
         </div>
 
-        {/* Center Line Marker (Desktop) */}
         <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-px bg-zinc-800 justify-center">
           <motion.div
             initial={{ scale: 0 }}
@@ -45,14 +47,12 @@ const ExperienceCard = ({ item, index }: { item: IExperienceItem; index: number 
           />
         </div>
 
-        {/* Content Card Side */}
         <div className="w-full md:w-5/12 relative">
           <div className="md:hidden mb-4">
             <span className="inline-block px-3 py-1 rounded-md bg-zinc-900 text-emerald-400 text-xs font-bold border border-zinc-800">{item.year}</span>
           </div>
 
           <div className="group/card relative bg-zinc-900/50 border border-zinc-800 p-6 md:p-8 rounded-3xl hover:border-emerald-500/30 hover:bg-zinc-900/80 transition-all duration-500 hover:shadow-2xl hover:shadow-emerald-900/10">
-            {/* Hover Glow */}
             <div className="absolute -inset-px bg-gradient-to-r from-emerald-500/20 to-teal-500/20 rounded-3xl opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 pointer-events-none blur-lg" />
 
             <div className="relative z-10 space-y-6">
@@ -99,7 +99,6 @@ const ExperienceCard = ({ item, index }: { item: IExperienceItem; index: number 
               </div>
             </div>
 
-            {/* Decoration Icon */}
             <ArrowUpRight className="absolute top-6 right-6 text-zinc-800 w-6 h-6 group-hover/card:text-emerald-500/50 transition-colors" />
           </div>
         </div>
@@ -136,7 +135,6 @@ const ClientSection12: React.FC<Section12Props> = ({ data }) => {
       ref={containerRef}
       className="relative w-full min-h-screen bg-zinc-950 py-24 md:py-32 overflow-hidden selection:bg-emerald-500/30 selection:text-emerald-100"
     >
-      {/* Background Ambience */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 right-0 w-[40vw] h-[40vw] bg-emerald-600/5 rounded-full blur-[120px]" />
         <div className="absolute bottom-0 left-0 w-[40vw] h-[40vw] bg-teal-600/5 rounded-full blur-[120px]" />
@@ -144,7 +142,6 @@ const ClientSection12: React.FC<Section12Props> = ({ data }) => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-20 md:mb-32 space-y-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -177,9 +174,7 @@ const ClientSection12: React.FC<Section12Props> = ({ data }) => {
           </motion.p>
         </div>
 
-        {/* Timeline Container */}
         <div className="relative">
-          {/* Main Vertical Line (Desktop) */}
           <div className="absolute left-1/2 top-0 bottom-0 w-px bg-zinc-900 hidden md:block">
             <motion.div style={{ scaleY, transformOrigin: 'top' }} className="w-full h-full bg-gradient-to-b from-emerald-500 via-teal-500 to-zinc-900" />
           </div>
@@ -191,7 +186,6 @@ const ClientSection12: React.FC<Section12Props> = ({ data }) => {
           </div>
         </div>
 
-        {/* Footer */}
         <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mt-24 flex justify-center">
           <div className="flex items-center gap-2 text-zinc-500 text-sm font-medium">
             <CheckCircle2 size={16} className="text-emerald-500" />

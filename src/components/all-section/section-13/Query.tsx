@@ -1,9 +1,18 @@
+/*
+|-----------------------------------------
+| setting up Query for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
+import Image from 'next/image';
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 import { Handshake, ArrowRight, Zap, BoxSelect, Sparkles, LayoutTemplate } from 'lucide-react';
+
 import { ISection13Data, defaultDataSection13, Section13Props } from './data';
 
 const ClientSection13: React.FC<Section13Props> = ({ data }) => {
@@ -17,11 +26,9 @@ const ClientSection13: React.FC<Section13Props> = ({ data }) => {
     }
   }, [data]);
 
-  // Create enough duplicates to ensure smooth scrolling on ultra-wide screens
   const marqueePartners = useMemo(() => {
     const base = sectionData.partners || [];
     if (base.length === 0) return [];
-    // Repeat at least 6 times or enough to fill width
     return [...base, ...base, ...base, ...base, ...base, ...base];
   }, [sectionData.partners]);
 
@@ -38,7 +45,6 @@ const ClientSection13: React.FC<Section13Props> = ({ data }) => {
 
   return (
     <section className="relative w-full py-24 md:py-32 bg-zinc-950 overflow-hidden selection:bg-cyan-500/30 selection:text-cyan-100">
-      {/* Ambient Background */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-1/4 w-[40vw] h-[40vw] bg-cyan-500/5 rounded-full blur-[120px]" />
         <div className="absolute bottom-0 right-1/4 w-[40vw] h-[40vw] bg-blue-600/5 rounded-full blur-[120px]" />
@@ -52,7 +58,6 @@ const ClientSection13: React.FC<Section13Props> = ({ data }) => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        {/* Header Section */}
         <div className="text-center max-w-3xl mx-auto mb-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -85,7 +90,6 @@ const ClientSection13: React.FC<Section13Props> = ({ data }) => {
           </motion.p>
         </div>
 
-        {/* Partners Marquee */}
         {marqueePartners.length > 0 && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -127,7 +131,6 @@ const ClientSection13: React.FC<Section13Props> = ({ data }) => {
           </motion.div>
         )}
 
-        {/* Collaboration Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
           {sectionData.collabOptions.map((option, index) => (
             <motion.div

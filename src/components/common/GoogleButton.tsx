@@ -1,6 +1,15 @@
+/*
+|-----------------------------------------
+| setting up GoogleButton for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import React from 'react';
+
 import { Button } from '@/components/ui/button';
 
 interface ContinueWithGoogleButtonProps {
@@ -10,7 +19,6 @@ interface ContinueWithGoogleButtonProps {
 const ContinueWithGoogleButton: React.FC<ContinueWithGoogleButtonProps> = ({ onClick }) => {
   return (
     <Button onClick={onClick} variant="outlineGlassy" className="rounded-full overflow-hidden border border-slate-100/50 w-3/4">
-      {/* Inline Google SVG */}
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="22" height="22">
         <path
           fill="#EA4335"

@@ -1,31 +1,40 @@
+/*
+|-----------------------------------------
+| setting up Mutation for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
   Type,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  AlignJustify,
-  Link as LinkIcon,
-  ExternalLink,
   Save,
-  Maximize2,
-  Underline as UnderlineIcon,
   Unlink,
-  LucideIcon,
   RotateCcw,
+  Maximize2,
+  AlignLeft,
+  LucideIcon,
+  AlignRight,
+  AlignCenter,
+  AlignJustify,
+  ExternalLink,
+  Link as LinkIcon,
+  Underline as UnderlineIcon,
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
 import { defaultDataSection21, ITitleData, PADDINGS, SIZES, TitleAlign, TitleFormProps, TitlePadding } from './data';
-import { cn } from '@/lib/utils';
 
 const AnimatedInput = ({
   label,
@@ -86,14 +95,12 @@ const MutationSection21 = ({ data, onSubmit }: TitleFormProps) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  // Calculate Preview Classes
   const handleReset = () => {
     setFormData(defaultDataSection21);
   };
 
   return (
     <div className="min-h-[600px] w-full max-w-2xl md:max-w-5xl mx-auto bg-zinc-950 text-zinc-100 font-sans selection:bg-blue-500/30 flex flex-col lg:flex-row border border-zinc-800 md:overflow-hidden shadow-2xl">
-      {/* --- RIGHT PANEL: CONTROLS --- */}
       <div className="flex-1 bg-zinc-950 relative h-auto lg:h-auto">
         <div className="p-6 lg:p-8 space-y-10">
           <div className="flex justify-end">
@@ -102,7 +109,6 @@ const MutationSection21 = ({ data, onSubmit }: TitleFormProps) => {
             </button>
           </div>
 
-          {/* 1. Content Input */}
           <section className="space-y-6">
             <h3 className="text-sm font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-2">
               <Type size={14} /> Content
@@ -120,13 +126,11 @@ const MutationSection21 = ({ data, onSubmit }: TitleFormProps) => {
 
           <div className="w-full h-px bg-zinc-800/50" />
 
-          {/* 2. Typography Controls */}
           <section className="space-y-6 max-w-2xl md:max-w-5xl">
             <h3 className="text-sm font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-2">
               <Maximize2 size={14} /> Typography
             </h3>
 
-            {/* Alignment Toggles */}
             <div className="space-y-3">
               <Label className="text-xs text-zinc-500">Alignment</Label>
               <div className="flex bg-zinc-900/50 p-1 rounded-xl border border-zinc-800">
@@ -150,7 +154,6 @@ const MutationSection21 = ({ data, onSubmit }: TitleFormProps) => {
               </div>
             </div>
 
-            {/* Size Slider (Horizontal Scroll) */}
             <div className="space-y-3">
               <div className="flex justify-between">
                 <Label className="text-xs text-zinc-500">Font Size</Label>
@@ -173,12 +176,10 @@ const MutationSection21 = ({ data, onSubmit }: TitleFormProps) => {
                     </button>
                   ))}
                 </div>
-                {/* Fade overlay for scrolling hint */}
                 <div className="absolute right-0 top-0 bottom-4 w-12 bg-gradient-to-l from-zinc-950 to-transparent pointer-events-none" />
               </div>
             </div>
 
-            {/* Padding & Decoration Row */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-3">
                 <Label className="text-xs text-zinc-500">Spacing (Padding)</Label>
@@ -214,7 +215,6 @@ const MutationSection21 = ({ data, onSubmit }: TitleFormProps) => {
 
           <div className="w-full h-px bg-zinc-800/50" />
 
-          {/* 3. Interaction / Link Section */}
           <section>
             <div
               onClick={() => updateField('isLink', !formData.isLink)}
@@ -235,7 +235,6 @@ const MutationSection21 = ({ data, onSubmit }: TitleFormProps) => {
               <Switch checked={formData.isLink} onCheckedChange={c => updateField('isLink', c)} />
             </div>
 
-            {/* Expandable Link Settings */}
             <AnimatePresence>
               {formData.isLink && (
                 <motion.div
@@ -264,7 +263,6 @@ const MutationSection21 = ({ data, onSubmit }: TitleFormProps) => {
             </AnimatePresence>
           </section>
 
-          {/* Footer Action */}
           <div className="pt-6 border-t border-zinc-800 flex justify-end">
             <Button onClick={() => onSubmit(formData)} variant="outlineGlassy" className="w-full">
               <Save className="w-5 h-5 mr-2" />

@@ -1,14 +1,24 @@
+/*
+|-----------------------------------------
+| setting up Page for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import React, { useState } from 'react';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react';
-import ContinueWithGoogleButton from '@/components/common/GoogleButton';
+
 import { signUp, signIn } from '@/lib/auth-client';
+
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import ContinueWithGoogleButton from '@/components/common/GoogleButton';
 
 const RegistrationPage = () => {
   const router = useRouter();
@@ -23,7 +33,7 @@ const RegistrationPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null); // ✅ new error message state
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -86,10 +96,9 @@ const RegistrationPage = () => {
         initial={{ opacity: 0, y: 60 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
-        className="flex flex-col md:flex-row backdrop-blur-xl bg-white/10 rounded-2xl shadow-2xl overflow-hidden w-full max-w-5xl border border-white/20"
+        className=" flex-col md:flex-row backdrop-blur-xl bg-white/10 rounded-2xl shadow-2xl overflow-hidden w-full max-w-5xl border border-white/20"
       >
-        {/* ===== Left Part (Visual/Info Section) ===== */}
-        <div className="flex-1 flex flex-col items-center justify-center text-white p-8 relative">
+        <div className="flex-1 hidden md:flex flex-col items-center justify-center text-white p-8 relative">
           <motion.div animate={{ rotate: [0, 10, -10, 0] }} transition={{ repeat: Infinity, duration: 6 }} className="text-6xl font-extrabold drop-shadow-md">
             ✨
           </motion.div>
@@ -108,12 +117,10 @@ const RegistrationPage = () => {
           </p>
         </div>
 
-        {/* ===== Right Part (Form Section) ===== */}
         <div className="flex-1 bg-white/10 backdrop-blur-lg p-8 flex flex-col justify-center text-white">
           <h2 className="text-2xl md:text-3xl font-semibold text-center mb-6">Sign Up</h2>
 
           <form onSubmit={handleRegister} className="flex flex-col space-y-4">
-            {/* Full Name */}
             <div>
               <label htmlFor="name" className="block mb-1 text-sm">
                 Full Name
@@ -121,7 +128,6 @@ const RegistrationPage = () => {
               <Input id="name" name="name" type="text" value={name} onChange={handleChange} required placeholder="Enter your name" />
             </div>
 
-            {/* Email */}
             <div>
               <label htmlFor="email" className="block mb-1 text-sm">
                 Email Address
@@ -129,7 +135,6 @@ const RegistrationPage = () => {
               <Input id="email" name="email" type="email" value={email} onChange={handleChange} required placeholder="Enter your email" />
             </div>
 
-            {/* Password */}
             <div>
               <label htmlFor="password" className="block mb-1 text-sm">
                 Password
@@ -154,7 +159,6 @@ const RegistrationPage = () => {
               </div>
             </div>
 
-            {/* Confirm Password */}
             <div>
               <label htmlFor="confirmPassword" className="block mb-1 text-sm">
                 Confirm Password
@@ -180,7 +184,6 @@ const RegistrationPage = () => {
               </div>
             </div>
 
-            {/* --- Error Message --- */}
             {error && (
               <motion.div
                 initial={{ opacity: 0, y: -5 }}
@@ -192,7 +195,6 @@ const RegistrationPage = () => {
               </motion.div>
             )}
 
-            {/* --- Register Button --- */}
             <motion.button
               type="submit"
               disabled={loading || !email || !password}
@@ -247,14 +249,12 @@ const RegistrationPage = () => {
             </motion.button>
           </form>
 
-          {/* --- OR Divider --- */}
           <div className="flex items-center justify-center my-6">
             <div className="w-1/5 border-t border-white/30"></div>
             <span className="mx-3 text-sm text-white/70">OR</span>
             <div className="w-1/5 border-t border-white/30"></div>
           </div>
 
-          {/* --- Google Sign Up --- */}
           <div className="flex justify-center">
             <ContinueWithGoogleButton
               onClick={async () => {
@@ -278,7 +278,6 @@ const RegistrationPage = () => {
             />
           </div>
 
-          {/* --- Login Redirect --- */}
           <p className="text-center text-sm mt-6 text-white/80">
             Already have an account?{' '}
             <Link href="/login" className="text-blue-600 font-bold hover:underline">

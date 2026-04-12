@@ -1,33 +1,42 @@
+/*
+|-----------------------------------------
+| setting up Mutation for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import {
-  LayoutGrid,
-  Trello,
-  LayoutTemplate,
   Film,
   Plus,
-  Trash2,
-  Image as ImageIcon,
-  Sparkles,
   Move,
   Save,
-  Settings2,
   Images,
-  Maximize2,
+  Trash2,
+  Trello,
   Columns,
+  Sparkles,
   RotateCcw,
+  Settings2,
+  Maximize2,
+  LayoutGrid,
+  LayoutTemplate,
+  Image as ImageIcon,
 } from 'lucide-react';
-
-import ImageUploadManagerSingle from '@/components/dashboard-ui/ImageUploadManagerSingle';
 import Image from 'next/image';
-import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+
+import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
+import ImageUploadManagerSingle from '@/components/dashboard-ui/ImageUploadManagerSingle';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { cn } from '@/lib/utils';
+
 import { defaultDataSection28, GalleryFormProps, IGalleryData, IGalleryItem } from './data';
 
 const ScrollArea = ({ children, className }: { children: React.ReactNode; className?: string }) => {
@@ -69,7 +78,6 @@ const MutationSection28 = ({ data, onSubmit }: GalleryFormProps) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  // Image Logic
   const addImage = () => {
     const newImg: IGalleryItem = {
       id: Math.random().toString(36).substr(2, 9),
@@ -101,9 +109,7 @@ const MutationSection28 = ({ data, onSubmit }: GalleryFormProps) => {
 
   return (
     <div className="min-h-[700px] w-full max-w-6xl mx-auto bg-zinc-950 text-zinc-100 font-sans selection:bg-blue-500/30 flex flex-col lg:flex-row rounded-3xl border border-zinc-800 overflow-hidden shadow-2xl">
-      {/* --- RIGHT PANEL: CONTROLS --- */}
       <div className="lg:w-[45%] bg-zinc-950 relative flex flex-col h-[600px] lg:h-auto">
-        {/* Tab Navigation */}
         <div className="flex border-b border-zinc-800">
           <button
             onClick={() => setActiveTab('content')}
@@ -134,9 +140,7 @@ const MutationSection28 = ({ data, onSubmit }: GalleryFormProps) => {
             </div>
 
             {activeTab === 'content' ? (
-              /* --- TAB 1: IMAGE CONTENT --- */
               <div className="space-y-6">
-                {/* Filmstrip Selector */}
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
                     <Label className="text-[10px] uppercase font-bold text-zinc-500">Select Image</Label>
@@ -183,7 +187,6 @@ const MutationSection28 = ({ data, onSubmit }: GalleryFormProps) => {
 
                 <div className="w-full h-px bg-zinc-800/50" />
 
-                {/* Active Editor */}
                 {activeImage ? (
                   <motion.div key={activeImage.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
                     <div className="space-y-2">
@@ -206,9 +209,7 @@ const MutationSection28 = ({ data, onSubmit }: GalleryFormProps) => {
                 )}
               </div>
             ) : (
-              /* --- TAB 2: SETTINGS --- */
               <div className="space-y-8">
-                {/* Layout Type */}
                 <section className="space-y-4">
                   <Label className="flex items-center gap-2 text-sm font-bold text-zinc-400 uppercase tracking-wider">
                     <LayoutTemplate size={14} /> Layout Structure
@@ -223,7 +224,6 @@ const MutationSection28 = ({ data, onSubmit }: GalleryFormProps) => {
 
                 <div className="w-full h-px bg-zinc-800/50" />
 
-                {/* Dimensions */}
                 <section className="space-y-4">
                   <Label className="flex items-center gap-2 text-sm font-bold text-zinc-400 uppercase tracking-wider">
                     <Move size={14} /> Sizing & Spacing
@@ -308,7 +308,6 @@ const MutationSection28 = ({ data, onSubmit }: GalleryFormProps) => {
                   </div>
                 </section>
 
-                {/* Animation */}
                 <section className="space-y-4">
                   <Label className="flex items-center gap-2 text-sm font-bold text-zinc-400 uppercase tracking-wider">
                     <Sparkles size={14} /> Effects
@@ -337,7 +336,6 @@ const MutationSection28 = ({ data, onSubmit }: GalleryFormProps) => {
               </div>
             )}
 
-            {/* Footer Action */}
             <div className="pt-6 border-t border-zinc-800 flex justify-end">
               <Button onClick={() => onSubmit(formData)} variant="outlineGlassy" className="w-full">
                 <Save className="w-5 h-5 mr-2" />
@@ -348,7 +346,6 @@ const MutationSection28 = ({ data, onSubmit }: GalleryFormProps) => {
         </ScrollArea>
       </div>
 
-      {/* Styles */}
       <style>{`
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }

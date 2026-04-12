@@ -1,11 +1,19 @@
+/*
+|-----------------------------------------
+| setting up ComingSoon for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Mail } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
-import { BsDribbble, BsGithub, BsTwitter } from 'react-icons/bs';
+import Image from 'next/image';
+import { Mail } from 'lucide-react';
 import { FaFacebook } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { BsDribbble, BsGithub, BsTwitter } from 'react-icons/bs';
 
 interface CountdownState {
   days: number;

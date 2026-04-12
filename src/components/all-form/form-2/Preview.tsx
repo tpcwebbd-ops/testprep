@@ -1,3 +1,11 @@
+/*
+|-----------------------------------------
+| setting up Preview for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import { defaultDataForm2, IForm2Data, Form2Props } from './data';
 
 const PreviewForm2 = ({ data }: Form2Props) => {

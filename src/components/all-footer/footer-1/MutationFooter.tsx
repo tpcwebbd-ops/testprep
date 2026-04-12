@@ -1,40 +1,47 @@
-﻿'use client';
+﻿/*
+|-----------------------------------------
+| setting up MutationFooter for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
 
-import React, { useState, useCallback, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+'use client';
+
 import {
+  X,
   Save,
   Plus,
-  Trash2,
-  Upload,
-  X,
-  Globe,
-  Smartphone,
   Mail,
-  MapPin,
   Type,
+  Hash,
+  Grid,
+  Globe,
+  Search,
+  Upload,
+  Trash2,
+  MapPin,
   Square,
-  RectangleHorizontal,
   Loader2,
   Sparkles,
-  Image as ImageIcon,
-  Link as LinkIcon,
-  MessageCircle,
-  Hash,
-  ExternalLink,
-  ChevronRight,
-  Copyright,
-  LayoutTemplate,
-  Grid,
   RefreshCw,
-  Search,
+  Copyright,
+  Smartphone,
+  ChevronRight,
+  ExternalLink,
+  MessageCircle,
+  LayoutTemplate,
+  Link as LinkIcon,
+  Image as ImageIcon,
+  RectangleHorizontal,
 } from 'lucide-react';
 import Image from 'next/image';
 import Cropper from 'react-easy-crop';
+import { useRouter } from 'next/navigation';
 import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import imageCompression from 'browser-image-compression';
 import { motion, AnimatePresence } from 'framer-motion';
+import imageCompression from 'browser-image-compression';
+import React, { useState, useCallback, useEffect } from 'react';
 
 export interface ContactInfo {
   address: string;
@@ -122,7 +129,7 @@ const MutationFooter1 = ({ data, onSave }: MutationFooter1Props) => {
   const fetchMediaImages = useCallback(async () => {
     setLoadingMedia(true);
     try {
-      const response = await fetch('/api/media');
+      const response = await fetch('/api/media/v1');
       if (!response.ok) throw new Error('Failed to fetch media');
       const data = await response.json();
       if (data?.data && Array.isArray(data.data)) {
@@ -249,7 +256,7 @@ const MutationFooter1 = ({ data, onSave }: MutationFooter1Props) => {
 
       if (data.success) {
         const newUrl = data.data.url;
-        await fetch('/api/media', {
+        await fetch('/api/media/v1', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

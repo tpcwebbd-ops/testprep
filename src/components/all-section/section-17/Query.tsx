@@ -1,12 +1,22 @@
+/*
+|-----------------------------------------
+| setting up Query for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
+import Image from 'next/image';
 import React, { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
 import { ArrowUpRight, Calendar, Clock, User, Hash, Sparkles } from 'lucide-react';
-import { BlogPost, defaultDataSection17, ISection17Data } from './data';
+
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+
+import { BlogPost, defaultDataSection17, ISection17Data } from './data';
 
 interface Section17Props {
   data?: ISection17Data | string;
@@ -15,7 +25,6 @@ interface Section17Props {
 const QuerySection17: React.FC<Section17Props> = ({ data }) => {
   const [selectedCategory, setSelectedCategory] = useState('All');
 
-  // Parse and Memoize Data
   const sectionData: ISection17Data = useMemo(() => {
     if (!data) return defaultDataSection17;
     try {
@@ -26,22 +35,18 @@ const QuerySection17: React.FC<Section17Props> = ({ data }) => {
     }
   }, [data]);
 
-  // Memoize derived lists to prevent unnecessary re-renders and fix lint warnings
   const posts = useMemo(() => sectionData.allData || [], [sectionData]);
   const categories = useMemo(() => sectionData.categories || ['All'], [sectionData]);
 
-  // Identify Featured Post
   const featuredPost = useMemo(() => {
     return posts.find(p => p.featured) || posts[0];
   }, [posts]);
 
-  // Filter List
   const filteredPosts = useMemo(() => {
     let base = posts;
     if (selectedCategory !== 'All') {
       base = base.filter(p => p.category === selectedCategory);
     } else {
-      // Don't show the featured post in the grid if viewing 'All' to avoid duplication
       if (featuredPost) {
         base = base.filter(p => p.id !== featuredPost.id);
       }
@@ -51,7 +56,6 @@ const QuerySection17: React.FC<Section17Props> = ({ data }) => {
 
   return (
     <section className="relative w-full py-24 bg-zinc-950 min-h-screen text-zinc-100 selection:bg-indigo-500/30 font-sans overflow-hidden">
-      {/* Background Ambience */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 right-0 w-[60vw] h-[60vw] bg-indigo-900/10 rounded-full blur-[120px] mix-blend-screen" />
         <div className="absolute bottom-0 left-0 w-[60vw] h-[60vw] bg-fuchsia-900/10 rounded-full blur-[120px] mix-blend-screen" />
@@ -59,7 +63,6 @@ const QuerySection17: React.FC<Section17Props> = ({ data }) => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 md:px-8 relative z-10 space-y-20">
-        {/* --- 1. HERO / FEATURED SECTION --- */}
         {featuredPost && selectedCategory === 'All' && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -67,7 +70,6 @@ const QuerySection17: React.FC<Section17Props> = ({ data }) => {
             className="relative group rounded-[2.5rem] overflow-hidden border border-zinc-800 bg-zinc-900/40 hover:border-indigo-500/30 transition-all duration-700"
           >
             <div className="grid lg:grid-cols-2 gap-0 min-h-[500px]">
-              {/* Image Side */}
               <div className="relative h-[300px] lg:h-full overflow-hidden">
                 {featuredPost.coverImage && (
                   <Image
@@ -86,7 +88,6 @@ const QuerySection17: React.FC<Section17Props> = ({ data }) => {
                 </div>
               </div>
 
-              {/* Content Side */}
               <div className="p-8 lg:p-16 flex flex-col justify-center relative">
                 <div className="space-y-6">
                   <div className="flex items-center gap-4 text-sm text-zinc-400 font-mono">
@@ -126,9 +127,7 @@ const QuerySection17: React.FC<Section17Props> = ({ data }) => {
           </motion.div>
         )}
 
-        {/* --- 2. FEED SECTION --- */}
         <div className="space-y-10">
-          {/* Filters */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-zinc-800 pb-6">
             <h3 className="text-2xl font-bold flex items-center gap-3">
               Latest Posts <span className="text-sm font-normal text-zinc-500 font-mono bg-zinc-900 px-2 py-1 rounded-md">{filteredPosts.length}</span>
@@ -152,7 +151,6 @@ const QuerySection17: React.FC<Section17Props> = ({ data }) => {
             </div>
           </div>
 
-          {/* Grid */}
           <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 min-h-[400px]">
             <AnimatePresence mode="popLayout">
               {filteredPosts.map(post => (
@@ -186,7 +184,6 @@ const PostCard = ({ post }: { post: BlogPost }) => {
       transition={{ duration: 0.4 }}
       className="group flex flex-col h-full"
     >
-      {/* Image Card */}
       <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-6 bg-zinc-900 border border-zinc-800/50 group-hover:border-indigo-500/50 transition-colors">
         {post.coverImage ? (
           <Image src={post.coverImage} alt={post.title} fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
@@ -205,7 +202,6 @@ const PostCard = ({ post }: { post: BlogPost }) => {
         </div>
       </div>
 
-      {/* Content */}
       <div className="flex-1 flex flex-col space-y-4">
         <div className="flex items-center gap-3 text-xs text-zinc-500 font-mono">
           <span className="flex items-center gap-1">
@@ -232,7 +228,6 @@ const PostCard = ({ post }: { post: BlogPost }) => {
           ))}
         </div>
 
-        {/* Author footer */}
         <div className="pt-4 border-t border-zinc-800/50 flex items-center gap-3 mt-2">
           <div className="relative w-6 h-6 rounded-full overflow-hidden bg-zinc-800 border border-zinc-700">
             {post.author.avatar ? (

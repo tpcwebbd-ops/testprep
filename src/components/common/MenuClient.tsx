@@ -1,27 +1,36 @@
+/*
+|-----------------------------------------
+| setting up MenuClient for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Menu,
   X,
+  Menu,
+  Info,
+  Phone,
+  Users,
+  LogIn,
+  Settings,
+  LucideIcon,
+  HelpCircle,
   ChevronDown,
   ChevronRight,
-  GraduationCap,
-  Info,
   FolderKanban,
-  Phone,
-  Settings,
-  HelpCircle,
-  Users,
+  GraduationCap,
   LayoutDashboard,
-  LogIn,
-  LucideIcon,
 } from 'lucide-react';
-import { useSession } from '@/lib/auth-client';
+import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useMemo } from 'react';
+
+import { useSession } from '@/lib/auth-client';
 
 type BrandFontSize = 'text-lg' | 'text-xl' | 'text-2xl' | 'text-3xl';
 type BrandFontFamily = 'font-sans' | 'font-serif' | 'font-mono';

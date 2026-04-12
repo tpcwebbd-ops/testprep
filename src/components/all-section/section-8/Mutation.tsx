@@ -1,31 +1,41 @@
+/*
+|-----------------------------------------
+| setting up Mutation for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import {
-  Building2,
-  MapPin,
-  Save,
-  GraduationCap,
   X,
+  Save,
   Plus,
-  Trash2,
   Globe,
-  BookOpen,
   Clock,
+  Award,
+  MapPin,
+  Trash2,
+  BookOpen,
+  Settings2,
+  Briefcase,
+  Building2,
   DollarSign,
   ChevronDown,
-  Briefcase,
-  Award,
-  Settings2,
+  GraduationCap,
 } from 'lucide-react';
+import Image from 'next/image';
+import { useState, useEffect } from 'react';
+
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import ImageUploadManagerSingle from '@/components/dashboard-ui/ImageUploadManagerSingle';
+
 import type { ISection8Data } from './data';
 import { defaultDataSection8 } from './data';
-import ImageUploadManagerSingle from '@/components/dashboard-ui/ImageUploadManagerSingle';
-import Image from 'next/image';
 
 export interface Section8FormProps {
   data?: ISection8Data;
@@ -120,11 +130,9 @@ const MutationSection8 = ({ data, onSubmit }: Section8FormProps) => {
     const targetUni = { ...updatedUnis[uniIndex] };
     const updatedCourses = [...targetUni.courses];
 
-    // Ensure array exists
     const currentParams = updatedCourses[courseIndex].applyBtnParmsDegreeLevel || [];
     const newParams = [...currentParams];
 
-    // Fill gaps if any (though UI typically prevents this)
     while (newParams.length <= paramIndex) {
       newParams.push('');
     }
@@ -201,7 +209,6 @@ const MutationSection8 = ({ data, onSubmit }: Section8FormProps) => {
     updateRootField('universitys', updatedUnis);
   };
 
-  // Degree Level Info Handlers
   const addDegreeLevelInfo = (uniIndex: number, courseIndex: number) => {
     const updatedUnis = [...formData.universitys];
     const targetUni = { ...updatedUnis[uniIndex] };
@@ -565,7 +572,6 @@ const MutationSection8 = ({ data, onSubmit }: Section8FormProps) => {
                               </div>
 
                               <div className="pt-3 border-t border-zinc-800/50 mt-3 space-y-4">
-                                {/* DEGREE LEVEL INFO SECTION */}
                                 <div className="space-y-2">
                                   <div className="flex items-center justify-between">
                                     <Label className="text-[10px] font-bold text-zinc-500 flex items-center gap-2 uppercase tracking-wide">
@@ -631,9 +637,7 @@ const MutationSection8 = ({ data, onSubmit }: Section8FormProps) => {
                                   </div>
                                 </div>
 
-                                {/* HIDDEN PARAMS GRID */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-zinc-800/50">
-                                  {/* Standard Apply Params */}
                                   <div className="space-y-2">
                                     <Label className="text-[10px] font-bold text-zinc-600 block flex items-center gap-2">
                                       <div className="w-1.5 h-1.5 rounded-full bg-zinc-700" /> APPLY BTN PARAMS
@@ -651,7 +655,6 @@ const MutationSection8 = ({ data, onSubmit }: Section8FormProps) => {
                                     </div>
                                   </div>
 
-                                  {/* Degree Level Apply Params */}
                                   <div className="space-y-2">
                                     <div className="flex items-center justify-between">
                                       <Label className="text-[10px] font-bold text-zinc-600 block flex items-center gap-2">

@@ -1,3 +1,11 @@
+/*
+|-----------------------------------------
+| setting up Data for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 export interface GalleryProps {
   data?: IGalleryData | string;
 }
@@ -17,18 +25,15 @@ export type Gap = 'none' | 'sm' | 'md' | 'lg';
 export interface IGalleryData {
   images: IGalleryItem[];
 
-  // Layout
   layout: GalleryLayout;
-  columns: Columns; // Applies to Grid & Masonry
+  columns: Columns;
   gap: Gap;
   aspectRatio: 'auto' | 'square' | 'video' | 'portrait';
 
-  // Effects
   hoverEffect: HoverEffect;
   animation: AnimationType;
   showCaption: boolean;
 
-  // Visuals
   rounded: 'none' | 'sm' | 'md' | 'lg' | 'xl';
 }
 

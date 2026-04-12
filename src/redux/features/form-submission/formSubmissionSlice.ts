@@ -1,3 +1,11 @@
+/*
+|-----------------------------------------
+| setting up FormSubmissionSlice for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import { apiSlice } from '@/redux/api/apiSlice';
 
 export const formSubmissionApi = apiSlice.injectEndpoints({

@@ -1,4 +1,13 @@
+/*
+|-----------------------------------------
+| setting up Preview for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import { FileText, Download, Phone, Image as ImageIcon, FileCheck } from 'lucide-react';
+
 import { defaultDataForm7, IForm7Data } from './data';
 
 export interface PreviewProps {

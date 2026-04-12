@@ -1,4 +1,13 @@
+/*
+|-----------------------------------------
+| setting up Query for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import Image from 'next/image';
+
 import { defaultDataSection1, ISection1Data, Section1Props } from './data';
 
 const QuerySection1 = ({ data }: Section1Props) => {
@@ -46,7 +55,6 @@ const QuerySection1 = ({ data }: Section1Props) => {
                   </div>
                 ))
               ) : (
-                // Fallback if no images exist
                 <div className="w-8 h-8 rounded-full bg-slate-800 border-2 border-slate-900 flex items-center justify-center">
                   <span className="text-xs text-gray-500">?</span>
                 </div>

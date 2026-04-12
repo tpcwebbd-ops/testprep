@@ -1,15 +1,24 @@
+/*
+|-----------------------------------------
+| setting up Mutation for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
+import { Sparkles, X, LayoutTemplate, Save, Image as ImageIcon } from 'lucide-react';
+
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Sparkles, X, LayoutTemplate, Save, Image as ImageIcon } from 'lucide-react';
+import ImageUploadManagerSingle from '@/components/dashboard-ui/ImageUploadManagerSingle';
 
 import type { ISection2Data } from './data';
 import { defaultDataSection2 } from './data';
-import ImageUploadManagerSingle from '@/components/dashboard-ui/ImageUploadManagerSingle';
 
 export interface SectionFormProps {
   data?: ISection2Data;
@@ -51,7 +60,6 @@ const MutationSection2 = ({ data, onSubmit }: SectionFormProps) => {
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 p-4 md:p-8 font-sans">
       <div className="max-w-6xl mx-auto bg-zinc-900/50 border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl">
-        {/* Header */}
         <div className="p-6 border-b border-zinc-800 bg-zinc-900/80 backdrop-blur flex items-center gap-3">
           <div className="p-2 bg-purple-500/10 rounded-lg">
             <LayoutTemplate className="text-purple-400" size={24} />
@@ -62,9 +70,7 @@ const MutationSection2 = ({ data, onSubmit }: SectionFormProps) => {
           </div>
         </div>
 
-        {/* Content Grid */}
         <div className="p-6 md:p-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Left Column: Main Content */}
           <div className="space-y-6">
             <div className="space-y-4">
               <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider flex items-center gap-2">
@@ -123,7 +129,6 @@ const MutationSection2 = ({ data, onSubmit }: SectionFormProps) => {
             </div>
           </div>
 
-          {/* Right Column: Media & Extras */}
           <div className="space-y-6">
             <div className="space-y-4">
               <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider flex items-center gap-2">
@@ -227,7 +232,6 @@ const MutationSection2 = ({ data, onSubmit }: SectionFormProps) => {
           </div>
         </div>
 
-        {/* Footer */}
         <div className="p-6 border-t border-zinc-800 bg-zinc-900/80 backdrop-blur flex justify-end">
           <Button onClick={handleSave} variant="outlineGlassy" size="sm">
             <Save className="w-5 h-5 mr-2" />

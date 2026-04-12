@@ -1,3 +1,11 @@
+/*
+|-----------------------------------------
+| setting up Controller for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import mongoose from 'mongoose';
 import Profile from './model';
 
@@ -7,14 +15,12 @@ interface IResponse {
   status: number;
 }
 
-// Centralized response helper
 const formatResponse = (data: unknown, message: string, status: number): IResponse => ({
   data,
   message,
   status,
 });
 
-// Connect to MongoDB once and reuse
 async function connectDB() {
   if (mongoose.connection.readyState === 0) {
     await mongoose.connect(process.env.mongooseURI!);
@@ -27,7 +33,6 @@ export async function createProfile(req: Request): Promise<IResponse> {
     await connectDB();
     const profileData = await req.json();
 
-    // Check if profile already exists for this user
     const existingProfile = await Profile.findOne({ userId: profileData.userId });
     if (existingProfile) {
       return formatResponse(null, 'Profile already exists for this user', 400);
@@ -44,7 +49,6 @@ export async function createProfile(req: Request): Promise<IResponse> {
   }
 }
 
-// GET single Profile by userId
 export async function getProfileByUserId(req: Request): Promise<IResponse> {
   await connectDB();
   const userId = new URL(req.url).searchParams.get('userId');
@@ -52,7 +56,6 @@ export async function getProfileByUserId(req: Request): Promise<IResponse> {
 
   const profile = await Profile.findOne({ userId });
   if (!profile) {
-    // Return empty profile structure instead of error
     return formatResponse(
       {
         userId,
@@ -74,7 +77,6 @@ export async function getProfileByUserId(req: Request): Promise<IResponse> {
   return formatResponse(profile, 'Profile fetched successfully', 200);
 }
 
-// GET Profile by ID
 export async function getProfileById(req: Request): Promise<IResponse> {
   await connectDB();
   const id = new URL(req.url).searchParams.get('id');
@@ -86,21 +88,14 @@ export async function getProfileById(req: Request): Promise<IResponse> {
   return formatResponse(profile, 'Profile fetched successfully', 200);
 }
 
-// UPDATE Profile
 export async function updateProfile(req: Request): Promise<IResponse> {
   await connectDB();
   const { userId, ...updateData } = await req.json();
 
   if (!userId) return formatResponse(null, 'User ID is required', 400);
 
-  // Try to update existing profile
-  let updatedProfile = await Profile.findOneAndUpdate(
-    { userId },
-    { $set: updateData },
-    { new: true, runValidators: true },
-  );
+  let updatedProfile = await Profile.findOneAndUpdate({ userId }, { $set: updateData }, { new: true, runValidators: true });
 
-  // If no profile exists, create one
   if (!updatedProfile) {
     updatedProfile = await Profile.create({ userId, ...updateData });
     return formatResponse(updatedProfile, 'Profile created successfully', 201);
@@ -109,7 +104,6 @@ export async function updateProfile(req: Request): Promise<IResponse> {
   return formatResponse(updatedProfile, 'Profile updated successfully', 200);
 }
 
-// DELETE Profile
 export async function deleteProfile(req: Request): Promise<IResponse> {
   await connectDB();
   const { userId } = await req.json();

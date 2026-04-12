@@ -1,13 +1,21 @@
+/*
+|-----------------------------------------
+| setting up Query for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import React, { useState, useMemo } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
+import Image from 'next/image';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { MapPin, GraduationCap, ArrowRight, Clock, DollarSign, ChevronDown, Building2, Globe, Search, BookOpenCheck, Sparkles, Award } from 'lucide-react';
+
 import { defaultDataSection8, ISection8Data } from './data';
 
-// Simple utility for class merging
 const classNames = (...classes: (string | undefined | null | false)[]) => classes.filter(Boolean).join(' ');
 
 export interface Section8Props {
@@ -18,7 +26,6 @@ const ClientSection8: React.FC<Section8Props> = ({ data }) => {
   const [activeTab, setActiveTab] = useState<string>('All');
   const [expandedUni, setExpandedUni] = useState<string | null>(null);
 
-  // Parse Data
   const sectionData: ISection8Data = useMemo(() => {
     if (!data) return defaultDataSection8;
     try {
@@ -29,13 +36,11 @@ const ClientSection8: React.FC<Section8Props> = ({ data }) => {
     }
   }, [data]);
 
-  // Extract Cities for Tabs
   const cities = useMemo(() => {
     const uniqueCities = Array.from(new Set(sectionData.city || []));
     return ['All', ...uniqueCities];
   }, [sectionData.city]);
 
-  // Filter Universities
   const filteredUniversities = useMemo(() => {
     if (activeTab === 'All') return sectionData.universitys;
     return sectionData.universitys.filter(
@@ -61,7 +66,6 @@ const ClientSection8: React.FC<Section8Props> = ({ data }) => {
 
   return (
     <section className="relative w-full min-h-screen bg-slate-50 py-20 lg:py-28 font-sans text-slate-900 overflow-hidden selection:bg-indigo-100 selection:text-indigo-900">
-      {/* Background Decor */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[100vw] h-[600px] bg-gradient-to-b from-indigo-50/50 to-transparent" />
         <div className="absolute -top-[10%] -right-[5%] w-[40vw] h-[40vw] bg-indigo-200/20 rounded-full blur-3xl opacity-60" />
@@ -69,7 +73,6 @@ const ClientSection8: React.FC<Section8Props> = ({ data }) => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        {/* Header Section */}
         <div className="flex flex-col items-center text-center space-y-8 mb-16">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -92,7 +95,6 @@ const ClientSection8: React.FC<Section8Props> = ({ data }) => {
               Study in <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">{sectionData.country}</span>
             </h1>
 
-            {/* Total Count Badge */}
             <div className="absolute -top-6 -right-6 md:-right-12 rotate-12 bg-yellow-400 text-yellow-950 text-xs font-black px-3 py-1.5 rounded-lg shadow-lg border-2 border-white transform hover:rotate-0 transition-transform cursor-default z-20">
               {sectionData.universitys.length} Universities
             </div>
@@ -109,7 +111,6 @@ const ClientSection8: React.FC<Section8Props> = ({ data }) => {
           </motion.p>
         </div>
 
-        {/* Tabs Section */}
         <LayoutGroup>
           <motion.div
             className="flex flex-wrap justify-center gap-2 mb-12"
@@ -145,7 +146,6 @@ const ClientSection8: React.FC<Section8Props> = ({ data }) => {
             })}
           </motion.div>
 
-          {/* Universities List (Accordion Style) */}
           <motion.div layout className="max-w-4xl mx-auto space-y-4">
             <AnimatePresence mode="popLayout">
               {filteredUniversities.length > 0 ? (
@@ -164,10 +164,8 @@ const ClientSection8: React.FC<Section8Props> = ({ data }) => {
                         : 'border-slate-200 shadow-sm hover:shadow-md hover:border-indigo-200',
                     )}
                   >
-                    {/* Accordion Header */}
                     <div onClick={() => toggleUni(uni.id)} className="cursor-pointer group relative p-5 sm:p-6">
                       <div className="flex items-center gap-6">
-                        {/* University Image/Logo */}
                         <div className="relative h-16 w-16 sm:h-20 sm:w-20 shrink-0 rounded-2xl overflow-hidden bg-slate-100 border border-slate-100 shadow-inner">
                           {uni.image ? (
                             <Image src={uni.image} alt={uni.name} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
@@ -178,7 +176,6 @@ const ClientSection8: React.FC<Section8Props> = ({ data }) => {
                           )}
                         </div>
 
-                        {/* Summary Info */}
                         <div className="flex-grow min-w-0">
                           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-1">
                             <h3 className="text-xl font-bold text-slate-900 truncate pr-4 group-hover:text-indigo-600 transition-colors">{uni.name}</h3>
@@ -200,7 +197,6 @@ const ClientSection8: React.FC<Section8Props> = ({ data }) => {
                           </div>
                         </div>
 
-                        {/* Chevron */}
                         <div
                           className={classNames(
                             'flex h-10 w-10 shrink-0 items-center justify-center rounded-full border transition-all duration-300',
@@ -214,7 +210,6 @@ const ClientSection8: React.FC<Section8Props> = ({ data }) => {
                       </div>
                     </div>
 
-                    {/* Accordion Content */}
                     <AnimatePresence>
                       {expandedUni === uni.id && (
                         <motion.div
@@ -249,7 +244,6 @@ const ClientSection8: React.FC<Section8Props> = ({ data }) => {
                                       <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">{course.description}</p>
                                     </div>
 
-                                    {/* Detailed Degree Info List */}
                                     {course.degreeLevelInfo && course.degreeLevelInfo.length > 0 ? (
                                       <div className="space-y-2 mb-4">
                                         {course.degreeLevelInfo.map(info => (
@@ -276,7 +270,6 @@ const ClientSection8: React.FC<Section8Props> = ({ data }) => {
                                         ))}
                                       </div>
                                     ) : (
-                                      /* Fallback Generic Info if no specific degree info */
                                       <div className="flex flex-wrap gap-2 mb-4">
                                         <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 text-xs font-bold">
                                           <Clock size={12} className="text-slate-400" />
@@ -339,7 +332,6 @@ const ClientSection8: React.FC<Section8Props> = ({ data }) => {
           </motion.div>
         </LayoutGroup>
 
-        {/* Footer info/decoration */}
         <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mt-20 text-center">
           <div className="inline-flex items-center gap-2 text-slate-400 text-sm font-medium">
             <Sparkles size={14} />

@@ -1,3 +1,11 @@
+/*
+|-----------------------------------------
+| setting up Utils for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 export interface IResponse {
   data: unknown;
   message: string;
@@ -5,7 +13,6 @@ export interface IResponse {
   ok?: boolean;
 }
 
-// Helper to format responses
 export const formatResponse = (data: unknown, message: string, status: number): IResponse => ({
   data,
   message,

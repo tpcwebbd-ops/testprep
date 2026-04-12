@@ -1,3 +1,11 @@
+/*
+|-----------------------------------------
+| setting up Data for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 export interface ImagesProps {
   data?: IImagesData | string;
 }
@@ -9,19 +17,16 @@ export type ImageWidth = 'auto' | '50%' | '75%' | '100%' | 'fixed-sm' | 'fixed-m
 export type GridColumns = 1 | 2 | 3 | 4;
 
 export interface IImagesData {
-  images: string[]; // Array of image URLs
+  images: string[];
 
-  // Positioning & Layout
   alignment: ImageAlign;
   gridColumns: GridColumns;
   gap: 'sm' | 'md' | 'lg' | 'none';
 
-  // Sizing
   width: ImageWidth;
   aspectRatio: ImageAspectRatio;
   objectFit: ImageFit;
 
-  // Styling
   borderRadius: 'none' | 'sm' | 'md' | 'lg' | 'full';
   shadow: boolean;
 }
@@ -38,21 +43,17 @@ export const defaultDataSection24: IImagesData = {
   shadow: true,
 };
 
-// --- Main Component ---
-
 export interface ImagesFormProps {
   data?: IImagesData;
   onSubmit: (values: IImagesData) => void;
 }
 
-// 1. Map Alignment (Container)
 export const alignClass = {
   left: 'justify-start',
   center: 'justify-center',
   right: 'justify-end',
 }[defaultDataSection24.alignment];
 
-// 2. Map Width (Container)
 export const widthClass = {
   auto: 'w-auto',
   '100%': 'w-full',
@@ -63,7 +64,6 @@ export const widthClass = {
   'fixed-lg': 'w-[600px]',
 }[defaultDataSection24.width];
 
-// 3. Map Aspect Ratio (Image Wrapper)
 export const aspectClass = {
   auto: 'aspect-auto',
   '1/1': 'aspect-square',
@@ -73,7 +73,6 @@ export const aspectClass = {
   '3/2': 'aspect-[3/2]',
 }[defaultDataSection24.aspectRatio];
 
-// 4. Grid Configuration
 export const gridClass = {
   1: 'grid-cols-1',
   2: 'grid-cols-1 sm:grid-cols-2',
@@ -88,7 +87,6 @@ export const gapClass = {
   lg: 'gap-8',
 }[defaultDataSection24.gap];
 
-// 5. Style Mapping
 export const radiusClass = {
   none: 'rounded-none',
   sm: 'rounded-sm',

@@ -1,11 +1,17 @@
+/*
+|-----------------------------------------
+| setting up Controller for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import { withDB } from '@/app/api/utils/db';
-import Verification from '../model';
-
 import { formatResponse, IResponse } from '@/app/api/utils/utils';
-import { logger } from 'better-auth';
 
+import Verification from '../model';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function getVerificationSummary(req: Request): Promise<IResponse> {
-  logger.info(JSON.stringify(req));
   return withDB(async () => {
     const now = new Date();
     const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);

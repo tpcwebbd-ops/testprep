@@ -1,22 +1,31 @@
+/*
+|-----------------------------------------
+| setting up Page for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+
+import { Button } from '@/components/ui/button';
+import { CustomLink } from '@/components/common/LinkButton';
 import { Video, ImageIcon, FileText, FileCode, Music, Database, LayoutGrid, VideoIcon } from 'lucide-react';
 
-import { CustomLink } from '@/components/common/LinkButton';
 
-import ImageUploadManagerSingle from '../uploadthings/components/ImageUploadMangerSingle';
-import ImageUploadManager from '../uploadthings/components/ImageUploadManger';
-import VideoUploadMangerSingle from '../uploadthings/components/VideoUploadMangerSingle';
-import VideoUploadManger from '../uploadthings/components/VideoUploadManger';
-import PdfUploadManagerSingle from '../uploadthings/components/PdfUploadManagerSingle';
 import PdfUploadManager from '../uploadthings/components/PdfUploadManager';
-import DocxUploadManagerSingle from '../uploadthings/components/DocxUploadManagerSingle';
 import DocxUploadManager from '../uploadthings/components/DocxUploadManager';
-import AudioUploadManagerSingle from '../uploadthings/components/AudioUploadManagerSingle';
+import VideoUploadManger from '../uploadthings/components/VideoUploadManger';
+import ImageUploadManager from '../uploadthings/components/ImageUploadManger';
 import AudioUploadManager from '../uploadthings/components/AudioUploadManager';
-import { Button } from '@/components/ui/button';
+import PdfUploadManagerSingle from '../uploadthings/components/PdfUploadManagerSingle';
+import VideoUploadMangerSingle from '../uploadthings/components/VideoUploadMangerSingle';
+import DocxUploadManagerSingle from '../uploadthings/components/DocxUploadManagerSingle';
+import ImageUploadManagerSingle from '../uploadthings/components/ImageUploadMangerSingle';
+import AudioUploadManagerSingle from '../uploadthings/components/AudioUploadManagerSingle';
 
 type TabType = 'image' | 'video' | 'pdf' | 'docx' | 'audio';
 

@@ -1,17 +1,26 @@
+/*
+|-----------------------------------------
+| setting up Mutation for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Clock, Monitor, Smartphone, Tablet, Grid, Link as LinkIcon, Save, Settings2, RotateCcw } from 'lucide-react';
 
-import ImageUploadManagerSingle from '@/components/dashboard-ui/ImageUploadManagerSingle';
-import Image from 'next/image';
-import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
+import ImageUploadManagerSingle from '@/components/dashboard-ui/ImageUploadManagerSingle';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { cn } from '@/lib/utils';
+
 import { defaultDataSection27, ILogoData, ILogoItem, LogoFormProps } from './data';
 
 const ScrollArea = ({ children, className }: { children: React.ReactNode; className?: string }) => {
@@ -93,7 +102,6 @@ const MutationSection27 = ({ data, onSubmit }: LogoFormProps) => {
     }));
   };
 
-  // Logo Logic
   const addLogo = () => {
     const newLogo: ILogoItem = {
       id: Math.random().toString(36).substr(2, 9),
@@ -126,9 +134,7 @@ const MutationSection27 = ({ data, onSubmit }: LogoFormProps) => {
 
   return (
     <div className="min-h-[600px] w-full max-w-5xl mx-auto bg-zinc-950 text-zinc-100 font-sans selection:bg-blue-500/30 flex flex-col lg:flex-row rounded-3xl border border-zinc-800 overflow-hidden shadow-2xl">
-      {/* --- RIGHT PANEL: CONTROLS --- */}
       <div className="lg:w-1/2 bg-zinc-950 relative flex flex-col h-[600px] lg:h-auto">
-        {/* Tabs */}
         <div className="flex border-b border-zinc-800">
           <button
             onClick={() => setActiveTab('assets')}
@@ -159,7 +165,6 @@ const MutationSection27 = ({ data, onSubmit }: LogoFormProps) => {
             </div>
 
             {activeTab === 'assets' ? (
-              /* --- TAB 1: LOGO ASSETS --- */
               <div className="space-y-6">
                 <div className="flex justify-between items-center">
                   <span className="text-xs text-zinc-500">Manage Client Logos</span>
@@ -168,7 +173,6 @@ const MutationSection27 = ({ data, onSubmit }: LogoFormProps) => {
                   </Button>
                 </div>
 
-                {/* Logo Grid Selection */}
                 <div className="grid grid-cols-4 gap-2">
                   {formData.logos.map((logo, idx) => (
                     <button
@@ -188,7 +192,6 @@ const MutationSection27 = ({ data, onSubmit }: LogoFormProps) => {
                           <span className="text-[9px] font-bold">{idx + 1}</span>
                         </div>
                       )}
-                      {/* Remove Button Overlay */}
                       <div
                         onClick={e => removeLogo(idx, e)}
                         className="absolute top-0.5 right-0.5 bg-black/60 text-white p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-red-500 transition-all"
@@ -207,7 +210,6 @@ const MutationSection27 = ({ data, onSubmit }: LogoFormProps) => {
 
                 <div className="w-full h-px bg-zinc-800/50" />
 
-                {/* Active Editor */}
                 {activeLogo ? (
                   <motion.div
                     key={activeLogo.id}
@@ -246,9 +248,7 @@ const MutationSection27 = ({ data, onSubmit }: LogoFormProps) => {
                 )}
               </div>
             ) : (
-              /* --- TAB 2: SETTINGS --- */
               <div className="space-y-8">
-                {/* Responsive Settings */}
                 <section className="space-y-4">
                   <Label className="flex items-center gap-2 text-sm font-bold text-zinc-400 uppercase tracking-wider">
                     <Monitor size={14} /> Responsive Columns
@@ -283,14 +283,12 @@ const MutationSection27 = ({ data, onSubmit }: LogoFormProps) => {
 
                 <div className="w-full h-px bg-zinc-800/50" />
 
-                {/* Behavior Settings */}
                 <section className="space-y-4">
                   <Label className="flex items-center gap-2 text-sm font-bold text-zinc-400 uppercase tracking-wider">
                     <Clock size={14} /> Behavior & Styles
                   </Label>
 
                   <div className="space-y-3">
-                    {/* Autoplay */}
                     <div className="flex items-center justify-between p-3 bg-zinc-900/30 border border-zinc-800 rounded-xl">
                       <div>
                         <p className="text-xs text-zinc-200 font-medium">Autoplay Speed</p>
@@ -310,7 +308,6 @@ const MutationSection27 = ({ data, onSubmit }: LogoFormProps) => {
                       </div>
                     </div>
 
-                    {/* Visual Toggles */}
                     <div className="grid grid-cols-2 gap-3">
                       <div
                         className={cn(
@@ -330,7 +327,6 @@ const MutationSection27 = ({ data, onSubmit }: LogoFormProps) => {
                   </div>
                 </section>
 
-                {/* Nav Settings */}
                 <section className="space-y-2">
                   <span className="text-xs text-zinc-500">Navigation Controls</span>
                   <Select value={formData.navPosition} onValueChange={val => updateField('navPosition', val)}>
@@ -347,7 +343,6 @@ const MutationSection27 = ({ data, onSubmit }: LogoFormProps) => {
               </div>
             )}
 
-            {/* Footer Action */}
             <div className="pt-6 border-t border-zinc-800 flex justify-end">
               <Button onClick={() => onSubmit(formData)} variant="outlineGlassy" className="w-full">
                 <Save className="w-5 h-5 mr-2" />
@@ -358,7 +353,6 @@ const MutationSection27 = ({ data, onSubmit }: LogoFormProps) => {
         </ScrollArea>
       </div>
 
-      {/* Scrollbar hiding utility */}
       <style>{`
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }

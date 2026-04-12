@@ -1,14 +1,22 @@
+/*
+|-----------------------------------------
+| setting up DateRangePickerField for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import * as React from 'react';
 import { format } from 'date-fns';
-import { Calendar as CalendarIcon } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
+import { Calendar as CalendarIcon } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
+import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
-import { Label } from '@/components/ui/label';
 
 export interface DateRangePickerProps {
   value: DateRange | undefined;
@@ -23,7 +31,6 @@ export default function DateRangePickerField({ id, label, value, onChange, place
   const [isOpen, setIsOpen] = React.useState(false);
   const ref = React.useRef<HTMLDivElement>(null);
 
-  // ✅ Hide calendar when clicking outside
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (ref.current && !ref.current.contains(event.target as Node)) {
@@ -35,21 +42,13 @@ export default function DateRangePickerField({ id, label, value, onChange, place
   }, []);
 
   return (
-    <div
-      ref={ref}
-      className={cn(
-        'relative grid w-full items-center gap-1.5',
-        isOpen && 'mb-64', // ✅ Prevent overlap
-        className,
-      )}
-    >
+    <div ref={ref} className={cn('relative grid w-full items-center gap-1.5', isOpen && 'mb-64', className)}>
       {label && (
         <Label className="text-white/90 drop-shadow-sm" htmlFor={id}>
           {label}
         </Label>
       )}
 
-      {/* ✅ Glassmorphism Trigger Button */}
       <Button
         id={id}
         variant="outline"
@@ -77,7 +76,6 @@ export default function DateRangePickerField({ id, label, value, onChange, place
         )}
       </Button>
 
-      {/* ✅ Glassmorphism Calendar Dropdown */}
       {isOpen && (
         <div
           className="

@@ -2,19 +2,20 @@
 |-----------------------------------------
 | setting up Page for the App
 | @author: Toufiquer Rahman<toufiquer.0@gmail.com>
-| @copyright: App Generator-webapp, October, 2025
+| @copyright: Toufiquer, April, 2026
 |-----------------------------------------
 */
 
 'use client';
 
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Loader2, MailCheck } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { authClient } from '@/lib/auth-client';
-import { toast } from 'react-toastify';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { toast } from 'react-toastify';
+import React, { useState } from 'react';
+import { Loader2, MailCheck } from 'lucide-react';
+
+import { authClient } from '@/lib/auth-client';
+import { Button } from '@/components/ui/button';
 
 const ForgetPassword = () => {
   const [email, setEmail] = useState('');
@@ -43,14 +44,13 @@ const ForgetPassword = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-500 via-purple-500 to-indigo-500 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-500 via-purple-500 to-indigo-500 p-4 pt-12">
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
         className="flex flex-col md:flex-row backdrop-blur-2xl bg-white/10 rounded-2xl shadow-2xl overflow-hidden w-full max-w-4xl border border-white/20"
       >
-        {/* ===== Left Side (Animated Illustration Part) ===== */}
         <div className="flex-1 flex flex-col items-center justify-center text-white p-8 relative overflow-hidden">
           <motion.div
             animate={{ rotate: [0, 10, -10, 0] }}
@@ -73,7 +73,6 @@ const ForgetPassword = () => {
             No worries — we’ll send you a password reset link to your email so you can safely get back in.
           </p>
 
-          {/* Glowing animation background */}
           <motion.div
             className="absolute bottom-10 left-1/2 -translate-x-1/2 h-28 w-28 bg-white/20 rounded-full blur-3xl"
             animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.6, 0.4] }}
@@ -81,7 +80,6 @@ const ForgetPassword = () => {
           />
         </div>
 
-        {/* ===== Right Side (Form Part) ===== */}
         <div className="flex-1 bg-white/10 backdrop-blur-lg p-8 flex flex-col justify-center">
           <h2 className="text-2xl md:text-3xl font-semibold text-center text-white mb-6">Reset Password</h2>
 

@@ -1,17 +1,25 @@
+/*
+|-----------------------------------------
+| setting up FilterDialog for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
+import { DateRange } from 'react-day-picker';
+import { Calendar as CalendarIcon } from 'lucide-react';
 import React, { useState, useMemo, useEffect } from 'react';
 import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
-import { Calendar as CalendarIcon } from 'lucide-react';
-import { DateRange } from 'react-day-picker';
 
 import { cn } from '@/lib/utils';
+import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 
 export type FilterPayload = { type: 'month'; value: { start: string; end: string } } | { type: 'range'; value: { start: string; end: string } };
 

@@ -1,8 +1,15 @@
-// InputFieldForPasscode.tsx
+/*
+|-----------------------------------------
+| setting up InputFieldForPasscode for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
 
-import { Input } from '@/components/ui/input';
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
+
+import { Input } from '@/components/ui/input';
 
 const InputFieldForPasscode = ({ id, value, onChange }: { id: string; value: string; onChange: (e: string) => void }) => {
   const [showPasscode, setShowPasscode] = useState(false);

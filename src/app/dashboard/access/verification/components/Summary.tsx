@@ -1,31 +1,37 @@
+/*
+|-----------------------------------------
+| setting up Summary for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
+import {
+  Bar,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  Legend,
+  Tooltip,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  PieLabelRenderProps,
+  PieChart as RechartsPieChart,
+} from 'recharts';
 import { useState } from 'react';
 import { Loader2, TrendingUp, BarChart3, PieChart, Calendar, Activity } from 'lucide-react';
 
-import { useGetVerificationsSummaryQuery } from '@/redux/features/verifications/verificationsSlice';
-
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
-
 import { cn } from '@/lib/utils';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  PieChart as RechartsPieChart,
-  Pie,
-  Cell,
-  PieLabelRenderProps,
-} from 'recharts';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useGetVerificationsSummaryQuery } from '@/redux/features/verifications/verificationsSlice';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 
 interface SummaryData {
   overall: {
@@ -68,7 +74,6 @@ const VerificationsSummary = () => {
 
   const summaryKeys = summaryData?.tableSummary ? Object.keys(summaryData.tableSummary).filter(key => key !== 'totalMonths') : [];
 
-  // Prepare chart data
   const barChartData =
     summaryData?.monthlyTable?.map(row => {
       const formattedRow: Record<string, number | string> = {};
@@ -130,7 +135,6 @@ const VerificationsSummary = () => {
 
         {!isLoading && !isError && summaryData && (
           <div className="space-y-6 py-2">
-            {/* Core Stats - 3 column grid on desktop, stack on mobile */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Card className="border-white/20 bg-gradient-to-br from-blue-500/20 to-blue-600/10 backdrop-blur-xl shadow-lg text-white hover:shadow-blue-500/20 transition-all duration-300 hover:scale-[1.02]">
                 <CardContent className="p-6">
@@ -175,7 +179,6 @@ const VerificationsSummary = () => {
               </Card>
             </div>
 
-            {/* Overall Stats Chart and Grand Total - 2 columns on desktop, stack on mobile */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card className="border-white/20 bg-white/5 backdrop-blur-xl shadow-lg text-white">
                 <CardHeader>
@@ -269,7 +272,6 @@ const VerificationsSummary = () => {
               )}
             </div>
 
-            {/* Monthly Data with View Toggle */}
             {summaryData.monthlyTable && (
               <Card className="border-white/20 bg-white/5 backdrop-blur-xl shadow-lg text-white">
                 <CardHeader>
@@ -444,7 +446,6 @@ const VerificationsSummary = () => {
           </div>
         )}
 
-        {/* Pagination */}
         <DialogFooter className="border-t border-white/10 pt-4 mt-2">
           {summaryData?.pagination && summaryData.pagination.totalPages > 1 && (
             <Pagination className="text-white w-full justify-center">

@@ -1,4 +1,13 @@
+/*
+|-----------------------------------------
+| setting up Input for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import * as React from 'react';
+
 import { cn } from '@/lib/utils';
 
 function Input({ className, type, ...props }: React.ComponentProps<'input'>) {

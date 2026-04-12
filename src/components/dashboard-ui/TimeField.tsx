@@ -1,13 +1,21 @@
+/*
+|-----------------------------------------
+| setting up TimeField for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import * as React from 'react';
-import { Clock } from 'lucide-react';
 import { format } from 'date-fns';
+import { Clock } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
+import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Label } from '@/components/ui/label';
 
 export interface TimeFieldProps {
   value: string | null | undefined;
@@ -77,14 +85,7 @@ export default function TimeField({ id, label, value, onChange, placeholder = 'P
   const minutes = Array.from({ length: 60 }, (_, i) => i);
 
   return (
-    <div
-      ref={ref}
-      className={cn(
-        'relative grid w-full items-center gap-1.5',
-        isOpen && 'mb-64', // ✅ Prevent overlap below
-        className,
-      )}
-    >
+    <div ref={ref} className={cn('relative grid w-full items-center gap-1.5', isOpen && 'mb-64', className)}>
       {label && <Label className="text-white/90 drop-shadow-sm">{label}</Label>}
 
       <Button

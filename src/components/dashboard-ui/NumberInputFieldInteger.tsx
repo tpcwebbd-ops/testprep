@@ -1,7 +1,13 @@
-// NumberInputFieldInteger.tsx
+/*
+|-----------------------------------------
+| setting up NumberInputFieldInteger for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
 
-import { Input } from '@/components/ui/input';
 import React from 'react';
+import { Input } from '@/components/ui/input';
 
 const NumberInputFieldInteger = ({
   id = Math.random().toString(36).substring(2),

@@ -1,15 +1,25 @@
+/*
+|-----------------------------------------
+| setting up Mutation for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
+import Image from 'next/image';
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from '@/components/ui/button';
+import { Save, Plus, Trash2, Users, Handshake, Briefcase, LayoutTemplate, ImageIcon, X, Sparkles, Tag } from 'lucide-react';
+
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Save, Plus, Trash2, Users, Handshake, Briefcase, LayoutTemplate, ImageIcon, X, Sparkles, Tag } from 'lucide-react';
-import { ISection13Data, defaultDataSection13, IPartner, ICollabOption } from './data';
 import ImageUploadManagerSingle from '@/components/dashboard-ui/ImageUploadManagerSingle';
-import Image from 'next/image';
+
+import { ISection13Data, defaultDataSection13, IPartner, ICollabOption } from './data';
 
 export interface Section13FormProps {
   data?: ISection13Data;
@@ -71,14 +81,12 @@ const MutationSection13 = ({ data, onSubmit }: Section13FormProps) => {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-cyan-500/30 pb-32 relative overflow-hidden">
-      {/* Ambient Background */}
       <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute top-[-10%] right-[-5%] w-[40vw] h-[40vw] bg-cyan-900/10 rounded-full blur-[120px]" />
         <div className="absolute bottom-[-10%] left-[-5%] w-[40vw] h-[40vw] bg-blue-900/10 rounded-full blur-[120px]" />
       </div>
 
       <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-8 relative z-10">
-        {/* Header Area */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-8">
           <div>
             <motion.div
@@ -95,9 +103,7 @@ const MutationSection13 = ({ data, onSubmit }: Section13FormProps) => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Left Column: Settings & Partners */}
           <div className="lg:col-span-5 space-y-8">
-            {/* 1. Section Settings */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -147,7 +153,6 @@ const MutationSection13 = ({ data, onSubmit }: Section13FormProps) => {
               </div>
             </motion.div>
 
-            {/* 2. Partners & Logos Management */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -175,7 +180,6 @@ const MutationSection13 = ({ data, onSubmit }: Section13FormProps) => {
                       key={partner.id}
                       className="bg-zinc-950/60 border border-white/5 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center gap-5 group relative overflow-hidden"
                     >
-                      {/* Logo Preview Area - Fixed Size, No Overlap */}
                       <div className="shrink-0 relative">
                         <div className="w-20 h-20 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center overflow-hidden shadow-inner">
                           {partner.logo ? (
@@ -188,7 +192,6 @@ const MutationSection13 = ({ data, onSubmit }: Section13FormProps) => {
                         </div>
                       </div>
 
-                      {/* Inputs Area */}
                       <div className="flex-1 w-full space-y-3 min-w-0 z-10">
                         <div className="space-y-1">
                           <Label className="text-xs text-zinc-500 font-medium ml-1">Company Name</Label>
@@ -200,7 +203,6 @@ const MutationSection13 = ({ data, onSubmit }: Section13FormProps) => {
                           />
                         </div>
 
-                        {/* Clean Upload Manager Wrapper */}
                         <div className="relative">
                           <Label className="text-xs text-zinc-500 font-medium ml-1 mb-1 block">Logo Source</Label>
                           <div className="flex items-center gap-2">
@@ -211,7 +213,6 @@ const MutationSection13 = ({ data, onSubmit }: Section13FormProps) => {
                         </div>
                       </div>
 
-                      {/* Delete Action */}
                       <div className="absolute top-2 right-2 sm:relative sm:top-0 sm:right-0">
                         <Button
                           size="icon"
@@ -235,7 +236,6 @@ const MutationSection13 = ({ data, onSubmit }: Section13FormProps) => {
             </motion.div>
           </div>
 
-          {/* Right Column: Collaboration Models */}
           <div className="lg:col-span-7 space-y-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -314,7 +314,6 @@ const MutationSection13 = ({ data, onSubmit }: Section13FormProps) => {
         </div>
       </div>
 
-      {/* FIXED FLOATING DOCK - SAVE BUTTON */}
       <div className="fixed bottom-6 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
         <motion.div
           initial={{ y: 100, opacity: 0 }}

@@ -1,17 +1,17 @@
 /*
 |-----------------------------------------
-| setting up MutationSection28 for the App
+| setting up Mutation for the App
 | @author: Toufiquer Rahman<toufiquer.0@gmail.com>
-| @copyright: App-Generator, December, 2025
+| @copyright: Toufiquer, April, 2026
 |-----------------------------------------
 */
+
 'use client';
+
 import React, { useState } from 'react';
+
 import { defaultDataSection29, IDefaultDataSection29, IDefaultDataSection29Props } from './data';
 
-/**
- * Helper component for Select input arrow to keep code clean
- */
 const ChevronDownIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -39,13 +39,11 @@ const MutationSection28 = ({ data, onSubmit }: IDefaultDataSection29Props) => {
     }
   };
 
-  // Determine if the user selected a backdrop filter so we can show a background image behind it
   const isBackdrop = localData.background.includes('backdrop');
 
   return (
     <div className="w-full max-w-5xl mx-auto p-4 md:p-8 font-sans">
       <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100 transition-all duration-500 hover:shadow-indigo-500/10">
-        {/* Header Section */}
         <div className="bg-slate-50 border-b border-slate-100 p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h2 className="text-2xl font-bold text-slate-800 tracking-tight">
@@ -59,9 +57,7 @@ const MutationSection28 = ({ data, onSubmit }: IDefaultDataSection29Props) => {
         </div>
 
         <div className="grid lg:grid-cols-12 min-h-[500px]">
-          {/* LEFT: Controls Panel */}
           <div className="lg:col-span-4 bg-white p-6 md:p-8 flex flex-col gap-6 border-r border-slate-100 z-10 relative">
-            {/* Height Control */}
             <div className="group">
               <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 group-focus-within:text-indigo-500 transition-colors">
                 Height
@@ -88,7 +84,6 @@ const MutationSection28 = ({ data, onSubmit }: IDefaultDataSection29Props) => {
               </div>
             </div>
 
-            {/* Width Control */}
             <div className="group">
               <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 group-focus-within:text-indigo-500 transition-colors">
                 Width
@@ -111,7 +106,6 @@ const MutationSection28 = ({ data, onSubmit }: IDefaultDataSection29Props) => {
               </div>
             </div>
 
-            {/* Background Control */}
             <div className="group">
               <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 group-focus-within:text-indigo-500 transition-colors">
                 Appearance
@@ -140,7 +134,6 @@ const MutationSection28 = ({ data, onSubmit }: IDefaultDataSection29Props) => {
               </div>
             </div>
 
-            {/* Display Control */}
             <div className="group">
               <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 group-focus-within:text-indigo-500 transition-colors">
                 Layout Mode
@@ -173,15 +166,12 @@ const MutationSection28 = ({ data, onSubmit }: IDefaultDataSection29Props) => {
             </button>
           </div>
 
-          {/* RIGHT: Live Preview */}
           <div className="lg:col-span-8 bg-slate-50 relative overflow-hidden flex flex-col items-center justify-center p-8 md:p-12">
-            {/* Background Pattern for Context */}
             <div
               className="absolute inset-0 z-0 opacity-40"
               style={{ backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)', backgroundSize: '24px 24px' }}
             ></div>
 
-            {/* Colored blobs for Backdrop filter demonstration */}
             {isBackdrop && (
               <div className="absolute inset-0 z-0 flex items-center justify-center overflow-hidden">
                 <div className="w-64 h-64 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse absolute top-1/4 left-1/4"></div>
@@ -193,12 +183,10 @@ const MutationSection28 = ({ data, onSubmit }: IDefaultDataSection29Props) => {
             )}
 
             <div className="w-full h-full border-2 border-dashed border-slate-300 rounded-2xl flex items-start justify-start relative z-10 transition-colors duration-300 bg-white/30">
-              {/* Labels for visualizing dimensions */}
               <div className="absolute -top-3 left-4 px-2 bg-slate-200 text-slate-500 text-[10px] font-bold uppercase rounded tracking-wider">
                 Container Context
               </div>
 
-              {/* THE ACTUAL DYNAMIC COMPONENT */}
               <div
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
@@ -213,7 +201,6 @@ const MutationSection28 = ({ data, onSubmit }: IDefaultDataSection29Props) => {
                   rounded-lg
                 `}
               >
-                {/* Internal visualizer for 'Transparent' or empty blocks so user sees something */}
                 <div
                   className={`
                   w-full h-full flex items-center justify-center 

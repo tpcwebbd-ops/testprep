@@ -1,6 +1,14 @@
+/*
+|-----------------------------------------
+| setting up Auth for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
+import { MongoClient } from 'mongodb';
 import { betterAuth } from 'better-auth';
 import { mongodbAdapter } from 'better-auth/adapters/mongodb';
-import { MongoClient } from 'mongodb';
 
 const client = new MongoClient(process.env.mongooseURI!);
 const db = client.db();
@@ -26,7 +34,6 @@ export const auth = betterAuth({
       });
     },
     onPasswordReset: async ({ user }) => {
-      // your logic here
       console.log(`Password for user ${user.email} has been reset.`);
     },
   },

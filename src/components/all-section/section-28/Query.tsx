@@ -1,8 +1,18 @@
+/*
+|-----------------------------------------
+| setting up Query for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import Image from 'next/image';
-import { defaultDataSection28, IGalleryData, GalleryProps, IGalleryItem } from './data';
+
 import { cn } from '@/lib/utils';
+
+import { defaultDataSection28, IGalleryData, GalleryProps, IGalleryItem } from './data';
 
 const QuerySection28 = ({ data }: GalleryProps) => {
   let galleryData = defaultDataSection28;
@@ -15,7 +25,6 @@ const QuerySection28 = ({ data }: GalleryProps) => {
 
   const { images, layout, columns, gap, aspectRatio, hoverEffect, animation, showCaption, rounded } = galleryData;
 
-  // --- Utility Mappers ---
   const gapClass = {
     none: 'gap-0 space-y-0',
     sm: 'gap-2 space-y-2',
@@ -52,7 +61,6 @@ const QuerySection28 = ({ data }: GalleryProps) => {
     xl: 'rounded-xl',
   }[rounded];
 
-  // --- Animation & Effects ---
   const hoverClass = {
     none: '',
     zoom: 'group-hover:scale-110',
@@ -68,18 +76,14 @@ const QuerySection28 = ({ data }: GalleryProps) => {
     'slide-up': 'animate-in slide-in-from-bottom-8 fade-in duration-700',
   }[animation];
 
-  // --- Sub-Component: Image Item ---
   const GalleryItem = ({ item, index, isBentoHero = false }: { item: IGalleryItem; index: number; isBentoHero?: boolean }) => (
     <div
       className={cn(
         'relative group overflow-hidden bg-gray-100/5 border border-white/5',
         roundedClass,
         aspectClass,
-        // If auto aspect, we need full height for container
         aspectRatio === 'auto' ? 'h-full' : '',
-        // Animation stagger delay via inline style usually, but simple here
         animationClass,
-        // Masonry specific: avoid break inside
         layout === 'masonry' && 'break-inside-avoid mb-4',
       )}
       style={{ animationDelay: `${index * 100}ms` }}
@@ -89,16 +93,10 @@ const QuerySection28 = ({ data }: GalleryProps) => {
         height={200}
         src={item.url}
         alt={item.caption || 'Gallery Image'}
-        className={cn(
-          'w-full h-full object-cover transition-all duration-500 ease-out',
-          hoverClass,
-          // Bento Hero styling
-          isBentoHero && 'object-center',
-        )}
+        className={cn('w-full h-full object-cover transition-all duration-500 ease-out', hoverClass, isBentoHero && 'object-center')}
         loading="lazy"
       />
 
-      {/* Caption / Overlay */}
       {showCaption && item.caption && (
         <div
           className={cn(
@@ -116,9 +114,6 @@ const QuerySection28 = ({ data }: GalleryProps) => {
 
   if (images.length === 0) return null;
 
-  // --- Render Layouts ---
-
-  // 1. Masonry Layout (CSS Columns)
   if (layout === 'masonry') {
     return (
       <div className={cn('w-full block', masonryColsClass, gapClass)}>
@@ -129,7 +124,6 @@ const QuerySection28 = ({ data }: GalleryProps) => {
     );
   }
 
-  // 2. Filmstrip (Horizontal Scroll)
   if (layout === 'filmstrip') {
     return (
       <div className={cn('flex w-full overflow-x-auto pb-4 snap-x', gapClass)}>
@@ -142,12 +136,10 @@ const QuerySection28 = ({ data }: GalleryProps) => {
     );
   }
 
-  // 3. Bento / Featured (First item is large)
   if (layout === 'bento') {
     return (
       <div className={cn('grid grid-cols-1 md:grid-cols-4 auto-rows-[200px]', gapClass)}>
         {images.map((item, idx) => {
-          // First item spans 2x2
           const isFirst = idx === 0;
           return (
             <div key={item.id} className={cn(isFirst ? 'md:col-span-2 md:row-span-2 h-full' : 'md:col-span-1 md:row-span-1 h-full')}>
@@ -159,7 +151,6 @@ const QuerySection28 = ({ data }: GalleryProps) => {
     );
   }
 
-  // 4. Standard Grid (Default)
   return (
     <div className={cn('grid w-full', colsClass, gapClass)}>
       {images.map((item, idx) => (

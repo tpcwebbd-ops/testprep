@@ -1,7 +1,15 @@
+/*
+|-----------------------------------------
+| setting up Data for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 export interface ICourseCard {
   title: string;
   level: string;
-  levelColorClass: string; // e.g., 'bg-blue-100 text-blue-700'
+  levelColorClass: string;
   description: string;
   features: string[];
   duration: string;

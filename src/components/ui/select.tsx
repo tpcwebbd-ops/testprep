@@ -1,8 +1,17 @@
+/*
+|-----------------------------------------
+| setting up Select for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import * as React from 'react';
-import * as SelectPrimitive from '@radix-ui/react-select';
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
+
+import * as SelectPrimitive from '@radix-ui/react-select';
 
 import { cn } from '@/lib/utils';
 

@@ -1,3 +1,11 @@
+/*
+|-----------------------------------------
+| setting up Preview for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import { defaultDataForm5, IForm5Data, Form5Props } from './data';
 
 const PreviewForm5 = ({ data }: Form5Props) => {

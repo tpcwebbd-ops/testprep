@@ -1,19 +1,28 @@
+/*
+|-----------------------------------------
+| setting up Mutation for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Clock, Layout, MoveHorizontal, Save, Image as ImageIcon, Play, Pause, Settings2, Layers, RotateCcw } from 'lucide-react';
 
-import ImageUploadManagerSingle from '@/components/dashboard-ui/ImageUploadManagerSingle';
-import Image from 'next/image';
-import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
+import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
+import { Textarea } from '@/components/ui/textarea';
+import ImageUploadManagerSingle from '@/components/dashboard-ui/ImageUploadManagerSingle';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { cn } from '@/lib/utils';
+
 import { defaultDataSection25, ISlideItem, ISliderData, SliderFormProps } from './data';
 
 const ScrollArea = ({ children, className }: { children: React.ReactNode; className?: string }) => {
@@ -56,7 +65,6 @@ const MutationSection25 = ({ data, onSubmit }: SliderFormProps) => {
     }
   }, [data]);
 
-  // --- Logic ---
   const updateField = (field: keyof ISliderData, value: string | number | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
@@ -95,9 +103,7 @@ const MutationSection25 = ({ data, onSubmit }: SliderFormProps) => {
 
   return (
     <div className="min-h-[700px] w-full max-w-2xl md:max-w-6xl mx-auto bg-zinc-950 text-zinc-100 font-sans selection:bg-blue-500/30 flex flex-col lg:flex-row rounded-3xl border border-zinc-800 overflow-hidden shadow-2xl">
-      {/* --- RIGHT PANEL: CONTROLS --- */}
       <div className="lg:w-[45%] bg-zinc-950 relative flex flex-col h-[600px] lg:h-auto">
-        {/* Tab Toggle */}
         <div className="flex border-b border-zinc-800">
           <button
             onClick={() => setActiveTab('content')}
@@ -128,9 +134,7 @@ const MutationSection25 = ({ data, onSubmit }: SliderFormProps) => {
             </div>
 
             {activeTab === 'content' ? (
-              /* --- TAB: CONTENT --- */
               <div className="space-y-6">
-                {/* Filmstrip Selector */}
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
                     <Label className="text-[10px] uppercase font-bold text-zinc-500">Select Slide to Edit</Label>
@@ -176,7 +180,6 @@ const MutationSection25 = ({ data, onSubmit }: SliderFormProps) => {
 
                 <div className="w-full h-px bg-zinc-800/50" />
 
-                {/* Active Slide Editor */}
                 {currentSlideData ? (
                   <motion.div key={currentSlideData.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
                     <div className="space-y-2">
@@ -219,9 +222,7 @@ const MutationSection25 = ({ data, onSubmit }: SliderFormProps) => {
                 )}
               </div>
             ) : (
-              /* --- TAB: SETTINGS --- */
               <div className="space-y-6">
-                {/* Section: Layout */}
                 <section className="space-y-4">
                   <Label className="flex items-center gap-2 text-sm font-bold text-zinc-400 uppercase tracking-wider">
                     <Layout size={14} /> Layout
@@ -271,7 +272,6 @@ const MutationSection25 = ({ data, onSubmit }: SliderFormProps) => {
 
                 <div className="w-full h-px bg-zinc-800/50" />
 
-                {/* Section: Playback */}
                 <section className="space-y-4">
                   <Label className="flex items-center gap-2 text-sm font-bold text-zinc-400 uppercase tracking-wider">
                     <Clock size={14} /> Playback
@@ -311,7 +311,6 @@ const MutationSection25 = ({ data, onSubmit }: SliderFormProps) => {
                   </div>
                 </section>
 
-                {/* Section: Navigation */}
                 <section className="space-y-4">
                   <Label className="flex items-center gap-2 text-sm font-bold text-zinc-400 uppercase tracking-wider">
                     <MoveHorizontal size={14} /> Navigation
@@ -337,7 +336,6 @@ const MutationSection25 = ({ data, onSubmit }: SliderFormProps) => {
               </div>
             )}
 
-            {/* Footer Action */}
             <div className="pt-6 border-t border-zinc-800 flex justify-end">
               <Button onClick={() => onSubmit(formData)} variant="outlineGlassy" className="w-full">
                 <Save className="w-5 h-5 mr-2" />
@@ -348,7 +346,6 @@ const MutationSection25 = ({ data, onSubmit }: SliderFormProps) => {
         </ScrollArea>
       </div>
 
-      {/* Styles */}
       <style>{`
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }

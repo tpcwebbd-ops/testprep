@@ -1,3 +1,11 @@
+/*
+|-----------------------------------------
+| setting up Data for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 export interface Form4Props {
   data?: IForm4Data | string;
 }
@@ -9,7 +17,7 @@ export interface IForm4Data {
   qualification: string;
   passingYear: string;
   resultCGPA: string;
-  englishTestType: string; // e.g., IELTS, PTE
+  englishTestType: string;
   englishTestScore: string;
   submitButtonText: string;
 }

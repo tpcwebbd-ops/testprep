@@ -1,12 +1,19 @@
-// DynamicSelectField.tsx
+/*
+|-----------------------------------------
+| setting up DynamicSelectField for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { X, ChevronDown, Search, Check, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+
 import { cn } from '@/lib/utils';
-import { logger } from 'better-auth';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 
 export interface DynamicSelectFieldProps {
   id?: string;
@@ -49,14 +56,12 @@ export default function DynamicSelectField({
   const [searchTerm, setSearchTerm] = useState('');
   const [activeIndex, setActiveIndex] = useState(-1);
 
-  // New state for tracking fetch time
   const [lastFetchTime, setLastFetchTime] = useState<number | null>(null);
 
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   const safeValue = useMemo(() => value ?? [], [value]);
 
-  // Create a unique key for local storage based on the API URL
   const storageKey = useMemo(() => `dynamic-select-cache-${apiUrl}`, [apiUrl]);
 
   const fetchData = useCallback(
@@ -64,7 +69,6 @@ export default function DynamicSelectField({
       setIsLoading(true);
       setError(null);
 
-      // 1. Check Local Storage (if not forcing an update)
       if (!forceUpdate) {
         try {
           const cachedItem = localStorage.getItem(storageKey);
@@ -74,16 +78,14 @@ export default function DynamicSelectField({
               setAvailableData(parsed.data);
               setLastFetchTime(parsed.timestamp);
               setIsLoading(false);
-              return; // Exit early, do not fetch
+              return;
             }
           }
         } catch (e) {
           console.warn('Error reading from local storage', e);
-          // Fall through to fetch if cache read fails
         }
       }
 
-      // 2. Fetch from API
       for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
         try {
           const response = await fetch(apiUrl);
@@ -91,7 +93,6 @@ export default function DynamicSelectField({
           const json = await response.json();
 
           if (!Array.isArray(json)) {
-            logger.error('API response is not an array');
             setError('Invalid data format received');
             setIsLoading(false);
             return;
@@ -110,7 +111,6 @@ export default function DynamicSelectField({
           setAvailableData(uniqueData);
           setLastFetchTime(timestamp);
 
-          // Save to Local Storage
           try {
             localStorage.setItem(
               storageKey,
@@ -125,8 +125,8 @@ export default function DynamicSelectField({
 
           setIsLoading(false);
           return;
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (err) {
-          logger.error(JSON.stringify(err));
           if (attempt === MAX_RETRIES) {
             setError('Failed to load options. Try again.');
             setIsLoading(false);
@@ -139,7 +139,6 @@ export default function DynamicSelectField({
     [apiUrl, dataMapper, storageKey],
   );
 
-  // Initial load
   useEffect(() => {
     fetchData(false);
   }, [fetchData]);
@@ -179,7 +178,7 @@ export default function DynamicSelectField({
   };
 
   const handleReload = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent dropdown toggle if clicked inside the wrapper area
+    e.stopPropagation();
     fetchData(true);
   };
 
@@ -205,7 +204,6 @@ export default function DynamicSelectField({
 
   return (
     <div className={cn('relative space-y-1.5 w-full max-w-2xl', isOpen && 'mb-64')} ref={wrapperRef}>
-      {/* Header with Label and Refresh Controls */}
       <div className="flex items-center justify-between">
         {label && (
           <Label htmlFor={id} className="text-white">

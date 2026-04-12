@@ -1,3 +1,11 @@
+/*
+|-----------------------------------------
+| setting up Data for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 export interface SliderProps {
   data?: ISliderData | string;
 }
@@ -17,20 +25,17 @@ export type ItemsPerSlide = 1 | 2 | 3 | 4;
 export interface ISliderData {
   slides: ISlideItem[];
 
-  // Configuration
-  autoplaySpeed: number; // in milliseconds
+  autoplaySpeed: number;
   isAutoplay: boolean;
   infiniteLoop: boolean;
   pauseOnHover: boolean;
 
-  // Layout
   itemsPerSlide: ItemsPerSlide;
   navPosition: NavPosition;
-  showArrowsOnHover: boolean; // If true, arrows only show when hovering the slider
+  showArrowsOnHover: boolean;
 
-  // Styling
   height: 'auto' | 'fixed-sm' | 'fixed-md' | 'fixed-lg' | 'screen';
-  overlayOpacity: number; // 0-100
+  overlayOpacity: number;
 }
 
 export const defaultDataSection25: ISliderData = {

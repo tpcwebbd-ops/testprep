@@ -1,11 +1,20 @@
+/*
+|-----------------------------------------
+| setting up Mutation for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
+import { LayoutTemplate, Save, Plus, Trash2 } from 'lucide-react';
+
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { LayoutTemplate, Save, Plus, Trash2 } from 'lucide-react';
 
 import { ISection41Data, defaultDataSection41, IServiceFeature } from './data';
 
@@ -61,7 +70,6 @@ const MutationSection41 = ({ data, onSubmit }: SectionFormProps) => {
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 p-4 md:p-8 font-sans">
       <div className="max-w-5xl mx-auto bg-zinc-900/50 border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl">
-        {/* Header */}
         <div className="p-6 border-b border-zinc-800 bg-zinc-900/80 backdrop-blur flex items-center gap-3">
           <div className="p-2 bg-indigo-500/10 rounded-lg">
             <LayoutTemplate className="text-indigo-400" size={24} />
@@ -72,9 +80,7 @@ const MutationSection41 = ({ data, onSubmit }: SectionFormProps) => {
           </div>
         </div>
 
-        {/* Content */}
         <div className="p-6 md:p-8 space-y-8">
-          {/* Main Titles */}
           <div className="space-y-6">
             <div className="space-y-2">
               <Label className="text-zinc-400">Top Badge Text</Label>
@@ -120,7 +126,6 @@ const MutationSection41 = ({ data, onSubmit }: SectionFormProps) => {
 
           <div className="h-px bg-zinc-800" />
 
-          {/* Right Card Config */}
           <div className="space-y-4">
             <Label className="text-zinc-300 text-lg font-semibold">Illustration Card Details</Label>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -149,7 +154,6 @@ const MutationSection41 = ({ data, onSubmit }: SectionFormProps) => {
 
           <div className="h-px bg-zinc-800" />
 
-          {/* Features List */}
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <Label className="text-zinc-300 text-lg font-semibold">Service Features</Label>
@@ -203,7 +207,6 @@ const MutationSection41 = ({ data, onSubmit }: SectionFormProps) => {
           </div>
         </div>
 
-        {/* Footer */}
         <div className="p-6 border-t border-zinc-800 bg-zinc-900/80 backdrop-blur flex justify-end">
           <Button onClick={handleSave} className="bg-indigo-600 hover:bg-indigo-500 text-white">
             <Save className="w-5 h-5 mr-2" />

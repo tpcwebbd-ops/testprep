@@ -1,5 +1,13 @@
-import { createUploadthing, type FileRouter } from 'uploadthing/next';
+/*
+|-----------------------------------------
+| setting up Core for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import { UploadThingError } from 'uploadthing/server';
+import { createUploadthing, type FileRouter } from 'uploadthing/next';
 
 const f = createUploadthing();
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -1,13 +1,22 @@
+/*
+|-----------------------------------------
+| setting up Query for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Maximize2, Minimize2, ExternalLink, MapPin, Phone, Mail, Clock, Globe2, Navigation, ArrowRight, Copy } from 'lucide-react';
-import { defaultDataSection18, mapStyles, OfficeLocation } from './data';
+
 import { cn } from '@/lib/utils';
 
-// --- Sub-Component: Location List (Sidebar) ---
+import { defaultDataSection18, mapStyles, OfficeLocation } from './data';
+
 interface LocationListProps {
   locations: OfficeLocation[];
   activeId: string;
@@ -69,7 +78,6 @@ const LocationList = ({ locations, activeId, onSelect }: LocationListProps) => {
   );
 };
 
-// --- Sub-Component: Details Card ---
 const LocationDetails = ({ activeLocation }: { activeLocation: OfficeLocation }) => {
   const [copied, setCopied] = useState(false);
 
@@ -132,13 +140,11 @@ const LocationDetails = ({ activeLocation }: { activeLocation: OfficeLocation })
   );
 };
 
-// --- Main Query Component ---
 interface QuerySection18Props {
   data?: OfficeLocation[] | string;
 }
 
 export default function QuerySection18({ data }: QuerySection18Props) {
-  // Parse Data
   const locations: OfficeLocation[] = useMemo(() => {
     if (!data) return defaultDataSection18;
     try {
@@ -153,10 +159,8 @@ export default function QuerySection18({ data }: QuerySection18Props) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [iframeKey, setIframeKey] = useState(0);
 
-  // Derive active location
   const activeLocation = useMemo(() => locations.find(l => l.id === activeId) || locations[0], [locations, activeId]);
 
-  // Force re-render iframe on location change to animate the "fly-to"
   useEffect(() => {
     setIframeKey(prev => prev + 1);
   }, [activeId]);
@@ -168,9 +172,7 @@ export default function QuerySection18({ data }: QuerySection18Props) {
         isExpanded ? 'h-screen fixed inset-0 z-50' : 'relative',
       )}
     >
-      {/* Main Content */}
       <main className="flex-1 relative flex flex-col lg:flex-row min-h-[calc(100vh-64px)]">
-        {/* Sidebar */}
         <motion.aside
           initial={{ x: -50, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
@@ -189,7 +191,6 @@ export default function QuerySection18({ data }: QuerySection18Props) {
 
             <LocationDetails activeLocation={activeLocation} />
 
-            {/* Location Detail Image */}
             <div className="mt-8 relative aspect-video rounded-2xl overflow-hidden border border-white/10 group">
               {activeLocation.image && (
                 <Image
@@ -210,9 +211,7 @@ export default function QuerySection18({ data }: QuerySection18Props) {
           </div>
         </motion.aside>
 
-        {/* Map Container */}
         <div className="flex-1 relative bg-zinc-900 overflow-hidden min-h-[500px]">
-          {/* Map Controls */}
           <div className="absolute top-6 right-6 z-20 flex flex-col gap-2">
             <button
               onClick={() => setIsExpanded(!isExpanded)}
@@ -225,7 +224,6 @@ export default function QuerySection18({ data }: QuerySection18Props) {
             </button>
           </div>
 
-          {/* Map Overlay Info */}
           <AnimatePresence mode="wait">
             <motion.div
               key={activeLocation.id}
@@ -244,12 +242,7 @@ export default function QuerySection18({ data }: QuerySection18Props) {
             </motion.div>
           </AnimatePresence>
 
-          {/* The Map */}
           <div className="absolute inset-0 z-0">
-            {/* 
-                Iframe with Dark Mode Filter 
-                Using the style prop to inject the filter logic from data.ts
-            */}
             <iframe
               key={iframeKey}
               width="100%"
@@ -263,11 +256,9 @@ export default function QuerySection18({ data }: QuerySection18Props) {
               referrerPolicy="no-referrer-when-downgrade"
             />
 
-            {/* Overlay Gradient to blend map edges into the app theme */}
             <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-transparent to-[#050505]/50" />
             <div className="absolute inset-0 pointer-events-none bg-purple-900/5 mix-blend-overlay" />
 
-            {/* Animated Radar Effect at Center */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
               <motion.div
                 animate={{ scale: [1, 3], opacity: [0.5, 0] }}
@@ -280,7 +271,6 @@ export default function QuerySection18({ data }: QuerySection18Props) {
             </div>
           </div>
 
-          {/* Features Grid Floating at Bottom */}
           <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black via-black/80 to-transparent z-10 pointer-events-none">
             <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 pointer-events-auto">
               {activeLocation.features.map((feature, i) => (

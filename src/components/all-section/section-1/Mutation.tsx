@@ -1,16 +1,25 @@
+/*
+|-----------------------------------------
+| setting up Mutation for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import Image from 'next/image'; // Added for displaying avatar thumbnails
-import { Button } from '@/components/ui/button';
+import { LayoutTemplate, Save, X } from 'lucide-react';
+
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { LayoutTemplate, Save, X } from 'lucide-react'; // Added X for delete icon
+import ImageUploadManagerSingle from '@/components/dashboard-ui/ImageUploadManagerSingle';
 
 import type { ISection1Data } from './data';
 import { defaultDataSection1 } from './data';
-import ImageUploadManagerSingle from '@/components/dashboard-ui/ImageUploadManagerSingle';
 
 export interface SectionFormProps {
   data?: ISection1Data;
@@ -18,7 +27,6 @@ export interface SectionFormProps {
 }
 
 const MuationSection1 = ({ data, onSubmit }: SectionFormProps) => {
-  // Initialize with default data including the array
   const [formData, setFormData] = useState<ISection1Data>({ ...defaultDataSection1 });
 
   useEffect(() => {
@@ -36,14 +44,11 @@ const MuationSection1 = ({ data, onSubmit }: SectionFormProps) => {
     onSubmit(formData);
   };
 
-  // Logic to remove an image from the usersImages array
   const handleRemoveUserImage = (indexToRemove: number) => {
     const newImages = formData.usersImages.filter((_, index) => index !== indexToRemove);
     updateField('usersImages', newImages);
   };
 
-  // Logic to add an image to the usersImages array
-  // We pass this to the ImageUploadManagerSingle
   const handleAddUserImage = (url: string) => {
     if (!url) return;
     const newImages = [...formData.usersImages, url];
@@ -64,9 +69,7 @@ const MuationSection1 = ({ data, onSubmit }: SectionFormProps) => {
           </div>
         </div>
 
-        {/* Content Grid */}
         <div className="p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Left Column: Main Content */}
           <div className="space-y-6">
             <div className="space-y-2">
               <Label className="text-zinc-400">Title</Label>
@@ -114,7 +117,6 @@ const MuationSection1 = ({ data, onSubmit }: SectionFormProps) => {
             </div>
           </div>
 
-          {/* Right Column: Details & Actions */}
           <div className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -145,11 +147,9 @@ const MuationSection1 = ({ data, onSubmit }: SectionFormProps) => {
               />
             </div>
 
-            {/* User Avatars Management Section */}
             <div className="space-y-3">
               <Label className="text-zinc-400">User Avatars</Label>
               <div className="bg-zinc-950/30 p-4 rounded-xl border border-zinc-800/50 space-y-4">
-                {/* List of existing images */}
                 {formData.usersImages?.length > 0 && (
                   <div className="flex flex-wrap gap-3">
                     {formData.usersImages.map((imgUrl, idx) => (
@@ -170,15 +170,8 @@ const MuationSection1 = ({ data, onSubmit }: SectionFormProps) => {
 
                 <div className="border-t border-zinc-800 pt-3">
                   <p className="text-xs text-zinc-500 mb-2">Add new avatar</p>
-                  {/* 
-                    We pass an empty string as value so it always stays in "Add Mode".
-                    When onChange is called, we append to our list.
-                  */}
-                  <ImageUploadManagerSingle
-                    label="" // Hide label to save space
-                    value=""
-                    onChange={handleAddUserImage}
-                  />
+
+                  <ImageUploadManagerSingle label="" value="" onChange={handleAddUserImage} />
                 </div>
               </div>
             </div>
@@ -202,7 +195,6 @@ const MuationSection1 = ({ data, onSubmit }: SectionFormProps) => {
           </div>
         </div>
 
-        {/* Footer */}
         <div className="p-6 border-t border-zinc-800 bg-zinc-900/80 backdrop-blur flex justify-end">
           <Button onClick={handleSave} variant="outlineGlassy" size="sm">
             <Save className="w-5 h-5 mr-2" />

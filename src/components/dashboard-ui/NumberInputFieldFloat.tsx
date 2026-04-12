@@ -1,7 +1,13 @@
-// NumberInputFieldFloat.tsx
+/*
+|-----------------------------------------
+| setting up NumberInputFieldFloat for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
 
-import { Input } from '@/components/ui/input';
 import React from 'react';
+import { Input } from '@/components/ui/input';
 
 const NumberInputFieldFloat = ({ id, value, onChange }: { id: string; value: number; onChange: (value: number) => void }) => {
   const min = 0;

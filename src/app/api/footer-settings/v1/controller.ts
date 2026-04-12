@@ -1,4 +1,13 @@
+/*
+|-----------------------------------------
+| setting up Controller for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import connectDB from '@/app/api/utils/mongoose';
+
 import Footer from './model';
 
 export const getFooters = async () => {

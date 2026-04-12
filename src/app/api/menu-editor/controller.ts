@@ -1,8 +1,17 @@
+/*
+|-----------------------------------------
+| setting up Controller for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import { NextResponse } from 'next/server';
-import Menu from './model';
+
 import connectToDB from '@/app/api/utils/mongoose';
 
-// Helper for standard response format
+import Menu from './model';
+
 const formatResponse = (data: unknown, message: string, status: number = 200) => {
   return NextResponse.json(
     {
@@ -31,7 +40,6 @@ export async function getMenu(type: string = 'main-menu') {
     const menu = await getMenuData(type);
 
     if (!menu) {
-      // Return empty structure or default if not found
       return formatResponse({ items: [] }, 'Menu not found', 404);
     }
 

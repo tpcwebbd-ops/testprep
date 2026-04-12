@@ -1,14 +1,22 @@
+/*
+|-----------------------------------------
+| setting up YTVideoUploadManager for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import React, { useMemo, useState, useEffect } from 'react';
-import { X, Loader2, Search, CheckCircle2, Youtube, Plus, MonitorPlay, VideoIcon, ChevronLeft, ChevronRight, Film, Code, Zap } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
+import { motion, AnimatePresence } from 'framer-motion';
+import React, { useMemo, useState, useEffect } from 'react';
+import { X, Loader2, Search, CheckCircle2, Youtube, Plus, MonitorPlay, ChevronLeft, ChevronRight, Film, Code, Zap } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useGetMediasQuery, useAddMediaMutation } from '@/redux/features/media/mediaSlice';
+import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 interface MediaItem {
   _id: string;
@@ -94,6 +102,7 @@ const InternalYouTubeVault = ({ onVideoToggle, selectedVideos }: YouTubeVaultPro
       toast.success('YouTube Asset Pipeline Integrated');
       onVideoToggle({ url: result.url, name: result.name });
       setIframeCode('');
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast.error('Failed to link YouTube asset');
     } finally {
@@ -274,8 +283,8 @@ export default function YouTubeVideoUploadManager({
           <AnimatePresence>
             {value.length > 0 && (
               <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
-                <Button variant="outlineFire" size="sm" onClick={() => onChange([])} className="h-8 text-[10px]">
-                  <X className="w-3 h-3 mr-1" /> Clear Pipeline
+                <Button variant="outlineFire" size="sm" onClick={() => onChange([])} className="min-w-1">
+                  <X className="w-3 h-3" /> Clear All
                 </Button>
               </motion.div>
             )}
@@ -283,11 +292,11 @@ export default function YouTubeVideoUploadManager({
 
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-              <Button variant="outlineGlassy" size="sm" className="h-8 text-[10px]">
-                <Plus className="w-3.5 h-3.5 mr-1" /> Open Vault
+              <Button variant="outlineGlassy" size="sm" className="min-w-1">
+                <Plus className="w-3.5 h-3.5" /> Add
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-6xl bg-transparent p-0 shadow-none border-white/40 border rounded-sm overflow-hidden">
+            <DialogContent className="max-w-6xl bg-transparent p-0 shadow-none border-white/40 border rounded-sm overflow-hidden mt-8 text-white">
               <InternalYouTubeVault selectedVideos={value} onVideoToggle={toggleVideo} />
             </DialogContent>
           </Dialog>

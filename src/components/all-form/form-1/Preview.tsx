@@ -1,3 +1,11 @@
+/*
+|-----------------------------------------
+| setting up Preview for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import { defaultDataForm1, IForm1Data, Form1Props } from './data';
 
 const PreviewForm1 = ({ data }: Form1Props) => {
@@ -11,7 +19,6 @@ const PreviewForm1 = ({ data }: Form1Props) => {
       <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-bl-full -mr-8 -mt-8 blur-2xl pointer-events-none" />
 
       <div className="space-y-6 relative z-10">
-        {/* Header */}
         <div className="border-b border-white/10 pb-4">
           <h3 className="text-xs font-semibold text-purple-400 uppercase tracking-wider">{formData.formTitle}</h3>
           <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
@@ -20,7 +27,6 @@ const PreviewForm1 = ({ data }: Form1Props) => {
           <p className="text-gray-400 text-sm mt-1">{formData.email}</p>
         </div>
 
-        {/* Details Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
           <div className="space-y-1">
             <p className="text-gray-500 text-xs">Phone Number</p>

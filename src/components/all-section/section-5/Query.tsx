@@ -1,5 +1,14 @@
+/*
+|-----------------------------------------
+| setting up Query for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import Image from 'next/image';
 import { TrendingUp, Award, Zap } from 'lucide-react';
+
 import { defaultDataSection5, ISection5Data, Section5Props } from './data';
 
 const QuerySection5 = ({ data }: Section5Props) => {

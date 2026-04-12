@@ -1,16 +1,25 @@
+/*
+|-----------------------------------------
+| setting up Mutation for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LayoutGrid, AlignLeft, AlignCenter, AlignRight, Trash2, Plus, Image as ImageIcon, Maximize, Crop, Save, Scan, RotateCcw } from 'lucide-react';
 
-import ImageUploadManagerSingle from '@/components/dashboard-ui/ImageUploadManagerSingle';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import ImageUploadManagerSingle from '@/components/dashboard-ui/ImageUploadManagerSingle';
+
 import { defaultDataSection24, IImagesData, ImagesFormProps } from './data';
-import { cn } from '@/lib/utils';
 
 const ScrollArea = ({ children, className }: { children: React.ReactNode; className?: string }) => {
   return (
@@ -33,7 +42,6 @@ const MutationSection24 = ({ data, onSubmit }: ImagesFormProps) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  // Image Management
   const addImageSlot = () => {
     setFormData(prev => ({ ...prev, images: [...prev.images, ''] }));
   };
@@ -60,7 +68,6 @@ const MutationSection24 = ({ data, onSubmit }: ImagesFormProps) => {
 
   return (
     <div className="min-h-[650px] w-full max-w-6xl mx-auto bg-zinc-950 text-zinc-100 font-sans selection:bg-blue-500/30 flex flex-col lg:flex-row rounded-3xl border border-zinc-800 overflow-hidden shadow-2xl">
-      {/* --- RIGHT PANEL: CONFIGURATION --- */}
       <div className="lg:w-1/2 bg-zinc-950 relative flex flex-col h-[600px] lg:h-auto">
         <ScrollArea className="h-full">
           <div className="p-6 lg:p-8 space-y-8">
@@ -74,7 +81,6 @@ const MutationSection24 = ({ data, onSubmit }: ImagesFormProps) => {
               </button>
             </div>
 
-            {/* 1. Image Manager */}
             <section className="space-y-4">
               <div className="flex items-center justify-between">
                 <Label className="flex items-center gap-2 text-zinc-400">
@@ -100,7 +106,6 @@ const MutationSection24 = ({ data, onSubmit }: ImagesFormProps) => {
                           {index + 1}
                         </div>
                         <div className="flex-1 min-w-0">
-                          {/* Third Party Component Integration */}
                           <ImageUploadManagerSingle value={url} onChange={(newUrl: string) => updateImageUrl(index, newUrl)} />
                         </div>
                         <button
@@ -129,14 +134,12 @@ const MutationSection24 = ({ data, onSubmit }: ImagesFormProps) => {
 
             <div className="w-full h-px bg-zinc-800/50" />
 
-            {/* 2. Layout & Grid Config */}
             <section className="space-y-6">
               <Label className="flex items-center gap-2 text-zinc-400">
                 <LayoutGrid size={14} /> Composition
               </Label>
 
               <div className="grid grid-cols-2 gap-6">
-                {/* Columns */}
                 <div className="space-y-2">
                   <span className="text-xs text-zinc-500">Grid Columns</span>
                   <div className="grid grid-cols-4 gap-2">
@@ -157,7 +160,6 @@ const MutationSection24 = ({ data, onSubmit }: ImagesFormProps) => {
                   </div>
                 </div>
 
-                {/* Alignment */}
                 <div className="space-y-2">
                   <span className="text-xs text-zinc-500">Alignment</span>
                   <div className="flex bg-zinc-900/50 p-1 rounded-lg border border-zinc-800 h-[38px]">
@@ -182,13 +184,11 @@ const MutationSection24 = ({ data, onSubmit }: ImagesFormProps) => {
               </div>
             </section>
 
-            {/* 3. Dimensions & Styling */}
             <section className="space-y-6">
               <Label className="flex items-center gap-2 text-zinc-400">
                 <Scan size={14} /> Appearance
               </Label>
 
-              {/* Width & Aspect Ratio */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <span className="text-xs text-zinc-500 flex items-center gap-1">
@@ -230,7 +230,6 @@ const MutationSection24 = ({ data, onSubmit }: ImagesFormProps) => {
                 </div>
               </div>
 
-              {/* Fit Mode */}
               <div className="space-y-2">
                 <span className="text-xs text-zinc-500">Image Fill Mode</span>
                 <div className="grid grid-cols-3 gap-2">
@@ -251,7 +250,6 @@ const MutationSection24 = ({ data, onSubmit }: ImagesFormProps) => {
                 </div>
               </div>
 
-              {/* Styling: Radius & Shadow */}
               <div className="p-4 bg-zinc-900/30 rounded-xl border border-zinc-800 grid grid-cols-2 gap-4 items-end">
                 <div className="space-y-2">
                   <span className="text-xs text-zinc-500">Corner Radius</span>
@@ -276,7 +274,6 @@ const MutationSection24 = ({ data, onSubmit }: ImagesFormProps) => {
               </div>
             </section>
 
-            {/* Footer Action */}
             <div className="pt-6 border-t border-zinc-800 flex justify-end">
               <Button onClick={() => handleSubmit(formData)} variant="outlineGlassy" className="w-full">
                 <Save className="w-5 h-5 mr-2" />
@@ -287,7 +284,6 @@ const MutationSection24 = ({ data, onSubmit }: ImagesFormProps) => {
         </ScrollArea>
       </div>
 
-      {/* Scrollbar Hiding */}
       <style>{`
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }

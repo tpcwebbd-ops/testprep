@@ -1,9 +1,17 @@
+/*
+|-----------------------------------------
+| setting up EmailComponent for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, CheckCircle, ArrowRight, Sparkles } from 'lucide-react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Mail, CheckCircle, ArrowRight, Sparkles } from 'lucide-react';
 
 const EmailConfirmationContent = () => {
   const router = useRouter();
@@ -23,7 +31,7 @@ const EmailConfirmationContent = () => {
   const handleBackToLogin = () => {
     router.push('/login');
   };
-  const handleridirectToContact = () => {
+  const handleRedirectToContact = () => {
     router.push('/contact');
   };
 
@@ -197,7 +205,7 @@ const EmailConfirmationContent = () => {
             <p>
               Need help?{' '}
               <button
-                onClick={handleridirectToContact}
+                onClick={handleRedirectToContact}
                 disabled={resendLoading || (resendSuccess && countdown > 0)}
                 className="text-blue-300 cursor-pointer hover:text-blue-200 font-semibold transition-colors underline disabled:opacity-50 disabled:cursor-not-allowed"
               >

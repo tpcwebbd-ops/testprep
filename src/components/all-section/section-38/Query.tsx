@@ -1,7 +1,16 @@
+/*
+|-----------------------------------------
+| setting up Query for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import { Check, Clock, BookOpen, MapPin, ArrowRight } from 'lucide-react';
+
 import { defaultDataSection38, ISection38Data, ICourseCard, Section38Props } from './data';
 
 const CourseCard: React.FC<ICourseCard> = ({
@@ -29,7 +38,6 @@ const CourseCard: React.FC<ICourseCard> = ({
       </div>
     )}
 
-    {/* Header */}
     <div className="flex items-start justify-between mb-6">
       <div className="flex items-start space-x-4">
         <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center shrink-0">
@@ -51,10 +59,8 @@ const CourseCard: React.FC<ICourseCard> = ({
       </div>
     )}
 
-    {/* Description */}
     <p className="text-gray-600 mb-6 leading-relaxed text-sm flex-grow">{description}</p>
 
-    {/* Schedule */}
     {schedule && schedule.length > 0 && (
       <div className="mb-6 bg-red-50/50 p-4 rounded-xl border border-red-100/50">
         <h4 className="font-semibold text-gray-900 mb-3 flex items-center text-sm">
@@ -72,7 +78,6 @@ const CourseCard: React.FC<ICourseCard> = ({
       </div>
     )}
 
-    {/* Features */}
     <div className="space-y-3 mb-8">
       {features.map((feature, index) => (
         <div key={index} className="flex items-start space-x-3">
@@ -84,7 +89,6 @@ const CourseCard: React.FC<ICourseCard> = ({
       ))}
     </div>
 
-    {/* Stats */}
     <div className="grid grid-cols-2 gap-4 mb-8 mt-auto">
       <div className="bg-gray-50 rounded-xl p-3 text-center border border-gray-100">
         <div className="text-lg font-bold text-gray-900 mb-0.5">{duration}</div>
@@ -96,7 +100,6 @@ const CourseCard: React.FC<ICourseCard> = ({
       </div>
     </div>
 
-    {/* CTA Button */}
     <button
       className={`w-full py-4 rounded-xl font-bold text-base transition-all duration-300 flex items-center justify-center group ${
         popular
@@ -138,17 +141,14 @@ const QuerySection38 = ({ data }: Section38Props) => {
   return (
     <div className="w-full min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-pink-50 py-20 px-4 md:px-8">
       <div className="container mx-auto max-w-7xl">
-        {/* Header Section */}
         <div
           className={`text-center mb-16 transform transition-all duration-1000 ease-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}
         >
-          {/* Badge */}
           <div className="inline-flex items-center bg-white border border-red-100 text-red-600 px-5 py-2 rounded-full text-sm font-semibold mb-8 shadow-sm">
             <MapPin className="w-4 h-4 mr-2" />
             {sectionData.badgeText}
           </div>
 
-          {/* Main Headline */}
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 mb-6 leading-tight">
             {sectionData.headingPrefix}{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-orange-600">{sectionData.headingHighlight}</span>{' '}
@@ -157,10 +157,8 @@ const QuerySection38 = ({ data }: Section38Props) => {
 
           <p className="text-xl text-slate-600 mb-10 max-w-2xl mx-auto leading-relaxed font-medium">{sectionData.subTitle}</p>
 
-          {/* Tab Navigation */}
           <div className="flex justify-center mb-14">
             <div className="bg-white p-1.5 rounded-2xl shadow-xl border border-gray-100 inline-flex relative">
-              {/* Animated Slider Background could go here for extra flair */}
               <button
                 onClick={() => setActiveTab('offline')}
                 className={`px-8 py-3 rounded-xl font-bold text-sm transition-all duration-300 relative z-10 ${
@@ -181,7 +179,6 @@ const QuerySection38 = ({ data }: Section38Props) => {
           </div>
         </div>
 
-        {/* Course Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {courses.map((course, index) => (
             <div

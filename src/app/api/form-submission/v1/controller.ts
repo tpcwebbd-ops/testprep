@@ -1,7 +1,17 @@
-import { withDB } from '@/app/api/utils/db';
-import FormSubmission from './model';
-import { formatResponse, IResponse } from '@/app/api/utils/utils';
+/*
+|-----------------------------------------
+| setting up Controller for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import { FilterQuery } from 'mongoose';
+
+import { withDB } from '@/app/api/utils/db';
+import { formatResponse, IResponse } from '@/app/api/utils/utils';
+
+import FormSubmission from './model';
 
 interface MongoError extends Error {
   code?: number;

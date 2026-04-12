@@ -1,3 +1,11 @@
+/*
+|-----------------------------------------
+| setting up AllForm for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import { defaultDataForm1, IForm1Data } from '../form-1/data';
 import { defaultDataForm2, IForm2Data } from '../form-2/data';
 import { defaultDataForm3, IForm3Data } from '../form-3/data';

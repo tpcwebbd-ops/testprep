@@ -1,14 +1,24 @@
+/*
+|-----------------------------------------
+| setting up Mutation for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
+import { Save, Plus, Trash2, User, Building2, BookOpen, GraduationCap, ChevronDown, ImageIcon, Sparkles, LayoutGrid } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Save, Plus, Trash2, User, Building2, BookOpen, GraduationCap, ChevronDown, ImageIcon, Sparkles, LayoutGrid } from 'lucide-react';
-import { ISection11Data, defaultDataSection11, IStory } from './data';
 import ImageUploadManagerSingle from '@/components/dashboard-ui/ImageUploadManagerSingle';
-import Image from 'next/image';
+
+import { ISection11Data, defaultDataSection11, IStory } from './data';
 
 export interface Section11FormProps {
   data?: ISection11Data;
@@ -60,7 +70,6 @@ const MutationSection11 = ({ data, onSubmit }: Section11FormProps) => {
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 p-4 md:p-8 font-sans selection:bg-indigo-500/30">
       <div className="max-w-7xl mx-auto bg-zinc-900/50 border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl backdrop-blur-sm">
-        {/* Header Section */}
         <div className="p-6 border-b border-zinc-800 bg-zinc-900/80 backdrop-blur flex items-center gap-3 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-indigo-600/5 to-violet-600/5 pointer-events-none" />
           <div className="p-2 bg-indigo-500/10 rounded-lg border border-indigo-500/20 z-10">
@@ -73,7 +82,6 @@ const MutationSection11 = ({ data, onSubmit }: Section11FormProps) => {
         </div>
 
         <div className="p-6 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Sidebar / Actions */}
           <div className="lg:col-span-4 space-y-6 h-fit lg:sticky lg:top-8">
             <div className="bg-zinc-950/50 border border-zinc-800/50 rounded-2xl p-6 backdrop-blur-sm space-y-6 shadow-inner">
               <div className="text-center space-y-3">
@@ -90,7 +98,6 @@ const MutationSection11 = ({ data, onSubmit }: Section11FormProps) => {
 
               <div className="h-px bg-zinc-800/50 w-full" />
 
-              {/* Stories Per Page Configuration */}
               <div className="space-y-3">
                 <Label className="text-zinc-400 text-xs font-medium flex items-center gap-2">
                   <LayoutGrid size={14} className="text-indigo-400" />
@@ -130,7 +137,6 @@ const MutationSection11 = ({ data, onSubmit }: Section11FormProps) => {
             </div>
           </div>
 
-          {/* Stories List */}
           <div className="lg:col-span-8 space-y-4">
             {formData.stories.length === 0 && (
               <div className="text-center py-16 bg-zinc-950/30 border border-dashed border-zinc-800 rounded-2xl flex flex-col items-center justify-center gap-3">
@@ -265,7 +271,6 @@ const MutationSection11 = ({ data, onSubmit }: Section11FormProps) => {
           </div>
         </div>
 
-        {/* Footer Actions */}
         <div className="p-6 border-t border-zinc-800 bg-zinc-900/80 backdrop-blur flex justify-between items-center">
           <p className="text-xs text-zinc-500 hidden sm:block">
             Last updated: <span className="text-zinc-400">Just now</span>

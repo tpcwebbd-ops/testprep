@@ -1,29 +1,38 @@
+/*
+|-----------------------------------------
+| setting up Mutation for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
 import {
   Bold,
-  Italic,
-  Underline as UnderlineIcon,
-  List,
-  ListOrdered,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  AlignJustify,
   Type,
   Save,
+  List,
+  Italic,
+  AlignLeft,
   RotateCcw,
+  AlignRight,
+  ListOrdered,
+  AlignCenter,
+  AlignJustify,
   Highlighter,
+  Underline as UnderlineIcon,
 } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
 
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { defaultDataSection22, DescAlign, DescPadding, DescriptionFormProps, DescSize, IDescriptionData, PADDING_MAP, SIZE_MAP } from './data';
 import { cn } from '@/lib/utils';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+import { defaultDataSection22, DescAlign, DescPadding, DescriptionFormProps, DescSize, IDescriptionData, PADDING_MAP, SIZE_MAP } from './data';
 
 const ToolbarBtn = ({ icon: Icon, onClick, active, title }: { icon: React.ElementType; onClick: () => void; active?: boolean; title: string }) => (
   <button
@@ -76,7 +85,6 @@ const MutationSection22 = ({ data, onSubmit }: DescriptionFormProps) => {
 
   return (
     <div className="min-h-[650px] w-full max-w-5xl mx-auto bg-zinc-950 text-zinc-100 font-sans selection:bg-blue-500/30 flex flex-col lg:flex-row rounded-3xl border border-zinc-800 overflow-hidden shadow-2xl">
-      {/* --- RIGHT PANEL: EDITOR & CONTROLS --- */}
       <div className="lg:w-1/2 bg-zinc-950 relative flex flex-col h-[600px] lg:h-auto">
         <ScrollArea className="h-full">
           <div className="p-6 lg:p-8 space-y-8">
@@ -86,7 +94,6 @@ const MutationSection22 = ({ data, onSubmit }: DescriptionFormProps) => {
               </button>
             </div>
 
-            {/* 1. Rich Text Editor Section */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <Label className="flex items-center gap-2 text-sm font-bold text-zinc-400 uppercase tracking-wider">
@@ -100,7 +107,6 @@ const MutationSection22 = ({ data, onSubmit }: DescriptionFormProps) => {
                   isFocused ? 'border-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.15)]' : 'border-zinc-800 hover:border-zinc-700',
                 )}
               >
-                {/* Toolbar */}
                 <div className="flex items-center gap-1 p-2 border-b border-zinc-800 bg-zinc-900/50">
                   <ToolbarBtn icon={Bold} onClick={() => execCmd('bold')} title="Bold" />
                   <ToolbarBtn icon={Italic} onClick={() => execCmd('italic')} title="Italic" />
@@ -110,7 +116,6 @@ const MutationSection22 = ({ data, onSubmit }: DescriptionFormProps) => {
                   <ToolbarBtn icon={ListOrdered} onClick={() => execCmd('insertOrderedList')} title="Numbered List" />
                 </div>
 
-                {/* Input Area */}
                 <div
                   ref={editorRef}
                   contentEditable
@@ -126,13 +131,11 @@ const MutationSection22 = ({ data, onSubmit }: DescriptionFormProps) => {
 
             <div className="w-full h-px bg-zinc-800/50" />
 
-            {/* 2. Styling Controls */}
             <div className="space-y-6">
               <Label className="flex items-center gap-2 text-sm font-bold text-zinc-400 uppercase tracking-wider">
                 <Type size={14} /> Typography
               </Label>
 
-              {/* Alignment */}
               <div className="space-y-2">
                 <span className="text-xs text-zinc-500">Alignment</span>
                 <div className="flex bg-zinc-900/50 p-1 rounded-xl border border-zinc-800">
@@ -156,9 +159,7 @@ const MutationSection22 = ({ data, onSubmit }: DescriptionFormProps) => {
                 </div>
               </div>
 
-              {/* Size & Padding Grid */}
               <div className="grid grid-cols-2 gap-4">
-                {/* Font Size */}
                 <div className="space-y-2">
                   <span className="text-xs text-zinc-500">Size</span>
                   <div className="relative">
@@ -177,7 +178,6 @@ const MutationSection22 = ({ data, onSubmit }: DescriptionFormProps) => {
                   </div>
                 </div>
 
-                {/* Padding */}
                 <div className="space-y-2">
                   <span className="text-xs text-zinc-500">Padding</span>
                   <div className="relative">
@@ -197,7 +197,6 @@ const MutationSection22 = ({ data, onSubmit }: DescriptionFormProps) => {
                 </div>
               </div>
 
-              {/* Global Underline Toggle */}
               <div
                 onClick={() => updateField('isGlobalUnderline', !formData.isGlobalUnderline)}
                 className={cn(
@@ -218,7 +217,6 @@ const MutationSection22 = ({ data, onSubmit }: DescriptionFormProps) => {
               </div>
             </div>
 
-            {/* Footer Action */}
             <div className="pt-6 border-t border-zinc-800 flex justify-end">
               <Button onClick={() => onSubmit(formData)} variant="outlineGlassy" className="w-full">
                 <Save className="w-5 h-5 mr-2" />
@@ -229,7 +227,6 @@ const MutationSection22 = ({ data, onSubmit }: DescriptionFormProps) => {
         </ScrollArea>
       </div>
 
-      {/* CSS for hiding scrollbar */}
       <style>{`
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }

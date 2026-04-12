@@ -1,8 +1,18 @@
+/*
+|-----------------------------------------
+| setting up Query for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import Link from 'next/link';
+
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { iconMap } from '@/components/all-icons/all-icons';
+
 import { defaultDataSection20, IButton2Data, Button2Props } from './data';
-import { cn } from '@/lib/utils';
 
 const QuerySection20 = ({ data }: Button2Props) => {
   let buttonData = defaultDataSection20;
@@ -11,7 +21,6 @@ const QuerySection20 = ({ data }: Button2Props) => {
     buttonData = JSON.parse(data) as IButton2Data;
   }
 
-  // Map buttonWidth to Tailwind classes
   const getWidthClass = (width: string | undefined) => {
     switch (width) {
       case 'full':
@@ -75,10 +84,8 @@ const QuerySection20 = ({ data }: Button2Props) => {
           target={buttonData.isNewTab ? '_blank' : undefined}
           rel={buttonData.isNewTab ? 'noopener noreferrer' : undefined}
         >
-          {/* Icon */}
           {renderIcon()}
 
-          {/* Text */}
           <span className="truncate">{buttonData.buttonName || 'Click Here'}</span>
 
           {buttonData.isNewTab && (

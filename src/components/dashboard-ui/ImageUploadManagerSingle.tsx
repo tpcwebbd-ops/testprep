@@ -1,10 +1,18 @@
+/*
+|-----------------------------------------
+| setting up ImageUploadManagerSingle for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import Image from 'next/image';
-import { Plus, X, UploadCloud, RefreshCw, Image as ImageIcon } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useEffect, useState, useCallback } from 'react';
 import imageCompression from 'browser-image-compression';
+import { Plus, X, UploadCloud, RefreshCw, Image as ImageIcon } from 'lucide-react';
 
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';

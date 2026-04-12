@@ -1,7 +1,17 @@
-import { withDB } from '@/app/api/utils/db';
-import PageBuilder from './model';
-import { formatResponse, IResponse } from '@/app/api/utils/utils';
+/*
+|-----------------------------------------
+| setting up Controller for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import { FilterQuery } from 'mongoose';
+
+import { withDB } from '@/app/api/utils/db';
+import { formatResponse, IResponse } from '@/app/api/utils/utils';
+
+import PageBuilder from './model';
 
 interface MongoError extends Error {
   code?: number;
@@ -69,7 +79,6 @@ export async function getPages(req: Request): Promise<IResponse> {
     return formatResponse({ pages, total, page, limit }, 'Fetched successfully', 200);
   });
 }
-// get All pages for SSG in /src/app/[...pageTitle]/page.tsx
 export async function getAllPages(): Promise<IResponse> {
   return withDB(async () => {
     const page = parseInt('1');

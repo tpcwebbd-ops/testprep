@@ -1,3 +1,11 @@
+/*
+|-----------------------------------------
+| setting up Db for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import connectDB from './mongoose';
 import { IResponse } from './utils';
 

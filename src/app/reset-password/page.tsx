@@ -1,12 +1,21 @@
+/*
+|-----------------------------------------
+| setting up Page for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import { toast } from 'react-toastify';
 import { motion } from 'framer-motion';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2, CheckCircle, AlertCircle, Eye, EyeOff, Lock } from 'lucide-react';
-import { authClient } from '@/lib/auth-client';
-import { toast } from 'sonner';
+
 import { Input } from '@/components/ui/input';
+import { authClient } from '@/lib/auth-client';
 import { Button } from '@/components/ui/button';
 
 const ResetPasswordPage = () => {

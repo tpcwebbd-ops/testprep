@@ -1,20 +1,26 @@
+/*
+|-----------------------------------------
+| setting up Mutation for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import type { LucideIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Layout, Type, Palette, MousePointer2, Link as LinkIcon, ExternalLink, Check, Save, RotateCcw, Search } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-
-// Import the dynamic icons
 import { iconMap, iconOptions } from '@/components/all-icons/all-icons-jsx';
 
-import type { LucideIcon } from 'lucide-react';
 import { ButtonFormProps, defaultDataSection20, IButton2Data } from './data';
-import { cn } from '@/lib/utils';
 
 const ScrollArea = ({ children, className }: { children: React.ReactNode; className?: string }) => {
   return (
@@ -75,7 +81,6 @@ const MutationSection20 = ({ data, onSubmit }: ButtonFormProps) => {
   const [formData, setFormData] = useState<IButton2Data>({ ...defaultDataSection20 });
   const [activeTab, setActiveTab] = useState<'Standard' | 'Solid' | 'Outline' | 'Neon'>('Standard');
 
-  // Icon Search State
   const [iconSearch, setIconSearch] = useState('');
 
   useEffect(() => {
@@ -98,7 +103,6 @@ const MutationSection20 = ({ data, onSubmit }: ButtonFormProps) => {
     setIconSearch('');
   };
 
-  // Filter icons based on search
   const filteredIcons = useMemo(() => {
     if (!iconSearch) return iconOptions;
     return iconOptions.filter(name => name.toLowerCase().includes(iconSearch.toLowerCase()));
@@ -106,7 +110,6 @@ const MutationSection20 = ({ data, onSubmit }: ButtonFormProps) => {
 
   return (
     <div className="min-h-[600px] w-full max-w-4xl mx-auto bg-zinc-950 text-zinc-100 font-sans selection:bg-blue-500/30 flex flex-col lg:flex-row rounded-0 border border-zinc-800 overflow-hidden shadow-2xl">
-      {/* --- Right Panel: Scrollable Form Controls --- */}
       <div className="flex-1 bg-zinc-950 relative h-[600px] lg:h-auto">
         <ScrollArea className="h-full">
           <div className="p-6 lg:p-8 pb-24 space-y-8 max-w-2xl mx-auto">
@@ -116,7 +119,6 @@ const MutationSection20 = ({ data, onSubmit }: ButtonFormProps) => {
               </button>
             </div>
 
-            {/* Section: Identity */}
             <section>
               <h3 className="flex items-center gap-2 text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-4">
                 <Type size={14} /> Content
@@ -150,14 +152,12 @@ const MutationSection20 = ({ data, onSubmit }: ButtonFormProps) => {
 
             <div className="w-full h-px bg-zinc-800/50" />
 
-            {/* Section: Layout */}
             <section>
               <h3 className="flex items-center gap-2 text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-4">
                 <Layout size={14} /> Layout
               </h3>
 
               <div className="space-y-6">
-                {/* Width Selector */}
                 <div>
                   <Label className="text-xs text-zinc-500 mb-2 block">Width Mode</Label>
                   <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
@@ -178,7 +178,6 @@ const MutationSection20 = ({ data, onSubmit }: ButtonFormProps) => {
                   </div>
                 </div>
 
-                {/* Size Selector */}
                 <div>
                   <Label className="text-xs text-zinc-500 mb-2 block">Size Scale</Label>
                   <div className="flex items-end gap-2 bg-zinc-900/50 p-2 rounded-xl border border-zinc-800">
@@ -202,13 +201,11 @@ const MutationSection20 = ({ data, onSubmit }: ButtonFormProps) => {
 
             <div className="w-full h-px bg-zinc-800/50" />
 
-            {/* Section: Aesthetics (Variants) */}
             <section>
               <h3 className="flex items-center gap-2 text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-4">
                 <Palette size={14} /> Aesthetics
               </h3>
 
-              {/* Tab Navigation for Variants */}
               <div className="flex gap-2 mb-4 overflow-x-auto no-scrollbar pb-1">
                 {Object.keys(variantGroups).map(group => (
                   <button
@@ -224,7 +221,6 @@ const MutationSection20 = ({ data, onSubmit }: ButtonFormProps) => {
                 ))}
               </div>
 
-              {/* Variant Grid */}
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 <AnimatePresence mode="wait">
                   {variantGroups[activeTab].map(variant => (
@@ -256,7 +252,6 @@ const MutationSection20 = ({ data, onSubmit }: ButtonFormProps) => {
 
             <div className="w-full h-px bg-zinc-800/50" />
 
-            {/* Section: Icon */}
             <section>
               <h3 className="flex items-center justify-between gap-2 text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-4">
                 <div className="flex items-center gap-2">
@@ -265,7 +260,6 @@ const MutationSection20 = ({ data, onSubmit }: ButtonFormProps) => {
                 <div className="text-[10px] text-zinc-600 font-normal">{formData.buttonIcon || 'No icon selected'}</div>
               </h3>
 
-              {/* Icon Search */}
               <div className="mb-4">
                 <div className="relative group">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-focus-within:text-blue-400 transition-colors" />
@@ -282,8 +276,6 @@ const MutationSection20 = ({ data, onSubmit }: ButtonFormProps) => {
               <div className="bg-zinc-900/30 border border-zinc-800 rounded-xl p-3">
                 {filteredIcons.length > 0 ? (
                   <div className="grid grid-cols-6 sm:grid-cols-8 gap-2 max-h-[240px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent">
-                    {/* Render currently selected icon first if it exists and isn't in view (optional UX, here just sticking to filter) */}
-
                     {filteredIcons.map(iconName => {
                       const IconComp = iconMap[iconName];
                       if (!IconComp) return null;
@@ -317,7 +309,6 @@ const MutationSection20 = ({ data, onSubmit }: ButtonFormProps) => {
               </div>
             </section>
 
-            {/* Footer Action */}
             <div className="pt-6 border-t border-zinc-800 flex justify-end">
               <Button onClick={() => onSubmit(formData)} variant="outlineGlassy" className="w-full">
                 <Save className="w-5 h-5 mr-2" />
@@ -328,7 +319,6 @@ const MutationSection20 = ({ data, onSubmit }: ButtonFormProps) => {
         </ScrollArea>
       </div>
 
-      {/* CSS for hiding scrollbar */}
       <style>{`
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }

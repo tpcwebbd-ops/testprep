@@ -1,10 +1,16 @@
-// ImageUploadManager.tsx
+/*
+|-----------------------------------------
+| setting up ImageUploadManager for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
 
 'use client';
 
 import Image from 'next/image';
-import { Plus, X, UploadCloud } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { Plus, X, UploadCloud } from 'lucide-react';
 import { useEffect, useState, useCallback } from 'react';
 import imageCompression from 'browser-image-compression';
 

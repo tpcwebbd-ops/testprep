@@ -1,13 +1,23 @@
+/*
+|-----------------------------------------
+| setting up PersonalInfoTab for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import React from 'react';
+import { Loader2, Save, Phone, MapPin, Calendar, Briefcase, Globe } from 'lucide-react';
+
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import InputFieldForString from '@/components/dashboard-ui/InputFieldForString';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, Save, Phone, MapPin, Calendar, Briefcase, Globe } from 'lucide-react';
-import { ProfileFormData } from './types';
+import { Separator } from '@/components/ui/separator';
 import { SelectField } from '@/components/dashboard-ui/SelectField';
+import InputFieldForString from '@/components/dashboard-ui/InputFieldForString';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
+import { ProfileFormData } from './types';
 
 interface PersonalInfoTabProps {
   profileFormData: ProfileFormData;
@@ -28,7 +38,6 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({
 }) => {
   return (
     <Card className="bg-white/10 backdrop-blur-xl border border-white/20 text-white shadow-lg rounded-2xl">
-      {' '}
       <CardHeader className="border-b border-white/10">
         <CardTitle className="text-xl font-semibold tracking-wide text-white/90 flex items-center gap-2">
           <Briefcase className="w-6 h-6" />

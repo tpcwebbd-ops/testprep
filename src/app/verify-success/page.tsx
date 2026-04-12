@@ -1,9 +1,17 @@
+/*
+|-----------------------------------------
+| setting up Page for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle, ArrowRight, Sparkles, PartyPopper } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { CheckCircle, ArrowRight, Sparkles, PartyPopper } from 'lucide-react';
 
 const EmailVerificationSuccess = () => {
   const router = useRouter();
@@ -23,7 +31,7 @@ const EmailVerificationSuccess = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-500 via-emerald-500 to-teal-500 p-4 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-500 via-emerald-500 to-teal-500 p-4 relative overflow-hidden pt-12">
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
           animate={{

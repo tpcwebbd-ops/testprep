@@ -1,14 +1,14 @@
 /*
 |-----------------------------------------
-| setting up Controller for the App
+| setting up Error for the App
 | @author: Toufiquer Rahman<toufiquer.0@gmail.com>
-| @copyright: varse-project, May, 2025
+| @copyright: Toufiquer, April, 2026
 |-----------------------------------------
 */
 
-// ErrorMessage.tsx
-import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useCallback } from 'react';
+
 import { SerializedError } from '@reduxjs/toolkit';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 
@@ -75,7 +75,7 @@ const ErrorMessageComponent: React.FC<ErrorMessageProps> = ({
       const timer = setTimeout(handleDismiss, autoHideDuration);
       return () => clearTimeout(timer);
     }
-  }, [autoHideDuration, isVisible, handleDismiss]); // Function to extract a displayable message from the error object
+  }, [autoHideDuration, isVisible, handleDismiss]);
 
   const getDisplayMessage = (error: string | FetchBaseQueryError | SerializedError): string => {
     if (typeof error === 'object' && error !== null && 'message' in error) {
@@ -86,26 +86,23 @@ const ErrorMessageComponent: React.FC<ErrorMessageProps> = ({
     if (typeof error === 'string') {
       console.log('error: 2');
       return error;
-    } // Check if it's a FetchBaseQueryError
+    }
 
-    // Fallback for unknown error types
     if (typeof error === 'object' && error !== null && 'status' in error) {
       const fetchError = error as FetchBaseQueryError;
       if (typeof fetchError.status === 'number') {
-        // HTTP status code error
         return `Error ${fetchError.status}: ${JSON.stringify(fetchError.data)}`;
       } else {
         console.log('error: 5');
-        // Fetch, parsing, or custom error with an error string
         return `Error: ${fetchError.error}`;
       }
-    } // Check if it's a SerializedError
+    }
 
     if (typeof error === 'object' && error !== null && 'message' in error) {
       console.log('error: 6');
       const serializedError = error as SerializedError;
       return `Error: ${serializedError.message}`;
-    } // Fallback for unknown error types
+    }
 
     return 'An unknown error occurred.';
   };

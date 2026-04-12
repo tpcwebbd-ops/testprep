@@ -1,9 +1,18 @@
+/*
+|-----------------------------------------
+| setting up Query for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import React, { useRef } from 'react';
 import Image from 'next/image';
-import { motion, useScroll, useSpring } from 'framer-motion';
 import { Quote } from 'lucide-react';
+import React, { useRef } from 'react';
+import { motion, useScroll, useSpring } from 'framer-motion';
+
 import { defaultDataSection43, ISection43Data, Section43Props } from './data';
 
 const ITEM_HEIGHT = 300;

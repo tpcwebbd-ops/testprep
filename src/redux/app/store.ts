@@ -2,14 +2,13 @@
 |-----------------------------------------
 | setting up Store for the App
 | @author: Toufiquer Rahman<toufiquer.0@gmail.com>
-| @copyright: Toufiquer, February, 2024
+| @copyright: Toufiquer, April, 2026
 |-----------------------------------------
 */
-// This template is only for use redux store.
-
-import { configureStore } from '@reduxjs/toolkit';
 
 import { TypedUseSelectorHook, useSelector } from 'react-redux';
+
+import { configureStore } from '@reduxjs/toolkit';
 
 import { apiSlice } from '@/redux/api/apiSlice';
 import { menuEditorApi } from '@/redux/features/menu-editor/menuEditorSlice';

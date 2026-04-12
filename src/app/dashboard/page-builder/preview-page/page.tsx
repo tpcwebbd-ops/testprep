@@ -1,27 +1,26 @@
 /*
 |-----------------------------------------
-| Preview Page Data (Pure Render)
+| setting up Page for the App
 | @author: Toufiquer Rahman<toufiquer.0@gmail.com>
-| @copyright: App-Generator, November, 2025
+| @copyright: Toufiquer, April, 2026
 |-----------------------------------------
 */
 
 'use client';
 
-import { useState, useEffect, Suspense, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useState, useEffect, Suspense, useMemo } from 'react';
 import { AlertTriangle, Type, Layers, RefreshCw } from 'lucide-react';
 
-import { AllSections, AllSectionsKeys } from '@/components/all-section/all-section-index/all-sections';
-import { AllForms, AllFormsKeys } from '@/components/all-form/all-form-index/all-form';
-
 import { Button } from '@/components/ui/button';
-import { PageContent } from '../utils';
 import { useGetPagesQuery } from '@/redux/features/page-builder/pageBuilderSlice';
+import { AllForms, AllFormsKeys } from '@/components/all-form/all-form-index/all-form';
+import { AllSections, AllSectionsKeys } from '@/components/all-section/all-section-index/all-sections';
+
+import { PageContent } from '../utils';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const COMPONENT_MAP: Record<string, { collection: any; keys: string[]; label: string; icon: any; color: string }> = {
-  // Core Categories
   form: { collection: AllForms, keys: AllFormsKeys, label: 'Forms', icon: Type, color: 'text-blue-400' },
   section: { collection: AllSections, keys: AllSectionsKeys, label: 'Sections', icon: Layers, color: 'text-purple-400' },
 };
@@ -30,13 +29,10 @@ interface ReadOnlyItemProps {
   item: PageContent;
 }
 
-// --- Sub-Component: Read Only Item (Pure Render) ---
 const ReadOnlyItem = ({ item }: ReadOnlyItemProps) => {
-  // Safe check for component mapping
   const mapEntry = COMPONENT_MAP[item.type];
   const config = mapEntry ? mapEntry.collection[item.key] : null;
 
-  // Fallback if data is corrupted or type is no longer supported
   if (!mapEntry || !config) {
     return null;
   }
@@ -64,7 +60,6 @@ const ReadOnlyItem = ({ item }: ReadOnlyItemProps) => {
   );
 };
 
-// Normalized Interface
 interface NormalizedPage {
   _id: string;
   pageName: string;
@@ -74,15 +69,12 @@ interface NormalizedPage {
   [key: string]: any;
 }
 
-// Main component
 function PreviewPageContent() {
   const searchParams = useSearchParams();
   const pathTitle = searchParams.get('pathTitle') || '/';
 
-  // Redux hooks
   const { data: pagesData, isLoading, error, refetch } = useGetPagesQuery({ page: 1, limit: 1000 });
 
-  // 1. NORMALIZE DATA
   const normalizedPages = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const rawPages = pagesData?.data?.pages || (pagesData as any)?.pages || [];
@@ -111,21 +103,18 @@ function PreviewPageContent() {
     return flattenPages(rawPages);
   }, [pagesData]);
 
-  // 2. FIND CURRENT PAGE
   const currentPage = useMemo(() => {
     return normalizedPages.find(p => p.path === pathTitle);
   }, [normalizedPages, pathTitle]);
 
   const [items, setItems] = useState<PageContent[]>([]);
 
-  // Load content
   useEffect(() => {
     if (currentPage?.content) {
       setItems(Array.isArray(currentPage.content) ? currentPage.content : []);
     }
   }, [currentPage]);
 
-  // --- ERROR STATE ---
   if (error) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-slate-950 text-white">
@@ -140,7 +129,6 @@ function PreviewPageContent() {
     );
   }
 
-  // --- LOADING STATE ---
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-950">
@@ -149,7 +137,6 @@ function PreviewPageContent() {
     );
   }
 
-  // --- 404 STATE ---
   if (!currentPage) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-white">
@@ -163,7 +150,6 @@ function PreviewPageContent() {
   }
 
   return (
-    // Assuming components need a dark background, otherwise remove 'bg-slate-950'
     <main className="min-h-screen w-full bg-slate-950 pt-[80px]">
       {items.length === 0 ? (
         <div className="min-h-[50vh] flex items-center justify-center text-slate-500">Empty Page</div>
@@ -178,7 +164,6 @@ function PreviewPageContent() {
   );
 }
 
-// Wrapper
 export default function Page() {
   return (
     <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-slate-950 text-white">Loading...</div>}>

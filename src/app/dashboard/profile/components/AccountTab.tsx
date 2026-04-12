@@ -1,12 +1,22 @@
+/*
+|-----------------------------------------
+| setting up AccountTab for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import React from 'react';
+import { Loader2, Save, User2, Mail, CheckCircle2, XCircle } from 'lucide-react';
+
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import InputFieldForEmail from '@/components/dashboard-ui/InputFieldForEmail';
 import InputFieldForString from '@/components/dashboard-ui/InputFieldForString';
-import { Loader2, Save, User2, Mail, CheckCircle2, XCircle } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
 import { UserFormData } from './types';
 
 interface AccountTabProps {

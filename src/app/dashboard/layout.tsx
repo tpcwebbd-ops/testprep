@@ -1,21 +1,29 @@
+/*
+|-----------------------------------------
+| setting up Layout for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
+import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Home, Settings, ChevronDown, ChevronRight, ChevronLeft, LogOut } from 'lucide-react';
-import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { Home, Settings, ChevronDown, ChevronRight, ChevronLeft, LogOut } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 import { signOut, useSession } from '@/lib/auth-client';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+
+import HasAccess from './hasAccess';
 import { useFetchSidebar } from './useFetchSidebar';
 import { IDefaultSidebarItem } from './default-items';
-import HasAccess from './hasAccess';
-
-// --- Components ---
 
 const LoadingOverlay = () => (
   <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden">
@@ -135,15 +143,12 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const user = session?.data?.user;
   const email = user?.email || '';
 
-  // Handle Authentication Redirects
   useEffect(() => {
-    // Only redirect if explicitly not pending and no session exists
     if (!isPending && !isAuthenticated) {
       router.push('/login');
     }
   }, [isPending, isAuthenticated, router]);
 
-  // Use the hook - it is safe now as layout handles protection
   const sidebarItems = useFetchSidebar(email);
 
   const toggleExpand = (id: number) => {
@@ -156,22 +161,18 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     router.push('/login');
   };
 
-  // 1. Loading State
   if (isPending) {
     return <LoadingOverlay />;
   }
 
-  // 2. Unauthenticated State (Waiting for redirect or null)
   if (!isAuthenticated) {
-    return null; // or <LoadingOverlay /> if you want to keep the loader until route change completes
+    return null;
   }
 
-  // 3. Authenticated Dashboard State
   return (
     <div className="fixed flex max-h-[calc(100vh-65px)] w-full pt-[65px]">
       <div className="fixed inset-0 bg-linear-to-br from-indigo-500 via-purple-500 to-blue-500 -z-10" />
 
-      {/* Desktop Sidebar */}
       <motion.aside
         animate={{ width: isCollapsed ? '80px' : '280px' }}
         transition={{ duration: 0.3, type: 'spring', stiffness: 300, damping: 30 }}
@@ -250,14 +251,12 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         )}
       </motion.aside>
 
-      {/* Main Content */}
       <motion.main initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="flex-1 md:pb-0 pb-20 text-white">
         <ScrollArea className="w-full h-[calc(100vh-65px)]">
           <HasAccess>{children}</HasAccess>
         </ScrollArea>
       </motion.main>
 
-      {/* Mobile Bottom Navigation */}
       <div className="md:hidden fixed bottom-0 left-0 w-full bg-white/10 backdrop-blur-xl border-t border-white/20 flex justify-between items-center px-4 py-3 text-white z-40">
         <Link href="/dashboard" className="flex items-center justify-center p-2 hover:bg-white/10 rounded-lg transition">
           <Home size={24} />
@@ -280,8 +279,8 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
             <SheetHeader className="p-4 border-b border-white/20">
               <SheetTitle className="text-white">Menu</SheetTitle>
             </SheetHeader>
-            <ScrollArea className="h-[calc(100vh-80px)]">
-              <nav className="flex flex-col space-y-1 p-4">
+            <ScrollArea className="h-[calc(100vh-210px)] w-full">
+              <nav className="flex flex-col space-y-1 p-4 ">
                 {sidebarItems.map((item, iidx) => (
                   <div key={item.id + iidx}>
                     {item.children ? (

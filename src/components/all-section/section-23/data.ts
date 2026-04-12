@@ -1,3 +1,11 @@
+/*
+|-----------------------------------------
+| setting up Data for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 export interface ParagraphProps {
   data?: IParagraphData | string;
 }
@@ -14,7 +22,7 @@ export interface IParagraphData {
   textWeight: ParaWeight;
   isUnderline: boolean;
   padding: ParaPadding;
-  opacity: number; // 0 to 100
+  opacity: number;
 }
 
 export const defaultDataSection23: IParagraphData = {
@@ -60,7 +68,6 @@ export const PADDING_MAP: Record<ParaPadding, string> = {
   '2xl': 'p-16',
 };
 
-// 1. Map Size
 export const sizeMap: Record<string, string> = {
   xs: 'text-xs leading-relaxed',
   sm: 'text-sm leading-relaxed',
@@ -71,7 +78,6 @@ export const sizeMap: Record<string, string> = {
   '3xl': 'text-3xl leading-tight',
 };
 
-// 2. Map Weight
 export const weightMap: Record<string, string> = {
   light: 'font-light',
   normal: 'font-normal',
@@ -80,7 +86,6 @@ export const weightMap: Record<string, string> = {
   bold: 'font-bold',
 };
 
-// 3. Map Padding
 export const paddingMap: Record<string, string> = {
   none: 'p-0',
   xs: 'p-2',
@@ -91,7 +96,6 @@ export const paddingMap: Record<string, string> = {
   '2xl': 'p-16',
 };
 
-// 4. Map Alignment
 export const alignMap: Record<string, string> = {
   left: 'text-left',
   center: 'text-center',

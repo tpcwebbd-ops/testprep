@@ -167,9 +167,6 @@
     "ISelect_6_000___": "ISelect",
     "select_5_000___": "select",
     "use_generate_folder": false,
-    "bulk_action": [
-      "title",
-      "area"
-    ]
+    "bulk_action": ["title", "area"]
   }
 }

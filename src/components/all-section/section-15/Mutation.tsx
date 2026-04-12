@@ -1,38 +1,48 @@
+/*
+|-----------------------------------------
+| setting up Mutation for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import {
+  Tag,
   Save,
   Plus,
+  User,
+  Type,
+  Quote,
+  Clock,
   Trash2,
   FileText,
   Calendar,
-  User,
-  ImageIcon,
-  Type,
-  Quote,
+  Sparkles,
   AlignLeft,
-  GripVertical,
-  Clock,
-  Tag,
-  ChevronRight,
+  ImageIcon,
   Settings2,
   LayoutList,
-  Badge as BadgeIcon,
+  GripVertical,
+  ChevronRight,
   LayoutTemplate,
-  Sparkles,
+  Badge as BadgeIcon,
 } from 'lucide-react';
-import { ISection15Data, defaultDataSection15, ArticleBlock } from './data';
-import ImageUploadManagerSingle from '@/components/dashboard-ui/ImageUploadManagerSingle';
 import Image from 'next/image';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import ImageUploadManagerSingle from '@/components/dashboard-ui/ImageUploadManagerSingle';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+
+import { ISection15Data, defaultDataSection15, ArticleBlock } from './data';
 
 export interface Section15FormProps {
   data?: ISection15Data;
@@ -40,27 +50,21 @@ export interface Section15FormProps {
 }
 
 const MutationSection15 = ({ data, onSubmit }: Section15FormProps) => {
-  // Initialize with the first item from the array default, as data structure suggests
   const [formData, setFormData] = useState<ISection15Data>(defaultDataSection15[0]);
   const [activeArticleId, setActiveArticleId] = useState<string>('');
 
   useEffect(() => {
-    // Check if data is passed.
     if (data) {
-      // If data comes in as array (legacy or initial fetch), take first, otherwise use as is
-      // We cast here to ensure TS knows the shape for the find() method below
       const normalizedData = (Array.isArray(data) ? data[0] : data) as ISection15Data;
       setFormData(normalizedData);
 
       if (normalizedData.allData && normalizedData.allData.length > 0) {
-        // Only set active ID if current one is invalid
         setActiveArticleId(prev => {
           const exists = normalizedData.allData.find(a => a.id === prev);
           return exists ? prev : normalizedData.allData[0].id;
         });
       }
     } else {
-      // Fallback for initial load
       setFormData(defaultDataSection15[0]);
       setActiveArticleId(defaultDataSection15[0].allData[0].id);
     }
@@ -69,12 +73,10 @@ const MutationSection15 = ({ data, onSubmit }: Section15FormProps) => {
   const activeArticle = formData.allData.find(a => a.id === activeArticleId) || formData.allData[0];
   const activeIndex = formData.allData.findIndex(a => a.id === activeArticleId);
 
-  // --- Section Field Updates ---
   const handleSectionChange = (field: keyof ISection15Data, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  // --- Article Management ---
   const handleAddArticle = () => {
     const newArticle = {
       id: `art-${Date.now()}`,
@@ -115,7 +117,6 @@ const MutationSection15 = ({ data, onSubmit }: Section15FormProps) => {
     }
   };
 
-  // --- Field Updates ---
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const updateArticle = (field: string, value: any) => {
     const updatedArticles = [...formData.allData];
@@ -140,7 +141,6 @@ const MutationSection15 = ({ data, onSubmit }: Section15FormProps) => {
     updateArticle('tags', tags);
   };
 
-  // --- Content Block Management ---
   const addBlock = (type: ArticleBlock['type']) => {
     const newBlock: ArticleBlock =
       type === 'heading'
@@ -163,8 +163,6 @@ const MutationSection15 = ({ data, onSubmit }: Section15FormProps) => {
   const updateBlock = (blockIndex: number, field: string, value: string) => {
     const updatedContent = [...activeArticle.content];
 
-    // We cast to 'any' here to allow dynamic field access on the union type ArticleBlock
-    // This is safe because the input fields are controlled by the specific block renderers below
     const currentBlock = updatedContent[blockIndex] as unknown as Record<string, string>;
     updatedContent[blockIndex] = { ...currentBlock, [field]: value } as ArticleBlock;
 
@@ -184,14 +182,12 @@ const MutationSection15 = ({ data, onSubmit }: Section15FormProps) => {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-indigo-500/30 pb-32 relative overflow-hidden">
-      {/* Ambient Background */}
       <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] bg-indigo-900/10 rounded-full blur-[120px]" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] bg-purple-900/10 rounded-full blur-[120px]" />
       </div>
 
       <div className="max-w-[1600px] mx-auto p-4 md:p-6 space-y-6 relative z-10">
-        {/* Top Header */}
         <div className="flex flex-col items-center md:items-start mb-8">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -208,9 +204,7 @@ const MutationSection15 = ({ data, onSubmit }: Section15FormProps) => {
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
-          {/* LEFT COLUMN: Sidebar (Section Settings & Article List) */}
           <div className="xl:col-span-3 space-y-4 xl:sticky xl:top-8 h-fit">
-            {/* 1. Section Level Settings */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -250,7 +244,6 @@ const MutationSection15 = ({ data, onSubmit }: Section15FormProps) => {
               </div>
             </motion.div>
 
-            {/* 2. Article List */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -327,11 +320,8 @@ const MutationSection15 = ({ data, onSubmit }: Section15FormProps) => {
             </motion.div>
           </div>
 
-          {/* RIGHT COLUMN: Editor Area */}
           <div className="xl:col-span-9 grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {/* 1. Article Metadata */}
             <div className="lg:col-span-4 space-y-6">
-              {/* Main Info Card */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -402,7 +392,6 @@ const MutationSection15 = ({ data, onSubmit }: Section15FormProps) => {
                 </div>
               </motion.div>
 
-              {/* Author & Image Card */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -454,7 +443,6 @@ const MutationSection15 = ({ data, onSubmit }: Section15FormProps) => {
               </motion.div>
             </div>
 
-            {/* 2. Content Builder (Main Area) */}
             <div className="lg:col-span-8 space-y-6">
               <motion.div
                 initial={{ opacity: 0, scale: 0.98 }}
@@ -500,7 +488,6 @@ const MutationSection15 = ({ data, onSubmit }: Section15FormProps) => {
                       animate={{ opacity: 1, y: 0 }}
                       className="group relative pl-8 pr-2 py-2 rounded-lg hover:bg-zinc-900/50 transition-colors border border-transparent hover:border-white/5"
                     >
-                      {/* Drag/Action Handle */}
                       <div className="absolute left-1 top-3 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button onClick={() => moveBlock(index, 'up')} className="text-zinc-600 hover:text-indigo-400">
                           <ChevronRight size={14} className="-rotate-90" />
@@ -511,7 +498,6 @@ const MutationSection15 = ({ data, onSubmit }: Section15FormProps) => {
                         </button>
                       </div>
 
-                      {/* Action Menu */}
                       <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Button
                           size="icon"
@@ -523,7 +509,6 @@ const MutationSection15 = ({ data, onSubmit }: Section15FormProps) => {
                         </Button>
                       </div>
 
-                      {/* Block Renderers */}
                       {block.type === 'heading' && (
                         <div className="flex gap-3 items-center">
                           <Type className="text-indigo-500 shrink-0 mt-2" size={20} />
@@ -611,7 +596,6 @@ const MutationSection15 = ({ data, onSubmit }: Section15FormProps) => {
         </div>
       </div>
 
-      {/* FIXED FLOATING DOCK - SAVE BUTTON */}
       <div className="fixed bottom-6 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
         <motion.div
           initial={{ y: 100, opacity: 0 }}

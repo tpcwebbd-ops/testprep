@@ -1,9 +1,18 @@
+/*
+|-----------------------------------------
+| setting up Page for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Home, MessageCircle, GraduationCap, Award, Users, BookOpen, Briefcase, Target, MessageSquare, Globe2, Headphones } from 'lucide-react';
+
 import MainFooter from '@/components/common/MainFooter';
 
 const Service = () => {
@@ -116,7 +125,6 @@ const Service = () => {
 
   return (
     <>
-      {/* Page Header */}
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="text-center mt-12">
         <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-linear-to-r from-blue-400 via-indigo-400 to-purple-400 mb-3">Our Services</h1>
         <p className="text-gray-400 text-base max-w-2xl mx-auto leading-relaxed">
@@ -124,7 +132,6 @@ const Service = () => {
         </p>
       </motion.div>
 
-      {/* Service Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6 max-w-7xl mx-auto mt-8">
         {serviceData.map((item, index) => (
           <motion.div

@@ -1,6 +1,14 @@
-import { getFormSubmissions, createFormSubmission, updateFormSubmission, deleteFormSubmission, getFormSubmissionById } from './controller';
+/*
+|-----------------------------------------
+| setting up Route for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
 
 import { formatResponse, IResponse } from '@/app/api/utils/jwt-verify';
+
+import { getFormSubmissions, createFormSubmission, updateFormSubmission, deleteFormSubmission, getFormSubmissionById } from './controller';
 
 export async function GET(req: Request) {
   const id = new URL(req.url).searchParams.get('id');

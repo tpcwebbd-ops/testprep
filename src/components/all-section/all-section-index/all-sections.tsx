@@ -1,4 +1,11 @@
-// all-section-index.tsx
+/*
+|-----------------------------------------
+| setting up AllSections for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import { defaultDataSection1 } from '../section-1/data';
 import { defaultDataSection2 } from '../section-2/data';
 import { defaultDataSection3 } from '../section-3/data';

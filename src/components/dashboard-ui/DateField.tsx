@@ -1,13 +1,21 @@
+/*
+|-----------------------------------------
+| setting up DateField for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import * as React from 'react';
 import { format } from 'date-fns';
 import { ChevronDown } from 'lucide-react';
 
+import { cn } from '@/lib/utils';
+import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
-import { Label } from '@/components/ui/label';
-import { cn } from '@/lib/utils';
 
 export interface DateFieldProps {
   id?: string;
@@ -19,7 +27,6 @@ export function DateField({ value, onChange, id = Math.random().toString() }: Da
   const [open, setOpen] = React.useState(false);
   const ref = React.useRef<HTMLDivElement>(null);
 
-  // Close when clicked outside
   React.useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (ref.current && !ref.current.contains(event.target as Node)) {

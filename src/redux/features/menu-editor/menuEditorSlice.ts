@@ -1,3 +1,11 @@
+/*
+|-----------------------------------------
+| setting up MenuEditorSlice for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export interface IMenuItem {
@@ -24,13 +32,13 @@ export const menuEditorApi = createApi({
   reducerPath: 'menuEditorApi',
   baseQuery: fetchBaseQuery({ baseUrl: '/api/menu-editor' }),
   tagTypes: ['Menu'],
-  endpoints: (builder) => ({
+  endpoints: builder => ({
     getMenu: builder.query<IMenuResponse, string>({
-      query: (type) => `?type=${type}`,
+      query: type => `?type=${type}`,
       providesTags: (result, error, type) => [{ type: 'Menu', id: type }],
     }),
     updateMenu: builder.mutation<IMenuResponse, { type: string; items: IMenuItem[] }>({
-      query: (body) => ({
+      query: body => ({
         url: '',
         method: 'POST',
         body,

@@ -1,3 +1,11 @@
+/*
+|-----------------------------------------
+| setting up Mongoose for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import mongoose from 'mongoose';
 
 const MONGODB_URI = process.env.mongooseURI;

@@ -1,33 +1,41 @@
+/*
+|-----------------------------------------
+| setting up TableView for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import { format } from 'date-fns';
 import React, { useState, useMemo } from 'react';
 import { MoreHorizontalIcon, EyeIcon, PencilIcon, TrashIcon, DownloadIcon } from 'lucide-react';
 
+import { cn } from '@/lib/utils';
+import {
+  DropdownMenu,
+  DropdownMenuLabel,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuCheckboxItem,
+} from '@/components/ui/dropdown-menu';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import LoadingComponent from '@/components/common/Loading';
 import ErrorMessageComponent from '@/components/common/Error';
+import { useGetVerificationsQuery } from '@/redux/features/verifications/verificationsSlice';
+import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { cn } from '@/lib/utils';
 
-import { IVerifications } from '../store/data/data';
-import { pageLimitArr } from '../store/store-constant';
-import { useVerificationsStore } from '../store/store';
-import { useGetVerificationsQuery } from '@/redux/features/verifications/verificationsSlice';
 import Pagination from './Pagination';
 import ExportDialog from './ExportDialog';
+import { IVerifications } from '../store/data/data';
+import { useVerificationsStore } from '../store/store';
+import { pageLimitArr } from '../store/store-constant';
 
 type DisplayableVerificationsKeys = 'identifier' | 'value' | 'createdAt';
 type ColumnVisibilityState = Record<DisplayableVerificationsKeys, boolean>;
@@ -166,7 +174,6 @@ const ViewTableNextComponents: React.FC = () => {
           </Button>
         </div>
 
-        {/* ===== Mobile Actions (Sheet popup) ===== */}
         <div className="md:hidden">
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
@@ -246,7 +253,6 @@ const ViewTableNextComponents: React.FC = () => {
 
   return (
     <div className="w-full flex flex-col">
-      {/* Toolbar Section */}
       <div className="w-full my-4">
         <div className="w-full flex md:flex-row items-center justify-between gap-4 pb-2 border-b">
           <div className="flex items-center gap-2 justify-start w-full">
@@ -254,7 +260,6 @@ const ViewTableNextComponents: React.FC = () => {
             <span className="text-sm text-slate-300">({bulkData.length})</span>
           </div>
 
-          {/* ===== Desktop Toolbar ===== */}
           <div className="hidden md:flex items-center justify-end w-full gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -298,7 +303,6 @@ const ViewTableNextComponents: React.FC = () => {
             </Button>
           </div>
 
-          {/* ===== Mobile Toolbar (Sheet) ===== */}
           <div className="flex md:hidden justify-end w-full">
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
@@ -363,7 +367,6 @@ const ViewTableNextComponents: React.FC = () => {
         </div>
       </div>
 
-      {/* ===== Responsive Scrollable Table ===== */}
       {allData.length === 0 ? (
         <div className="py-12 text-center text-2xl text-slate-300">Ops! Nothing was found.</div>
       ) : (
@@ -419,7 +422,6 @@ const ViewTableNextComponents: React.FC = () => {
         </Select>
       </div>
 
-      {/* Render the ExportDialog and pass it the required props */}
       <ExportDialog
         isOpen={isExportDialogOpen}
         onOpenChange={setExportDialogOpen}

@@ -1,17 +1,25 @@
+/*
+|-----------------------------------------
+| setting up DocxUploadManagerSingle for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import React, { useMemo, useState, useEffect } from 'react';
-import { X, Loader2, Ghost, RefreshCcw, Search, CheckCircle2, Zap, FileText, Files, ChevronLeft, ChevronRight, FilePlus, Plus } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 import { FaFileWord } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
+import React, { useMemo, useState, useEffect } from 'react';
+import { X, Loader2, Ghost, RefreshCcw, Search, CheckCircle2, Zap, FileText, Files, ChevronLeft, ChevronRight, FilePlus, Plus } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { UploadButton } from '@/lib/uploadthing';
-
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useGetMediasQuery, useAddMediaMutation } from '@/redux/features/media/mediaSlice';
+import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+
 
 interface MediaItem {
   _id: string;

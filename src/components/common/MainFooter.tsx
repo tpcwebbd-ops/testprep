@@ -1,7 +1,8 @@
 ﻿/*
 |-----------------------------------------
-| English  - Main Footer
-| Author: Toufiquer Rahman <toufiquer.0@gmail.com>
+| setting up MainFooter for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
 |-----------------------------------------
 */
 
@@ -10,9 +11,9 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { BiLogoFacebookCircle, BiLogoLinkedin } from 'react-icons/bi';
 import { BsTwitter } from 'react-icons/bs';
 import { useEffect, useState } from 'react';
+import { BiLogoFacebookCircle, BiLogoLinkedin } from 'react-icons/bi';
 
 interface QuickLink {
   id: number;
@@ -73,7 +74,6 @@ const MainFooter = () => {
   });
 
   useEffect(() => {
-    // Fetch footer settings from API
     const loadSettings = async () => {
       try {
         const res = await fetch('/api/footer-settings');
@@ -112,9 +112,7 @@ const MainFooter = () => {
         viewport={{ once: true }}
         className="max-w-7xl mx-auto px-6 py-12"
       >
-        {/* Top Section */}
         <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {/* Logo & Info */}
           <div>
             <Link href="/" className="flex items-center gap-2">
               <Image
@@ -129,7 +127,6 @@ const MainFooter = () => {
             <p className="mt-4 text-sm text-gray-600 leading-relaxed">{settings.tagline}</p>
           </div>
 
-          {/* Quick Links */}
           <div>
             <h3 className="text-lg font-semibold text-blue-700 mb-3">Quick Links</h3>
             <ul className="space-y-2">
@@ -143,7 +140,6 @@ const MainFooter = () => {
             </ul>
           </div>
 
-          {/* Contact Info */}
           <div>
             <h3 className="text-lg font-semibold text-blue-700 mb-3">Contact Info</h3>
             <ul className="space-y-2 text-sm text-gray-700">
@@ -153,7 +149,6 @@ const MainFooter = () => {
             </ul>
           </div>
 
-          {/* Follow Us */}
           <div>
             <h3 className="text-lg font-semibold text-blue-700 mb-3">Follow Us</h3>
             <div className="flex items-center gap-4">
@@ -172,10 +167,8 @@ const MainFooter = () => {
           </div>
         </div>
 
-        {/* Divider */}
         <div className="my-10 border-t border-white/40" />
 
-        {/* Bottom Section */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs md:text-sm text-gray-600">
           <p>
             &copy; {new Date().getFullYear()} {settings.copyrightText}
@@ -186,7 +179,6 @@ const MainFooter = () => {
         </div>
       </motion.div>
 
-      {/* Floating Gradient Blur Effects */}
       <div className="absolute top-0 left-0 w-40 h-40 bg-blue-300/20 blur-3xl rounded-full animate-pulse" />
       <div className="absolute bottom-0 right-0 w-56 h-56 bg-purple-300/20 blur-3xl rounded-full animate-pulse" />
     </footer>

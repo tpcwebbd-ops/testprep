@@ -1,12 +1,22 @@
+/*
+|-----------------------------------------
+| setting up Query for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { defaultDataSection27, ILogoData, LogoProps } from './data';
 import Image from 'next/image';
+import { useState, useEffect, useCallback } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+
+import { defaultDataSection27, ILogoData, LogoProps } from './data';
 
 const QuerySection27 = ({ data }: LogoProps) => {
   let logoData = defaultDataSection27;
@@ -26,7 +36,6 @@ const QuerySection27 = ({ data }: LogoProps) => {
 
   const totalItems = logos.length;
 
-  // Handle Responsive Count
   useEffect(() => {
     setMounted(true);
     const handleResize = () => {
@@ -40,14 +49,12 @@ const QuerySection27 = ({ data }: LogoProps) => {
       }
     };
 
-    // Initial check
     handleResize();
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [logoData.responsive]);
 
-  // Navigation Logic
   const nextSlide = useCallback(() => {
     setCurrentIndex(prev => {
       if (prev >= totalItems - visibleCount) {
@@ -66,11 +73,9 @@ const QuerySection27 = ({ data }: LogoProps) => {
     });
   }, [totalItems, visibleCount, infiniteLoop]);
 
-  // Autoplay
   useEffect(() => {
     if (!isAutoplay || isPaused || !mounted) return;
 
-    // Don't autoplay if all items are visible
     if (totalItems <= visibleCount && !infiniteLoop) return;
 
     const interval = setInterval(() => {
@@ -80,7 +85,6 @@ const QuerySection27 = ({ data }: LogoProps) => {
     return () => clearInterval(interval);
   }, [isAutoplay, isPaused, autoplaySpeed, nextSlide, totalItems, visibleCount, infiniteLoop, mounted]);
 
-  // Style Maps
   const gapMap = {
     sm: 'px-2',
     md: 'px-4',
@@ -99,7 +103,6 @@ const QuerySection27 = ({ data }: LogoProps) => {
     hidden: { container: 'relative', prev: 'hidden', next: 'hidden', wrapper: '' },
   }[navPosition || 'hidden'];
 
-  // Prevent hydration mismatch flickering
   if (!mounted) return <div className="w-full h-20 bg-transparent animate-pulse" />;
   if (logos.length === 0) return null;
 
@@ -112,7 +115,6 @@ const QuerySection27 = ({ data }: LogoProps) => {
       onMouseLeave={() => pauseOnHover && setIsPaused(false)}
     >
       <div className={navClasses.container}>
-        {/* Prev Button */}
         {navPosition !== 'hidden' && totalItems > visibleCount && (
           <Button
             variant="ghost"
@@ -129,7 +131,6 @@ const QuerySection27 = ({ data }: LogoProps) => {
           </Button>
         )}
 
-        {/* Carousel Window */}
         <div className={cn('overflow-hidden w-full', navClasses.wrapper)}>
           <div
             className="flex items-center transition-transform duration-700 ease-in-out will-change-transform"
@@ -173,7 +174,6 @@ const QuerySection27 = ({ data }: LogoProps) => {
           </div>
         </div>
 
-        {/* Next Button */}
         {navPosition !== 'hidden' && totalItems > visibleCount && (
           <Button
             variant="ghost"

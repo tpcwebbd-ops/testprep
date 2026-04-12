@@ -1,3 +1,11 @@
+/*
+|-----------------------------------------
+| setting up Model for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import mongoose, { Schema } from 'mongoose';
 
 const userSchema = new Schema(
@@ -14,5 +22,4 @@ const userSchema = new Schema(
   { timestamps: true },
 );
 
-// ✅ Explicitly set collection name to match your MongoDB data
 export default mongoose.models.User || mongoose.model('User', userSchema, 'user');

@@ -1,46 +1,58 @@
+/*
+|-----------------------------------------
+| setting up Page for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
-  LayoutGrid,
+  X,
+  Eye,
+  Send,
+  Play,
+  Plus,
+  Code,
   Video,
-  ImageIcon,
+  Music,
+  Cloud,
+  Ghost,
+  Trash2,
+  Upload,
+  Search,
+  Volume2,
+  Loader2,
+  Youtube,
   FileText,
   FileCode,
-  Trash2,
-  Plus,
-  HardDrive,
-  Ghost,
-  Headphones,
-  Volume2,
-  Eye,
-  Search,
-  X,
+  Database,
   RefreshCw,
-  Loader2,
-  Play,
-  Cloud,
-  ExternalLink,
-  AlertTriangle,
+  ImageIcon,
   VideoIcon,
-  Youtube,
-  Music,
-  Code,
-  Send,
+  LayoutGrid,
+  Headphones,
+  ChevronLeft,
+  ExternalLink,
+  ChevronRight,
+  AlertTriangle,
 } from 'lucide-react';
-import { toast } from 'react-toastify';
-import Image from 'next/image';
 import Link from 'next/link';
+import Image from 'next/image';
+import { toast } from 'react-toastify';
+import { motion, AnimatePresence } from 'framer-motion';
 import imageCompression from 'browser-image-compression';
+import React, { useState, useMemo, useEffect } from 'react';
 
-import { Tabs, TabsList, TabsTrigger } from './components/tabs';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import { useGetMediasQuery, useAddMediaMutation, useUpdateMediaMutation, useDeleteMediaMutation } from '@/redux/features/media/mediaSlice';
+import { Button } from '@/components/ui/button';
 import { UploadButton } from '@/lib/uploadthing';
 import { CustomLink } from '@/components/common/LinkButton';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { useGetMediasQuery, useAddMediaMutation, useUpdateMediaMutation, useDeleteMediaMutation } from '@/redux/features/media/mediaSlice';
+
+import { Tabs, TabsList, TabsTrigger } from './components/tabs';
 
 type MediaType = 'all' | 'video' | 'image' | 'pdf' | 'docx' | 'audio';
 type MediaStatus = 'active' | 'trash';
@@ -98,6 +110,7 @@ export default function MediaDashboard() {
 
   const items = useMemo(() => response?.data || [], [response]);
   const totalItems = response?.total || 0;
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
 
   const handleUpdateStatus = async (id: string, newStatus: MediaStatus) => {
     setProcessingId(id);
@@ -186,7 +199,7 @@ export default function MediaDashboard() {
   };
 
   return (
-    <main className="min-h-screen p-2 bg-transparent text-white selection:bg-indigo-500/30">
+    <main className="min-h-screen p-2 bg-transparent text-white selection:bg-indigo-500/30 pb-20 -ml-8">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-7xl mx-auto space-y-6">
         <header className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-sm p-6 shadow-2xl flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="space-y-1 text-center sm:text-left">
@@ -199,29 +212,41 @@ export default function MediaDashboard() {
           </div>
           <div className="flex flex-wrap items-center justify-center gap-3">
             <CustomLink href="/dashboard/media/example/yt-videos" variant="outlineGlassy" size="sm">
-              <Youtube size={16} className="mr-2" /> YouTube Vault
+              <Youtube size={16} className="" /> YouTube
             </CustomLink>
-            <Button size="sm" variant="outlineGlassy" onClick={() => refetch()} disabled={isFetching}>
+            <CustomLink href="/dashboard/media/example/uploadthings" variant="outlineGlassy">
+              <Upload size={16} /> Uploadthings
+            </CustomLink>
+            <CustomLink href="/dashboard/media/example/imagebb" variant="outlineGlassy">
+              <Database size={16} /> Image BB
+            </CustomLink>
+            <Button size="sm" variant="outlineGlassy" onClick={() => refetch()} disabled={isFetching} className="min-w-1">
               <RefreshCw size={16} className={isFetching ? 'animate-spin' : ''} />
             </Button>
-            <Button onClick={() => setIsAddDialogOpen(true)} variant="outlineGlassy" size="sm" className="bg-white/5 border-white/40">
-              <Plus size={18} className="mr-2" /> Ingest
+            <Button onClick={() => setIsAddDialogOpen(true)} variant="outlineGlassy" size="sm" className="bg-white/5 border-white/40 min-w-1">
+              <Plus size={18} className="" /> Add
             </Button>
           </div>
         </header>
 
         <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-sm p-3 shadow-xl flex flex-col lg:flex-row items-center justify-between gap-4">
-          <Tabs value={activeTab} onValueChange={v => setActiveTab(v as MediaType)}>
+          <Tabs
+            value={activeTab}
+            onValueChange={v => {
+              setActiveTab(v as MediaType);
+              setCurrentPage(1);
+            }}
+          >
             <TabsList className="bg-transparent h-10 p-0 gap-2">
               {[
                 { id: 'all', icon: LayoutGrid, l: 'All' },
                 { id: 'image', icon: ImageIcon, l: 'Img' },
-                { id: 'video', icon: Video, l: 'Motion' },
-                { id: 'audio', icon: Headphones, l: 'Sonic' },
+                { id: 'video', icon: Video, l: 'Video' },
+                { id: 'audio', icon: Headphones, l: 'Audio' },
                 { id: 'pdf', icon: FileText, l: 'PDF' },
               ].map(t => (
                 <TabsTrigger key={t.id} value={t.id} className="h-8 px-4 text-[10px] uppercase font-black tracking-widest">
-                  <t.icon size={12} className="mr-2" /> {t.l}
+                  <t.icon size={12} className="" /> <span className="hidden md:flex">{t.l}</span>
                 </TabsTrigger>
               ))}
             </TabsList>
@@ -231,7 +256,10 @@ export default function MediaDashboard() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-indigo-400" />
               <Input
                 value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
+                onChange={e => {
+                  setSearchQuery(e.target.value);
+                  setCurrentPage(1);
+                }}
                 className="bg-white/5 border-white/10 pl-10 h-8 text-xs w-48"
                 placeholder="Search Archive..."
               />
@@ -242,7 +270,10 @@ export default function MediaDashboard() {
                   key={s}
                   variant="ghost"
                   size="sm"
-                  onClick={() => setActiveStatus(s as MediaStatus)}
+                  onClick={() => {
+                    setActiveStatus(s as MediaStatus);
+                    setCurrentPage(1);
+                  }}
                   className={`h-6 px-3 text-[9px] uppercase font-black tracking-widest ${activeStatus === s ? 'bg-white/10' : 'text-white/30'}`}
                 >
                   {s}
@@ -252,12 +283,17 @@ export default function MediaDashboard() {
           </div>
         </div>
 
-        <section className="min-h-[60vh] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+        <section className="min-h-[60vh] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6 content-start">
           <AnimatePresence>
             {isLoading ? (
               <div className="col-span-full flex flex-col items-center justify-center py-40 gap-4 opacity-20">
                 <Loader2 size={40} className="animate-spin" />
                 <span className="text-[10px] font-mono tracking-[0.5em] uppercase">Synchronizing</span>
+              </div>
+            ) : items.length === 0 ? (
+              <div className="col-span-full flex flex-col items-center justify-center py-40 gap-4 opacity-20 text-center">
+                <Ghost size={40} className="animate-pulse" />
+                <span className="text-[10px] font-mono tracking-[0.5em] uppercase">Nothing was found</span>
               </div>
             ) : (
               items.map((item: MediaItem, idx: number) => (
@@ -266,7 +302,9 @@ export default function MediaDashboard() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.05 }}
-                  className="group relative backdrop-blur-3xl bg-white/[0.03] border border-white/10 rounded-sm overflow-hidden flex flex-col h-full hover:border-white/30 transition-all shadow-xl"
+                  className={`group relative backdrop-blur-3xl bg-white/[0.03] border border-white/10 rounded-sm overflow-hidden flex flex-col hover:border-white/30 transition-all shadow-xl ${
+                    processingId === item._id ? 'opacity-50 pointer-events-none scale-95' : ''
+                  }`}
                 >
                   <div className="relative aspect-video bg-black/60 overflow-hidden">
                     {item.contentType === 'image' && (
@@ -313,11 +351,12 @@ export default function MediaDashboard() {
                         size="sm"
                         variant="outlineFire"
                         className="h-8 px-2"
+                        disabled={processingId === item._id}
                         onClick={() =>
                           activeStatus === 'active' ? handleUpdateStatus(item._id, 'trash') : (setMediaToDelete(item), setIsDeleteDialogOpen(true))
                         }
                       >
-                        <Trash2 size={14} />
+                        {processingId === item._id ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
                       </Button>
                     </div>
                   </div>
@@ -336,6 +375,68 @@ export default function MediaDashboard() {
             )}
           </AnimatePresence>
         </section>
+
+        {totalItems > 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex flex-col lg:flex-row justify-between items-center gap-4 mt-8 p-4 backdrop-blur-xl bg-white/5 border border-white/10 rounded-sm shadow-xl"
+          >
+            <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-white/40">
+              Tracking <span className="text-indigo-50/50">{(currentPage - 1) * pageSize + 1}</span> -{' '}
+              <span className="text-indigo-50/50">{Math.min(currentPage * pageSize, totalItems)}</span> of <span className="text-white">{totalItems}</span>{' '}
+              Nodes
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <div className="flex items-center gap-2 lg:border-r border-white/10 lg:pr-4">
+                <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-white/40">Size:</span>
+                <div className="flex bg-black/20 p-1 rounded-sm border border-white/5">
+                  {[10, 20, 50, 100].map(size => (
+                    <button
+                      key={size}
+                      onClick={() => {
+                        setPageSize(size);
+                        setCurrentPage(1);
+                      }}
+                      className={`px-3 py-1 text-[9px] font-black tracking-widest rounded-sm transition-all uppercase ${
+                        pageSize === size ? 'bg-white/10 text-white' : 'text-white/30 hover:text-white/60 hover:bg-white/5'
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outlineGlassy"
+                  size="sm"
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1 || isFetching}
+                  className="h-8 px-4 text-[10px] uppercase font-black tracking-widest disabled:opacity-30 bg-white/5 border-white/10 hover:bg-white/10"
+                >
+                  <ChevronLeft size={14} className="mr-2" /> Prev
+                </Button>
+
+                <div className="px-4 py-2 bg-black/20 border border-white/5 rounded-sm text-[10px] font-black tracking-widest uppercase text-white/60">
+                  Page <span className="text-indigo-400">{currentPage}</span> / {totalPages}
+                </div>
+
+                <Button
+                  variant="outlineGlassy"
+                  size="sm"
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  disabled={currentPage === totalPages || isFetching || totalPages === 0}
+                  className="h-8 px-4 text-[10px] uppercase font-black tracking-widest disabled:opacity-30 bg-white/5 border-white/10 hover:bg-white/10"
+                >
+                  Next <ChevronRight size={14} className="ml-2" />
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+        )}
       </motion.div>
 
       <Dialog
@@ -385,8 +486,7 @@ export default function MediaDashboard() {
                 </button>
 
                 {['imageUploader', 'videoUploader', 'audioUploader', 'pdfUploader', 'documentUploader'].map(endpoint => {
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  const icons: Record<string, any> = {
+                  const icons: Record<string, React.ElementType> = {
                     imageUploader: ImageIcon,
                     videoUploader: VideoIcon,
                     audioUploader: Music,
@@ -401,15 +501,13 @@ export default function MediaDashboard() {
                     >
                       <Icon className="w-8 h-8 text-white/20 group-hover:text-indigo-400 mb-2 transition-colors" />
                       <UploadButton
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        endpoint={endpoint as any}
+                        endpoint={endpoint as 'imageUploader' | 'videoUploader' | 'audioUploader' | 'pdfUploader' | 'documentUploader'}
                         onClientUploadComplete={res => {
                           if (res?.[0]) {
                             addMedia({
                               url: res[0].url,
                               name: res[0].name,
-                              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                              contentType: endpoint.replace('Uploader', '').replace('document', 'docx') as any,
+                              contentType: endpoint.replace('Uploader', '').replace('document', 'docx') as MediaType,
                               status: 'active',
                             }).unwrap();
                             setIsAddDialogOpen(false);
@@ -456,7 +554,7 @@ export default function MediaDashboard() {
         <DialogContent className="max-w-5xl bg-black/95 border-white/20 backdrop-blur-3xl text-white p-0 overflow-hidden shadow-2xl mt-4">
           <DialogTitle className="sr-only">Viewer</DialogTitle>
           <div className="aspect-video w-full bg-black flex items-center justify-center">
-            {previewMedia?.contentType === 'image' && <Image src={previewMedia.url} alt="" fill className="object-contain" unoptimized />}
+            {previewMedia?.contentType === 'image' && <Image src={previewMedia.url} alt="preview Image" fill className="object-contain" unoptimized />}
             {previewMedia?.contentType === 'video' &&
               (previewMedia.uploaderPlace === 'youtube' ? (
                 <iframe src={previewMedia.url} className="w-full h-full" allow="autoplay; encrypted-media" allowFullScreen />

@@ -1,7 +1,16 @@
+/*
+|-----------------------------------------
+| setting up Query for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import React from 'react';
 import { Users, CheckCircle, Award, TrendingUp, Star, Globe, Zap, HelpCircle } from 'lucide-react';
+
 import { defaultDataSection37, ISection37Data, Section37Props } from './data';
 
 const iconMap: { [key: string]: React.ElementType } = {
@@ -34,7 +43,6 @@ const QuerySection37 = ({ data }: Section37Props) => {
     <div className="w-full bg-gradient-to-br from-red-50 to-orange-50 py-16 px-4">
       <div className="container mx-auto px-4 md:px-6">
         <div className="bg-gradient-to-r from-red-500 via-orange-500 to-amber-500 rounded-[2.5rem] p-10 md:p-16 text-center shadow-2xl relative overflow-hidden group">
-          {/* Animated Background Circles */}
           <div className="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl group-hover:bg-white/15 transition-all duration-700" />
           <div className="absolute bottom-0 right-0 w-80 h-80 bg-white/10 rounded-full translate-x-1/3 translate-y-1/3 blur-3xl group-hover:bg-white/15 transition-all duration-700" />
 

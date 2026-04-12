@@ -1,31 +1,41 @@
+/*
+|-----------------------------------------
+| setting up Mutation for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
+import {
+  X,
+  Tag,
+  Save,
+  Plus,
+  Users,
+  Trash2,
+  MapPin,
+  Ticket,
+  Layers,
+  Sparkles,
+  ImageIcon,
+  ChevronDown,
+  CalendarDays,
+  LayoutTemplate,
+  Badge as BadgeIcon,
+} from 'lucide-react';
+import Image from 'next/image';
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import {
-  Save,
-  Plus,
-  Trash2,
-  Users,
-  CalendarDays,
-  MapPin,
-  Ticket,
-  LayoutTemplate,
-  ImageIcon,
-  ChevronDown,
-  Tag,
-  X,
-  Sparkles,
-  Layers,
-  Badge as BadgeIcon,
-} from 'lucide-react';
-import { ISection14Data, defaultDataSection14, IEvent } from './data';
 import ImageUploadManagerSingle from '@/components/dashboard-ui/ImageUploadManagerSingle';
-import Image from 'next/image';
+
+import { ISection14Data, defaultDataSection14, IEvent } from './data';
 
 export interface Section14FormProps {
   data?: ISection14Data;
@@ -33,7 +43,6 @@ export interface Section14FormProps {
 }
 
 const MutationSection14 = ({ data, onSubmit }: Section14FormProps) => {
-  // Initialize with safe defaults
   const [formData, setFormData] = useState<ISection14Data>({
     ...defaultDataSection14,
     categories: defaultDataSection14.categories || [],
@@ -42,13 +51,11 @@ const MutationSection14 = ({ data, onSubmit }: Section14FormProps) => {
   const [expandedEvent, setExpandedEvent] = useState<string | null>(null);
   const [newCategory, setNewCategory] = useState('');
 
-  // Update state when data prop changes, ensuring arrays exist
   useEffect(() => {
     if (data && typeof data !== 'string') {
       setFormData(prev => ({
         ...prev,
         ...data,
-        // Safety check: ensure arrays are never undefined
         categories: data.categories || prev.categories || [],
         events: data.events || prev.events || [],
       }));
@@ -77,7 +84,6 @@ const MutationSection14 = ({ data, onSubmit }: Section14FormProps) => {
       date: 'TBD',
       location: 'TBD',
       image: '',
-      // Default to first category if available, else 'General'
       category: categories.length > 0 ? categories[0] : 'General',
       description: 'Event details goes here...',
       actionText: 'Register',
@@ -98,7 +104,6 @@ const MutationSection14 = ({ data, onSubmit }: Section14FormProps) => {
     setExpandedEvent(expandedEvent === id ? null : id);
   };
 
-  // --- Category Management ---
   const handleAddCategory = () => {
     const currentCategories = formData.categories || [];
     if (newCategory.trim() && !currentCategories.includes(newCategory.trim())) {
@@ -119,14 +124,12 @@ const MutationSection14 = ({ data, onSubmit }: Section14FormProps) => {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-rose-500/30 pb-32 relative overflow-hidden">
-      {/* Ambient Background */}
       <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute top-[-10%] left-[-5%] w-[40vw] h-[40vw] bg-rose-900/10 rounded-full blur-[120px]" />
         <div className="absolute bottom-[-10%] right-[-5%] w-[40vw] h-[40vw] bg-orange-900/10 rounded-full blur-[120px]" />
       </div>
 
       <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-8 relative z-10">
-        {/* Header */}
         <div className="flex flex-col items-center md:items-start text-center md:text-left mb-8">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -143,9 +146,7 @@ const MutationSection14 = ({ data, onSubmit }: Section14FormProps) => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Left Panel: Settings & Categories */}
           <div className="lg:col-span-4 space-y-6 h-fit lg:sticky lg:top-8">
-            {/* General Settings */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -195,7 +196,6 @@ const MutationSection14 = ({ data, onSubmit }: Section14FormProps) => {
               </div>
             </motion.div>
 
-            {/* Category Manager */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -222,7 +222,6 @@ const MutationSection14 = ({ data, onSubmit }: Section14FormProps) => {
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                  {/* Safe .map() with fallback */}
                   {(formData.categories || []).map(cat => (
                     <motion.span
                       key={cat}
@@ -254,10 +253,8 @@ const MutationSection14 = ({ data, onSubmit }: Section14FormProps) => {
             </motion.div>
           </div>
 
-          {/* Right Panel: Events List */}
           <div className="lg:col-span-8 space-y-6">
             <AnimatePresence>
-              {/* Safe .map() with fallback */}
               {(formData.events || []).map((evt, index) => (
                 <motion.div
                   key={evt.id}
@@ -319,7 +316,6 @@ const MutationSection14 = ({ data, onSubmit }: Section14FormProps) => {
                       >
                         <div className="p-6 md:p-8 space-y-8 bg-zinc-950/30">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            {/* Left Column Fields */}
                             <div className="space-y-5">
                               <div className="space-y-2">
                                 <Label className="text-zinc-400 text-xs uppercase font-bold tracking-wider">Event Name</Label>
@@ -359,7 +355,6 @@ const MutationSection14 = ({ data, onSubmit }: Section14FormProps) => {
                                   <Label className="text-zinc-400 text-xs uppercase font-bold tracking-wider flex items-center gap-1">
                                     <Tag size={12} /> Category
                                   </Label>
-                                  {/* Custom Styled Select for Categories */}
                                   <div className="relative">
                                     <select
                                       value={evt.category}
@@ -369,7 +364,6 @@ const MutationSection14 = ({ data, onSubmit }: Section14FormProps) => {
                                       <option value="" disabled>
                                         Select Category
                                       </option>
-                                      {/* Safe .map() with fallback */}
                                       {(formData.categories || []).map(cat => (
                                         <option key={cat} value={cat} className="bg-zinc-900 text-zinc-100">
                                           {cat}
@@ -393,7 +387,6 @@ const MutationSection14 = ({ data, onSubmit }: Section14FormProps) => {
                               </div>
                             </div>
 
-                            {/* Right Column Fields */}
                             <div className="space-y-5">
                               <div className="space-y-2">
                                 <Label className="text-zinc-400 text-xs uppercase font-bold tracking-wider flex items-center gap-1">
@@ -431,7 +424,6 @@ const MutationSection14 = ({ data, onSubmit }: Section14FormProps) => {
         </div>
       </div>
 
-      {/* Floating Dock - Save Button */}
       <div className="fixed bottom-6 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
         <motion.div
           initial={{ y: 100, opacity: 0 }}

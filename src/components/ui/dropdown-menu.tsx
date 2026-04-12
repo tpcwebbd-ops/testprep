@@ -1,8 +1,17 @@
+/*
+|-----------------------------------------
+| setting up DropdownMenu for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import * as React from 'react';
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import { CheckIcon, ChevronRightIcon, CircleIcon } from 'lucide-react';
+
 import { cn } from '@/lib/utils';
 
 function DropdownMenu(props: React.ComponentProps<typeof DropdownMenuPrimitive.Root>) {
@@ -24,10 +33,8 @@ function DropdownMenuContent({ className, sideOffset = 4, ...props }: React.Comp
         data-slot="dropdown-menu-content"
         sideOffset={sideOffset}
         className={cn(
-          // 🌟 Glassmorphism Core Styles
           'z-50 min-w-[8rem] rounded-lg border border-white/20 bg-white/10 backdrop-blur-xl shadow-xl',
           'p-1 overflow-hidden text-white',
-          // ✨ Animation
           'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
           'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
           className,
@@ -53,7 +60,6 @@ function DropdownMenuItem({
       data-inset={inset}
       data-variant={variant}
       className={cn(
-        // 🌟 Glassy + Interactive
         'relative flex cursor-pointer items-center select-none gap-2 rounded-md px-2 py-1.5 text-sm outline-none',
         'text-white/80 hover:text-white transition-all',
         'hover:bg-white/20 focus:bg-white/30',
@@ -73,7 +79,6 @@ function DropdownMenuCheckboxItem({ className, children, checked, ...props }: Re
       data-slot="dropdown-menu-checkbox-item"
       checked={checked}
       className={cn(
-        // 🌟 Checkbox with highlight glow
         'relative flex cursor-pointer items-center select-none rounded-md py-1.5 pr-2 pl-8 text-sm outline-none',
         'text-white/80 hover:text-white transition-all',
         'hover:bg-white/20 focus:bg-white/30',

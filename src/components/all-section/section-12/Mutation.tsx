@@ -1,12 +1,22 @@
+/*
+|-----------------------------------------
+| setting up Mutation for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from '@/components/ui/button';
+import { Save, Plus, Trash2, Briefcase, Calendar, Trophy, Target, Layers, X, ChevronDown, ChevronUp, Sparkles, Wand2 } from 'lucide-react';
+
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Save, Plus, Trash2, Briefcase, Calendar, Trophy, Target, Layers, X, ChevronDown, ChevronUp, Sparkles, Wand2 } from 'lucide-react';
+
 import { ISection12Data, defaultDataSection12, IExperienceItem } from './data';
 
 export interface Section12FormProps {
@@ -19,7 +29,6 @@ const MutationSection12 = ({ data, onSubmit }: Section12FormProps) => {
   const [expandedExp, setExpandedExp] = useState<string | null>(null);
   const [featureInputs, setFeatureInputs] = useState<{ [key: string]: string }>({});
 
-  // Initialize with first item expanded or from data
   useEffect(() => {
     if (data && typeof data !== 'string') {
       setFormData(data);
@@ -76,7 +85,6 @@ const MutationSection12 = ({ data, onSubmit }: Section12FormProps) => {
     const value = featureInputs[id]?.trim();
     if (value) {
       const updated = [...formData.experiences];
-      // FIX: Create a shallow copy of the experience object before modifying features
       updated[index] = {
         ...updated[index],
         features: [...updated[index].features, value],
@@ -88,7 +96,6 @@ const MutationSection12 = ({ data, onSubmit }: Section12FormProps) => {
 
   const removeFeature = (expIndex: number, featureIndex: number) => {
     const updated = [...formData.experiences];
-    // FIX: Create a shallow copy of the experience object before modifying features
     updated[expIndex] = {
       ...updated[expIndex],
       features: updated[expIndex].features.filter((_, i) => i !== featureIndex),
@@ -99,13 +106,11 @@ const MutationSection12 = ({ data, onSubmit }: Section12FormProps) => {
   const editFeature = (expIndex: number, featureIndex: number, id: string) => {
     const featureToEdit = formData.experiences[expIndex].features[featureIndex];
     const updated = [...formData.experiences];
-    // FIX: Create a shallow copy of the experience object before modifying features
     updated[expIndex] = {
       ...updated[expIndex],
       features: updated[expIndex].features.filter((_, i) => i !== featureIndex),
     };
     setFormData(prev => ({ ...prev, experiences: updated }));
-    // Set into input
     setFeatureInputs(prev => ({ ...prev, [id]: featureToEdit }));
   };
 
@@ -115,14 +120,12 @@ const MutationSection12 = ({ data, onSubmit }: Section12FormProps) => {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-indigo-500/30 pb-32">
-      {/* Background Ambience */}
       <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] bg-indigo-900/10 rounded-full blur-[120px]" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] bg-fuchsia-900/10 rounded-full blur-[120px]" />
       </div>
 
       <div className="max-w-7xl mx-auto p-4 md:p-8 relative z-10">
-        {/* Header Section */}
         <div className="mb-12 flex flex-col items-center md:items-start text-center md:text-left space-y-4">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -141,7 +144,6 @@ const MutationSection12 = ({ data, onSubmit }: Section12FormProps) => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Left Column: Section Settings */}
           <div className="lg:col-span-4 space-y-6 h-fit lg:sticky lg:top-8">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -199,7 +201,6 @@ const MutationSection12 = ({ data, onSubmit }: Section12FormProps) => {
             </motion.div>
           </div>
 
-          {/* Right Column: Experiences List */}
           <div className="lg:col-span-8 space-y-6">
             <AnimatePresence>
               {formData.experiences.map((exp, index) => (
@@ -213,7 +214,6 @@ const MutationSection12 = ({ data, onSubmit }: Section12FormProps) => {
                     expandedExp === exp.id ? 'border-indigo-500/40 ring-1 ring-indigo-500/20' : 'border-white/5 hover:border-white/10'
                   } rounded-3xl overflow-hidden backdrop-blur-md transition-all duration-300`}
                 >
-                  {/* Collapsed Header */}
                   <div className="p-6 cursor-pointer" onClick={() => toggleExpand(exp.id)}>
                     <div className="flex items-start md:items-center justify-between gap-4">
                       <div className="flex items-center gap-5">
@@ -246,7 +246,6 @@ const MutationSection12 = ({ data, onSubmit }: Section12FormProps) => {
                     </div>
                   </div>
 
-                  {/* Expanded Content */}
                   <AnimatePresence>
                     {expandedExp === exp.id && (
                       <motion.div
@@ -256,7 +255,6 @@ const MutationSection12 = ({ data, onSubmit }: Section12FormProps) => {
                         className="border-t border-white/5"
                       >
                         <div className="p-6 md:p-8 space-y-8 bg-slate-950/30">
-                          {/* Core Fields Grid */}
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div className="space-y-5">
                               <div className="space-y-2">
@@ -292,7 +290,6 @@ const MutationSection12 = ({ data, onSubmit }: Section12FormProps) => {
                             </div>
 
                             <div className="space-y-5">
-                              {/* Milestone Box */}
                               <div className="bg-gradient-to-br from-indigo-900/20 to-purple-900/20 border border-indigo-500/20 rounded-2xl p-5 space-y-4">
                                 <div className="flex items-center gap-2 text-indigo-300 text-xs font-bold uppercase tracking-widest">
                                   <Target size={14} /> Highlight Milestone
@@ -342,7 +339,6 @@ const MutationSection12 = ({ data, onSubmit }: Section12FormProps) => {
                             />
                           </div>
 
-                          {/* Skills Section */}
                           <div className="space-y-3 pt-4 border-t border-white/5">
                             <Label className="text-slate-400 flex items-center gap-2 text-xs uppercase tracking-wider">
                               <Wand2 size={12} /> Skills & Tech Stack
@@ -400,7 +396,6 @@ const MutationSection12 = ({ data, onSubmit }: Section12FormProps) => {
                             </div>
                           </div>
 
-                          {/* Footer Actions */}
                           <div className="flex justify-end pt-4 border-t border-white/5">
                             <Button
                               variant="ghost"
@@ -425,7 +420,6 @@ const MutationSection12 = ({ data, onSubmit }: Section12FormProps) => {
         </div>
       </div>
 
-      {/* Floating Bottom Dock for Save Action */}
       <div className="fixed bottom-6 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
         <motion.div
           initial={{ y: 100, opacity: 0 }}

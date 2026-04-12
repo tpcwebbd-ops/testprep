@@ -1,7 +1,16 @@
+/*
+|-----------------------------------------
+| setting up Query for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import { ChevronRight, BookOpen, Users, Award, TrendingUp, Play, Star, Zap } from 'lucide-react';
+
 import { defaultDataSection31, ISection31Data, Section31Props } from './data';
 
 const iconMap: { [key: string]: React.ReactNode } = {
@@ -35,7 +44,6 @@ const QuerySection31 = ({ data }: Section31Props) => {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
 
-  // Parse data
   let sectionData = defaultDataSection31;
   if (data) {
     if (typeof data === 'string') {
@@ -49,7 +57,6 @@ const QuerySection31 = ({ data }: Section31Props) => {
     }
   }
 
-  // Ensure arrays exist to prevent crashes
   const testimonials = sectionData.testimonials?.length ? sectionData.testimonials : defaultDataSection31.testimonials;
   const stats = sectionData.stats?.length ? sectionData.stats : defaultDataSection31.stats;
 
@@ -66,7 +73,6 @@ const QuerySection31 = ({ data }: Section31Props) => {
   return (
     <main className="w-full">
       <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-900 to-pink-900 relative overflow-hidden flex items-center justify-center py-20">
-        {/* Animated Background Elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-[-10%] left-[-5%] w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-3xl animate-pulse" />
           <div className="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] bg-pink-600/20 rounded-full blur-3xl animate-pulse delay-1000" />
@@ -75,15 +81,12 @@ const QuerySection31 = ({ data }: Section31Props) => {
 
         <div className="relative z-10 container mx-auto px-6 lg:px-12">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
-            {/* Left Content */}
             <div className={`transform transition-all duration-1000 ease-out ${isVisible ? 'translate-x-0 opacity-100' : '-translate-x-12 opacity-0'}`}>
-              {/* Badge */}
               <div className="inline-flex items-center bg-white/5 backdrop-blur-md rounded-full px-5 py-2 mb-8 border border-white/10 shadow-lg hover:bg-white/10 transition-colors cursor-default">
                 <Star className="w-4 h-4 text-yellow-400 mr-2.5 fill-yellow-400" />
                 <span className="text-white/90 text-xs sm:text-sm font-semibold tracking-wide uppercase">{sectionData.badge}</span>
               </div>
 
-              {/* Headline */}
               <h1 className="text-5xl lg:text-7xl font-bold text-white mb-6 leading-[1.1]">
                 {sectionData.headingPrefix} <br />
                 <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
@@ -94,7 +97,6 @@ const QuerySection31 = ({ data }: Section31Props) => {
 
               <p className="text-lg lg:text-xl text-indigo-100/80 mb-10 leading-relaxed max-w-xl">{sectionData.description}</p>
 
-              {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-5 mb-12">
                 <button className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white px-8 py-4 rounded-2xl font-bold flex items-center justify-center group transition-all duration-300 shadow-xl shadow-purple-900/30">
                   <span className="relative z-10 flex items-center">
@@ -112,7 +114,6 @@ const QuerySection31 = ({ data }: Section31Props) => {
                 </button>
               </div>
 
-              {/* Testimonial Carousel */}
               {testimonials.length > 0 && (
                 <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 max-w-md shadow-2xl relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-500 to-pink-500" />
@@ -132,7 +133,6 @@ const QuerySection31 = ({ data }: Section31Props) => {
               )}
             </div>
 
-            {/* Right Content - Stats Grid */}
             <div
               className={`transform transition-all duration-1000 delay-300 ease-out ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-12 opacity-0'}`}
             >

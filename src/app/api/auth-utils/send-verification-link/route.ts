@@ -1,6 +1,14 @@
-// app/api/auth-utils/send-verification-link/route.ts
-import { NextResponse } from 'next/server';
+/*
+|-----------------------------------------
+| setting up Route for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 import nodemailer from 'nodemailer';
+import { NextResponse } from 'next/server';
+
 import { formatResponse, IResponse } from '@/app/api/utils/utils';
 
 const GMAIL_USER = process.env.GMAIL_USER!;

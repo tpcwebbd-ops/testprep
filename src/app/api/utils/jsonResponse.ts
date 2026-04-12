@@ -1,4 +1,11 @@
-// src/lib/error-codes.ts
+/*
+|-----------------------------------------
+| setting up JsonResponse for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
+
 export const ERROR_CODES = {
   SUCCESS: { code: 200, message: 'OK', id: 'S2000' },
   CREATED: { code: 201, message: 'Created successfully', id: 'S2010' },

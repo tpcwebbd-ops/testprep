@@ -1,10 +1,12 @@
-'use client';
+/*
+|-----------------------------------------
+| setting up RichTextEditorField for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, April, 2026
+|-----------------------------------------
+*/
 
-import React, { useEffect } from 'react';
-import { useEditor, EditorContent, Editor } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import Highlight from '@tiptap/extension-highlight';
-import TextAlign from '@tiptap/extension-text-align';
+'use client';
 
 import {
   AlignCenter,
@@ -23,14 +25,16 @@ import {
   ListOrdered,
   Strikethrough,
 } from 'lucide-react';
+import React, { useEffect } from 'react';
 
-import { Toggle } from '@/components/ui/toggle';
-import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
+import StarterKit from '@tiptap/starter-kit';
+import { Label } from '@/components/ui/label';
+import { Toggle } from '@/components/ui/toggle';
+import Highlight from '@tiptap/extension-highlight';
+import TextAlign from '@tiptap/extension-text-align';
+import { useEditor, EditorContent, Editor } from '@tiptap/react';
 
-// ----------------------
-// Menu Bar Component
-// ----------------------
 function EditorMenuBar({ editor }: { editor: Editor | null }) {
   if (!editor) return null;
 
@@ -113,9 +117,6 @@ function EditorMenuBar({ editor }: { editor: Editor | null }) {
   );
 }
 
-// ----------------------
-// RichTextEditorField
-// ----------------------
 export interface RichTextEditorProps {
   id: string;
   value: string;
