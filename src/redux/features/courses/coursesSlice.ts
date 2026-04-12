@@ -12,7 +12,7 @@ export const coursesApi = apiSlice.injectEndpoints({
   endpoints: builder => ({
     getCourses: builder.query({
       query: ({ page, limit, q }) => {
-        let url = `/api/courses?page=${page || 1}&limit=${limit || 10}`;
+        let url = `/api/courses/v1?page=${page || 1}&limit=${limit || 10}`;
         if (q) {
           url += `&q=${encodeURIComponent(q)}`;
         }
@@ -21,12 +21,12 @@ export const coursesApi = apiSlice.injectEndpoints({
       providesTags: [{ type: 'tagTypeCourses' as const, id: 'LIST' }],
     }),
     getCourseById: builder.query({
-      query: id => `/api/courses?id=${id}`,
+      query: id => `/api/courses/v1?id=${id}`,
       providesTags: (result, error, id) => [{ type: 'tagTypeCourses' as const, id }],
     }),
     addCourse: builder.mutation({
       query: newCourse => ({
-        url: '/api/courses',
+        url: '/api/courses/v1',
         method: 'POST',
         body: newCourse,
       }),
@@ -34,7 +34,7 @@ export const coursesApi = apiSlice.injectEndpoints({
     }),
     updateCourse: builder.mutation({
       query: ({ id, ...data }) => ({
-        url: `/api/courses`,
+        url: `/api/courses/v1`,
         method: 'PUT',
         body: { id, ...data },
       }),
@@ -45,7 +45,7 @@ export const coursesApi = apiSlice.injectEndpoints({
     }),
     deleteCourse: builder.mutation({
       query: ({ id }) => ({
-        url: `/api/courses`,
+        url: `/api/courses/v1`,
         method: 'DELETE',
         body: { id },
       }),
@@ -56,7 +56,7 @@ export const coursesApi = apiSlice.injectEndpoints({
     }),
     bulkUpdateCourses: builder.mutation({
       query: bulkData => ({
-        url: `/api/courses?bulk=true`,
+        url: `/api/courses/v1?bulk=true`,
         method: 'PUT',
         body: bulkData,
       }),
@@ -64,7 +64,7 @@ export const coursesApi = apiSlice.injectEndpoints({
     }),
     bulkDeleteCourses: builder.mutation({
       query: bulkData => ({
-        url: `/api/courses?bulk=true`,
+        url: `/api/courses/v1?bulk=true`,
         method: 'DELETE',
         body: bulkData,
       }),

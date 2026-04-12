@@ -90,6 +90,7 @@ export async function updateCourse(req: Request): Promise<IResponse> {
         runValidators: false,
       });
       if (!updated) return formatResponse(null, 'Not found', 404);
+
       return formatResponse(updated, 'Updated successfully', 200);
     } catch (error: unknown) {
       if (isMongoError(error) && error.code === 11000) {
