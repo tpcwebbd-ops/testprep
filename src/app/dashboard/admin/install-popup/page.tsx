@@ -284,20 +284,20 @@ export default function AdminPWAPage() {
                       <label className="text-[10px] font-black text-white/70 uppercase tracking-[0.2em]">Label</label>
                       <input
                         type="text"
-                        value={config[key].text}
+                        value={config[key]?.text || ''}
                         onChange={e => updateBtn(key, 'text', e.target.value)}
                         className="h-12 w-full bg-white/5 border border-white/20 rounded-sm px-4 text-sm font-black text-white outline-none focus:border-white/40 transition-all"
                       />
                     </div>
 
-                    <ColorPicker label="Backing Value" value={config[key].bgColor} onChange={val => updateBtn(key, 'bgColor', val)} />
-                    <ColorPicker label="Ink Identity" value={config[key].textColor} onChange={val => updateBtn(key, 'textColor', val)} />
+                    <ColorPicker label="Backing Value" value={config[key]?.bgColor || ''} onChange={val => updateBtn(key, 'bgColor', val)} />
+                    <ColorPicker label="Ink Identity" value={config[key]?.textColor || ''} onChange={val => updateBtn(key, 'textColor', val)} />
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-4">
                         <label className="text-[10px] font-black text-white/70 uppercase tracking-[0.2em]">Geometry</label>
                         <select
-                          value={config[key].size}
+                          value={config[key]?.size || ''}
                           onChange={e => updateBtn(key, 'size', e.target.value)}
                           className="h-12 w-full bg-white/5 border border-white/20 rounded-sm px-4 text-[10px] font-black uppercase text-white outline-none focus:border-white transition-all appearance-none"
                         >
@@ -316,7 +316,7 @@ export default function AdminPWAPage() {
                       <div className="space-y-4">
                         <label className="text-[10px] font-black text-white/70 uppercase tracking-[0.2em]">Physics</label>
                         <select
-                          value={config[key].animation}
+                          value={config[key]?.animation || ''}
                           onChange={e => updateBtn(key, 'animation', e.target.value)}
                           className="h-12 w-full bg-white/5 border border-white/20 rounded-sm px-4 text-[10px] font-black uppercase text-white outline-none focus:border-white transition-all appearance-none"
                         >
@@ -360,7 +360,7 @@ export default function AdminPWAPage() {
 
                 <div className="h-[650px] bg-gradient-to-br from-slate-900 to-black w-full relative flex items-center justify-center p-6">
                   <div className="absolute inset-0 grid grid-cols-3 gap-6 p-10 content-start opacity-10 mt-12">
-                    {[...Array(9)].map((_, i) => (
+                    {[...Array(9)]?.map((_, i) => (
                       <div key={i} className="aspect-square rounded-sm bg-white/20 border border-white/10"></div>
                     ))}
                   </div>

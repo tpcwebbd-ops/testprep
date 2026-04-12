@@ -10,7 +10,7 @@ import { cache } from 'react';
 import { notFound } from 'next/navigation';
 import { Type, Layers } from 'lucide-react';
 
-import { PageContent } from '@/app/dashboard/page-builder/utils';
+import { PageContent } from '@/app/dashboard/admin/page-builder/utils';
 import { AllForms, AllFormsKeys } from '@/components/all-form/all-form-index/all-form';
 import { AllSections, AllSectionsKeys } from '@/components/all-section/all-section-index/all-sections';
 

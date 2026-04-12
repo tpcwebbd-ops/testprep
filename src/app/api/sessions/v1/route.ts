@@ -18,7 +18,7 @@ export async function GET(req: Request) {
 
   if (process.env.AuthorizationEnable === 'true') {
     const wantToAccess: IWantAccess = {
-      db_name: 'sessions',
+      db_name: 'session',
       access: 'read',
     };
     const isAccess = await isUserHasAccessByRole(wantToAccess);
@@ -35,7 +35,7 @@ export async function POST(req: Request) {
 
   if (process.env.AuthorizationEnable === 'true') {
     const wantToAccess: IWantAccess = {
-      db_name: 'sessions',
+      db_name: 'session',
       access: 'create',
     };
     const isAccess = await isUserHasAccessByRole(wantToAccess);
@@ -51,7 +51,7 @@ export async function PUT(req: Request) {
 
   if (process.env.AuthorizationEnable === 'true') {
     const wantToAccess: IWantAccess = {
-      db_name: 'sessions',
+      db_name: 'session',
       access: 'update',
     };
     const isAccess = await isUserHasAccessByRole(wantToAccess);
@@ -69,7 +69,7 @@ export async function DELETE(req: Request) {
 
   if (process.env.AuthorizationEnable === 'true') {
     const wantToAccess: IWantAccess = {
-      db_name: 'sessions',
+      db_name: 'session',
       access: 'delete',
     };
     const isAccess = await isUserHasAccessByRole(wantToAccess);

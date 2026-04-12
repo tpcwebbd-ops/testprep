@@ -15,7 +15,7 @@ import {
   getAccessManagementById,
   bulkUpdateAccessManagements,
   bulkDeleteAccessManagements,
-} from './controller';
+} from './controller';  
 
 import { formatResponse, IResponse } from '@/app/api/utils/jwt-verify';
 import { isUserHasAccessByRole, IWantAccess } from '../../utils/is-user-has-access-by-role';

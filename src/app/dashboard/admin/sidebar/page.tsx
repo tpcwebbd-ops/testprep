@@ -45,7 +45,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent, pointerWithin } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 
-
 type DeviceType = 'mobile' | 'tablet' | 'desktop';
 
 interface SidebarItem {
@@ -168,17 +167,17 @@ function SortableItem({
 
         <div className="flex items-center gap-1 shrink-0">
           <div className="hidden lg:flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
-            <Button variant="ghost" size="icon" onClick={() => onView(item)} className="h-8 w-8 hover:bg-blue-500/20 text-blue-400">
+            <Button variant="ghost" size="icon" onClick={() => onView(item)} className="h-8 w-8 hover:bg-blue-500/20 text-blue-400 min-w-1">
               <Eye size={16} />
             </Button>
-            <Button variant="ghost" size="icon" onClick={() => onEdit(item)} className="h-8 w-8 hover:bg-amber-500/20 text-amber-400">
+            <Button variant="ghost" size="icon" onClick={() => onEdit(item)} className="h-8 w-8 hover:bg-amber-500/20 text-amber-400 min-w-1">
               <Edit2 size={16} />
             </Button>
-            <Button variant="ghost" size="icon" onClick={() => onDelete(item)} className="h-8 w-8 hover:bg-rose-500/20 text-rose-400">
+            <Button variant="ghost" size="icon" onClick={() => onDelete(item)} className="h-8 w-8 hover:bg-rose-500/20 text-rose-400 min-w-1">
               <Trash2 size={16} />
             </Button>
             {!isChild && (
-              <Button variant="ghost" size="icon" onClick={() => onAddChild?.(item)} className="h-8 w-8 hover:bg-emerald-500/20 text-emerald-400">
+              <Button variant="ghost" size="icon" onClick={() => onAddChild?.(item)} className="h-8 w-8 hover:bg-emerald-500/20 text-emerald-400 min-w-1">
                 <Plus size={16} />
               </Button>
             )}
