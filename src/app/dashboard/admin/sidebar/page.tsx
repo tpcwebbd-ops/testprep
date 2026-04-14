@@ -8,25 +8,24 @@
 
 'use client';
 
-import {
-  X,
-  Eye,
-  Plus,
-  Save,
-  Edit2,
-  Trash2,
-  Search,
-  ArrowUp,
-  ArrowDown,
-  ArrowUpDown,
-  MoreVertical,
-  ChevronRight,
-  GripVertical,
-  Menu as MenuIcon,
-} from 'lucide-react';
-import { toast } from 'react-toastify';
 import React, { useState, useEffect, useMemo } from 'react';
+import { X, Eye, Plus, Edit2, Trash2, Search, ArrowUp, ArrowDown, ArrowUpDown, MoreVertical, ChevronRight, GripVertical, Menu as MenuIcon } from 'lucide-react';
+import { toast } from 'react-toastify';
 import { motion, AnimatePresence } from 'framer-motion';
+import {
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+  DragStartEvent,
+  DragOverlay,
+  pointerWithin,
+  defaultDropAnimationSideEffects,
+} from '@dnd-kit/core';
+import { SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 import {
   useGetSidebarsQuery,
@@ -35,15 +34,12 @@ import {
   useDeleteSidebarMutation,
   useBulkUpdateSidebarsMutation,
 } from '@/redux/features/sidebars/sidebarsSlice';
-import { CSS } from '@dnd-kit/utilities';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { iconMap, iconOptions } from '@/components/all-icons/all-icons-jsx';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent, pointerWithin } from '@dnd-kit/core';
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 
 type DeviceType = 'mobile' | 'tablet' | 'desktop';
 
@@ -56,19 +52,25 @@ interface SidebarItem {
   children?: SidebarItem[];
 }
 
-interface SortableItemProps {
+interface SidebarCardProps {
   item: SidebarItem;
-  onView: (item: SidebarItem) => void;
-  onEdit: (item: SidebarItem) => void;
-  onDelete: (item: SidebarItem) => void;
+  onView?: (item: SidebarItem) => void;
+  onEdit?: (item: SidebarItem) => void;
+  onDelete?: (item: SidebarItem) => void;
   onAddChild?: (parentItem: SidebarItem) => void;
   onToggleCollapse?: (itemId: number) => void;
   onReorderRequest?: (item: SidebarItem) => void;
   isCollapsed?: boolean;
   isChild?: boolean;
-  isOverTarget?: boolean;
   isDragging?: boolean;
+  isOverlay?: boolean;
   deviceType: DeviceType;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  attributes?: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  listeners?: any;
+  setNodeRef?: (node: HTMLElement | null) => void;
+  style?: React.CSSProperties;
 }
 
 function useDeviceType(): DeviceType {
@@ -94,26 +96,145 @@ const getIcon = (name: string) => {
   return <IconComp size={18} />;
 };
 
-function SortableItem({
-  item,
-  onView,
-  onEdit,
-  onDelete,
-  onAddChild,
-  onToggleCollapse,
-  onReorderRequest,
-  isCollapsed = false,
-  isChild = false,
-  isOverTarget = false,
-  isDragging = false,
-  deviceType,
-}: SortableItemProps) {
-  const isDesktop = deviceType === 'desktop';
-  const [showActions, setShowActions] = useState(false);
+const SidebarCard = React.forwardRef<HTMLDivElement, SidebarCardProps>(
+  (
+    {
+      item,
+      onView,
+      onEdit,
+      onDelete,
+      onAddChild,
+      onToggleCollapse,
+      onReorderRequest,
+      isCollapsed = false,
+      isChild = false,
+      isOverlay = false,
+      deviceType,
+      attributes,
+      listeners,
+      style,
+    },
+    ref,
+  ) => {
+    const isDesktop = deviceType === 'desktop';
+    const [showActions, setShowActions] = useState(false);
+    const hasChildren = item.children && item.children.length > 0;
 
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
-    id: item.sl_no.toString(),
-    disabled: !isDesktop,
+    return (
+      <motion.div
+        ref={ref}
+        style={style}
+        layout={!isOverlay}
+        initial={!isOverlay ? { opacity: 0, scale: 0.95 } : false}
+        animate={!isOverlay ? { opacity: 1, scale: 1 } : false}
+        className={`group relative backdrop-blur-2xl bg-white/5 border ${
+          isOverlay ? 'border-blue-500 ring-1 ring-blue-500/50 shadow-2xl scale-105' : 'border-white/10'
+        } rounded-2xl p-3 mb-3 transition-all duration-300 ${isChild ? 'ml-6 sm:ml-10' : ''}`}
+      >
+        <div className="flex items-center gap-0 w-full">
+          {isDesktop ? (
+            <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing p-2 hover:bg-white/10 rounded-lg transition-colors shrink-0">
+              <GripVertical size={18} className="text-white/30 group-hover:text-white/70" />
+            </div>
+          ) : (
+            <Button onClick={() => onReorderRequest?.(item)} variant="ghost" size="icon" className="h-9 w-9 text-white/40 hover:text-white shrink-0 min-w-1">
+              <ArrowUpDown size={18} />
+            </Button>
+          )}
+
+          {!isChild && (
+            <button
+              onClick={() => onToggleCollapse?.(item.sl_no)}
+              className={`p-1 text-white/40 min-w-1 hover:text-white transition-all duration-300 ${isCollapsed ? '' : 'rotate-90'} ${
+                !hasChildren ? 'opacity-0 pointer-events-none' : ''
+              }`}
+            >
+              <ChevronRight size={20} />
+            </button>
+          )}
+
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <div className="p-2.5 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-xl border border-white/5 group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-all">
+              {getIcon(item.iconName)}
+            </div>
+            <div className="flex flex-col min-w-0 flex-1">
+              <span className="font-semibold text-sm sm:text-base text-white truncate">{item.name}</span>
+              <span className="text-[10px] sm:text-xs text-white/50 font-mono truncate">{item.path}</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1 shrink-0">
+            <div className="hidden lg:flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
+              <Button variant="ghost" size="icon" onClick={() => onView?.(item)} className="h-8 w-8 hover:bg-blue-500/20 text-blue-400 min-w-1">
+                <Eye size={16} />
+              </Button>
+              <Button variant="ghost" size="icon" onClick={() => onEdit?.(item)} className="h-8 w-8 hover:bg-amber-500/20 text-amber-400 min-w-1">
+                <Edit2 size={16} />
+              </Button>
+              <Button variant="ghost" size="icon" onClick={() => onDelete?.(item)} className="h-8 w-8 hover:bg-rose-500/20 text-rose-400 min-w-1">
+                <Trash2 size={16} />
+              </Button>
+              {!isChild && (
+                <Button variant="ghost" size="icon" onClick={() => onAddChild?.(item)} className="h-8 w-8 hover:bg-emerald-500/20 text-emerald-400 min-w-1">
+                  <Plus size={16} />
+                </Button>
+              )}
+            </div>
+
+            <div className="lg:hidden">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowActions(!showActions)}
+                className={`h-9 w-9 min-w-1 -ml-2 transition-colors ${showActions ? 'bg-white/10 text-white' : 'text-white/40'}`}
+              >
+                {showActions ? <X size={18} /> : <MoreVertical size={18} />}
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        <AnimatePresence>
+          {showActions && (
+            <motion.div
+              initial={{ height: 0, opacity: 0, marginTop: 0 }}
+              animate={{ height: 'auto', opacity: 1, marginTop: 12 }}
+              exit={{ height: 0, opacity: 0, marginTop: 0 }}
+              className="overflow-hidden border-t border-white/5 pt-3"
+            >
+              <div className="grid grid-cols-4 gap-2">
+                <Button variant="secondary" className="bg-white/5 hover:bg-blue-500/20 text-blue-400 border-none h-11" onClick={() => onView?.(item)}>
+                  <Eye size={18} />
+                </Button>
+                <Button variant="secondary" className="bg-white/5 hover:bg-amber-500/20 text-amber-400 border-none h-11" onClick={() => onEdit?.(item)}>
+                  <Edit2 size={18} />
+                </Button>
+                <Button variant="secondary" className="bg-white/5 hover:bg-rose-500/20 text-rose-400 border-none h-11" onClick={() => onDelete?.(item)}>
+                  <Trash2 size={18} />
+                </Button>
+                {!isChild && (
+                  <Button
+                    variant="secondary"
+                    className="bg-white/5 hover:bg-emerald-500/20 text-emerald-400 border-none h-11"
+                    onClick={() => onAddChild?.(item)}
+                  >
+                    <Plus size={18} />
+                  </Button>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    );
+  },
+);
+SidebarCard.displayName = 'SidebarCard';
+
+function SortableItemWrapper(props: SidebarCardProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: props.item.sl_no.toString(),
+    disabled: props.deviceType !== 'desktop',
   });
 
   const style = {
@@ -122,109 +243,7 @@ function SortableItem({
     opacity: isDragging ? 0.3 : 1,
   };
 
-  const hasChildren = item.children && item.children.length > 0;
-
-  return (
-    <motion.div
-      ref={setNodeRef}
-      style={style}
-      layout
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className={`group relative backdrop-blur-2xl bg-white/5 border ${
-        isOverTarget ? 'border-blue-500 ring-1 ring-blue-500/50' : 'border-white/10'
-      } rounded-2xl p-3 mb-3 transition-all duration-300 ${isChild ? 'ml-6 sm:ml-10' : ''}`}
-    >
-      <div className="flex items-center gap-2 sm:gap-4 w-full">
-        {isDesktop ? (
-          <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing p-2 hover:bg-white/10 rounded-lg transition-colors shrink-0">
-            <GripVertical size={18} className="text-white/30 group-hover:text-white/70" />
-          </div>
-        ) : (
-          <Button onClick={() => onReorderRequest?.(item)} variant="ghost" size="icon" className="h-9 w-9 text-white/40 hover:text-white shrink-0 min-w-1">
-            <ArrowUpDown size={18} />
-          </Button>
-        )}
-
-        {!isChild && (
-          <button
-            onClick={() => onToggleCollapse?.(item.sl_no)}
-            className={`p-1 text-white/40 min-w-1 hover:text-white transition-all duration-300 ${isCollapsed ? '' : 'rotate-90'} ${!hasChildren ? 'opacity-0 pointer-events-none' : ''}`}
-          >
-            <ChevronRight size={20} />
-          </button>
-        )}
-
-        <div className="flex items-center gap-3 flex-1 min-w-0">
-          <div className="p-2.5 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-xl border border-white/5 group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-all">
-            {getIcon(item.iconName)}
-          </div>
-          <div className="flex flex-col min-w-0 flex-1">
-            <span className="font-semibold text-sm sm:text-base text-white truncate">{item.name}</span>
-            <span className="text-[10px] sm:text-xs text-white/50 font-mono truncate">{item.path}</span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-1 shrink-0">
-          <div className="hidden lg:flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
-            <Button variant="ghost" size="icon" onClick={() => onView(item)} className="h-8 w-8 hover:bg-blue-500/20 text-blue-400 min-w-1">
-              <Eye size={16} />
-            </Button>
-            <Button variant="ghost" size="icon" onClick={() => onEdit(item)} className="h-8 w-8 hover:bg-amber-500/20 text-amber-400 min-w-1">
-              <Edit2 size={16} />
-            </Button>
-            <Button variant="ghost" size="icon" onClick={() => onDelete(item)} className="h-8 w-8 hover:bg-rose-500/20 text-rose-400 min-w-1">
-              <Trash2 size={16} />
-            </Button>
-            {!isChild && (
-              <Button variant="ghost" size="icon" onClick={() => onAddChild?.(item)} className="h-8 w-8 hover:bg-emerald-500/20 text-emerald-400 min-w-1">
-                <Plus size={16} />
-              </Button>
-            )}
-          </div>
-
-          <div className="lg:hidden">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setShowActions(!showActions)}
-              className={`h-9 w-9 min-w-1 -ml-2 transition-colors ${showActions ? 'bg-white/10 text-white' : 'text-white/40'}`}
-            >
-              {showActions ? <X size={18} /> : <MoreVertical size={18} />}
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      <AnimatePresence>
-        {showActions && (
-          <motion.div
-            initial={{ height: 0, opacity: 0, marginTop: 0 }}
-            animate={{ height: 'auto', opacity: 1, marginTop: 12 }}
-            exit={{ height: 0, opacity: 0, marginTop: 0 }}
-            className="overflow-hidden border-t border-white/5 pt-3"
-          >
-            <div className="grid grid-cols-4 gap-2">
-              <Button variant="secondary" className="bg-white/5 hover:bg-blue-500/20 text-blue-400 border-none h-11" onClick={() => onView(item)}>
-                <Eye size={18} />
-              </Button>
-              <Button variant="secondary" className="bg-white/5 hover:bg-amber-500/20 text-amber-400 border-none h-11" onClick={() => onEdit(item)}>
-                <Edit2 size={18} />
-              </Button>
-              <Button variant="secondary" className="bg-white/5 hover:bg-rose-500/20 text-rose-400 border-none h-11" onClick={() => onDelete(item)}>
-                <Trash2 size={18} />
-              </Button>
-              {!isChild && (
-                <Button variant="secondary" className="bg-white/5 hover:bg-emerald-500/20 text-emerald-400 border-none h-11" onClick={() => onAddChild?.(item)}>
-                  <Plus size={18} />
-                </Button>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
-  );
+  return <SidebarCard ref={setNodeRef} style={style} {...props} attributes={attributes} listeners={listeners} isDragging={isDragging} />;
 }
 
 export default function SiteMenuPage() {
@@ -232,10 +251,13 @@ export default function SiteMenuPage() {
   const { data: sidebarData, isLoading, refetch } = useGetSidebarsQuery({ page: 1, limit: 100 });
   const [addSidebar] = useAddSidebarMutation();
   const [updateSidebar] = useUpdateSidebarMutation();
-  const [deleteSidebar] = useDeleteSidebarMutation();
+  const [deleteSidebarMutation] = useDeleteSidebarMutation();
   const [bulkUpdateSidebars] = useBulkUpdateSidebarsMutation();
 
   const [menuItems, setMenuItems] = useState<SidebarItem[]>([]);
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [activeItem, setActiveItem] = useState<SidebarItem | null>(null);
+
   const [viewItem, setViewItem] = useState<SidebarItem | null>(null);
   const [editItem, setEditItem] = useState<SidebarItem | null>(null);
   const [addParentItem, setAddParentItem] = useState<SidebarItem | null>(null);
@@ -276,50 +298,188 @@ export default function SiteMenuPage() {
     });
   };
 
-  const handleManualMove = (direction: 'up' | 'down') => {
-    if (!reorderItem) return;
-    const newItems = JSON.parse(JSON.stringify(menuItems));
-
-    const findAndMove = (list: SidebarItem[]): boolean => {
-      const idx = list.findIndex(i => i.sl_no === reorderItem.sl_no);
-      if (idx !== -1) {
-        const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
-        if (targetIdx >= 0 && targetIdx < list.length) {
-          [list[idx], list[targetIdx]] = [list[targetIdx], list[idx]];
-          return true;
-        }
-        return false;
+  const autoSave = async (items: SidebarItem[]) => {
+    try {
+      const payload = items
+        .filter(i => i._id)
+        .map(i => ({
+          id: i._id,
+          updateData: { ...i },
+        }));
+      if (payload.length > 0) {
+        await bulkUpdateSidebars(payload).unwrap();
       }
-      for (const item of list) {
-        if (item.children && findAndMove(item.children)) return true;
-      }
-      return false;
-    };
-
-    if (findAndMove(newItems)) {
-      setMenuItems(updateSlNo(newItems));
-      toast.success('Position updated');
-      setReorderItem(null);
-    } else {
-      toast.info('End of list');
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      toast.error('Failed to sync changes automatically');
     }
   };
 
+  const deepUpdate = (list: SidebarItem[], sl_no: number, data: Partial<SidebarItem>): boolean => {
+    for (let i = 0; i < list.length; i++) {
+      const item = list[i];
+      if (item.sl_no === sl_no) {
+        list[i] = { ...item, ...data };
+        return true;
+      }
+      if (item.children && deepUpdate(item.children as SidebarItem[], sl_no, data)) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const deepDelete = (list: SidebarItem[], sl_no: number): boolean => {
+    for (let i = 0; i < list.length; i++) {
+      const item = list[i];
+      if (item.sl_no === sl_no) {
+        list.splice(i, 1);
+        return true;
+      }
+      if (item.children && deepDelete(item.children as SidebarItem[], sl_no)) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const findArrayContainingId = (list: SidebarItem[], id: number): SidebarItem[] | null => {
+    if (list.some(i => i.sl_no === id)) return list;
+    for (const item of list) {
+      if (item.children) {
+        const found = findArrayContainingId(item.children as SidebarItem[], id);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+
+  const handleManualMove = (direction: 'up' | 'down') => {
+    if (!reorderItem) return;
+    const newItems = JSON.parse(JSON.stringify(menuItems));
+    const targetArray = findArrayContainingId(newItems, reorderItem.sl_no);
+
+    if (targetArray) {
+      const idx = targetArray.findIndex(i => i.sl_no === reorderItem.sl_no);
+      const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
+
+      if (targetIdx >= 0 && targetIdx < targetArray.length) {
+        [targetArray[idx], targetArray[targetIdx]] = [targetArray[targetIdx], targetArray[idx]];
+        const finalized = updateSlNo(newItems);
+        setMenuItems(finalized);
+        autoSave(finalized);
+        toast.success('Position updated');
+        setReorderItem(null);
+        return;
+      }
+    }
+    toast.info('End of list');
+  };
+
+  const handleDragStart = (event: DragStartEvent) => {
+    const { active } = event;
+    setActiveId(active.id.toString());
+    const findItem = (list: SidebarItem[], id: number): SidebarItem | null => {
+      for (const item of list) {
+        if (item.sl_no === id) return item;
+        if (item.children) {
+          const found = findItem(item.children as SidebarItem[], id);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
+    setActiveItem(findItem(menuItems, parseInt(active.id.toString())));
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
+    setActiveId(null);
+    setActiveItem(null);
     const { active, over } = event;
     if (!over || active.id === over.id) return;
+
     const activeIdNum = parseInt(active.id.toString());
     const overIdNum = parseInt(over.id.toString());
 
     setMenuItems(prev => {
-      const activeIdx = prev.findIndex(i => i.sl_no === activeIdNum);
-      const overIdx = prev.findIndex(i => i.sl_no === overIdNum);
-      if (activeIdx !== -1 && overIdx !== -1) return updateSlNo(arrayMove(prev, activeIdx, overIdx));
+      const newItems = JSON.parse(JSON.stringify(prev));
+      const activeArray = findArrayContainingId(newItems, activeIdNum);
+      const overArray = findArrayContainingId(newItems, overIdNum);
+
+      if (activeArray && overArray && activeArray === overArray) {
+        const activeIdx = activeArray.findIndex(i => i.sl_no === activeIdNum);
+        const overIdx = overArray.findIndex(i => i.sl_no === overIdNum);
+        activeArray.splice(overIdx, 0, activeArray.splice(activeIdx, 1)[0]);
+        const finalized = updateSlNo(newItems);
+        autoSave(finalized);
+        return finalized;
+      }
       return prev;
     });
   };
 
-  if (isLoading)
+  const handleSaveEntry = async () => {
+    try {
+      if (editItem) {
+        if (editItem._id) {
+          await updateSidebar({ id: editItem._id, ...formData }).unwrap();
+        }
+        const newItems = JSON.parse(JSON.stringify(menuItems));
+        deepUpdate(newItems, editItem.sl_no, formData);
+        const finalized = updateSlNo(newItems);
+        setMenuItems(finalized);
+        await autoSave(finalized);
+        toast.success('Updated successfully');
+      } else if (addParentItem) {
+        const newItems = JSON.parse(JSON.stringify(menuItems));
+        const parentArray = findArrayContainingId(newItems, addParentItem.sl_no);
+        if (parentArray) {
+          const parent = parentArray.find(i => i.sl_no === addParentItem.sl_no);
+          if (parent) {
+            parent.children = parent.children || [];
+            parent.children.push({ ...formData, sl_no: Date.now() });
+          }
+        }
+        const finalized = updateSlNo(newItems);
+        setMenuItems(finalized);
+        await autoSave(finalized);
+        toast.success('Sub-entry created');
+      } else {
+        await addSidebar({ ...formData, sl_no: (menuItems.length + 1) * 10, children: [] }).unwrap();
+        toast.success('Sidebar created successfully');
+        refetch();
+      }
+      setIsAddingNew(false);
+      setEditItem(null);
+      setAddParentItem(null);
+    } catch {
+      toast.error('Failed to save entry');
+    }
+  };
+
+  const handleDeleteEntry = async () => {
+    if (!deleteItem) return;
+    try {
+      const isTopLevel = menuItems.some(i => i.sl_no === deleteItem.sl_no);
+      if (isTopLevel && deleteItem._id) {
+        await deleteSidebarMutation({ id: deleteItem._id }).unwrap();
+        toast.success('Deleted successfully');
+        refetch();
+      } else {
+        const newItems = JSON.parse(JSON.stringify(menuItems));
+        deepDelete(newItems, deleteItem.sl_no);
+        const finalized = updateSlNo(newItems);
+        setMenuItems(finalized);
+        await autoSave(finalized);
+        toast.success('Deleted sub-entry');
+      }
+      setDeleteItem(null);
+    } catch {
+      toast.error('Failed to delete');
+    }
+  };
+
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#020617]">
         <motion.div
@@ -329,29 +489,41 @@ export default function SiteMenuPage() {
         />
       </div>
     );
+  }
+
+  const dropAnimationConfig = {
+    sideEffects: defaultDropAnimationSideEffects({ styles: { active: { opacity: '0.5' } } }),
+  };
 
   return (
     <main className="min-h-screen text-slate-200 p-4 md:p-12 font-sans overflow-x-hidden">
       <div className="max-w-4xl mx-auto">
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12 relative z-10">
           <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }}>
             <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-white/40">
               Sidebars
             </h1>
-            <p className="text-slate-50/50 mt-2 text-lg">Manage and reorder your system navigation</p>
           </motion.div>
-          <Button onClick={() => setIsAddingNew(true)} variant="outlineGlassy">
-            <Plus className="mr-2" size={22} /> Add New
-          </Button>
+          <motion.div initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }}>
+            <Button
+              onClick={() => {
+                setFormData({ name: '', path: '', iconName: 'ShieldCheck' });
+                setIsAddingNew(true);
+              }}
+              variant="outlineGlassy"
+            >
+              <Plus className="mr-2" size={22} /> Add New
+            </Button>
+          </motion.div>
         </header>
 
-        <section className="relative">
-          <DndContext sensors={sensors} collisionDetection={pointerWithin} onDragEnd={handleDragEnd}>
+        <section className="relative z-10">
+          <DndContext sensors={sensors} collisionDetection={pointerWithin} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             <SortableContext items={menuItems.map(i => i.sl_no.toString())} strategy={verticalListSortingStrategy}>
-              <AnimatePresence mode="popLayout">
+              <div className="space-y-4">
                 {menuItems.map(item => (
                   <div key={item.sl_no}>
-                    <SortableItem
+                    <SortableItemWrapper
                       item={item}
                       onView={setViewItem}
                       onEdit={i => {
@@ -359,15 +531,15 @@ export default function SiteMenuPage() {
                         setFormData({ name: i.name, path: i.path, iconName: i.iconName });
                       }}
                       onDelete={setDeleteItem}
-                      onAddChild={setAddParentItem}
+                      onAddChild={i => {
+                        setAddParentItem(i);
+                        setFormData({ name: '', path: '', iconName: 'ShieldCheck' });
+                      }}
                       onToggleCollapse={id =>
                         setCollapsedItems(prev => {
                           const next = new Set(prev);
-                          if (next.has(id)) {
-                            next.delete(id);
-                          } else {
-                            next.add(id);
-                          }
+                          if (next.has(id)) next.delete(id);
+                          else next.add(id);
                           return next;
                         })
                       }
@@ -375,45 +547,50 @@ export default function SiteMenuPage() {
                       isCollapsed={collapsedItems.has(item.sl_no)}
                       deviceType={deviceType}
                     />
-                    {!collapsedItems.has(item.sl_no) && item.children && (
-                      <div className="relative">
-                        <div className="absolute left-6 top-0 bottom-6 w-px bg-gradient-to-b from-blue-500/20 to-transparent" />
-                        {item.children.map(child => (
-                          <SortableItem
-                            key={child.sl_no}
-                            item={child}
-                            onView={setViewItem}
-                            onEdit={i => {
-                              setEditItem(i);
-                              setFormData({ name: i.name, path: i.path, iconName: i.iconName });
-                            }}
-                            onDelete={setDeleteItem}
-                            onReorderRequest={setReorderItem}
-                            isChild
-                            deviceType={deviceType}
-                          />
-                        ))}
-                      </div>
-                    )}
+
+                    <AnimatePresence>
+                      {!collapsedItems.has(item.sl_no) && item.children && item.children.length > 0 && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="relative overflow-hidden"
+                        >
+                          <div className="absolute left-6 top-0 bottom-6 w-px bg-gradient-to-b from-blue-500/20 to-transparent" />
+                          <div className="pt-2">
+                            <SortableContext items={item.children.map(c => c.sl_no.toString())} strategy={verticalListSortingStrategy}>
+                              {item.children.map(child => (
+                                <SortableItemWrapper
+                                  key={child.sl_no}
+                                  item={child}
+                                  onView={setViewItem}
+                                  onEdit={i => {
+                                    setEditItem(i);
+                                    setFormData({ name: i.name, path: i.path, iconName: i.iconName });
+                                  }}
+                                  onDelete={setDeleteItem}
+                                  onReorderRequest={setReorderItem}
+                                  isChild
+                                  deviceType={deviceType}
+                                />
+                              ))}
+                            </SortableContext>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 ))}
-              </AnimatePresence>
+              </div>
             </SortableContext>
+
+            <DragOverlay dropAnimation={dropAnimationConfig}>
+              {activeId && activeItem ? (
+                <SidebarCard item={activeItem} isChild={menuItems.every(i => i.sl_no !== activeItem.sl_no)} deviceType={deviceType} isOverlay />
+              ) : null}
+            </DragOverlay>
           </DndContext>
         </section>
-
-        <footer className="mt-16 flex justify-end pb-20">
-          <Button
-            onClick={async () => {
-              const payload = menuItems.map(i => ({ id: i._id, updateData: { ...i } }));
-              await bulkUpdateSidebars(payload).unwrap();
-              toast.success('Hierarchy synchronized');
-            }}
-            variant="outlineGlassy"
-          >
-            <Save className="mr-2" size={22} /> Save All Changes
-          </Button>
-        </footer>
       </div>
 
       <Dialog open={!!viewItem} onOpenChange={() => setViewItem(null)}>
@@ -456,10 +633,10 @@ export default function SiteMenuPage() {
           </DialogHeader>
           <div className="grid gap-4 py-6">
             <Button onClick={() => handleManualMove('up')} variant="outlineGlassy">
-              Shift Upwards <ArrowUp className="text-blue-400" />
+              Shift Upwards <ArrowUp className="text-blue-400 ml-2" />
             </Button>
             <Button onClick={() => handleManualMove('down')} variant="outlineGlassy">
-              Shift Downwards <ArrowDown className="text-purple-400" />
+              Shift Downwards <ArrowDown className="text-purple-400 ml-2" />
             </Button>
           </div>
         </DialogContent>
@@ -467,10 +644,12 @@ export default function SiteMenuPage() {
 
       <Dialog
         open={isAddingNew || !!editItem || !!addParentItem}
-        onOpenChange={() => {
-          setIsAddingNew(false);
-          setEditItem(null);
-          setAddParentItem(null);
+        onOpenChange={isOpen => {
+          if (!isOpen) {
+            setIsAddingNew(false);
+            setEditItem(null);
+            setAddParentItem(null);
+          }
         }}
       >
         <DialogContent className="bg-blue-400 rounded-sm bg-clip-padding backdrop-filter backdrop-blur-md mt-2 text-white bg-opacity-30 border border-gray-100 p-0 overflow-hidden shadow-3xl">
@@ -537,35 +716,7 @@ export default function SiteMenuPage() {
             >
               Cancel
             </Button>
-            <Button
-              onClick={async () => {
-                try {
-                  if (editItem?._id) await updateSidebar({ id: editItem._id, ...formData }).unwrap();
-                  else if (addParentItem) {
-                    const newItems = JSON.parse(JSON.stringify(menuItems));
-                    const findAndAdd = (list: SidebarItem[]) => {
-                      const parent = list.find(l => l.sl_no === addParentItem.sl_no);
-                      if (parent) {
-                        parent.children = [...(parent.children || []), { ...formData, sl_no: Date.now() }];
-                        return true;
-                      }
-                      for (const l of list) if (l.children && findAndAdd(l.children)) return true;
-                      return false;
-                    };
-                    findAndAdd(newItems);
-                    setMenuItems(updateSlNo(newItems));
-                  } else await addSidebar({ ...formData, sl_no: (menuItems.length + 1) * 10, children: [] }).unwrap();
-                  toast.success('successful');
-                  setIsAddingNew(false);
-                  setEditItem(null);
-                  setAddParentItem(null);
-                  refetch();
-                } catch {
-                  toast.error('Failed');
-                }
-              }}
-              variant="outlineGlassy"
-            >
+            <Button variant="outlineGlassy" onClick={handleSaveEntry}>
               Confirm
             </Button>
           </div>
@@ -584,15 +735,7 @@ export default function SiteMenuPage() {
             <Button variant="outlineGlassy" onClick={() => setDeleteItem(null)}>
               Cancel
             </Button>
-            <Button
-              variant="outlineFire"
-              onClick={async () => {
-                if (deleteItem?._id) await deleteSidebar({ id: deleteItem._id }).unwrap();
-                toast.success('Deleted');
-                setDeleteItem(null);
-                refetch();
-              }}
-            >
+            <Button variant="outlineFire" onClick={handleDeleteEntry}>
               Delete
             </Button>
           </DialogFooter>
