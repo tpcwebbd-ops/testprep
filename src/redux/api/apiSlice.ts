@@ -25,6 +25,7 @@ export const apiSlice = createApi({
     'tagTypeFormSubmission',
     'DashboardEditor',
     'tagTypeMedia',
+    'tagTypeMyCourses',
   ],
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({
