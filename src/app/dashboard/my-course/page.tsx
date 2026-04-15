@@ -22,6 +22,8 @@ import {
   Sparkles,
   CheckCircle,
   Info,
+  Clock4,
+  ExternalLink,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -55,7 +57,8 @@ interface IEnrollment {
   _id: string;
   studentEmail: string;
   enrollCoursesIDS: string[];
-  paymentStatus: string;
+  paymentStatus: string; // 'pending' | 'completed' | 'failed' | 'refunded'
+  studentsStatus: string; // 'blocked' | 'pending' | 'complete' | 'running'
 }
 
 const containerVariants = {
@@ -84,6 +87,8 @@ export default function MyCoursesPage() {
 
   // Queries
   const { data: coursesData, isLoading: isCoursesLoading, error: coursesError, refetch: refetchCourses } = useGetCoursesQuery({ page: 1, limit: 100 });
+
+  // MyCourses Query (Used for Attendance stats)
   const {
     data: myCoursesData,
     isLoading: isMyCoursesLoading,
@@ -91,30 +96,57 @@ export default function MyCoursesPage() {
     refetch: refetchMyCourses,
   } = useGetMyCoursesQuery({ page: 1, limit: 100 });
 
-  // Enrollments Query for the current user
-  const { data: enrollmentsData, refetch: refetchEnrollments } = useGetEnrollmentsQuery({ page: 1, limit: 100, q: studentInfo.email });
+  // Enrollments Query for the current user (Used for categorizing sections)
+  const {
+    data: enrollmentsData,
+    isLoading: isEnrollmentsLoading,
+    error: enrollmentsError,
+    refetch: refetchEnrollments,
+  } = useGetEnrollmentsQuery({ page: 1, limit: 100, q: studentInfo.email });
 
   // Mutation
   const [addEnrollment] = useAddEnrollmentMutation();
 
-  const isLoading = isCoursesLoading || isMyCoursesLoading;
-  const error = coursesError || myCoursesError;
+  const isLoading = isCoursesLoading || isMyCoursesLoading || isEnrollmentsLoading;
+  const error = coursesError || myCoursesError || enrollmentsError;
 
-  const { enrolledCourses, notEnrolledCourses, hasData } = useMemo(() => {
+  // Categorize courses based on Enrollments Data
+  const { activeCourses, pendingCourses, availableCourses, hasData } = useMemo(() => {
     const allCourses: ICourse[] = coursesData?.data?.courses || [];
     const myCoursesList: IMyCourse[] = myCoursesData?.data?.myCourses || [];
+    const userEnrollments: IEnrollment[] = enrollmentsData?.data?.enrollments || [];
 
-    const enrolledCourseIds = new Set(myCoursesList.map(mc => (typeof mc.courseId === 'string' ? mc.courseId : mc.courseId._id)));
+    const active: ICourse[] = [];
+    const pending: ICourse[] = [];
+    const available: ICourse[] = [];
 
-    const enrolled = allCourses.filter(c => enrolledCourseIds.has(c._id));
-    const notEnrolled = allCourses.filter(c => !enrolledCourseIds.has(c._id) && c.isActive);
+    allCourses.forEach(course => {
+      // Find if the course exists in any of the user's enrollments
+      const relatedEnrollments = userEnrollments.filter(e => e.enrollCoursesIDS?.includes(course._id));
+
+      if (relatedEnrollments.length > 0) {
+        // Check if there is an active enrollment (payment: completed & student: running)
+        const isActive = relatedEnrollments.some(e => e.paymentStatus === 'completed' && e.studentsStatus === 'running');
+
+        if (isActive) {
+          active.push(course);
+        } else {
+          // Exists in enrollments but not active (e.g., pending payment or pending student status)
+          pending.push(course);
+        }
+      } else if (course.isActive) {
+        // Not found in any enrollments
+        available.push(course);
+      }
+    });
 
     return {
-      enrolledCourses: enrolled,
-      notEnrolledCourses: notEnrolled,
+      activeCourses: active,
+      pendingCourses: pending,
+      availableCourses: available,
       hasData: myCoursesList.length > 0,
     };
-  }, [coursesData, myCoursesData]);
+  }, [coursesData, myCoursesData, enrollmentsData]);
 
   const displayAttendance = {
     todaysAttendance: hasData ? 'Present' : 'In-complete',
@@ -135,6 +167,11 @@ export default function MyCoursesPage() {
     refetchEnrollments();
   };
 
+  const handleAttendClass = (courseId: string) => {
+    // Open the class link in a new tab
+    window.open(`/dashboard/my-course/my-class?courseId=${courseId}`, '_blank');
+  };
+
   const handleEnrollment = async () => {
     if (!selectedCourse) return;
 
@@ -142,7 +179,7 @@ export default function MyCoursesPage() {
     setEnrollmentError('');
 
     try {
-      // 1. Check if user already applied
+      // Check if user already applied
       const userEnrollments: IEnrollment[] = enrollmentsData?.data?.enrollments || [];
       const alreadyApplied = userEnrollments.some(enrollment => enrollment.enrollCoursesIDS?.includes(selectedCourse._id));
 
@@ -152,7 +189,7 @@ export default function MyCoursesPage() {
         return;
       }
 
-      // 2. Not applied, submit post request via RTK Mutation
+      // Submit post request via RTK Mutation
       const payload = {
         studentName: studentInfo.name,
         studentEmail: studentInfo.email,
@@ -166,7 +203,7 @@ export default function MyCoursesPage() {
 
       await addEnrollment(payload).unwrap();
 
-      // 3. Handle Success
+      // Handle Success
       setEnrollSuccess(true);
       refetchEnrollments(); // Update cache
 
@@ -278,29 +315,27 @@ export default function MyCoursesPage() {
           </div>
         </motion.div>
 
-        {/* My Enrolled Courses Section */}
+        {/* --- SECTION 1: Active Enrolled Courses --- */}
         <section>
           <div className="flex items-center gap-3 mb-8 border-b border-white/10 pb-4">
             <Unlock className="h-6 w-6 text-indigo-400" />
-            <h2 className="text-2xl md:text-3xl font-bold text-white">My Enrolled Courses</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-white">Active Enrolled Courses</h2>
           </div>
 
-          {enrolledCourses.length === 0 ? (
+          {activeCourses.length === 0 ? (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="flex flex-col items-center justify-center min-h-[30vh] border border-dashed border-indigo-500/30 rounded-3xl bg-indigo-950/20 p-8"
             >
               <BookOpen className="h-12 w-12 text-indigo-400/50 mb-4" />
-              <p className="text-slate-400 text-center max-w-md">
-                You haven&apos;t enrolled in any courses yet. Explore our available courses below to get started on your journey.
-              </p>
+              <p className="text-slate-400 text-center max-w-md">You don&apos;t have any active courses yet.</p>
             </motion.div>
           ) : (
             <motion.div variants={containerVariants} initial="hidden" animate="visible" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {enrolledCourses.map(course => (
+              {activeCourses.map(course => (
                 <motion.div
-                  key={`enrolled-${course._id}`}
+                  key={`active-${course._id}`}
                   variants={itemVariants}
                   whileHover={{ y: -5, scale: 1.01 }}
                   className="group relative bg-slate-900/60 backdrop-blur-xl rounded-3xl border border-indigo-500/20 overflow-hidden shadow-xl shadow-indigo-500/5 flex flex-col"
@@ -309,8 +344,8 @@ export default function MyCoursesPage() {
 
                   <div className="p-6 pb-4 flex-1 relative z-10">
                     <div className="flex justify-between items-start mb-4">
-                      <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider text-indigo-300 bg-indigo-500/10 border border-indigo-500/20 rounded-full">
-                        Enrolled
+                      <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider text-indigo-300 bg-indigo-500/10 border border-indigo-500/20 rounded-full flex items-center gap-1">
+                        <CheckCircle className="h-3 w-3" /> Enrolled
                       </span>
                       <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
                         {course.challengeDay || 0} Days
@@ -329,21 +364,16 @@ export default function MyCoursesPage() {
                         <Clock className="h-4 w-4 text-indigo-400" />
                         <span className="text-sm font-medium">{course.totalDuration || 'N/A'}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-slate-300">
-                        <FileText className="h-4 w-4 text-indigo-400" />
-                        <span className="text-sm font-medium">{course.totalAssignment || 0} Tasks</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-slate-300">
-                        <Award className="h-4 w-4 text-indigo-400" />
-                        <span className="text-sm font-medium">{course.totalMockTest || 0} Tests</span>
-                      </div>
                     </div>
                   </div>
 
                   <div className="mt-auto z-10 p-6 pt-4 border-t border-white/5 bg-slate-950/40">
-                    <Button className="w-full bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl h-12 shadow-lg shadow-indigo-500/20 group-hover:shadow-indigo-500/40 transition-all">
-                      Continue Learning
-                      <ArrowRight className="h-4 w-4 ml-2" />
+                    <Button
+                      onClick={() => handleAttendClass(course._id)}
+                      className="w-full bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl h-12 shadow-lg shadow-indigo-500/20 group-hover:shadow-indigo-500/40 transition-all font-semibold"
+                    >
+                      Attend Class
+                      <ExternalLink className="h-4 w-4 ml-2" />
                     </Button>
                   </div>
                 </motion.div>
@@ -352,25 +382,67 @@ export default function MyCoursesPage() {
           )}
         </section>
 
-        {/* Available Courses Section */}
+        {/* --- SECTION 2: Pending/Requested Courses --- */}
+        {pendingCourses.length > 0 && (
+          <section>
+            <div className="flex items-center gap-3 mb-8 border-b border-white/10 pb-4 mt-8">
+              <Clock4 className="h-6 w-6 text-orange-400" />
+              <h2 className="text-2xl md:text-3xl font-bold text-white">Pending Requests</h2>
+            </div>
+
+            <motion.div variants={containerVariants} initial="hidden" animate="visible" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {pendingCourses.map(course => (
+                <motion.div
+                  key={`pending-${course._id}`}
+                  variants={itemVariants}
+                  whileHover={{ y: -5 }}
+                  className="group relative bg-slate-900/50 backdrop-blur-sm rounded-3xl border border-orange-500/20 overflow-hidden hover:border-orange-500/40 hover:bg-slate-900/80 transition-all duration-300 flex flex-col"
+                >
+                  <div className="p-6 pb-4 flex-1 relative z-10">
+                    <div className="flex justify-between items-start mb-4">
+                      <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider text-orange-300 bg-orange-500/10 border border-orange-500/20 rounded-full flex items-center gap-1">
+                        <Loader2 className="h-3 w-3 animate-spin" /> Pending Approval
+                      </span>
+                    </div>
+
+                    <h3 className="text-xl font-bold text-white mb-2 line-clamp-2">{course.courseTitle}</h3>
+                    <p className="text-sm text-slate-400 line-clamp-2 mb-6">{course.courseDescription || 'No description available.'}</p>
+                  </div>
+
+                  <div className="mt-auto z-10 p-6 pt-4 border-t border-white/5 bg-slate-950/40">
+                    <Button
+                      onClick={() => setSelectedCourse(course)}
+                      variant="outline"
+                      className="w-full bg-transparent text-orange-400 border-orange-500/30 hover:bg-orange-500/10 rounded-xl h-12 transition-all font-medium"
+                    >
+                      Request Enrollment
+                    </Button>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          </section>
+        )}
+
+        {/* --- SECTION 3: Available Courses --- */}
         <section>
-          <div className="flex items-center gap-3 mb-8 border-b border-white/10 pb-4">
+          <div className="flex items-center gap-3 mb-8 border-b border-white/10 pb-4 mt-8">
             <Lock className="h-6 w-6 text-slate-400" />
             <h2 className="text-2xl md:text-3xl font-bold text-white">Available Courses</h2>
           </div>
 
-          {notEnrolledCourses.length === 0 ? (
+          {availableCourses.length === 0 ? (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="flex flex-col items-center justify-center min-h-[30vh] border border-dashed border-white/10 rounded-3xl bg-slate-900/20 p-8"
             >
               <Award className="h-12 w-12 text-slate-500 mb-4" />
-              <p className="text-slate-400 text-center max-w-md">You have enrolled in all available courses! Incredible dedication.</p>
+              <p className="text-slate-400 text-center max-w-md">You have enrolled or requested in all available courses! Incredible dedication.</p>
             </motion.div>
           ) : (
             <motion.div variants={containerVariants} initial="hidden" animate="visible" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {notEnrolledCourses.map(course => (
+              {availableCourses.map(course => (
                 <motion.div
                   key={`available-${course._id}`}
                   variants={itemVariants}
@@ -413,7 +485,7 @@ export default function MyCoursesPage() {
                     <div className="px-6 pb-6 pt-2 bg-slate-950/30">
                       <Button
                         onClick={() => setSelectedCourse(course)}
-                        className="w-full bg-slate-800 hover:bg-slate-700 text-white border border-white/10 rounded-xl h-12 transition-all group-hover:border-indigo-500/50 group-hover:text-indigo-300"
+                        className="w-full bg-slate-800 hover:bg-slate-700 text-white border border-white/10 rounded-xl h-12 transition-all group-hover:border-indigo-500/50 group-hover:text-indigo-300 font-semibold"
                       >
                         Enroll Now
                       </Button>
@@ -443,7 +515,7 @@ export default function MyCoursesPage() {
               className="bg-slate-900 border border-indigo-500/30 rounded-3xl overflow-hidden shadow-2xl shadow-indigo-500/20 w-full max-w-md relative"
               onClick={e => e.stopPropagation()} // Prevents clicks inside the modal from bubbling to the backdrop
             >
-              {/* Added pointer-events-none to prevent gradient from capturing clicks on the close button */}
+              {/* Pointer-events-none to prevent gradient from capturing clicks on the close button */}
               <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-br from-indigo-600/20 via-purple-600/20 to-transparent pointer-events-none" />
 
               <button

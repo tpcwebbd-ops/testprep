@@ -1740,3 +1740,4 @@ Now your task is implement those features in courses/edit/page.tsx with the foll
   - text [rich text editor]
   - MCQ [I can add Questions, and answer from 2 to 6 and select answer one of them. (first option is default answer)]
   - assignment. 
+  
