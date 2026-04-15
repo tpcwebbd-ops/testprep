@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Edit, Trash2, BookOpen, Clock, Award, PlayCircle, FileText, AlertTriangle, RefreshCw, X, DollarSign, Layers, Power } from 'lucide-react';
+import { Plus, Edit, Trash2, BookOpen, Clock, Award, PlayCircle, FileText, AlertTriangle, RefreshCw, X, Layers, Power } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -331,9 +331,9 @@ export default function CoursesPage() {
                       <span className="text-sm text-slate-400">{course.totalLecture || 0} Lectures</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-slate-500 line-through decoration-red-500/50">${course.realPrice || 0}</span>
+                      <span className="text-sm text-slate-500 line-through decoration-red-500/50"> ৳{course.realPrice || 0}</span>
                       <span className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
-                        ${course.discountPrice || 0}
+                        ৳{course.discountPrice || 0}
                       </span>
                     </div>
                   </div>
@@ -544,7 +544,7 @@ export default function CoursesPage() {
                   <div className="space-y-2 relative">
                     <Label className="text-slate-300">Real Price</Label>
                     <div className="relative">
-                      <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                      ৳
                       <Input
                         type="number"
                         className="bg-slate-950 border-white/10 text-white focus:border-emerald-500 h-12 rounded-xl pl-9"
@@ -556,7 +556,7 @@ export default function CoursesPage() {
                   <div className="space-y-2 relative">
                     <Label className="text-slate-300">Discount Price</Label>
                     <div className="relative">
-                      <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-emerald-500" />
+                      ৳
                       <Input
                         type="number"
                         className="bg-slate-950 border-emerald-500/30 text-white focus:border-emerald-500 h-12 rounded-xl pl-9"
