@@ -1,4 +1,5 @@
-Look at the courses/v1/controller.ts
+Look at those code
+api/my-course/v1/controller.ts
 ```
 /*
 |-----------------------------------------
@@ -7,13 +8,12 @@ Look at the courses/v1/controller.ts
 | @copyright: Toufiquer, April, 2026
 |-----------------------------------------
 */
-
 import { FilterQuery } from 'mongoose';
 
 import { withDB } from '@/app/api/utils/db';
 import { formatResponse, IResponse } from '@/app/api/utils/utils';
 
-import Course from './model';
+import MyCourse from './model';
 
 interface MongoError extends Error {
   code?: number;
@@ -24,12 +24,12 @@ function isMongoError(error: unknown): error is MongoError {
   return error !== null && typeof error === 'object' && 'code' in error && typeof (error as MongoError).code === 'number';
 }
 
-export async function createCourse(req: Request): Promise<IResponse> {
+export async function createMyCourse(req: Request): Promise<IResponse> {
   return withDB(async () => {
     try {
-      const courseData = await req.json();
-      const newCourse = await Course.create(courseData);
-      return formatResponse(newCourse, 'Course created successfully', 201);
+      const myCourseData = await req.json();
+      const newMyCourse = await MyCourse.create(myCourseData);
+      return formatResponse(newMyCourse, 'MyCourse created successfully', 201);
     } catch (error: unknown) {
       if (isMongoError(error) && error.code === 11000) {
         return formatResponse(null, `Duplicate: ${JSON.stringify(error.keyValue)}`, 409);
@@ -39,17 +39,17 @@ export async function createCourse(req: Request): Promise<IResponse> {
   });
 }
 
-export async function getCourseById(req: Request): Promise<IResponse> {
+export async function getMyCourseById(req: Request): Promise<IResponse> {
   return withDB(async () => {
     const id = new URL(req.url).searchParams.get('id');
     if (!id) return formatResponse(null, 'ID is required', 400);
-    const course = await Course.findById(id);
-    if (!course) return formatResponse(null, 'Not found', 404);
-    return formatResponse(course, 'Fetched successfully', 200);
+    const myCourse = await MyCourse.findById(id);
+    if (!myCourse) return formatResponse(null, 'Not found', 404);
+    return formatResponse(myCourse, 'Fetched successfully', 200);
   });
 }
 
-export async function getCourses(req: Request): Promise<IResponse> {
+export async function getMyCourses(req: Request): Promise<IResponse> {
   return withDB(async () => {
     const url = new URL(req.url);
     const page = parseInt(url.searchParams.get('page') || '1');
@@ -60,34 +60,34 @@ export async function getCourses(req: Request): Promise<IResponse> {
 
     if (searchQuery) {
       filter = {
-        $or: [{ courseTitle: { $regex: searchQuery, $options: 'i' } }, { courseDescription: { $regex: searchQuery, $options: 'i' } }],
+        $or: [{ studentName: { $regex: searchQuery, $options: 'i' } }, { studentEmail: { $regex: searchQuery, $options: 'i' } }],
       };
     }
 
-    const courses = await Course.find(filter).sort({ updatedAt: -1 }).skip(skip).limit(limit);
-    const total = await Course.countDocuments(filter);
-    return formatResponse({ courses, total, page, limit }, 'Fetched successfully', 200);
+    const myCourses = await MyCourse.find(filter).sort({ updatedAt: -1 }).skip(skip).limit(limit);
+    const total = await MyCourse.countDocuments(filter);
+    return formatResponse({ myCourses, total, page, limit }, 'Fetched successfully', 200);
   });
 }
 
-export async function getAllCourses(): Promise<IResponse> {
+export async function getAllMyCourses(): Promise<IResponse> {
   return withDB(async () => {
     const page = parseInt('1');
     const limit = parseInt('1000');
     const skip = (page - 1) * limit;
     const filter: FilterQuery<unknown> = {};
-    const courses = await Course.find(filter).sort({ updatedAt: -1 }).skip(skip).limit(limit);
-    const total = await Course.countDocuments(filter);
-    return formatResponse({ courses, total, page, limit }, 'Fetched successfully', 200);
+    const myCourses = await MyCourse.find(filter).sort({ updatedAt: -1 }).skip(skip).limit(limit);
+    const total = await MyCourse.countDocuments(filter);
+    return formatResponse({ myCourses, total, page, limit }, 'Fetched successfully', 200);
   });
 }
 
-export async function updateCourse(req: Request): Promise<IResponse> {
+export async function updateMyCourse(req: Request): Promise<IResponse> {
   return withDB(async () => {
     try {
       const { id, ...updateData } = await req.json();
       if (!id) return formatResponse(null, 'ID is required', 400);
-      const updated = await Course.findByIdAndUpdate(id, updateData, {
+      const updated = await MyCourse.findByIdAndUpdate(id, updateData, {
         new: true,
         runValidators: false,
       });
@@ -103,18 +103,18 @@ export async function updateCourse(req: Request): Promise<IResponse> {
   });
 }
 
-export async function deleteCourse(req: Request): Promise<IResponse> {
+export async function deleteMyCourse(req: Request): Promise<IResponse> {
   return withDB(async () => {
     const { id } = await req.json();
     if (!id) return formatResponse(null, 'ID required', 400);
-    const deleted = await Course.findByIdAndDelete(id);
+    const deleted = await MyCourse.findByIdAndDelete(id);
     if (!deleted) return formatResponse(null, 'Not found', 404);
     return formatResponse({ deletedCount: 1 }, 'Deleted successfully', 200);
   });
 }
 
 ```
-courses/v1/model.ts
+api/my-course/v1/model.ts
 ```
 /*
 |-----------------------------------------
@@ -123,34 +123,36 @@ courses/v1/model.ts
 | @copyright: Testprep , April, 2026
 |-----------------------------------------
 */
-
 import mongoose, { Schema } from 'mongoose';
 
-const courseSchema = new Schema(
+const myCourseSchema = new Schema(
   {
-    courseTitle: { type: String, required: true },
-    courseDescription: { type: String },
-    isActive: { type: Boolean },
-    totalClass: { type: Number },
-    totalAssignment: { type: Number },
-    totalDuration: { type: String },
-    totalMockTest: { type: Number },
-    realPrice: { type: Number },
-    discountPrice: { type: Number },
-    challengeDay: { type: Number },
-    totalLecture: { type: Number },
-    lectureData: { type: Schema.Types.Mixed, default: {} },
+    studentName: { type: String },
+    studentEmail: { type: String },
+    attenDance: [
+      {
+        courseID: { type: String },
+        data: [
+          {
+            ClassName: { type: String },
+            status: { type: String, enum: ['complete', 'incomplete'], default: 'incomplete' },
+            completeDate: { type: Date },
+          },
+        ],
+      },
+    ],
   },
   { _id: true, timestamps: true },
 );
 
-courseSchema.index({ courseTitle: 1 });
-courseSchema.index({ discountPrice: 1 });
+myCourseSchema.index({ studentEmail: 1 });
+myCourseSchema.index({ studentName: 1 });
 
-export default mongoose.models.Course || mongoose.model('Course', courseSchema);
+export default mongoose.models.MyCourse || mongoose.model('MyCourse', myCourseSchema);
 
 ```
-courses/v1/route.ts
+
+api/my-course/v1/route.ts
 ```
 /*
 |-----------------------------------------
@@ -159,28 +161,27 @@ courses/v1/route.ts
 | @copyright: Toufiquer, April, 2026
 |-----------------------------------------
 */
-
 import { revalidatePath } from 'next/cache';
 
 import { handleRateLimit } from '@/app/api/utils/rate-limit';
 import { formatResponse, IResponse } from '@/app/api/utils/jwt-verify';
 import { isUserHasAccessByRole, IWantAccess } from '@/app/api/utils/is-user-has-access-by-role';
 
-import { getCourses, createCourse, updateCourse, deleteCourse, getCourseById } from './controller';
+import { getMyCourses, createMyCourse, updateMyCourse, deleteMyCourse, getMyCourseById } from './controller';
 
 export async function GET(req: Request) {
   const rateLimitResponse = handleRateLimit(req);
   if (rateLimitResponse) return rateLimitResponse;
   if (process.env.AuthorizationEnable === 'true') {
     const wantToAccess: IWantAccess = {
-      db_name: 'courses',
+      db_name: 'my-course',
       access: 'read',
     };
     const isAccess = await isUserHasAccessByRole(wantToAccess);
     if (isAccess) return isAccess;
   }
   const id = new URL(req.url).searchParams.get('id');
-  const result: IResponse = id ? await getCourseById(req) : await getCourses(req);
+  const result: IResponse = id ? await getMyCourseById(req) : await getMyCourses(req);
   return formatResponse(result.data, result.message, result.status);
 }
 
@@ -189,15 +190,15 @@ export async function POST(req: Request) {
   if (rateLimitResponse) return rateLimitResponse;
   if (process.env.AuthorizationEnable === 'true') {
     const wantToAccess: IWantAccess = {
-      db_name: 'courses',
+      db_name: 'my-course',
       access: 'create',
     };
     const isAccess = await isUserHasAccessByRole(wantToAccess);
     if (isAccess) return isAccess;
   }
-  const result = await createCourse(req);
+  const result = await createMyCourse(req);
   if (result.status === 200 || result.status === 201) {
-    revalidatePath('/courses');
+    revalidatePath('/my-courses');
   }
   return formatResponse(result.data, result.message, result.status);
 }
@@ -207,15 +208,15 @@ export async function PUT(req: Request) {
   if (rateLimitResponse) return rateLimitResponse;
   if (process.env.AuthorizationEnable === 'true') {
     const wantToAccess: IWantAccess = {
-      db_name: 'courses',
+      db_name: 'my-course',
       access: 'update',
     };
     const isAccess = await isUserHasAccessByRole(wantToAccess);
     if (isAccess) return isAccess;
   }
-  const result = await updateCourse(req);
+  const result = await updateMyCourse(req);
   if (result.status === 200) {
-    revalidatePath('/courses');
+    revalidatePath('/my-courses');
   }
   return formatResponse(result.data, result.message, result.status);
 }
@@ -225,22 +226,21 @@ export async function DELETE(req: Request) {
   if (rateLimitResponse) return rateLimitResponse;
   if (process.env.AuthorizationEnable === 'true') {
     const wantToAccess: IWantAccess = {
-      db_name: 'courses',
+      db_name: 'my-course',
       access: 'delete',
     };
     const isAccess = await isUserHasAccessByRole(wantToAccess);
     if (isAccess) return isAccess;
   }
-  const result = await deleteCourse(req);
+  const result = await deleteMyCourse(req);
   if (result.status === 200) {
-    revalidatePath('/courses');
+    revalidatePath('/my-courses');
   }
   return formatResponse(result.data, result.message, result.status);
 }
 
 ```
-
-here is example of redux/coursesSlie.ts
+redux/myCoursesSlice.ts
 ```
 /*
 |-----------------------------------------
@@ -249,98 +249,87 @@ here is example of redux/coursesSlie.ts
 | @copyright: Toufiquer, April, 2026
 |-----------------------------------------
 */
-
 import { apiSlice } from '@/redux/api/apiSlice';
 
-export const coursesApi = apiSlice.injectEndpoints({
+export const myCoursesApi = apiSlice.injectEndpoints({
   endpoints: builder => ({
-    getCourses: builder.query({
+    getMyCourses: builder.query({
       query: ({ page, limit, q }) => {
-        let url = `/api/courses/v1?page=${page || 1}&limit=${limit || 10}`;
+        let url = `/api/my-courses/v1?page=${page || 1}&limit=${limit || 10}`;
         if (q) {
           url += `&q=${encodeURIComponent(q)}`;
         }
         return url;
       },
-      providesTags: [{ type: 'tagTypeCourses' as const, id: 'LIST' }],
+      providesTags: [{ type: 'tagTypeMyCourses' as const, id: 'LIST' }],
     }),
-    getCourseById: builder.query({
-      query: id => `/api/courses/v1?id=${id}`,
-      providesTags: (result, error, id) => [{ type: 'tagTypeCourses' as const, id }],
+    getMyCourseById: builder.query({
+      query: id => `/api/my-courses/v1?id=${id}`,
+      providesTags: (result, error, id) => [{ type: 'tagTypeMyCourses' as const, id }],
     }),
-    addCourse: builder.mutation({
-      query: newCourse => ({
-        url: '/api/courses/v1',
+    addMyCourse: builder.mutation({
+      query: newMyCourse => ({
+        url: '/api/my-courses/v1',
         method: 'POST',
-        body: newCourse,
+        body: newMyCourse,
       }),
-      invalidatesTags: [{ type: 'tagTypeCourses' as const, id: 'LIST' }],
+      invalidatesTags: [{ type: 'tagTypeMyCourses' as const, id: 'LIST' }],
     }),
-    updateCourse: builder.mutation({
+    updateMyCourse: builder.mutation({
       query: ({ id, ...data }) => ({
-        url: `/api/courses/v1`,
+        url: `/api/my-courses/v1`,
         method: 'PUT',
         body: { id, ...data },
       }),
       invalidatesTags: (result, error, { id }) => [
-        { type: 'tagTypeCourses' as const, id },
-        { type: 'tagTypeCourses' as const, id: 'LIST' },
+        { type: 'tagTypeMyCourses' as const, id },
+        { type: 'tagTypeMyCourses' as const, id: 'LIST' },
       ],
     }),
-    deleteCourse: builder.mutation({
+    deleteMyCourse: builder.mutation({
       query: ({ id }) => ({
-        url: `/api/courses/v1`,
+        url: `/api/my-courses/v1`,
         method: 'DELETE',
         body: { id },
       }),
       invalidatesTags: (result, error, { id }) => [
-        { type: 'tagTypeCourses' as const, id },
-        { type: 'tagTypeCourses' as const, id: 'LIST' },
+        { type: 'tagTypeMyCourses' as const, id },
+        { type: 'tagTypeMyCourses' as const, id: 'LIST' },
       ],
     }),
-    bulkUpdateCourses: builder.mutation({
+    bulkUpdateMyCourses: builder.mutation({
       query: bulkData => ({
-        url: `/api/courses/v1?bulk=true`,
+        url: `/api/my-courses/v1?bulk=true`,
         method: 'PUT',
         body: bulkData,
       }),
-      invalidatesTags: [{ type: 'tagTypeCourses' as const, id: 'LIST' }],
+      invalidatesTags: [{ type: 'tagTypeMyCourses' as const, id: 'LIST' }],
     }),
-    bulkDeleteCourses: builder.mutation({
+    bulkDeleteMyCourses: builder.mutation({
       query: bulkData => ({
-        url: `/api/courses/v1?bulk=true`,
+        url: `/api/my-courses/v1?bulk=true`,
         method: 'DELETE',
         body: bulkData,
       }),
-      invalidatesTags: [{ type: 'tagTypeCourses' as const, id: 'LIST' }],
+      invalidatesTags: [{ type: 'tagTypeMyCourses' as const, id: 'LIST' }],
     }),
   }),
 });
 
 export const {
-  useGetCoursesQuery,
-  useGetCourseByIdQuery,
-  useAddCourseMutation,
-  useUpdateCourseMutation,
-  useDeleteCourseMutation,
-  useBulkUpdateCoursesMutation,
-  useBulkDeleteCoursesMutation,
-} = coursesApi;
+  useGetMyCoursesQuery,
+  useGetMyCourseByIdQuery,
+  useAddMyCourseMutation,
+  useUpdateMyCourseMutation,
+  useDeleteMyCourseMutation,
+  useBulkUpdateMyCoursesMutation,
+  useBulkDeleteMyCoursesMutation,
+} = myCoursesApi;
 
 ```
 
-here is interface for my-courses
-```
-interface MyCourse {
-  studentName: string;
-  studentEmail: string;
-  enrollmentDate: Date;
-  enrollCoursesID: { courseID: string; enrollmentDate: Date }[];
-  attenDance: { courseID: string; data: { ClassName: string; status: 'complete' | 'incomplete'; completeDate: Date }[] }[];
-}
-```
 
-Now your task is generate 
+Now your task is generate those file if need updated. if there is no need to update then just write No Need to update.
 my-courses/v1/controller.ts, 
 my-courses/v1/model.ts, and 
 my-courses/v1/route.ts
