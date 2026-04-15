@@ -21,11 +21,13 @@ import {
   Loader2,
   Sparkles,
   CheckCircle,
+  Info,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { useGetCoursesQuery } from '@/redux/features/courses/coursesSlice';
 import { useGetMyCoursesQuery } from '@/redux/features/my-courses/myCoursesSlice';
+import { useGetEnrollmentsQuery, useAddEnrollmentMutation } from '@/redux/features/enrollments/enrollmentsSlice';
 
 interface ICourse {
   _id: string;
@@ -49,6 +51,11 @@ interface IMyCourse {
   enrolledAt?: string;
 }
 
+interface IEnrollment {
+  _id: string;
+  courseId: string | ICourse;
+}
+
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -66,6 +73,7 @@ export default function MyCoursesPage() {
   const [selectedCourse, setSelectedCourse] = useState<ICourse | null>(null);
   const [isEnrolling, setIsEnrolling] = useState(false);
   const [enrollSuccess, setEnrollSuccess] = useState(false);
+  const [alreadyApplied, setAlreadyApplied] = useState(false);
 
   const { data: coursesData, isLoading: isCoursesLoading, error: coursesError, refetch: refetchCourses } = useGetCoursesQuery({ page: 1, limit: 100 });
 
@@ -75,6 +83,9 @@ export default function MyCoursesPage() {
     error: myCoursesError,
     refetch: refetchMyCourses,
   } = useGetMyCoursesQuery({ page: 1, limit: 100 });
+
+  const { data: enrollmentsData, refetch: refetchEnrollments } = useGetEnrollmentsQuery({ page: 1, limit: 100 });
+  const [addEnrollment] = useAddEnrollmentMutation();
 
   const isLoading = isCoursesLoading || isMyCoursesLoading;
   const error = coursesError || myCoursesError;
@@ -105,16 +116,50 @@ export default function MyCoursesPage() {
   const handleRefetch = () => {
     refetchCourses();
     refetchMyCourses();
+    refetchEnrollments();
   };
 
   const handleEnrollment = async () => {
+    if (!selectedCourse) return;
+
     setIsEnrolling(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsEnrolling(false);
-    setEnrollSuccess(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setEnrollSuccess(false);
-    setSelectedCourse(null);
+
+    const enrollmentsList: IEnrollment[] =
+      (enrollmentsData as { data?: { enrollments?: IEnrollment[] } })?.data?.enrollments || (enrollmentsData as { data?: IEnrollment[] })?.data || [];
+
+    const hasApplied = enrollmentsList.some(e => {
+      const eCourseId = typeof e.courseId === 'string' ? e.courseId : e.courseId._id;
+      return eCourseId === selectedCourse._id;
+    });
+
+    if (hasApplied) {
+      setAlreadyApplied(true);
+      setIsEnrolling(false);
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      setAlreadyApplied(false);
+      setSelectedCourse(null);
+      return;
+    }
+
+    try {
+      await addEnrollment({ courseId: selectedCourse._id }).unwrap();
+      setEnrollSuccess(true);
+      await new Promise(resolve => setTimeout(resolve, 2500));
+      setEnrollSuccess(false);
+      setSelectedCourse(null);
+    } catch (err) {
+      setIsEnrolling(false);
+    } finally {
+      setIsEnrolling(false);
+    }
+  };
+
+  const handleCloseModal = () => {
+    if (!isEnrolling) {
+      setSelectedCourse(null);
+      setAlreadyApplied(false);
+      setEnrollSuccess(false);
+    }
   };
 
   if (isLoading) {
@@ -374,30 +419,34 @@ export default function MyCoursesPage() {
               <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-br from-indigo-600/20 via-purple-600/20 to-transparent" />
 
               <button
-                onClick={() => !isEnrolling && setSelectedCourse(null)}
+                onClick={handleCloseModal}
                 className="absolute top-4 right-4 p-2 rounded-full bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors z-10"
               >
                 <X className="h-5 w-5" />
               </button>
 
               <div className="p-8 relative z-10 flex flex-col h-full">
-                <div className="w-16 h-16 rounded-2xl bg-indigo-500/20 flex items-center justify-center border border-indigo-500/30 mb-6 text-indigo-400 shadow-inner">
-                  {enrollSuccess ? (
-                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="text-emerald-400">
+                {alreadyApplied ? (
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center py-6">
+                    <div className="w-16 h-16 mx-auto rounded-2xl bg-orange-500/20 flex items-center justify-center border border-orange-500/30 mb-6 text-orange-400 shadow-inner">
+                      <Info className="h-8 w-8" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-white mb-2">Already Applied</h3>
+                    <p className="text-slate-400 text-sm">You have already submitted an enrollment request for {selectedCourse.courseTitle}.</p>
+                  </motion.div>
+                ) : enrollSuccess ? (
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center py-6">
+                    <div className="w-16 h-16 mx-auto rounded-2xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30 mb-6 text-emerald-400 shadow-inner">
                       <CheckCircle className="h-8 w-8" />
-                    </motion.div>
-                  ) : (
-                    <Sparkles className="h-8 w-8" />
-                  )}
-                </div>
-
-                {enrollSuccess ? (
-                  <div className="text-center py-6">
+                    </div>
                     <h3 className="text-2xl font-bold text-white mb-2">Enrollment Requested!</h3>
-                    <p className="text-slate-400">Your request for {selectedCourse.courseTitle} is being processed.</p>
-                  </div>
+                    <p className="text-slate-400 text-sm">Your request for {selectedCourse.courseTitle} is being processed successfully.</p>
+                  </motion.div>
                 ) : (
-                  <>
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                    <div className="w-16 h-16 rounded-2xl bg-indigo-500/20 flex items-center justify-center border border-indigo-500/30 mb-6 text-indigo-400 shadow-inner">
+                      <Sparkles className="h-8 w-8" />
+                    </div>
                     <h3 className="text-2xl font-bold text-white mb-2 leading-tight">{selectedCourse.courseTitle}</h3>
                     <p className="text-slate-400 text-sm mb-8 line-clamp-3">
                       {selectedCourse.courseDescription || 'Get ready to unlock your potential with this comprehensive course.'}
@@ -431,7 +480,7 @@ export default function MyCoursesPage() {
                         'Confirm Enrollment'
                       )}
                     </Button>
-                  </>
+                  </motion.div>
                 )}
               </div>
             </motion.div>
