@@ -240,7 +240,7 @@ const JsonEditor: React.FC = () => {
     }
 
     try {
-      const response = await fetch('/template-generator/api/template', {
+      const response = await fetch('/tools/template-generator/api/template', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
