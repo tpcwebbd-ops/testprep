@@ -12,6 +12,7 @@ const enrollmentSchema = new Schema(
   {
     studentName: { type: String },
     studentEmail: { type: String },
+    studentsStatus: { type: String, default: 'active', enum: ['blocked', 'pending', 'complete', 'running'] },
     enrollmentDate: { type: Date, default: Date.now },
     enrollCoursesIDS: [{ type: String }],
     realPrice: { type: Number },
