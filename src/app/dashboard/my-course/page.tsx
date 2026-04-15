@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   BookOpen,
@@ -53,7 +53,9 @@ interface IMyCourse {
 
 interface IEnrollment {
   _id: string;
-  courseId: string | ICourse;
+  studentEmail: string;
+  enrollCoursesIDS: string[];
+  paymentStatus: string;
 }
 
 const containerVariants = {
@@ -73,10 +75,15 @@ export default function MyCoursesPage() {
   const [selectedCourse, setSelectedCourse] = useState<ICourse | null>(null);
   const [isEnrolling, setIsEnrolling] = useState(false);
   const [enrollSuccess, setEnrollSuccess] = useState(false);
-  const [alreadyApplied, setAlreadyApplied] = useState(false);
+  const [enrollmentError, setEnrollmentError] = useState<string>('');
 
+  const studentInfo = {
+    name: 'Toufiquer Rahman',
+    email: 'toufiquer.0@gmail.com',
+  };
+
+  // Queries
   const { data: coursesData, isLoading: isCoursesLoading, error: coursesError, refetch: refetchCourses } = useGetCoursesQuery({ page: 1, limit: 100 });
-
   const {
     data: myCoursesData,
     isLoading: isMyCoursesLoading,
@@ -84,7 +91,10 @@ export default function MyCoursesPage() {
     refetch: refetchMyCourses,
   } = useGetMyCoursesQuery({ page: 1, limit: 100 });
 
-  const { data: enrollmentsData, refetch: refetchEnrollments } = useGetEnrollmentsQuery({ page: 1, limit: 100 });
+  // Enrollments Query for the current user
+  const { data: enrollmentsData, refetch: refetchEnrollments } = useGetEnrollmentsQuery({ page: 1, limit: 100, q: studentInfo.email });
+
+  // Mutation
   const [addEnrollment] = useAddEnrollmentMutation();
 
   const isLoading = isCoursesLoading || isMyCoursesLoading;
@@ -106,12 +116,18 @@ export default function MyCoursesPage() {
     };
   }, [coursesData, myCoursesData]);
 
-  const studentInfo = {
-    name: 'Toufiquer Rahman',
-    email: 'toufiquer.0@gmail.com',
+  const displayAttendance = {
     todaysAttendance: hasData ? 'Present' : 'In-complete',
     totalAttendance: hasData ? 142 : 0,
   };
+
+  // Reset errors and success state when modal closes/opens
+  useEffect(() => {
+    if (!selectedCourse) {
+      setEnrollmentError('');
+      setEnrollSuccess(false);
+    }
+  }, [selectedCourse]);
 
   const handleRefetch = () => {
     refetchCourses();
@@ -123,42 +139,47 @@ export default function MyCoursesPage() {
     if (!selectedCourse) return;
 
     setIsEnrolling(true);
-
-    const enrollmentsList: IEnrollment[] =
-      (enrollmentsData as { data?: { enrollments?: IEnrollment[] } })?.data?.enrollments || (enrollmentsData as { data?: IEnrollment[] })?.data || [];
-
-    const hasApplied = enrollmentsList.some(e => {
-      const eCourseId = typeof e.courseId === 'string' ? e.courseId : e.courseId._id;
-      return eCourseId === selectedCourse._id;
-    });
-
-    if (hasApplied) {
-      setAlreadyApplied(true);
-      setIsEnrolling(false);
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      setAlreadyApplied(false);
-      setSelectedCourse(null);
-      return;
-    }
+    setEnrollmentError('');
 
     try {
-      await addEnrollment({ courseId: selectedCourse._id }).unwrap();
+      // 1. Check if user already applied
+      const userEnrollments: IEnrollment[] = enrollmentsData?.data?.enrollments || [];
+      const alreadyApplied = userEnrollments.some(enrollment => enrollment.enrollCoursesIDS?.includes(selectedCourse._id));
+
+      if (alreadyApplied) {
+        setEnrollmentError('You already applied for this enrollment. Please wait for approval.');
+        setIsEnrolling(false);
+        return;
+      }
+
+      // 2. Not applied, submit post request via RTK Mutation
+      const payload = {
+        studentName: studentInfo.name,
+        studentEmail: studentInfo.email,
+        enrollCoursesIDS: [selectedCourse._id],
+        realPrice: selectedCourse.realPrice || 0,
+        discountPrice: selectedCourse.discountPrice || 0,
+        paymentAmount: selectedCourse.discountPrice || 0,
+        studentsStatus: 'pending',
+        paymentStatus: 'pending',
+      };
+
+      await addEnrollment(payload).unwrap();
+
+      // 3. Handle Success
       setEnrollSuccess(true);
-      await new Promise(resolve => setTimeout(resolve, 2500));
-      setEnrollSuccess(false);
-      setSelectedCourse(null);
+      refetchEnrollments(); // Update cache
+
+      // Auto close modal after showing success state
+      setTimeout(() => {
+        setEnrollSuccess(false);
+        setSelectedCourse(null);
+      }, 2500);
     } catch (err) {
-      setIsEnrolling(false);
+      console.error('Failed to enroll:', err);
+      setEnrollmentError('Something went wrong during enrollment. Try again later.');
     } finally {
       setIsEnrolling(false);
-    }
-  };
-
-  const handleCloseModal = () => {
-    if (!isEnrolling) {
-      setSelectedCourse(null);
-      setAlreadyApplied(false);
-      setEnrollSuccess(false);
     }
   };
 
@@ -208,6 +229,7 @@ export default function MyCoursesPage() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 pt-[90px] pb-20 px-4 md:px-8 overflow-hidden relative">
       <div className="max-w-7xl mx-auto space-y-12 relative z-10">
+        {/* Header Profile Section */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -239,7 +261,7 @@ export default function MyCoursesPage() {
                 </div>
                 <div>
                   <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">Today&apos;s Status</p>
-                  <p className={`text-lg font-bold ${hasData ? 'text-emerald-400' : 'text-orange-400'}`}>{studentInfo.todaysAttendance}</p>
+                  <p className={`text-lg font-bold ${hasData ? 'text-emerald-400' : 'text-orange-400'}`}>{displayAttendance.todaysAttendance}</p>
                 </div>
               </div>
 
@@ -249,13 +271,14 @@ export default function MyCoursesPage() {
                 </div>
                 <div>
                   <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">Total Attendance</p>
-                  <p className={`text-lg font-bold ${hasData ? 'text-blue-400' : 'text-slate-400'}`}>{studentInfo.totalAttendance} Days</p>
+                  <p className={`text-lg font-bold ${hasData ? 'text-blue-400' : 'text-slate-400'}`}>{displayAttendance.totalAttendance} Days</p>
                 </div>
               </div>
             </div>
           </div>
         </motion.div>
 
+        {/* My Enrolled Courses Section */}
         <section>
           <div className="flex items-center gap-3 mb-8 border-b border-white/10 pb-4">
             <Unlock className="h-6 w-6 text-indigo-400" />
@@ -329,6 +352,7 @@ export default function MyCoursesPage() {
           )}
         </section>
 
+        {/* Available Courses Section */}
         <section>
           <div className="flex items-center gap-3 mb-8 border-b border-white/10 pb-4">
             <Lock className="h-6 w-6 text-slate-400" />
@@ -402,57 +426,58 @@ export default function MyCoursesPage() {
         </section>
       </div>
 
+      {/* Enrollment Modal */}
       <AnimatePresence>
         {selectedCourse && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm"
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm"
+            onClick={() => !isEnrolling && setSelectedCourse(null)} // Closes when clicking outside
           >
             <motion.div
               initial={{ scale: 0.9, y: 20, opacity: 0 }}
               animate={{ scale: 1, y: 0, opacity: 1 }}
               exit={{ scale: 0.9, y: 20, opacity: 0 }}
               className="bg-slate-900 border border-indigo-500/30 rounded-3xl overflow-hidden shadow-2xl shadow-indigo-500/20 w-full max-w-md relative"
+              onClick={e => e.stopPropagation()} // Prevents clicks inside the modal from bubbling to the backdrop
             >
-              <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-br from-indigo-600/20 via-purple-600/20 to-transparent" />
+              {/* Added pointer-events-none to prevent gradient from capturing clicks on the close button */}
+              <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-br from-indigo-600/20 via-purple-600/20 to-transparent pointer-events-none" />
 
               <button
-                onClick={handleCloseModal}
-                className="absolute top-4 right-4 p-2 rounded-full bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors z-10"
+                type="button"
+                onClick={() => !isEnrolling && setSelectedCourse(null)}
+                className="absolute top-4 right-4 p-2 rounded-full bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors z-20 cursor-pointer"
               >
                 <X className="h-5 w-5" />
               </button>
 
               <div className="p-8 relative z-10 flex flex-col h-full">
-                {alreadyApplied ? (
-                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center py-6">
-                    <div className="w-16 h-16 mx-auto rounded-2xl bg-orange-500/20 flex items-center justify-center border border-orange-500/30 mb-6 text-orange-400 shadow-inner">
-                      <Info className="h-8 w-8" />
-                    </div>
-                    <h3 className="text-2xl font-bold text-white mb-2">Already Applied</h3>
-                    <p className="text-slate-400 text-sm">You have already submitted an enrollment request for {selectedCourse.courseTitle}.</p>
-                  </motion.div>
-                ) : enrollSuccess ? (
-                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center py-6">
-                    <div className="w-16 h-16 mx-auto rounded-2xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30 mb-6 text-emerald-400 shadow-inner">
+                <div className="w-16 h-16 rounded-2xl bg-indigo-500/20 flex items-center justify-center border border-indigo-500/30 mb-6 text-indigo-400 shadow-inner">
+                  {enrollSuccess ? (
+                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="text-emerald-400">
                       <CheckCircle className="h-8 w-8" />
-                    </div>
+                    </motion.div>
+                  ) : (
+                    <Sparkles className="h-8 w-8" />
+                  )}
+                </div>
+
+                {enrollSuccess ? (
+                  <div className="text-center py-6">
                     <h3 className="text-2xl font-bold text-white mb-2">Enrollment Requested!</h3>
-                    <p className="text-slate-400 text-sm">Your request for {selectedCourse.courseTitle} is being processed successfully.</p>
-                  </motion.div>
+                    <p className="text-slate-400">Your request for {selectedCourse.courseTitle} has been submitted successfully.</p>
+                  </div>
                 ) : (
-                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-                    <div className="w-16 h-16 rounded-2xl bg-indigo-500/20 flex items-center justify-center border border-indigo-500/30 mb-6 text-indigo-400 shadow-inner">
-                      <Sparkles className="h-8 w-8" />
-                    </div>
+                  <>
                     <h3 className="text-2xl font-bold text-white mb-2 leading-tight">{selectedCourse.courseTitle}</h3>
                     <p className="text-slate-400 text-sm mb-8 line-clamp-3">
                       {selectedCourse.courseDescription || 'Get ready to unlock your potential with this comprehensive course.'}
                     </p>
 
-                    <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-950/50 border border-white/5 mb-8">
+                    <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-950/50 border border-white/5 mb-6">
                       <div>
                         <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-1">Course Price</p>
                         <div className="flex items-center gap-2">
@@ -465,6 +490,20 @@ export default function MyCoursesPage() {
                         <span className="text-slate-300 font-medium text-sm">{selectedCourse.challengeDay || 0} Days</span>
                       </div>
                     </div>
+
+                    <AnimatePresence>
+                      {enrollmentError && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0, y: -10 }}
+                          animate={{ opacity: 1, height: 'auto', y: 0 }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="mb-6 p-4 rounded-xl bg-orange-500/10 border border-orange-500/20 flex gap-3 text-orange-400"
+                        >
+                          <Info className="h-5 w-5 shrink-0 mt-0.5" />
+                          <p className="text-sm font-medium">{enrollmentError}</p>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
 
                     <Button
                       onClick={handleEnrollment}
@@ -480,7 +519,7 @@ export default function MyCoursesPage() {
                         'Confirm Enrollment'
                       )}
                     </Button>
-                  </motion.div>
+                  </>
                 )}
               </div>
             </motion.div>
