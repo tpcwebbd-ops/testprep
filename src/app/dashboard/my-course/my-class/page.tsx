@@ -26,6 +26,9 @@ import {
   ShieldAlert,
   Mail,
   ExternalLink,
+  AlignRight, // Replacing standard Menu icon
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -99,6 +102,13 @@ function StudentCourseContent() {
   const [selectedClass, setSelectedClass] = useState<ProcessedClass | null>(null);
   const [activeResourceTab, setActiveResourceTab] = useState<string | null>(null);
 
+  // Assignment/MCQ states
+  const [mcqAnswers, setMcqAnswers] = useState<Record<string, number>>({});
+  const [mcqSubmitted, setMcqSubmitted] = useState<Record<string, boolean>>({});
+
+  // Controls the resource list sidebar on mobile devices
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
   const hasAccess = useMemo(() => {
     if (!enrollmentsData?.data?.enrollments || !courseId) return false;
     return enrollmentsData.data.enrollments.some(
@@ -163,11 +173,15 @@ function StudentCourseContent() {
     if (cls.status === 'locked') return;
     setSelectedClass(cls);
     setActiveResourceTab(cls.resources.length > 0 ? cls.resources[0].id : null);
+
+    // Auto-open sidebar when entering a class on mobile
+    setIsMobileSidebarOpen(true);
   };
 
   const closeClassModal = () => {
     setSelectedClass(null);
     setActiveResourceTab(null);
+    setIsMobileSidebarOpen(false);
   };
 
   const getResourceIcon = (type: ResourceType, className = 'h-5 w-5') => {
@@ -187,13 +201,11 @@ function StudentCourseContent() {
     }
   };
 
-  // Intercept rich text anchor clicks to force them into the SAME window
   const handleHtmlContentClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement;
     const anchor = target.closest('a');
     if (anchor) {
       e.preventDefault();
-      // Enforce opening the URL in the same window/tab
       window.location.href = anchor.href;
     }
   };
@@ -214,7 +226,7 @@ function StudentCourseContent() {
 
   if (!hasAccess) {
     return (
-      <main className="min-h-screen bg-[#020817] text-slate-200 flex items-center justify-center p-4 relative overflow-hidden font-sans">
+      <main className="min-h-screen mt-[65px] bg-[#020817] text-slate-200 flex items-center justify-center p-4 relative overflow-hidden font-sans">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-red-900/20 via-[#020817] to-[#020817] pointer-events-none" />
         <motion.div
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -252,18 +264,18 @@ function StudentCourseContent() {
   }
 
   return (
-    <main className="min-h-screen bg-[#020817] text-slate-200 selection:bg-teal-500/30 overflow-x-hidden font-sans">
+    <main className="min-h-screen mt-[65px] bg-[#020817] text-slate-200 selection:bg-teal-500/30 overflow-x-hidden font-sans">
       <div className="fixed inset-0 z-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-teal-900/20 via-[#020817] to-[#020817] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-24 relative z-10 space-y-8">
         <header className="flex flex-col xl:flex-row gap-6 justify-between items-start">
           <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col gap-6 w-full xl:w-1/2">
-            <div className="flex items-center gap-4">
+            <div className="flex items-start sm:items-center gap-4">
               <Button
                 onClick={() => router.push('/dashboard/my-course')}
                 variant="ghost"
                 size="icon"
-                className="rounded-full bg-white/5 hover:bg-white/10 text-white backdrop-blur-md h-12 w-12 shrink-0"
+                className="rounded-full bg-white/5 hover:bg-white/10 text-white backdrop-blur-md h-12 w-12 shrink-0 mt-1 sm:mt-0"
               >
                 <ArrowLeft className="h-6 w-6" />
               </Button>
@@ -597,27 +609,52 @@ function StudentCourseContent() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-xl"
+            className="fixed top-[65px] inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-xl"
           >
             <motion.div
               initial={{ scale: 0.95, y: 20, opacity: 0 }}
               animate={{ scale: 1, y: 0, opacity: 1 }}
               exit={{ scale: 0.95, y: 20, opacity: 0 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="w-full h-full flex flex-col lg:flex-row bg-[#020817] text-white overflow-hidden relative"
+              className="w-full h-full flex bg-[#020817] text-white overflow-hidden relative"
             >
               <div className="absolute top-0 right-0 w-[50vw] h-[50vw] bg-teal-500/10 rounded-full blur-[100px] pointer-events-none" />
 
-              <div className="w-full lg:w-80 border-b lg:border-b-0 lg:border-r border-white/10 bg-slate-950/80 flex flex-col shrink-0 relative z-10 h-[30vh] lg:h-full">
-                <div className="p-6 border-b border-white/10 flex items-start justify-between">
+              {/* Mobile Sidebar Backdrop */}
+              <AnimatePresence>
+                {isMobileSidebarOpen && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="absolute inset-0 bg-black/60 z-[60] lg:hidden backdrop-blur-sm"
+                    onClick={() => setIsMobileSidebarOpen(false)}
+                  />
+                )}
+              </AnimatePresence>
+
+              {/* Sidebar (Fixed on mobile, Relative on desktop) */}
+              <div
+                className={`absolute lg:relative top-0 left-0 h-full w-[85%] sm:w-80 bg-slate-950/95 lg:bg-slate-950/80 border-r border-white/10 flex flex-col shrink-0 z-[70] lg:z-10 transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none ${
+                  isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+                }`}
+              >
+                <div className="p-6 border-b border-white/10 flex items-start justify-between bg-slate-950">
                   <div>
                     <span className="text-xs font-bold text-teal-400 tracking-widest uppercase mb-1 block">Class {selectedClass.day}</span>
                     <h2 className="text-xl font-bold leading-tight line-clamp-2">{selectedClass.title}</h2>
                   </div>
+                  {/* Close button inside sidebar */}
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={closeClassModal}
+                    onClick={() => {
+                      if (typeof window !== 'undefined' && window.innerWidth >= 1024) {
+                        closeClassModal(); // Desktop: closes the entire modal
+                      } else {
+                        setIsMobileSidebarOpen(false); // Mobile: closes just the sidebar
+                      }
+                    }}
                     className="shrink-0 rounded-full bg-white/5 hover:bg-white/10 hover:text-red-400 transition-colors"
                   >
                     <X className="h-5 w-5" />
@@ -636,7 +673,12 @@ function StudentCourseContent() {
                       return (
                         <button
                           key={resource.id}
-                          onClick={() => setActiveResourceTab(resource.id)}
+                          onClick={() => {
+                            setActiveResourceTab(resource.id);
+                            if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+                              setIsMobileSidebarOpen(false); // Auto close sidebar on mobile after selection
+                            }
+                          }}
                           className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all duration-200 border ${
                             isActive
                               ? 'bg-teal-500/10 border-teal-500/30 shadow-[inset_0_0_20px_rgba(20,184,166,0.1)]'
@@ -664,27 +706,83 @@ function StudentCourseContent() {
                 </div>
               </div>
 
-              <div className="flex-1 bg-[#020817] relative z-10 overflow-y-auto custom-scrollbar h-[70vh] lg:h-full">
+              {/* Main Content Area */}
+              <div className="flex-1 bg-[#020817] relative z-10 overflow-y-auto custom-scrollbar h-full w-full flex flex-col">
+                {/* Mobile Top Bar with Menu & Close Options */}
+                <div className="lg:hidden sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-white/10 flex items-center justify-between p-4 shadow-xl">
+                  <div className="flex items-center gap-3 overflow-hidden">
+                    <div className="p-1.5 bg-teal-500/20 text-teal-400 rounded-lg shrink-0">
+                      <BookOpen className="h-5 w-5" />
+                    </div>
+                    <span className="text-sm font-bold text-white truncate">
+                      {selectedClass.resources.find(r => r.id === activeResourceTab)?.title || 'Course Overview'}
+                    </span>
+                  </div>
+
+                  {/* Action buttons container */}
+                  <div className="flex items-center gap-1.5 shrink-0 ml-3">
+                    {/* Hamburger Menu Button */}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setIsMobileSidebarOpen(true)}
+                      className="rounded-xl bg-teal-500/10 text-teal-400 hover:bg-teal-500/20 hover:text-teal-300 transition-colors h-10 w-10"
+                    >
+                      <AlignRight className="h-5 w-5" />
+                    </Button>
+
+                    {/* Dedicated Close Button for Mobile Modal */}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={closeClassModal}
+                      className="rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:text-red-300 transition-colors h-10 w-10"
+                    >
+                      <X className="h-5 w-5" />
+                    </Button>
+                  </div>
+                </div>
+
                 {activeResourceTab ? (
-                  <div className="p-6 lg:p-12 max-w-5xl mx-auto h-full flex flex-col">
+                  <div className="p-4 sm:p-6 lg:p-12 max-w-5xl mx-auto h-full flex flex-col w-full">
                     {selectedClass.resources.map(resource => {
                       if (resource.id !== activeResourceTab) return null;
 
+                      // Compute Next/Previous Indexes safely
+                      const currentIndex = selectedClass.resources.findIndex(r => r.id === activeResourceTab);
+                      const hasPrev = currentIndex > 0;
+                      const hasNext = currentIndex < selectedClass.resources.length - 1;
+
+                      const handlePrev = () => {
+                        if (hasPrev) setActiveResourceTab(selectedClass.resources[currentIndex - 1].id);
+                      };
+                      const handleNext = () => {
+                        if (hasNext) setActiveResourceTab(selectedClass.resources[currentIndex + 1].id);
+                      };
+
                       return (
-                        <motion.div key={resource.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col h-full space-y-6">
-                          <div className="flex items-center gap-4 pb-6 border-b border-white/10 shrink-0">
-                            <div className="p-3 bg-slate-900 border border-white/10 rounded-2xl shadow-inner">{getResourceIcon(resource.type, 'h-8 w-8')}</div>
+                        <motion.div
+                          key={resource.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="flex flex-col h-full space-y-4 lg:space-y-6"
+                        >
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-4 pb-4 lg:pb-6 border-b border-white/10 shrink-0">
+                            <div className="p-3 bg-slate-900 border border-white/10 rounded-2xl shadow-inner w-fit">
+                              {getResourceIcon(resource.type, 'h-6 w-6 sm:h-8 sm:w-8')}
+                            </div>
                             <div>
-                              <h2 className="text-2xl md:text-4xl font-black text-white">{resource.title}</h2>
+                              <h2 className="text-xl sm:text-2xl md:text-4xl font-black text-white leading-tight">{resource.title}</h2>
                               <div className="flex items-center gap-2 mt-2">
-                                <span className="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-xs font-bold text-slate-300 uppercase tracking-widest">
+                                <span className="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] sm:text-xs font-bold text-slate-300 uppercase tracking-widest">
                                   {resource.type}
                                 </span>
                               </div>
                             </div>
                           </div>
 
-                          <div className="flex-1 min-h-0 bg-slate-900/40 border border-white/5 rounded-3xl p-6 lg:p-8 overflow-y-auto backdrop-blur-sm shadow-2xl">
+                          {/* Content Container */}
+                          <div className="flex-1 min-h-0 bg-slate-900/40 border border-white/5 rounded-3xl p-4 sm:p-6 lg:p-8 overflow-y-auto backdrop-blur-sm shadow-2xl">
                             {(resource.type === 'youtube' || resource.type === 'video') && (
                               <div className="w-full aspect-video bg-black rounded-2xl overflow-hidden border border-white/10 shadow-2xl flex items-center justify-center relative group">
                                 {resource.url ? (
@@ -695,8 +793,8 @@ function StudentCourseContent() {
                                   />
                                 ) : (
                                   <div className="flex flex-col items-center text-slate-500">
-                                    <VideoIcon className="h-16 w-16 mb-4 opacity-50" />
-                                    <p className="font-medium">Video source not provided</p>
+                                    <VideoIcon className="h-12 w-12 sm:h-16 sm:w-16 mb-4 opacity-50" />
+                                    <p className="font-medium text-sm sm:text-base">Video source not provided</p>
                                   </div>
                                 )}
                               </div>
@@ -704,25 +802,24 @@ function StudentCourseContent() {
 
                             {(resource.type === 'text' || resource.type === 'assignment') && (
                               <div
-                                className="prose prose-invert prose-teal max-w-none text-slate-300 leading-relaxed space-y-4"
-                                onClick={handleHtmlContentClick} // <-- Attached interceptor here!
+                                className="prose prose-invert prose-sm sm:prose-base prose-teal max-w-none text-slate-300 leading-relaxed space-y-4"
+                                onClick={handleHtmlContentClick}
                               >
                                 {resource.content ? (
                                   <div dangerouslySetInnerHTML={{ __html: resource.content }} />
                                 ) : (
-                                  <div className="flex flex-col items-center justify-center h-64 text-slate-500 border-2 border-dashed border-white/10 rounded-2xl">
-                                    <FileText className="h-12 w-12 mb-4 opacity-50" />
-                                    <p>No textual content available.</p>
+                                  <div className="flex flex-col items-center justify-center h-48 sm:h-64 text-slate-500 border-2 border-dashed border-white/10 rounded-2xl">
+                                    <FileText className="h-10 w-10 sm:h-12 sm:w-12 mb-4 opacity-50" />
+                                    <p className="text-sm sm:text-base">No textual content available.</p>
                                   </div>
                                 )}
 
-                                {/* Fallback explicit external link if url is provided for texts/assignments */}
                                 {resource.url && (
                                   <div className="mt-8 pt-6 border-t border-white/10">
                                     <a
                                       href={resource.url}
-                                      target="_self" // Force self / same window target
-                                      className="inline-flex items-center gap-2 px-6 py-3 bg-teal-500/10 text-teal-400 hover:bg-teal-500/20 hover:text-teal-300 font-semibold border border-teal-500/20 hover:border-teal-500/50 rounded-xl transition-all shadow-[0_0_15px_rgba(20,184,166,0.1)]"
+                                      target="_self"
+                                      className="inline-flex items-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 bg-teal-500/10 text-teal-400 hover:bg-teal-500/20 hover:text-teal-300 text-sm sm:text-base font-semibold border border-teal-500/20 hover:border-teal-500/50 rounded-xl transition-all shadow-[0_0_15px_rgba(20,184,166,0.1)]"
                                     >
                                       <ExternalLink className="h-4 w-4" />
                                       Access External Resource
@@ -733,30 +830,113 @@ function StudentCourseContent() {
                             )}
 
                             {resource.type === 'mcq' && resource.mcqData && (
-                              <div className="max-w-3xl mx-auto space-y-8">
-                                <div className="bg-slate-950 p-6 lg:p-8 rounded-2xl border border-white/10 shadow-xl relative overflow-hidden">
+                              <div className="max-w-3xl mx-auto space-y-6 sm:space-y-8">
+                                <div className="bg-slate-950 p-5 sm:p-6 lg:p-8 rounded-2xl border border-white/10 shadow-xl relative overflow-hidden">
                                   <div className="absolute top-0 left-0 w-1 h-full bg-amber-500" />
-                                  <h3 className="text-xl lg:text-2xl font-bold text-white mb-6 leading-relaxed">{resource.mcqData.question}</h3>
+                                  <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-white mb-6 leading-relaxed">{resource.mcqData.question}</h3>
                                   <div className="space-y-3">
-                                    {resource.mcqData.options.map((opt, idx) => (
-                                      <button
-                                        key={idx}
-                                        className="w-full text-left p-4 rounded-xl border border-white/10 bg-slate-900/50 hover:bg-slate-800 hover:border-amber-500/50 hover:shadow-[0_0_15px_rgba(251,191,36,0.1)] transition-all duration-200 flex items-center gap-4 group"
-                                      >
-                                        <div className="w-8 h-8 rounded-full bg-slate-950 border border-white/10 flex items-center justify-center text-sm font-bold text-slate-400 group-hover:text-amber-400 group-hover:border-amber-500/50 shrink-0">
-                                          {String.fromCharCode(65 + idx)}
-                                        </div>
-                                        <span className="text-slate-300 group-hover:text-white font-medium">{opt}</span>
-                                      </button>
-                                    ))}
+                                    {resource.mcqData.options.map((opt, idx) => {
+                                      const isSelected = mcqAnswers[resource.id] === idx;
+                                      const isSubmitted = mcqSubmitted[resource.id];
+                                      const isCorrect = idx === resource?.mcqData?.correctAnswerIndex;
+                                      const isWrong = isSelected && !isCorrect;
+
+                                      let btnClass =
+                                        'w-full text-left p-3 sm:p-4 rounded-xl border transition-all duration-200 flex items-center gap-3 sm:gap-4 group ';
+                                      let circleClass =
+                                        'w-7 h-7 sm:w-8 sm:h-8 rounded-full border flex items-center justify-center text-xs sm:text-sm font-bold shrink-0 transition-colors ';
+
+                                      if (isSubmitted) {
+                                        if (isCorrect) {
+                                          btnClass += 'bg-emerald-500/20 border-emerald-500/50 text-white';
+                                          circleClass += 'bg-emerald-500 text-white border-emerald-500';
+                                        } else if (isWrong) {
+                                          btnClass += 'bg-red-500/20 border-red-500/50 text-white';
+                                          circleClass += 'bg-red-500 text-white border-red-500';
+                                        } else {
+                                          btnClass += 'bg-slate-900/50 border-white/5 text-slate-500 opacity-50';
+                                          circleClass += 'bg-slate-950 border-white/5 text-slate-600';
+                                        }
+                                      } else {
+                                        if (isSelected) {
+                                          btnClass += 'bg-amber-500/20 border-amber-500/50 text-white shadow-[0_0_15px_rgba(251,191,36,0.15)]';
+                                          circleClass += 'bg-amber-500 text-white border-amber-500';
+                                        } else {
+                                          btnClass += 'bg-slate-900/50 border-white/10 text-slate-300 hover:bg-slate-800 hover:border-amber-500/50';
+                                          circleClass +=
+                                            'bg-slate-950 border-white/10 text-slate-400 group-hover:text-amber-400 group-hover:border-amber-500/50';
+                                        }
+                                      }
+
+                                      return (
+                                        <button
+                                          key={idx}
+                                          disabled={isSubmitted}
+                                          onClick={() => setMcqAnswers(prev => ({ ...prev, [resource.id]: idx }))}
+                                          className={btnClass}
+                                        >
+                                          <div className={circleClass}>{String.fromCharCode(65 + idx)}</div>
+                                          <span className="text-sm sm:text-base font-medium">{opt}</span>
+                                        </button>
+                                      );
+                                    })}
                                   </div>
                                 </div>
-                                <div className="flex justify-end">
-                                  <Button className="bg-amber-600 hover:bg-amber-500 text-white font-bold h-12 px-8 rounded-xl shadow-lg shadow-amber-500/20">
+                                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-4 sm:pb-0">
+                                  <div className="text-sm font-medium w-full sm:w-auto text-center sm:text-left">
+                                    {mcqSubmitted[resource.id] &&
+                                      (mcqAnswers[resource.id] === resource.mcqData.correctAnswerIndex ? (
+                                        <span className="text-emerald-400 flex items-center justify-center sm:justify-start gap-2">
+                                          <CheckCircle2 className="w-5 h-5" /> Correct Answer! Great job.
+                                        </span>
+                                      ) : (
+                                        <span className="text-red-400 flex items-center justify-center sm:justify-start gap-2">
+                                          <X className="w-5 h-5" /> Incorrect. Try reviewing the material.
+                                        </span>
+                                      ))}
+                                  </div>
+                                  <Button
+                                    disabled={mcqAnswers[resource.id] === undefined || mcqSubmitted[resource.id]}
+                                    onClick={() => setMcqSubmitted(prev => ({ ...prev, [resource.id]: true }))}
+                                    className="w-full sm:w-auto bg-amber-600 hover:bg-amber-500 text-white font-bold h-12 px-8 rounded-xl shadow-lg shadow-amber-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
                                     Submit Answer
                                   </Button>
                                 </div>
                               </div>
+                            )}
+                          </div>
+
+                          {/* Navigation Buttons */}
+                          <div className="pt-2 sm:pt-4 mt-auto border-t border-white/10 flex items-center justify-between shrink-0">
+                            <Button
+                              variant="outline"
+                              onClick={handlePrev}
+                              disabled={!hasPrev}
+                              className="bg-transparent border-white/10 text-slate-300 hover:bg-white/5 disabled:opacity-30 h-10 sm:h-12 px-4 sm:px-6 rounded-xl"
+                            >
+                              <ChevronLeft className="w-4 h-4 sm:mr-2" />
+                              <span className="hidden sm:inline">Previous</span>
+                            </Button>
+
+                            {hasNext ? (
+                              <Button
+                                variant="outline"
+                                onClick={handleNext}
+                                className="bg-transparent border-white/10 text-slate-300 hover:bg-white/5 h-10 sm:h-12 px-4 sm:px-6 rounded-xl"
+                              >
+                                <span className="hidden sm:inline">Next</span>
+                                <ChevronRight className="w-4 h-4 sm:ml-2" />
+                              </Button>
+                            ) : (
+                              <Button
+                                onClick={closeClassModal}
+                                className="bg-emerald-600 hover:bg-emerald-500 text-white font-medium h-10 sm:h-12 px-4 sm:px-6 rounded-xl shadow-lg shadow-emerald-500/20 transition-all"
+                              >
+                                <CheckCircle2 className="w-4 h-4 sm:mr-2" />
+                                <span className="hidden sm:inline">Complete Class</span>
+                                <span className="inline sm:hidden">Complete</span>
+                              </Button>
                             )}
                           </div>
                         </motion.div>
@@ -765,12 +945,12 @@ function StudentCourseContent() {
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center h-full text-slate-500 p-8 text-center space-y-4">
-                    <div className="w-24 h-24 bg-slate-900 rounded-full flex items-center justify-center border border-white/5 mb-4 shadow-inner">
-                      <BookOpen className="h-10 w-10 text-slate-600" />
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 bg-slate-900 rounded-full flex items-center justify-center border border-white/5 mb-4 shadow-inner">
+                      <BookOpen className="h-8 w-8 sm:h-10 sm:w-10 text-slate-600" />
                     </div>
-                    <h3 className="text-2xl font-bold text-slate-400">Select a Resource</h3>
-                    <p className="max-w-md">
-                      Choose an item from the left sidebar to start learning. You can watch videos, read materials, and complete assignments.
+                    <h3 className="text-xl sm:text-2xl font-bold text-slate-400">Select a Resource</h3>
+                    <p className="max-w-md text-sm sm:text-base">
+                      Choose an item from the sidebar to start learning. You can watch videos, read materials, and complete assignments.
                     </p>
                   </div>
                 )}

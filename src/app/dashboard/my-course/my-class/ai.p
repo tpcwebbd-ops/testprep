@@ -1,13 +1,5 @@
-Look at the my-class/page.tsx 
+Look at the page.tsx 
 ```
-/*
-|-----------------------------------------
-| setting up Page for the App
-| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
-| @copyright: testprep-webapp, April, 2026
-|-----------------------------------------
-*/
-
 'use client';
 
 import { useState, Suspense, useEffect, useMemo } from 'react';
@@ -33,11 +25,19 @@ import {
   Gamepad2,
   CalendarDays,
   Target,
+  ShieldAlert,
+  Mail,
+  ExternalLink,
+  AlignRight, // Replacing standard Menu icon
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { useGetCourseByIdQuery } from '@/redux/features/courses/coursesSlice';
+import { useGetEnrollmentsQuery } from '@/redux/features/enrollments/enrollmentsSlice';
+import { useSession } from '@/lib/auth-client';
 
 type ResourceType = 'youtube' | 'video' | 'text' | 'mcq' | 'assignment';
 
@@ -63,6 +63,14 @@ interface IClass {
   resources: IResource[];
 }
 
+interface IEnrollment {
+  _id: string;
+  studentEmail: string;
+  enrollCoursesIDS: string[];
+  paymentStatus: string;
+  studentsStatus: string;
+}
+
 type ClassStatus = 'completed' | 'missed' | 'active' | 'locked';
 
 interface ProcessedClass extends IClass {
@@ -80,6 +88,11 @@ function StudentCourseContent() {
   const router = useRouter();
   const courseId = searchParams.get('courseId');
 
+  const session = useSession();
+  const userEmail = session?.data?.user?.email || '';
+
+  const { data: enrollmentsData, isLoading: isEnrollmentsLoading } = useGetEnrollmentsQuery({ page: 1, limit: 100, q: userEmail }, { skip: !userEmail });
+
   const { data: courseResponse, isLoading: isCourseLoading } = useGetCourseByIdQuery(courseId, {
     skip: !courseId,
   });
@@ -90,6 +103,20 @@ function StudentCourseContent() {
   const [gridColumns, setGridColumns] = useState<1 | 2 | 3>(3);
   const [selectedClass, setSelectedClass] = useState<ProcessedClass | null>(null);
   const [activeResourceTab, setActiveResourceTab] = useState<string | null>(null);
+
+  // Assignment/MCQ states
+  const [mcqAnswers, setMcqAnswers] = useState<Record<string, number>>({});
+  const [mcqSubmitted, setMcqSubmitted] = useState<Record<string, boolean>>({});
+
+  // Controls the resource list sidebar on mobile devices
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+  const hasAccess = useMemo(() => {
+    if (!enrollmentsData?.data?.enrollments || !courseId) return false;
+    return enrollmentsData.data.enrollments.some(
+      (e: IEnrollment) => e.enrollCoursesIDS?.includes(courseId) && e.paymentStatus === 'completed' && e.studentsStatus === 'running',
+    );
+  }, [enrollmentsData, courseId]);
 
   useEffect(() => {
     if (courseData?.lectureData) {
@@ -148,11 +175,15 @@ function StudentCourseContent() {
     if (cls.status === 'locked') return;
     setSelectedClass(cls);
     setActiveResourceTab(cls.resources.length > 0 ? cls.resources[0].id : null);
+
+    // Auto-open sidebar when entering a class on mobile
+    setIsMobileSidebarOpen(true);
   };
 
   const closeClassModal = () => {
     setSelectedClass(null);
     setActiveResourceTab(null);
+    setIsMobileSidebarOpen(false);
   };
 
   const getResourceIcon = (type: ResourceType, className = 'h-5 w-5') => {
@@ -172,21 +203,81 @@ function StudentCourseContent() {
     }
   };
 
+  const handleHtmlContentClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+    const anchor = target.closest('a');
+    if (anchor) {
+      e.preventDefault();
+      window.location.href = anchor.href;
+    }
+  };
+
+  const isLoading = isCourseLoading || isEnrollmentsLoading;
   const courseTitleDisplay = isCourseLoading ? 'Loading Workspace...' : (courseData?.courseTitle ?? 'My Learning Journey');
 
+  if (isLoading) {
+    return (
+      <main className="min-h-screen bg-[#020817] flex items-center justify-center p-4">
+        <div className="animate-pulse flex flex-col items-center gap-6">
+          <div className="w-20 h-20 rounded-full border-4 border-teal-500 border-t-transparent animate-spin shadow-[0_0_30px_rgba(20,184,166,0.4)]" />
+          <p className="text-teal-400 font-bold tracking-[0.2em] text-lg">INITIALIZING SYSTEM</p>
+        </div>
+      </main>
+    );
+  }
+
+  if (!hasAccess) {
+    return (
+      <main className="min-h-screen mt-[65px] bg-[#020817] text-slate-200 flex items-center justify-center p-4 relative overflow-hidden font-sans">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-red-900/20 via-[#020817] to-[#020817] pointer-events-none" />
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          className="relative z-10 max-w-lg w-full bg-slate-900/80 backdrop-blur-xl border border-red-500/20 rounded-3xl p-8 md:p-10 text-center shadow-2xl shadow-red-500/10"
+        >
+          <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-red-500/20 shadow-[0_0_30px_rgba(239,68,68,0.2)]">
+            <ShieldAlert className="w-10 h-10 text-red-500" />
+          </div>
+          <h1 className="text-3xl font-black text-white mb-3 tracking-tight">Access Restricted</h1>
+          <p className="text-slate-400 mb-8 leading-relaxed">
+            You currently do not have active access to this course. This might be because your enrollment is pending approval, payment is incomplete, or your
+            student status is not active.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button
+              onClick={() => router.push('/dashboard/my-course')}
+              variant="outline"
+              className="bg-transparent border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800 h-12 px-6 rounded-xl"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Return to Courses
+            </Button>
+            <Button
+              onClick={() => (window.location.href = 'mailto:admin@example.com?subject=Course Enrollment Issue')}
+              className="bg-red-600 hover:bg-red-500 text-white h-12 px-6 rounded-xl shadow-lg shadow-red-500/20"
+            >
+              <Mail className="w-4 h-4 mr-2" />
+              Contact Admin
+            </Button>
+          </div>
+        </motion.div>
+      </main>
+    );
+  }
+
   return (
-    <main className="min-h-screen bg-[#020817] text-slate-200 selection:bg-teal-500/30 overflow-x-hidden font-sans">
+    <main className="min-h-screen mt-[65px] bg-[#020817] text-slate-200 selection:bg-teal-500/30 overflow-x-hidden font-sans">
       <div className="fixed inset-0 z-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-teal-900/20 via-[#020817] to-[#020817] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-24 relative z-10 space-y-8">
         <header className="flex flex-col xl:flex-row gap-6 justify-between items-start">
           <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col gap-6 w-full xl:w-1/2">
-            <div className="flex items-center gap-4">
+            <div className="flex items-start sm:items-center gap-4">
               <Button
-                onClick={() => router.push('/dashboard/courses')}
+                onClick={() => router.push('/dashboard/my-course')}
                 variant="ghost"
                 size="icon"
-                className="rounded-full bg-white/5 hover:bg-white/10 text-white backdrop-blur-md h-12 w-12 shrink-0"
+                className="rounded-full bg-white/5 hover:bg-white/10 text-white backdrop-blur-md h-12 w-12 shrink-0 mt-1 sm:mt-0"
               >
                 <ArrowLeft className="h-6 w-6" />
               </Button>
@@ -284,7 +375,7 @@ function StudentCourseContent() {
         {classes.length === 0 ? (
           <div className="flex flex-col items-center justify-center min-h-[40vh]">
             <div className="w-16 h-16 border-4 border-teal-500 border-t-transparent rounded-full animate-spin mb-4" />
-            <p className="text-teal-400 font-medium tracking-widest">LOADING CONTENT...</p>
+            <p className="text-teal-400 font-medium tracking-widest">NO CONTENT AVAILABLE</p>
           </div>
         ) : (
           <div className="mt-12 relative">
@@ -293,7 +384,9 @@ function StudentCourseContent() {
                 <div className="absolute top-0 bottom-0 left-[28px] md:left-1/2 w-1.5 bg-slate-800 -translate-x-1/2 rounded-full overflow-hidden z-0">
                   <motion.div
                     initial={{ height: 0 }}
-                    animate={{ height: `${classes.length > 0 ? (classes.filter(c => c.status !== 'locked').length / classes.length) * 100 : 0}%` }}
+                    animate={{
+                      height: `${classes.length > 0 ? (classes.filter(c => c.status !== 'locked').length / classes.length) * 100 : 0}%`,
+                    }}
                     transition={{ duration: 1.5, ease: 'easeInOut' }}
                     className="w-full bg-gradient-to-b from-teal-400 via-emerald-400 to-amber-400"
                   />
@@ -337,11 +430,16 @@ function StudentCourseContent() {
                         initial="hidden"
                         whileInView="visible"
                         viewport={{ once: true, margin: '-100px' }}
-                        variants={{ hidden: { opacity: 0, y: 50 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, delay: index * 0.1 } } }}
+                        variants={{
+                          hidden: { opacity: 0, y: 50 },
+                          visible: { opacity: 1, y: 0, transition: { duration: 0.5, delay: index * 0.1 } },
+                        }}
                         className={`relative flex items-center w-full group ml-[56px] md:ml-0 ${isLeft ? 'md:justify-start' : 'md:justify-end'}`}
                       >
                         <div
-                          className={`absolute left-[-28px] md:left-1/2 w-14 h-14 -translate-x-1/2 rounded-full border-4 flex items-center justify-center z-10 transition-transform duration-300 ${isLocked ? '' : 'cursor-pointer hover:scale-110'} ${nodeColor} ${glow}`}
+                          className={`absolute left-[-28px] md:left-1/2 w-14 h-14 -translate-x-1/2 rounded-full border-4 flex items-center justify-center z-10 transition-transform duration-300 ${
+                            isLocked ? '' : 'cursor-pointer hover:scale-110'
+                          } ${nodeColor} ${glow}`}
                           onClick={() => openClassModal(cls)}
                         >
                           <Icon className="h-6 w-6" />
@@ -513,27 +611,52 @@ function StudentCourseContent() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-xl"
+            className="fixed top-[65px] inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-xl"
           >
             <motion.div
               initial={{ scale: 0.95, y: 20, opacity: 0 }}
               animate={{ scale: 1, y: 0, opacity: 1 }}
               exit={{ scale: 0.95, y: 20, opacity: 0 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="w-full h-full flex flex-col lg:flex-row bg-[#020817] text-white overflow-hidden relative"
+              className="w-full h-full flex bg-[#020817] text-white overflow-hidden relative"
             >
               <div className="absolute top-0 right-0 w-[50vw] h-[50vw] bg-teal-500/10 rounded-full blur-[100px] pointer-events-none" />
 
-              <div className="w-full lg:w-80 border-b lg:border-b-0 lg:border-r border-white/10 bg-slate-950/80 flex flex-col shrink-0 relative z-10 h-[30vh] lg:h-full">
-                <div className="p-6 border-b border-white/10 flex items-start justify-between">
+              {/* Mobile Sidebar Backdrop */}
+              <AnimatePresence>
+                {isMobileSidebarOpen && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="absolute inset-0 bg-black/60 z-[60] lg:hidden backdrop-blur-sm"
+                    onClick={() => setIsMobileSidebarOpen(false)}
+                  />
+                )}
+              </AnimatePresence>
+
+              {/* Sidebar (Fixed on mobile, Relative on desktop) */}
+              <div
+                className={`absolute lg:relative top-0 left-0 h-full w-[85%] sm:w-80 bg-slate-950/95 lg:bg-slate-950/80 border-r border-white/10 flex flex-col shrink-0 z-[70] lg:z-10 transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none ${
+                  isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+                }`}
+              >
+                <div className="p-6 border-b border-white/10 flex items-start justify-between bg-slate-950">
                   <div>
                     <span className="text-xs font-bold text-teal-400 tracking-widest uppercase mb-1 block">Class {selectedClass.day}</span>
                     <h2 className="text-xl font-bold leading-tight line-clamp-2">{selectedClass.title}</h2>
                   </div>
+                  {/* Close button inside sidebar */}
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={closeClassModal}
+                    onClick={() => {
+                      if (typeof window !== 'undefined' && window.innerWidth >= 1024) {
+                        closeClassModal(); // Desktop: closes the entire modal
+                      } else {
+                        setIsMobileSidebarOpen(false); // Mobile: closes just the sidebar
+                      }
+                    }}
                     className="shrink-0 rounded-full bg-white/5 hover:bg-white/10 hover:text-red-400 transition-colors"
                   >
                     <X className="h-5 w-5" />
@@ -552,7 +675,12 @@ function StudentCourseContent() {
                       return (
                         <button
                           key={resource.id}
-                          onClick={() => setActiveResourceTab(resource.id)}
+                          onClick={() => {
+                            setActiveResourceTab(resource.id);
+                            if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+                              setIsMobileSidebarOpen(false); // Auto close sidebar on mobile after selection
+                            }
+                          }}
                           className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all duration-200 border ${
                             isActive
                               ? 'bg-teal-500/10 border-teal-500/30 shadow-[inset_0_0_20px_rgba(20,184,166,0.1)]'
@@ -580,27 +708,83 @@ function StudentCourseContent() {
                 </div>
               </div>
 
-              <div className="flex-1 bg-[#020817] relative z-10 overflow-y-auto custom-scrollbar h-[70vh] lg:h-full">
+              {/* Main Content Area */}
+              <div className="flex-1 bg-[#020817] relative z-10 overflow-y-auto custom-scrollbar h-full w-full flex flex-col">
+                {/* Mobile Top Bar with Menu & Close Options */}
+                <div className="lg:hidden sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-white/10 flex items-center justify-between p-4 shadow-xl">
+                  <div className="flex items-center gap-3 overflow-hidden">
+                    <div className="p-1.5 bg-teal-500/20 text-teal-400 rounded-lg shrink-0">
+                      <BookOpen className="h-5 w-5" />
+                    </div>
+                    <span className="text-sm font-bold text-white truncate">
+                      {selectedClass.resources.find(r => r.id === activeResourceTab)?.title || 'Course Overview'}
+                    </span>
+                  </div>
+
+                  {/* Action buttons container */}
+                  <div className="flex items-center gap-1.5 shrink-0 ml-3">
+                    {/* Hamburger Menu Button */}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setIsMobileSidebarOpen(true)}
+                      className="rounded-xl bg-teal-500/10 text-teal-400 hover:bg-teal-500/20 hover:text-teal-300 transition-colors h-10 w-10"
+                    >
+                      <AlignRight className="h-5 w-5" />
+                    </Button>
+
+                    {/* Dedicated Close Button for Mobile Modal */}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={closeClassModal}
+                      className="rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:text-red-300 transition-colors h-10 w-10"
+                    >
+                      <X className="h-5 w-5" />
+                    </Button>
+                  </div>
+                </div>
+
                 {activeResourceTab ? (
-                  <div className="p-6 lg:p-12 max-w-5xl mx-auto h-full flex flex-col">
+                  <div className="p-4 sm:p-6 lg:p-12 max-w-5xl mx-auto h-full flex flex-col w-full">
                     {selectedClass.resources.map(resource => {
                       if (resource.id !== activeResourceTab) return null;
 
+                      // Compute Next/Previous Indexes safely
+                      const currentIndex = selectedClass.resources.findIndex(r => r.id === activeResourceTab);
+                      const hasPrev = currentIndex > 0;
+                      const hasNext = currentIndex < selectedClass.resources.length - 1;
+
+                      const handlePrev = () => {
+                        if (hasPrev) setActiveResourceTab(selectedClass.resources[currentIndex - 1].id);
+                      };
+                      const handleNext = () => {
+                        if (hasNext) setActiveResourceTab(selectedClass.resources[currentIndex + 1].id);
+                      };
+
                       return (
-                        <motion.div key={resource.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col h-full space-y-6">
-                          <div className="flex items-center gap-4 pb-6 border-b border-white/10 shrink-0">
-                            <div className="p-3 bg-slate-900 border border-white/10 rounded-2xl shadow-inner">{getResourceIcon(resource.type, 'h-8 w-8')}</div>
+                        <motion.div
+                          key={resource.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="flex flex-col h-full space-y-4 lg:space-y-6"
+                        >
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-4 pb-4 lg:pb-6 border-b border-white/10 shrink-0">
+                            <div className="p-3 bg-slate-900 border border-white/10 rounded-2xl shadow-inner w-fit">
+                              {getResourceIcon(resource.type, 'h-6 w-6 sm:h-8 sm:w-8')}
+                            </div>
                             <div>
-                              <h2 className="text-2xl md:text-4xl font-black text-white">{resource.title}</h2>
+                              <h2 className="text-xl sm:text-2xl md:text-4xl font-black text-white leading-tight">{resource.title}</h2>
                               <div className="flex items-center gap-2 mt-2">
-                                <span className="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-xs font-bold text-slate-300 uppercase tracking-widest">
+                                <span className="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] sm:text-xs font-bold text-slate-300 uppercase tracking-widest">
                                   {resource.type}
                                 </span>
                               </div>
                             </div>
                           </div>
 
-                          <div className="flex-1 min-h-0 bg-slate-900/40 border border-white/5 rounded-3xl p-6 lg:p-8 overflow-y-auto backdrop-blur-sm shadow-2xl">
+                          {/* Content Container */}
+                          <div className="flex-1 min-h-0 bg-slate-900/40 border border-white/5 rounded-3xl p-4 sm:p-6 lg:p-8 overflow-y-auto backdrop-blur-sm shadow-2xl">
                             {(resource.type === 'youtube' || resource.type === 'video') && (
                               <div className="w-full aspect-video bg-black rounded-2xl overflow-hidden border border-white/10 shadow-2xl flex items-center justify-center relative group">
                                 {resource.url ? (
@@ -611,52 +795,140 @@ function StudentCourseContent() {
                                   />
                                 ) : (
                                   <div className="flex flex-col items-center text-slate-500">
-                                    <VideoIcon className="h-16 w-16 mb-4 opacity-50" />
-                                    <p className="font-medium">Video source not provided</p>
+                                    <VideoIcon className="h-12 w-12 sm:h-16 sm:w-16 mb-4 opacity-50" />
+                                    <p className="font-medium text-sm sm:text-base">Video source not provided</p>
                                   </div>
                                 )}
                               </div>
                             )}
 
                             {(resource.type === 'text' || resource.type === 'assignment') && (
-                              <div className="prose prose-invert prose-teal max-w-none text-slate-300 leading-relaxed space-y-4">
+                              <div
+                                className="prose prose-invert prose-sm sm:prose-base prose-teal max-w-none text-slate-300 leading-relaxed space-y-4"
+                                onClick={handleHtmlContentClick}
+                              >
                                 {resource.content ? (
                                   <div dangerouslySetInnerHTML={{ __html: resource.content }} />
                                 ) : (
-                                  <div className="flex flex-col items-center justify-center h-64 text-slate-500 border-2 border-dashed border-white/10 rounded-2xl">
-                                    <FileText className="h-12 w-12 mb-4 opacity-50" />
-                                    <p>No textual content available.</p>
+                                  <div className="flex flex-col items-center justify-center h-48 sm:h-64 text-slate-500 border-2 border-dashed border-white/10 rounded-2xl">
+                                    <FileText className="h-10 w-10 sm:h-12 sm:w-12 mb-4 opacity-50" />
+                                    <p className="text-sm sm:text-base">No textual content available.</p>
+                                  </div>
+                                )}
+
+                                {resource.url && (
+                                  <div className="mt-8 pt-6 border-t border-white/10">
+                                    <a
+                                      href={resource.url}
+                                      target="_self"
+                                      className="inline-flex items-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 bg-teal-500/10 text-teal-400 hover:bg-teal-500/20 hover:text-teal-300 text-sm sm:text-base font-semibold border border-teal-500/20 hover:border-teal-500/50 rounded-xl transition-all shadow-[0_0_15px_rgba(20,184,166,0.1)]"
+                                    >
+                                      <ExternalLink className="h-4 w-4" />
+                                      Access External Resource
+                                    </a>
                                   </div>
                                 )}
                               </div>
                             )}
 
                             {resource.type === 'mcq' && resource.mcqData && (
-                              <div className="max-w-3xl mx-auto space-y-8">
-                                <div className="bg-slate-950 p-6 lg:p-8 rounded-2xl border border-white/10 shadow-xl relative overflow-hidden">
+                              <div className="max-w-3xl mx-auto space-y-6 sm:space-y-8">
+                                <div className="bg-slate-950 p-5 sm:p-6 lg:p-8 rounded-2xl border border-white/10 shadow-xl relative overflow-hidden">
                                   <div className="absolute top-0 left-0 w-1 h-full bg-amber-500" />
-                                  <h3 className="text-xl lg:text-2xl font-bold text-white mb-6 leading-relaxed">{resource.mcqData.question}</h3>
+                                  <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-white mb-6 leading-relaxed">{resource.mcqData.question}</h3>
                                   <div className="space-y-3">
-                                    {resource.mcqData.options.map((opt, idx) => (
-                                      <button
-                                        key={idx}
-                                        className="w-full text-left p-4 rounded-xl border border-white/10 bg-slate-900/50 hover:bg-slate-800 hover:border-amber-500/50 hover:shadow-[0_0_15px_rgba(251,191,36,0.1)] transition-all duration-200 flex items-center gap-4 group"
-                                      >
-                                        <div className="w-8 h-8 rounded-full bg-slate-950 border border-white/10 flex items-center justify-center text-sm font-bold text-slate-400 group-hover:text-amber-400 group-hover:border-amber-500/50 shrink-0">
-                                          {String.fromCharCode(65 + idx)}
-                                        </div>
-                                        <span className="text-slate-300 group-hover:text-white font-medium">{opt}</span>
-                                      </button>
-                                    ))}
+                                    {resource.mcqData.options.map((opt, idx) => {
+                                      const isSelected = mcqAnswers[resource.id] === idx;
+                                      const isSubmitted = mcqSubmitted[resource.id];
+                                      const isCorrect = idx === resource?.mcqData?.correctAnswerIndex;
+                                      const isWrong = isSelected && !isCorrect;
+
+                                      let btnClass =
+                                        'w-full text-left p-3 sm:p-4 rounded-xl border transition-all duration-200 flex items-center gap-3 sm:gap-4 group ';
+                                      let circleClass =
+                                        'w-7 h-7 sm:w-8 sm:h-8 rounded-full border flex items-center justify-center text-xs sm:text-sm font-bold shrink-0 transition-colors ';
+
+                                      if (isSubmitted) {
+                                        if (isCorrect) {
+                                          btnClass += 'bg-emerald-500/20 border-emerald-500/50 text-white';
+                                          circleClass += 'bg-emerald-500 text-white border-emerald-500';
+                                        } else if (isWrong) {
+                                          btnClass += 'bg-red-500/20 border-red-500/50 text-white';
+                                          circleClass += 'bg-red-500 text-white border-red-500';
+                                        } else {
+                                          btnClass += 'bg-slate-900/50 border-white/5 text-slate-500 opacity-50';
+                                          circleClass += 'bg-slate-950 border-white/5 text-slate-600';
+                                        }
+                                      } else {
+                                        if (isSelected) {
+                                          btnClass += 'bg-amber-500/20 border-amber-500/50 text-white shadow-[0_0_15px_rgba(251,191,36,0.15)]';
+                                          circleClass += 'bg-amber-500 text-white border-amber-500';
+                                        } else {
+                                          btnClass += 'bg-slate-900/50 border-white/10 text-slate-300 hover:bg-slate-800 hover:border-amber-500/50';
+                                          circleClass +=
+                                            'bg-slate-950 border-white/10 text-slate-400 group-hover:text-amber-400 group-hover:border-amber-500/50';
+                                        }
+                                      }
+
+                                      return (
+                                        <button
+                                          key={idx}
+                                          disabled={isSubmitted}
+                                          onClick={() => setMcqAnswers(prev => ({ ...prev, [resource.id]: idx }))}
+                                          className={btnClass}
+                                        >
+                                          <div className={circleClass}>{String.fromCharCode(65 + idx)}</div>
+                                          <span className="text-sm sm:text-base font-medium">{opt}</span>
+                                        </button>
+                                      );
+                                    })}
                                   </div>
                                 </div>
-                                <div className="flex justify-end">
-                                  <Button className="bg-amber-600 hover:bg-amber-500 text-white font-bold h-12 px-8 rounded-xl shadow-lg shadow-amber-500/20">
+                                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-4 sm:pb-0">
+                                  <div className="text-sm font-medium w-full sm:w-auto text-center sm:text-left">
+                                    {mcqSubmitted[resource.id] &&
+                                      (mcqAnswers[resource.id] === resource.mcqData.correctAnswerIndex ? (
+                                        <span className="text-emerald-400 flex items-center justify-center sm:justify-start gap-2">
+                                          <CheckCircle2 className="w-5 h-5" /> Correct Answer! Great job.
+                                        </span>
+                                      ) : (
+                                        <span className="text-red-400 flex items-center justify-center sm:justify-start gap-2">
+                                          <X className="w-5 h-5" /> Incorrect. Try reviewing the material.
+                                        </span>
+                                      ))}
+                                  </div>
+                                  <Button
+                                    disabled={mcqAnswers[resource.id] === undefined || mcqSubmitted[resource.id]}
+                                    onClick={() => setMcqSubmitted(prev => ({ ...prev, [resource.id]: true }))}
+                                    className="w-full sm:w-auto bg-amber-600 hover:bg-amber-500 text-white font-bold h-12 px-8 rounded-xl shadow-lg shadow-amber-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
                                     Submit Answer
                                   </Button>
                                 </div>
                               </div>
                             )}
+                          </div>
+
+                          {/* Navigation Buttons */}
+                          <div className="pt-2 sm:pt-4 mt-auto border-t border-white/10 flex items-center justify-between shrink-0">
+                            <Button
+                              variant="outline"
+                              onClick={handlePrev}
+                              disabled={!hasPrev}
+                              className="bg-transparent border-white/10 text-slate-300 hover:bg-white/5 disabled:opacity-30 h-10 sm:h-12 px-4 sm:px-6 rounded-xl"
+                            >
+                              <ChevronLeft className="w-4 h-4 sm:mr-2" />
+                              <span className="hidden sm:inline">Previous</span>
+                            </Button>
+                            <Button
+                              variant="outline"
+                              onClick={handleNext}
+                              disabled={!hasNext}
+                              className="bg-transparent border-white/10 text-slate-300 hover:bg-white/5 disabled:opacity-30 h-10 sm:h-12 px-4 sm:px-6 rounded-xl"
+                            >
+                              <span className="hidden sm:inline">Next</span>
+                              <ChevronRight className="w-4 h-4 sm:ml-2" />
+                            </Button>
                           </div>
                         </motion.div>
                       );
@@ -664,12 +936,12 @@ function StudentCourseContent() {
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center h-full text-slate-500 p-8 text-center space-y-4">
-                    <div className="w-24 h-24 bg-slate-900 rounded-full flex items-center justify-center border border-white/5 mb-4 shadow-inner">
-                      <BookOpen className="h-10 w-10 text-slate-600" />
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 bg-slate-900 rounded-full flex items-center justify-center border border-white/5 mb-4 shadow-inner">
+                      <BookOpen className="h-8 w-8 sm:h-10 sm:w-10 text-slate-600" />
                     </div>
-                    <h3 className="text-2xl font-bold text-slate-400">Select a Resource</h3>
-                    <p className="max-w-md">
-                      Choose an item from the left sidebar to start learning. You can watch videos, read materials, and complete assignments.
+                    <h3 className="text-xl sm:text-2xl font-bold text-slate-400">Select a Resource</h3>
+                    <p className="max-w-md text-sm sm:text-base">
+                      Choose an item from the sidebar to start learning. You can watch videos, read materials, and complete assignments.
                     </p>
                   </div>
                 )}
@@ -699,616 +971,4 @@ export default function StudentCoursePage() {
   );
 }
 ```
-
-
-and here is example of my-course/page.tsx 
-```
-'use client';
-
-import { useMemo, useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-  BookOpen,
-  Clock,
-  Award,
-  PlayCircle,
-  AlertTriangle,
-  RefreshCw,
-  User,
-  Mail,
-  CalendarCheck,
-  Activity,
-  Unlock,
-  Lock,
-  X,
-  Loader2,
-  Sparkles,
-  CheckCircle,
-  Info,
-  Clock4,
-  ExternalLink,
-} from 'lucide-react';
-
-import { Button } from '@/components/ui/button';
-import { useGetCoursesQuery } from '@/redux/features/courses/coursesSlice';
-import { useGetMyCoursesQuery } from '@/redux/features/my-courses/myCoursesSlice';
-import { useGetEnrollmentsQuery, useAddEnrollmentMutation } from '@/redux/features/enrollments/enrollmentsSlice';
-import { useSession } from '@/lib/auth-client';
-
-interface ICourse {
-  _id: string;
-  courseTitle: string;
-  courseDescription?: string;
-  totalClass?: number;
-  totalAssignment?: number;
-  totalDuration?: string;
-  totalMockTest?: number;
-  realPrice?: number;
-  discountPrice?: number;
-  challengeDay?: number;
-  totalLecture?: number;
-  isActive?: boolean;
-}
-
-interface IMyCourse {
-  _id: string;
-  courseId: ICourse | string;
-  progress?: number;
-  enrolledAt?: string;
-}
-
-interface IEnrollment {
-  _id: string;
-  studentEmail: string;
-  enrollCoursesIDS: string[];
-  paymentStatus: string; // 'pending' | 'completed' | 'failed' | 'refunded'
-  studentsStatus: string; // 'blocked' | 'pending' | 'complete' | 'running'
-}
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1 },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
-};
-
-export default function MyCoursesPage() {
-  const [selectedCourse, setSelectedCourse] = useState<ICourse | null>(null);
-  const [isEnrolling, setIsEnrolling] = useState(false);
-  const [enrollSuccess, setEnrollSuccess] = useState(false);
-  const [enrollmentError, setEnrollmentError] = useState<string>('');
-  const session = useSession();
-  const user = session?.data?.user;
-
-  const studentInfo = {
-    name: user?.name || '',
-    email: user?.email || '',
-  };
-
-  // Queries
-  const { data: coursesData, isLoading: isCoursesLoading, error: coursesError, refetch: refetchCourses } = useGetCoursesQuery({ page: 1, limit: 100 });
-
-  // MyCourses Query (Used for Attendance stats)
-  const {
-    data: myCoursesData,
-    isLoading: isMyCoursesLoading,
-    error: myCoursesError,
-    refetch: refetchMyCourses,
-  } = useGetMyCoursesQuery({ page: 1, limit: 100 });
-
-  // Enrollments Query for the current user (Used for categorizing sections)
-  const {
-    data: enrollmentsData,
-    isLoading: isEnrollmentsLoading,
-    error: enrollmentsError,
-    refetch: refetchEnrollments,
-  } = useGetEnrollmentsQuery({ page: 1, limit: 100, q: studentInfo.email });
-
-  // Mutation
-  const [addEnrollment] = useAddEnrollmentMutation();
-
-  const isLoading = isCoursesLoading || isMyCoursesLoading || isEnrollmentsLoading;
-  const error = coursesError || myCoursesError || enrollmentsError;
-
-  // Categorize courses based on Enrollments Data
-  const { activeCourses, pendingCourses, availableCourses, hasData } = useMemo(() => {
-    const allCourses: ICourse[] = coursesData?.data?.courses || [];
-    const myCoursesList: IMyCourse[] = myCoursesData?.data?.myCourses || [];
-    const userEnrollments: IEnrollment[] = enrollmentsData?.data?.enrollments || [];
-
-    const active: ICourse[] = [];
-    const pending: ICourse[] = [];
-    const available: ICourse[] = [];
-
-    allCourses.forEach(course => {
-      // Find if the course exists in any of the user's enrollments
-      const relatedEnrollments = userEnrollments.filter(e => e.enrollCoursesIDS?.includes(course._id));
-
-      if (relatedEnrollments.length > 0) {
-        // Check if there is an active enrollment (payment: completed & student: running)
-        const isActive = relatedEnrollments.some(e => e.paymentStatus === 'completed' && e.studentsStatus === 'running');
-
-        if (isActive) {
-          active.push(course);
-        } else {
-          // Exists in enrollments but not active (e.g., pending payment or pending student status)
-          pending.push(course);
-        }
-      } else if (course.isActive) {
-        // Not found in any enrollments
-        available.push(course);
-      }
-    });
-
-    return {
-      activeCourses: active,
-      pendingCourses: pending,
-      availableCourses: available,
-      hasData: myCoursesList.length > 0,
-    };
-  }, [coursesData, myCoursesData, enrollmentsData]);
-
-  const displayAttendance = {
-    todaysAttendance: hasData ? 'Present' : 'In-complete',
-    totalAttendance: hasData ? 142 : 0,
-  };
-
-  // Reset errors and success state when modal closes/opens
-  useEffect(() => {
-    if (!selectedCourse) {
-      setEnrollmentError('');
-      setEnrollSuccess(false);
-    }
-  }, [selectedCourse]);
-
-  const handleRefetch = () => {
-    refetchCourses();
-    refetchMyCourses();
-    refetchEnrollments();
-  };
-
-  const handleAttendClass = (courseId: string) => {
-    // Open the class link in a new tab
-    window.open(`/dashboard/my-course/my-class?courseId=${courseId}`, '_blank');
-  };
-
-  const handleEnrollment = async () => {
-    if (!selectedCourse) return;
-
-    setIsEnrolling(true);
-    setEnrollmentError('');
-
-    try {
-      // Check if user already applied
-      const userEnrollments: IEnrollment[] = enrollmentsData?.data?.enrollments || [];
-      const alreadyApplied = userEnrollments.some(enrollment => enrollment.enrollCoursesIDS?.includes(selectedCourse._id));
-
-      if (alreadyApplied) {
-        setEnrollmentError('You already applied for this enrollment. Please wait for approval.');
-        setIsEnrolling(false);
-        return;
-      }
-
-      // Submit post request via RTK Mutation
-      const payload = {
-        studentName: studentInfo.name,
-        studentEmail: studentInfo.email,
-        enrollCoursesIDS: [selectedCourse._id],
-        realPrice: selectedCourse.realPrice || 0,
-        discountPrice: selectedCourse.discountPrice || 0,
-        paymentAmount: selectedCourse.discountPrice || 0,
-        studentsStatus: 'pending',
-        paymentStatus: 'pending',
-      };
-
-      await addEnrollment(payload).unwrap();
-
-      // Handle Success
-      setEnrollSuccess(true);
-      refetchEnrollments(); // Update cache
-
-      // Auto close modal after showing success state
-      setTimeout(() => {
-        setEnrollSuccess(false);
-        setSelectedCourse(null);
-      }, 2500);
-    } catch (err) {
-      console.error('Failed to enroll:', err);
-      setEnrollmentError('Something went wrong during enrollment. Try again later.');
-    } finally {
-      setIsEnrolling(false);
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <main className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 pt-[90px] pb-20 px-4 md:px-8">
-        <div className="max-w-7xl mx-auto flex items-center justify-center min-h-[50vh]">
-          <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center gap-4">
-            <div className="relative">
-              <div className="absolute inset-0 bg-indigo-500/30 blur-3xl rounded-full animate-pulse" />
-              <div className="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center shadow-2xl">
-                <BookOpen className="h-10 w-10 text-white animate-pulse" />
-              </div>
-            </div>
-            <div className="text-white text-xl font-semibold mt-4">Loading your journey...</div>
-          </motion.div>
-        </div>
-      </main>
-    );
-  }
-
-  if (error) {
-    return (
-      <main className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 pt-[90px] pb-20 px-4 md:px-8">
-        <div className="max-w-7xl mx-auto flex items-center justify-center min-h-[50vh]">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center gap-6 max-w-md">
-            <div className="relative">
-              <div className="absolute inset-0 bg-red-500/30 blur-3xl rounded-full" />
-              <div className="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center shadow-2xl">
-                <AlertTriangle className="h-10 w-10 text-white" />
-              </div>
-            </div>
-            <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-white">Oops! Something went wrong</h2>
-              <p className="text-slate-400 text-sm">We could not load your courses at the moment.</p>
-            </div>
-            <Button onClick={handleRefetch} variant="outline" className="gap-2 bg-transparent text-white border-white/20 hover:bg-white/10">
-              <RefreshCw className="h-4 w-4" />
-              Try Again
-            </Button>
-          </motion.div>
-        </div>
-      </main>
-    );
-  }
-
-  return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 pt-[90px] pb-20 px-4 md:px-8 overflow-hidden relative">
-      <div className="max-w-7xl mx-auto space-y-12 relative z-10">
-        {/* Header Profile Section */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="relative overflow-hidden rounded-3xl border border-white/10 bg-slate-900/50 backdrop-blur-xl shadow-2xl"
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-transparent" />
-          <div className="relative p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 md:gap-0">
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-3">
-                <div className="h-12 w-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg">
-                  <User className="h-6 w-6" />
-                </div>
-                <div>
-                  <h1 className="text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">
-                    {studentInfo.name}
-                  </h1>
-                  <div className="flex items-center gap-2 text-slate-400 text-sm md:text-base mt-1">
-                    <Mail className="h-4 w-4 text-indigo-400" />
-                    <span>{studentInfo.email}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-              <div className="flex items-center gap-4 bg-slate-950/50 rounded-2xl p-4 border border-white/5 shadow-inner flex-1 md:flex-initial">
-                <div className={`p-2 rounded-xl ${hasData ? 'bg-emerald-500/20 text-emerald-400' : 'bg-orange-500/20 text-orange-400'}`}>
-                  <CalendarCheck className="h-6 w-6" />
-                </div>
-                <div>
-                  <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">Today&apos;s Status</p>
-                  <p className={`text-lg font-bold ${hasData ? 'text-emerald-400' : 'text-orange-400'}`}>{displayAttendance.todaysAttendance}</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-4 bg-slate-950/50 rounded-2xl p-4 border border-white/5 shadow-inner flex-1 md:flex-initial">
-                <div className={`p-2 rounded-xl ${hasData ? 'bg-blue-500/20 text-blue-400' : 'bg-slate-800 text-slate-400'}`}>
-                  <Activity className="h-6 w-6" />
-                </div>
-                <div>
-                  <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">Total Attendance</p>
-                  <p className={`text-lg font-bold ${hasData ? 'text-blue-400' : 'text-slate-400'}`}>{displayAttendance.totalAttendance} Days</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* --- SECTION 1: Active Enrolled Courses --- */}
-        <section>
-          <div className="flex items-center gap-3 mb-8 border-b border-white/10 pb-4">
-            <Unlock className="h-6 w-6 text-indigo-400" />
-            <h2 className="text-2xl md:text-3xl font-bold text-white">Active Enrolled Courses</h2>
-          </div>
-
-          {activeCourses.length === 0 ? (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex flex-col items-center justify-center min-h-[30vh] border border-dashed border-indigo-500/30 rounded-3xl bg-indigo-950/20 p-8"
-            >
-              <BookOpen className="h-12 w-12 text-indigo-400/50 mb-4" />
-              <p className="text-slate-400 text-center max-w-md">You don&apos;t have any active courses yet.</p>
-            </motion.div>
-          ) : (
-            <motion.div variants={containerVariants} initial="hidden" animate="visible" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {activeCourses.map(course => (
-                <motion.div
-                  key={`active-${course._id}`}
-                  variants={itemVariants}
-                  whileHover={{ y: -5, scale: 1.01 }}
-                  className="group relative bg-slate-900/60 backdrop-blur-xl rounded-3xl border border-indigo-500/20 overflow-hidden shadow-xl shadow-indigo-500/5 flex flex-col"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-                  <div className="p-6 pb-4 flex-1 relative z-10">
-                    <div className="flex justify-between items-start mb-4">
-                      <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider text-indigo-300 bg-indigo-500/10 border border-indigo-500/20 rounded-full flex items-center gap-1">
-                        <CheckCircle className="h-3 w-3" /> Enrolled
-                      </span>
-                      <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
-                        {course.challengeDay || 0} Days
-                      </span>
-                    </div>
-
-                    <h3 className="text-xl font-bold text-white mb-2 line-clamp-2">{course.courseTitle}</h3>
-                    <p className="text-sm text-slate-400 line-clamp-2 mb-6">{course.courseDescription || 'No description available.'}</p>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="flex items-center gap-2 text-slate-300">
-                        <PlayCircle className="h-4 w-4 text-indigo-400" />
-                        <span className="text-sm font-medium">{course.totalClass || 0} Classes</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-slate-300">
-                        <Clock className="h-4 w-4 text-indigo-400" />
-                        <span className="text-sm font-medium">{course.totalDuration || 'N/A'}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-auto z-10 p-6 pt-4 border-t border-white/5 bg-slate-950/40">
-                    <Button
-                      onClick={() => handleAttendClass(course._id)}
-                      className="w-full bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl h-12 shadow-lg shadow-indigo-500/20 group-hover:shadow-indigo-500/40 transition-all font-semibold"
-                    >
-                      Attend Class
-                      <ExternalLink className="h-4 w-4 ml-2" />
-                    </Button>
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
-          )}
-        </section>
-
-        {/* --- SECTION 2: Pending/Requested Courses --- */}
-        {pendingCourses.length > 0 && (
-          <section>
-            <div className="flex items-center gap-3 mb-8 border-b border-white/10 pb-4 mt-8">
-              <Clock4 className="h-6 w-6 text-orange-400" />
-              <h2 className="text-2xl md:text-3xl font-bold text-white">Pending Requests</h2>
-            </div>
-
-            <motion.div variants={containerVariants} initial="hidden" animate="visible" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {pendingCourses.map(course => (
-                <motion.div
-                  key={`pending-${course._id}`}
-                  variants={itemVariants}
-                  whileHover={{ y: -5 }}
-                  className="group relative bg-slate-900/50 backdrop-blur-sm rounded-3xl border border-orange-500/20 overflow-hidden hover:border-orange-500/40 hover:bg-slate-900/80 transition-all duration-300 flex flex-col"
-                >
-                  <div className="p-6 pb-4 flex-1 relative z-10">
-                    <div className="flex justify-between items-start mb-4">
-                      <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider text-orange-300 bg-orange-500/10 border border-orange-500/20 rounded-full flex items-center gap-1">
-                        <Loader2 className="h-3 w-3 animate-spin" /> Pending Approval
-                      </span>
-                    </div>
-
-                    <h3 className="text-xl font-bold text-white mb-2 line-clamp-2">{course.courseTitle}</h3>
-                    <p className="text-sm text-slate-400 line-clamp-2 mb-6">{course.courseDescription || 'No description available.'}</p>
-                  </div>
-
-                  <div className="mt-auto z-10 p-6 pt-4 border-t border-white/5 bg-slate-950/40">
-                    <Button
-                      onClick={() => setSelectedCourse(course)}
-                      variant="outline"
-                      className="w-full bg-transparent text-orange-400 border-orange-500/30 hover:bg-orange-500/10 rounded-xl h-12 transition-all font-medium"
-                    >
-                      Request Enrollment
-                    </Button>
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
-          </section>
-        )}
-
-        {/* --- SECTION 3: Available Courses --- */}
-        <section>
-          <div className="flex items-center gap-3 mb-8 border-b border-white/10 pb-4 mt-8">
-            <Lock className="h-6 w-6 text-slate-400" />
-            <h2 className="text-2xl md:text-3xl font-bold text-white">Available Courses</h2>
-          </div>
-
-          {availableCourses.length === 0 ? (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex flex-col items-center justify-center min-h-[30vh] border border-dashed border-white/10 rounded-3xl bg-slate-900/20 p-8"
-            >
-              <Award className="h-12 w-12 text-slate-500 mb-4" />
-              <p className="text-slate-400 text-center max-w-md">You have enrolled or requested in all available courses! Incredible dedication.</p>
-            </motion.div>
-          ) : (
-            <motion.div variants={containerVariants} initial="hidden" animate="visible" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {availableCourses.map(course => (
-                <motion.div
-                  key={`available-${course._id}`}
-                  variants={itemVariants}
-                  whileHover={{ y: -5 }}
-                  className="group relative bg-slate-900/40 backdrop-blur-sm rounded-3xl border border-white/10 overflow-hidden hover:border-slate-500/30 hover:bg-slate-900/60 transition-all duration-300 flex flex-col grayscale-[20%] hover:grayscale-0"
-                >
-                  <div className="p-6 pb-4 flex-1">
-                    <div className="flex justify-between items-start mb-4">
-                      <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider text-slate-400 bg-slate-800 border border-slate-700 rounded-full">
-                        {course.challengeDay || 0} Days
-                      </span>
-                    </div>
-
-                    <h3 className="text-xl font-bold text-white mb-2 line-clamp-2 opacity-90">{course.courseTitle}</h3>
-                    <p className="text-sm text-slate-400 line-clamp-2 mb-6">{course.courseDescription || 'No description available.'}</p>
-
-                    <div className="grid grid-cols-2 gap-4 mb-2">
-                      <div className="flex items-center gap-2 text-slate-400">
-                        <PlayCircle className="h-4 w-4 text-slate-500" />
-                        <span className="text-sm font-medium">{course.totalClass || 0} Classes</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-slate-400">
-                        <Clock className="h-4 w-4 text-slate-500" />
-                        <span className="text-sm font-medium">{course.totalDuration || 'N/A'}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-auto flex flex-col">
-                    <div className="px-6 py-4 bg-slate-950/30 border-t border-white/5 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <BookOpen className="h-5 w-5 text-slate-600" />
-                        <span className="text-sm text-slate-400">{course.totalLecture || 0} Lectures</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-slate-500 line-through">৳{course.realPrice || 0}</span>
-                        <span className="text-2xl font-bold text-white">৳{course.discountPrice || 0}</span>
-                      </div>
-                    </div>
-                    <div className="px-6 pb-6 pt-2 bg-slate-950/30">
-                      <Button
-                        onClick={() => setSelectedCourse(course)}
-                        className="w-full bg-slate-800 hover:bg-slate-700 text-white border border-white/10 rounded-xl h-12 transition-all group-hover:border-indigo-500/50 group-hover:text-indigo-300 font-semibold"
-                      >
-                        Enroll Now
-                      </Button>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
-          )}
-        </section>
-      </div>
-
-      {/* Enrollment Modal */}
-      <AnimatePresence>
-        {selectedCourse && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm"
-            onClick={() => !isEnrolling && setSelectedCourse(null)} // Closes when clicking outside
-          >
-            <motion.div
-              initial={{ scale: 0.9, y: 20, opacity: 0 }}
-              animate={{ scale: 1, y: 0, opacity: 1 }}
-              exit={{ scale: 0.9, y: 20, opacity: 0 }}
-              className="bg-slate-900 border border-indigo-500/30 rounded-3xl overflow-hidden shadow-2xl shadow-indigo-500/20 w-full max-w-md relative"
-              onClick={e => e.stopPropagation()} // Prevents clicks inside the modal from bubbling to the backdrop
-            >
-              {/* Pointer-events-none to prevent gradient from capturing clicks on the close button */}
-              <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-br from-indigo-600/20 via-purple-600/20 to-transparent pointer-events-none" />
-
-              <button
-                type="button"
-                onClick={() => !isEnrolling && setSelectedCourse(null)}
-                className="absolute top-4 right-4 p-2 rounded-full bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors z-20 cursor-pointer"
-              >
-                <X className="h-5 w-5" />
-              </button>
-
-              <div className="p-8 relative z-10 flex flex-col h-full">
-                <div className="w-16 h-16 rounded-2xl bg-indigo-500/20 flex items-center justify-center border border-indigo-500/30 mb-6 text-indigo-400 shadow-inner">
-                  {enrollSuccess ? (
-                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="text-emerald-400">
-                      <CheckCircle className="h-8 w-8" />
-                    </motion.div>
-                  ) : (
-                    <Sparkles className="h-8 w-8" />
-                  )}
-                </div>
-
-                {enrollSuccess ? (
-                  <div className="text-center py-6">
-                    <h3 className="text-2xl font-bold text-white mb-2">Enrollment Requested!</h3>
-                    <p className="text-slate-400">Your request for {selectedCourse.courseTitle} has been submitted successfully.</p>
-                  </div>
-                ) : (
-                  <>
-                    <h3 className="text-2xl font-bold text-white mb-2 leading-tight">{selectedCourse.courseTitle}</h3>
-                    <p className="text-slate-400 text-sm mb-8 line-clamp-3">
-                      {selectedCourse.courseDescription || 'Get ready to unlock your potential with this comprehensive course.'}
-                    </p>
-
-                    <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-950/50 border border-white/5 mb-6">
-                      <div>
-                        <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-1">Course Price</p>
-                        <div className="flex items-center gap-2">
-                          <span className="text-slate-500 line-through text-sm">৳{selectedCourse.realPrice || 0}</span>
-                          <span className="text-xl font-bold text-white">৳{selectedCourse.discountPrice || 0}</span>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-1">Duration</p>
-                        <span className="text-slate-300 font-medium text-sm">{selectedCourse.challengeDay || 0} Days</span>
-                      </div>
-                    </div>
-
-                    <AnimatePresence>
-                      {enrollmentError && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0, y: -10 }}
-                          animate={{ opacity: 1, height: 'auto', y: 0 }}
-                          exit={{ opacity: 0, height: 0 }}
-                          className="mb-6 p-4 rounded-xl bg-orange-500/10 border border-orange-500/20 flex gap-3 text-orange-400"
-                        >
-                          <Info className="h-5 w-5 shrink-0 mt-0.5" />
-                          <p className="text-sm font-medium">{enrollmentError}</p>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-
-                    <Button
-                      onClick={handleEnrollment}
-                      disabled={isEnrolling}
-                      className="w-full h-14 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-lg shadow-indigo-500/25 transition-all text-lg font-semibold"
-                    >
-                      {isEnrolling ? (
-                        <>
-                          <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                          Processing...
-                        </>
-                      ) : (
-                        'Confirm Enrollment'
-                      )}
-                    </Button>
-                  </>
-                )}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </main>
-  );
-}
-
-```
-
-and update it with the following instructions.
-1. Make sure user have enrolled this course. and also make sure the student status is running. if it is not then show a UI to contact the admin to resolve the problem.
+Now your task is update the page so inside model At the end of the navigation please remove right button and add Complete button. 
