@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation'; // <-- Added import
 import { toast } from 'react-toastify';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Edit, Trash2, BookOpen, Clock, Award, PlayCircle, FileText, AlertTriangle, RefreshCw, X, Layers, Power } from 'lucide-react';
@@ -42,6 +43,7 @@ const defaultFormData = {
 };
 
 export default function CoursesPage() {
+  const router = useRouter(); // <-- Initialized router
   const { data: coursesData, isLoading, error, refetch } = useGetCoursesQuery({ page: 1, limit: 100 });
   const [addCourse, { isLoading: isAdding }] = useAddCourseMutation();
   const [updateCourse, { isLoading: isUpdating }] = useUpdateCourseMutation();
@@ -61,6 +63,7 @@ export default function CoursesPage() {
 
   const courses: ICourse[] = coursesData?.data?.courses || [];
   console.log('courses : ', courses);
+
   const handleOpenAddModal = () => {
     setModalMode('add');
     setFormData(defaultFormData);
@@ -163,7 +166,8 @@ export default function CoursesPage() {
   };
 
   const handleManageClasses = (id: string) => {
-    window.open(`/dashboard/courses/edit?id=${id}`, '_blank');
+    // <-- Updated to use router.push for same-window navigation
+    router.push(`/dashboard/courses/edit?id=${id}`);
   };
 
   if (isLoading) {
@@ -219,7 +223,6 @@ export default function CoursesPage() {
             <h1 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400">
               Course Management
             </h1>
-            <p className="text-emerald-100/60 mt-2 text-sm md:text-base">Curate and manage your educational content effortlessly.</p>
           </motion.div>
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex gap-3">
             <Button onClick={() => refetch()} size="icon" className="bg-white/5 border border-white/10 hover:bg-white/10 text-white transition-all">
@@ -544,7 +547,7 @@ export default function CoursesPage() {
                   <div className="space-y-2 relative">
                     <Label className="text-slate-300">Real Price</Label>
                     <div className="relative">
-                      ৳
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">৳</span>
                       <Input
                         type="number"
                         className="bg-slate-950 border-white/10 text-white focus:border-emerald-500 h-12 rounded-xl pl-9"
@@ -556,7 +559,7 @@ export default function CoursesPage() {
                   <div className="space-y-2 relative">
                     <Label className="text-slate-300">Discount Price</Label>
                     <div className="relative">
-                      ৳
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">৳</span>
                       <Input
                         type="number"
                         className="bg-slate-950 border-emerald-500/30 text-white focus:border-emerald-500 h-12 rounded-xl pl-9"
