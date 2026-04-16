@@ -1,3 +1,5 @@
+look at the page.tsx 
+```
 'use client';
 
 import { useState, Suspense, useEffect, useMemo, useRef } from 'react';
@@ -31,7 +33,6 @@ import {
   Rocket,
   Award,
   Trophy,
-  ShieldBan,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -80,6 +81,7 @@ interface ProcessedClass extends IClass {
   day: number;
 }
 
+// Interfaces for tracking attendance progress
 interface IAttendanceData {
   ClassName: string;
   status: 'complete' | 'incomplete';
@@ -114,18 +116,20 @@ function StudentCourseContent() {
   const userEmail = session?.data?.user?.email || '';
   const userName = session?.data?.user?.name || 'Student';
 
-  // === Content Protection States ===
-  const [isObscured, setIsObscured] = useState(false);
-
   // API Hooks
   const { data: enrollmentsData, isLoading: isEnrollmentsLoading } = useGetEnrollmentsQuery({ page: 1, limit: 100, q: userEmail }, { skip: !userEmail });
-  const { data: courseResponse, isLoading: isCourseLoading } = useGetCourseByIdQuery(courseId, { skip: !courseId });
+
+  const { data: courseResponse, isLoading: isCourseLoading } = useGetCourseByIdQuery(courseId, {
+    skip: !courseId,
+  });
+
   const { data: myCoursesData } = useGetMyCoursesQuery({ page: 1, limit: 100, q: userEmail }, { skip: !userEmail });
 
   const [updateMyCourse, { isLoading: isUpdatingCourse }] = useUpdateMyCourseMutation();
   const [addMyCourse, { isLoading: isAddingCourse }] = useAddMyCourseMutation();
 
   const isSavingProgress = isUpdatingCourse || isAddingCourse;
+
   const courseData = courseResponse?.data;
 
   // Local States
@@ -143,6 +147,7 @@ function StudentCourseContent() {
 
   // Celebration Overlay State
   const [showCelebration, setShowCelebration] = useState(false);
+
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   // Bottom Taskbar States
@@ -150,39 +155,6 @@ function StudentCourseContent() {
   const [isStatsExpanded, setIsStatsExpanded] = useState(false);
 
   const timelineBottomRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    // 1. Disable Right Click
-    const handleContextMenu = (e: MouseEvent) => e.preventDefault();
-
-    // 2. Disable Keyboard Shortcuts only
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (
-        e.key === 'PrintScreen' ||
-        (e.ctrlKey && e.key === 'p') ||
-        (e.ctrlKey && e.key === 's') ||
-        (e.ctrlKey && e.shiftKey && e.key === 'I') ||
-        (e.ctrlKey && e.shiftKey && e.key === 'J') ||
-        (e.ctrlKey && e.key === 'u') ||
-        (e.metaKey && e.shiftKey && e.key === '4') ||
-        (e.metaKey && e.shiftKey && e.key === '3') ||
-        (e.metaKey && e.shiftKey && e.key === '5')
-      ) {
-        e.preventDefault();
-        setIsObscured(true);
-        setTimeout(() => setIsObscured(false), 2000);
-      }
-    };
-
-    window.addEventListener('contextmenu', handleContextMenu);
-    window.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      window.removeEventListener('contextmenu', handleContextMenu);
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, []);
-  // ==========================================
 
   // Access Checks & Record Fetch
   const hasAccess = useMemo(() => {
@@ -197,6 +169,7 @@ function StudentCourseContent() {
     return myCoursesData.data.myCourses.find((c: IMyCourseDoc) => c.courseId === courseId) || null;
   }, [myCoursesData, courseId]);
 
+  // Compute Processed Classes dynamically depending on real AttenDance records
   useEffect(() => {
     if (courseData?.lectureData) {
       try {
@@ -209,11 +182,14 @@ function StudentCourseContent() {
 
           const processedClasses: ProcessedClass[] = parsedData.map((cls: Partial<IClass>, index: number) => {
             const title = cls?.title || 'Untitled Class';
+
+            // Find matching attendance for this module
             const courseAtt = myCourseDoc?.attenDance?.find((a: IAttendance) => a.courseID === courseId);
             const classAtt = courseAtt?.data?.find((d: IAttendanceData) => d.ClassName === title);
 
             let status: ClassStatus = 'locked';
 
+            // Core Logic for Colorizing/Unlocking Modules
             if (classAtt?.status === 'complete') {
               status = 'completed';
             } else if (!foundActive) {
@@ -260,6 +236,7 @@ function StudentCourseContent() {
     return { total, completed, remaining, percentage, active };
   }, [classes]);
 
+  // Methods
   const openClassModal = (cls: ProcessedClass) => {
     if (cls.status === 'locked') return;
     setSelectedClass(cls);
@@ -273,6 +250,7 @@ function StudentCourseContent() {
     setIsMobileSidebarOpen(false);
   };
 
+  // Keep track of viewed resources for local sidebar checkmarks
   useEffect(() => {
     if (activeResourceTab) {
       setViewedResources(prev => {
@@ -283,6 +261,7 @@ function StudentCourseContent() {
     }
   }, [activeResourceTab]);
 
+  // Scroll to bottom on Game Mode mount so user sees "Start Here"
   useEffect(() => {
     if (isGameMode && classes.length > 0) {
       const timer = setTimeout(() => {
@@ -302,7 +281,13 @@ function StudentCourseContent() {
       const newAttendance: IAttendance[] = [
         {
           courseID: courseId,
-          data: [{ ClassName: currentTitle, status: 'complete', completeDate: new Date().toISOString() }],
+          data: [
+            {
+              ClassName: currentTitle,
+              status: 'complete',
+              completeDate: new Date().toISOString(),
+            },
+          ],
         },
       ];
 
@@ -318,7 +303,11 @@ function StudentCourseContent() {
         }).unwrap();
 
         closeClassModal();
-        if (initialProgress >= 100 && previousProgress < 100) setShowCelebration(true);
+
+        // Check if just completed right off the bat (rare but possible for 1-module courses)
+        if (initialProgress >= 100 && previousProgress < 100) {
+          setShowCelebration(true);
+        }
       } catch (err) {
         console.error('Failed to add completion state.', err);
       }
@@ -338,7 +327,11 @@ function StudentCourseContent() {
       classData.status = 'complete';
       classData.completeDate = new Date().toISOString();
     } else {
-      courseAtt.data.push({ ClassName: currentTitle, status: 'complete', completeDate: new Date().toISOString() });
+      courseAtt.data.push({
+        ClassName: currentTitle,
+        status: 'complete',
+        completeDate: new Date().toISOString(),
+      });
     }
 
     const totalClasses = classes.length;
@@ -346,14 +339,24 @@ function StudentCourseContent() {
     const newProgress = totalClasses > 0 ? Math.round((completedClassesCount / totalClasses) * 100) : 0;
 
     try {
-      await updateMyCourse({ id: myCourseDoc._id, attenDance: newAttendance, progress: newProgress }).unwrap();
+      await updateMyCourse({
+        id: myCourseDoc._id,
+        attenDance: newAttendance,
+        progress: newProgress,
+      }).unwrap();
+
       closeClassModal();
-      if (newProgress >= 100 && previousProgress < 100) setShowCelebration(true);
+
+      // IF THEY JUST HIT 100%, TRIGGER THE CELEBRATION OVERLAY
+      if (newProgress >= 100 && previousProgress < 100) {
+        setShowCelebration(true);
+      }
     } catch (err) {
       console.error('Failed to update status', err);
     }
   };
 
+  // Effect to handle Auto-Next after 5 seconds upon MCQ submission
   useEffect(() => {
     let interval: NodeJS.Timeout;
     let timeout: NodeJS.Timeout;
@@ -412,6 +415,7 @@ function StudentCourseContent() {
     }
   };
 
+  // Extracted Stats Panel JSX so we can use it in Top Header OR Bottom Taskbar
   const renderStatsPanel = () => (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 divide-y lg:divide-y-0 lg:divide-x divide-white/10">
       <div className="flex flex-col gap-2 pb-6 lg:pb-0 lg:pr-8 col-span-2 lg:col-span-1 border-b lg:border-b-0 border-white/10">
@@ -516,32 +520,13 @@ function StudentCourseContent() {
   }
 
   return (
-    <main className="min-h-screen mt-[65px] bg-[#020817] text-slate-200 selection:bg-teal-500/30 overflow-x-hidden font-sans pb-32 md:pb-48 relative select-none">
-      {/* ========================================== */}
-      {/* SECURITY OVERLAY: Screen Recording / Snipping Tool Protector */}
-      {/* ========================================== */}
-      <AnimatePresence>
-        {isObscured && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[99999] bg-black flex flex-col items-center justify-center text-white p-6 backdrop-blur-3xl"
-          >
-            <ShieldBan className="w-24 h-24 text-red-500 mb-6 animate-pulse" />
-            <h2 className="text-3xl font-black mb-3">Content Protected</h2>
-            <p className="text-slate-400 text-center max-w-md">
-              Screenshots, recording, and copying content is disabled for security and copyright protection. Please return focus to the window to continue
-              learning.
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-      {/* ========================================== */}
-
+    <main className="min-h-screen mt-[65px] bg-[#020817] text-slate-200 selection:bg-teal-500/30 overflow-x-hidden font-sans pb-32 md:pb-48 relative">
       <div className="fixed inset-0 z-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-teal-900/20 via-[#020817] to-[#020817] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 lg:pt-16 relative z-10 space-y-8">
+        {/* ========================================================= */}
+        {/* TOP HERO HEADER SECTION (Only visible when NOT in Game Mode) */}
+        {/* ========================================================= */}
         <AnimatePresence>
           {!isGameMode && (
             <motion.header
@@ -551,9 +536,11 @@ function StudentCourseContent() {
               className="relative w-full mb-8"
             >
               <div className="bg-slate-900/60 backdrop-blur-3xl border border-teal-500/30 rounded-[2rem] shadow-[0_0_50px_rgba(20,184,166,0.15)] overflow-hidden flex flex-col relative">
+                {/* Background Glow Node inside header */}
                 <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-teal-500/10 rounded-full blur-[140px] pointer-events-none -translate-y-1/2 translate-x-1/3" />
 
                 <div className="p-6 md:p-8 lg:p-10 flex flex-col xl:flex-row gap-8 justify-between items-start xl:items-center relative z-10">
+                  {/* Top Left: Title Space */}
                   <div className="flex items-start md:items-center gap-5 md:gap-6 w-full xl:w-auto">
                     <Button
                       onClick={() => router.push('/dashboard/my-course')}
@@ -570,6 +557,7 @@ function StudentCourseContent() {
                     </div>
                   </div>
 
+                  {/* Top Right: UI Controls */}
                   <div className="flex items-center gap-3 bg-slate-950/50 p-2 md:p-3 rounded-2xl border border-white/10 shrink-0 w-full xl:w-auto overflow-x-auto custom-scrollbar justify-start xl:justify-end shadow-inner">
                     <div className="flex items-center gap-3 px-4 py-2.5 bg-slate-900/80 rounded-xl border border-white/5 transition-all hover:bg-slate-800">
                       <div className="p-1.5 md:p-2 rounded-lg transition-colors bg-slate-800 text-slate-400">
@@ -610,6 +598,9 @@ function StudentCourseContent() {
           )}
         </AnimatePresence>
 
+        {/* ========================================================= */}
+        {/* MAIN CLASSES CONTENT */}
+        {/* ========================================================= */}
         {classes.length === 0 ? (
           <div className="flex flex-col items-center justify-center min-h-[40vh]">
             <div className="w-16 h-16 border-4 border-teal-500 border-t-transparent rounded-full animate-spin mb-4" />
@@ -619,6 +610,7 @@ function StudentCourseContent() {
           <div className="mt-12 relative">
             {isGameMode ? (
               <div className="relative py-10 max-w-4xl mx-auto flex flex-col items-center">
+                {/* Timeline background continuous vertical line (Grows bottom up) */}
                 <div className="absolute top-[50px] bottom-[50px] left-[28px] md:left-1/2 w-1.5 bg-slate-800 -translate-x-1/2 rounded-full overflow-hidden z-0">
                   <motion.div
                     initial={{ height: 0 }}
@@ -628,6 +620,7 @@ function StudentCourseContent() {
                   />
                 </div>
 
+                {/* END CIRCLE (Rendered Top of screen, reached last) */}
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
@@ -643,6 +636,7 @@ function StudentCourseContent() {
                   </span>
                 </motion.div>
 
+                {/* MODULES TIMELINE (Reversed Array for Bottom-to-Top Visuals) */}
                 <div className="w-full space-y-12 md:space-y-24 flex flex-col items-start md:items-center">
                   {[...classes].reverse().map(cls => {
                     const originalIndex = classes.findIndex(c => c.id === cls.id);
@@ -735,6 +729,7 @@ function StudentCourseContent() {
                   })}
                 </div>
 
+                {/* START CIRCLE (Rendered at bottom of screen, starting point) */}
                 <motion.div
                   ref={timelineBottomRef}
                   initial={{ scale: 0 }}
@@ -855,6 +850,9 @@ function StudentCourseContent() {
         )}
       </div>
 
+      {/* ========================================================= */}
+      {/* GAME MODE BOTTOM TASKBAR */}
+      {/* ========================================================= */}
       <AnimatePresence>
         {isGameMode && isTaskbarVisible && (
           <motion.div
@@ -864,6 +862,7 @@ function StudentCourseContent() {
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             className="fixed bottom-0 left-0 right-0 z-[60] bg-slate-950/90 backdrop-blur-2xl border-t border-teal-500/30 shadow-[0_-10px_50px_rgba(20,184,166,0.15)]"
           >
+            {/* Center Bouncing Toggle Button */}
             <div className="absolute left-1/2 -translate-x-1/2 -top-6 z-[61]">
               <button
                 onClick={() => setIsStatsExpanded(!isStatsExpanded)}
@@ -875,6 +874,7 @@ function StudentCourseContent() {
               </button>
             </div>
 
+            {/* Expanded Stats View */}
             <AnimatePresence>
               {isStatsExpanded && (
                 <motion.div
@@ -888,7 +888,9 @@ function StudentCourseContent() {
               )}
             </AnimatePresence>
 
+            {/* Base Taskbar */}
             <div className="h-[72px] md:h-[88px] w-full px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4 max-w-[1600px] mx-auto">
+              {/* LEFT: Back Button & Title */}
               <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
                 <Button
                   onClick={() => router.push('/dashboard/my-course')}
@@ -905,6 +907,7 @@ function StudentCourseContent() {
                 </div>
               </div>
 
+              {/* CENTER: Progress */}
               <div className="flex-1 flex items-center justify-center gap-3 shrink-0 hidden md:flex">
                 <Target className="w-5 h-5 text-teal-500 shrink-0" />
                 <div className="flex items-center gap-2">
@@ -918,7 +921,9 @@ function StudentCourseContent() {
                 </div>
               </div>
 
+              {/* RIGHT: Toggles & Close */}
               <div className="flex items-center justify-end gap-2 sm:gap-4 flex-1">
+                {/* Mobile-only Progress indicator */}
                 <div className="flex items-center gap-1.5 md:hidden bg-slate-900/80 px-2 py-1 rounded-lg border border-white/5 shrink-0">
                   <Target className="w-3.5 h-3.5 text-teal-500" />
                   <span className="text-xs font-black text-emerald-400">{progressStats.percentage}%</span>
@@ -947,6 +952,7 @@ function StudentCourseContent() {
         )}
       </AnimatePresence>
 
+      {/* Floating Restore Button if Taskbar is hidden in Game Mode */}
       <AnimatePresence>
         {isGameMode && !isTaskbarVisible && (
           <motion.button
@@ -962,6 +968,9 @@ function StudentCourseContent() {
         )}
       </AnimatePresence>
 
+      {/* ========================================================= */}
+      {/* FULLSCREEN LEARNING WORKSPACE MODAL */}
+      {/* ========================================================= */}
       <AnimatePresence>
         {selectedClass && (
           <motion.div
@@ -991,6 +1000,7 @@ function StudentCourseContent() {
                 )}
               </AnimatePresence>
 
+              {/* Sidebar */}
               <div
                 className={`absolute lg:relative top-0 left-0 h-full w-[85%] sm:w-80 bg-slate-950/95 lg:bg-slate-950/80 border-r border-white/10 flex flex-col shrink-0 z-[70] lg:z-10 transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none ${
                   isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
@@ -1071,6 +1081,7 @@ function StudentCourseContent() {
                 </div>
               </div>
 
+              {/* Main Display Frame */}
               <div className="flex-1 bg-[#020817] relative z-10 overflow-y-auto custom-scrollbar h-full w-full flex flex-col">
                 <div className="lg:hidden sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-white/10 flex items-center justify-between p-4 shadow-xl">
                   <div className="flex items-center gap-3 overflow-hidden">
@@ -1159,7 +1170,7 @@ function StudentCourseContent() {
 
                             {(resource.type === 'text' || resource.type === 'assignment') && (
                               <div
-                                className="prose prose-invert prose-sm sm:prose-base prose-teal max-w-none text-slate-300 leading-relaxed space-y-4 select-none"
+                                className="prose prose-invert prose-sm sm:prose-base prose-teal max-w-none text-slate-300 leading-relaxed space-y-4"
                                 onClick={handleHtmlContentClick}
                               >
                                 {resource.content ? (
@@ -1185,7 +1196,7 @@ function StudentCourseContent() {
                             )}
 
                             {resource.type === 'mcq' && resource.mcqData && (
-                              <div className="max-w-3xl mx-auto space-y-6 sm:space-y-8 select-none">
+                              <div className="max-w-3xl mx-auto space-y-6 sm:space-y-8">
                                 <div className="bg-slate-950 p-5 sm:p-6 lg:p-8 rounded-2xl border border-white/10 shadow-xl relative overflow-hidden">
                                   <div className="absolute top-0 left-0 w-1 h-full bg-amber-500" />
                                   <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-white mb-6 leading-relaxed">{resource.mcqData.question}</h3>
@@ -1342,17 +1353,27 @@ function StudentCourseContent() {
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-950/95 backdrop-blur-2xl overflow-hidden"
           >
+            {/* Floating Particles / Confetti effect */}
             {[...Array(40)].map((_, i) => (
               <motion.div
                 key={`particle-${i}`}
-                initial={{ opacity: 1, x: '50vw', y: '50vh', scale: 0 }}
+                initial={{
+                  opacity: 1,
+                  x: '50vw',
+                  y: '50vh',
+                  scale: 0,
+                }}
                 animate={{
                   x: `${Math.random() * 100}vw`,
                   y: `${Math.random() * 100}vh`,
                   scale: [0, Math.random() * 1.5 + 0.5, 0],
                   rotate: Math.random() * 360,
                 }}
-                transition={{ duration: 2 + Math.random() * 3, ease: 'easeOut', repeat: Infinity }}
+                transition={{
+                  duration: 2 + Math.random() * 3,
+                  ease: 'easeOut',
+                  repeat: Infinity,
+                }}
                 className={`absolute w-3 h-3 rounded-full ${
                   ['bg-amber-400', 'bg-emerald-400', 'bg-teal-400', 'bg-fuchsia-400', 'bg-orange-500'][i % 5]
                 } shadow-[0_0_15px_currentColor]`}
@@ -1360,12 +1381,14 @@ function StudentCourseContent() {
               />
             ))}
 
+            {/* Central Celebration Card */}
             <motion.div
               initial={{ scale: 0.5, y: 50, opacity: 0 }}
               animate={{ scale: 1, y: 0, opacity: 1 }}
               transition={{ type: 'spring', bounce: 0.5 }}
               className="relative z-10 flex flex-col items-center text-center p-8 md:p-12 w-[90%] max-w-2xl bg-slate-900/50 border border-amber-500/30 rounded-3xl shadow-[0_0_100px_rgba(245,158,11,0.2)] backdrop-blur-xl"
             >
+              {/* Massive Golden Trophy */}
               <motion.div
                 animate={{ rotateY: 360, y: [-10, 10, -10] }}
                 transition={{
@@ -1419,3 +1442,11 @@ export default function StudentCoursePage() {
     </Suspense>
   );
 }
+```
+
+Now your task is implement those features in this page as the following instructions.
+1. If some one take snapshoot of the website then he will get black.
+2. If some one want to  record video throw any software then they recored black screen. 
+3. Can you hide url from the user.
+
+--- and give me idea how can I hide Video and resource from recored and take screenshoot. also I want to hide video. please answer in bangla. 
