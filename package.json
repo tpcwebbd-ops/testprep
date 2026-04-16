@@ -80,7 +80,7 @@
     "@types/nodemailer": "^7.0.2",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "baseline-browser-mapping": "^2.10.18",
+    "baseline-browser-mapping": "^2.10.19",
     "eslint": "^9",
     "eslint-config-next": "15.4.0-canary.51",
     "tailwindcss": "^4",
