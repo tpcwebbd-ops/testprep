@@ -15,24 +15,21 @@ import {
   Video as VideoIcon,
   HelpCircle,
   ClipboardList,
-  Trophy,
   PlayCircle,
   LayoutGrid,
   List,
   X,
   Lock,
-  AlertCircle,
   Gamepad2,
   CalendarDays,
   Target,
   ShieldAlert,
-  Mail,
   ExternalLink,
   AlignRight,
   ChevronLeft,
   ChevronRight,
+  ChevronUp,
   Loader2,
-  Unlock,
   Rocket,
   Award,
 } from 'lucide-react';
@@ -149,6 +146,12 @@ function StudentCourseContent() {
 
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
+  // Bottom Taskbar States
+  const [isTaskbarVisible, setIsTaskbarVisible] = useState(true);
+  const [isStatsExpanded, setIsStatsExpanded] = useState(false);
+
+  const timelineBottomRef = useRef<HTMLDivElement>(null);
+
   // Access Checks & Record Fetch
   const hasAccess = useMemo(() => {
     if (!enrollmentsData?.data?.enrollments || !courseId) return false;
@@ -254,12 +257,21 @@ function StudentCourseContent() {
     }
   }, [activeResourceTab]);
 
+  // Scroll to bottom on Game Mode mount so user sees "Start Here"
+  useEffect(() => {
+    if (isGameMode && classes.length > 0) {
+      const timer = setTimeout(() => {
+        timelineBottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isGameMode, classes.length]);
+
   const handleMarkAsComplete = async () => {
     if (!selectedClass || !courseId) return;
 
     const currentTitle = selectedClass.title;
 
-    // SCENARIO 1: First time enrolling, record doesn't exist yet
     if (!myCourseDoc) {
       const newAttendance: IAttendance[] = [
         {
@@ -291,7 +303,6 @@ function StudentCourseContent() {
       return;
     }
 
-    // SCENARIO 2: Update existing Record
     const newAttendance: IAttendance[] = JSON.parse(JSON.stringify(myCourseDoc.attenDance || []));
     let courseAtt = newAttendance.find(a => a.courseID === courseId);
 
@@ -348,7 +359,6 @@ function StudentCourseContent() {
           if (hasNext) {
             setActiveResourceTab(selectedClass.resources[currentIndex + 1].id);
           } else {
-            // Auto complete module and sync with DB if it's the last resource
             handleMarkAsComplete();
           }
         }
@@ -360,8 +370,7 @@ function StudentCourseContent() {
       clearTimeout(timeout);
       setAutoNextCountdown(null);
     };
-    // Note: Deliberately avoiding `handleMarkAsComplete` in deps to avoid constant refiring
-  }, [activeResourceTab, mcqSubmitted, selectedClass]);
+  }, [activeResourceTab, mcqSubmitted, selectedClass, handleMarkAsComplete]);
 
   const getResourceIcon = (type: ResourceType, className = 'h-5 w-5') => {
     switch (type) {
@@ -389,7 +398,65 @@ function StudentCourseContent() {
     }
   };
 
-  // Rendering Layers
+  // Extracted Stats Panel JSX so we can use it in Top Header OR Bottom Taskbar
+  const renderStatsPanel = () => (
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 divide-y lg:divide-y-0 lg:divide-x divide-white/10">
+      <div className="flex flex-col gap-2 pb-6 lg:pb-0 lg:pr-8 col-span-2 lg:col-span-1 border-b lg:border-b-0 border-white/10">
+        <span className="text-xs md:text-sm text-slate-400 font-bold tracking-wider uppercase flex items-center gap-2">
+          <Target className="w-4 h-4 text-teal-500" /> Completion Progress
+        </span>
+        <div className="flex items-end gap-2 mt-1">
+          <span className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-emerald-400">
+            {progressStats.percentage}%
+          </span>
+        </div>
+        <div className="w-full bg-slate-900 h-2.5 rounded-full mt-3 overflow-hidden shadow-inner border border-white/5">
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${progressStats.percentage}%` }}
+            transition={{ duration: 1.5, ease: 'easeOut' }}
+            className="h-full bg-gradient-to-r from-teal-500 to-emerald-400 rounded-full shadow-[0_0_15px_rgba(16,185,129,0.5)] relative"
+          >
+            <div className="absolute top-0 right-0 bottom-0 w-8 bg-white/20 blur-md" />
+          </motion.div>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-1 lg:px-8 pt-6 lg:pt-0">
+        <div className="flex items-center gap-2 mb-1">
+          <div className="p-1.5 bg-emerald-500/10 rounded-md">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+          </div>
+          <span className="text-xs md:text-sm text-slate-400 font-bold tracking-wider uppercase">Mastered</span>
+        </div>
+        <span className="text-3xl md:text-4xl font-black text-emerald-400">{progressStats.completed}</span>
+        <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest mt-1">Modules Done</span>
+      </div>
+
+      <div className="flex flex-col gap-1 lg:px-8 pt-6 lg:pt-0 border-l border-white/10 pl-6 lg:border-l-0 lg:pl-8">
+        <div className="flex items-center gap-2 mb-1">
+          <div className="p-1.5 bg-amber-500/10 rounded-md">
+            <PlayCircle className="w-4 h-4 text-amber-400" />
+          </div>
+          <span className="text-xs md:text-sm text-slate-400 font-bold tracking-wider uppercase">In Progress</span>
+        </div>
+        <span className="text-3xl md:text-4xl font-black text-amber-400">{progressStats.active}</span>
+        <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest mt-1">Active Modules</span>
+      </div>
+
+      <div className="flex flex-col gap-1 lg:px-8 pt-6 lg:pt-0">
+        <div className="flex items-center gap-2 mb-1">
+          <div className="p-1.5 bg-slate-800 rounded-md">
+            <Lock className="w-4 h-4 text-slate-400" />
+          </div>
+          <span className="text-xs md:text-sm text-slate-400 font-bold tracking-wider uppercase">Locked Ahead</span>
+        </div>
+        <span className="text-3xl md:text-4xl font-black text-slate-300">{progressStats.remaining}</span>
+        <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest mt-1">Modules Left</span>
+      </div>
+    </div>
+  );
+
   const isLoading = isCourseLoading || isEnrollmentsLoading;
   const courseTitleDisplay = isCourseLoading ? 'Loading Workspace...' : (courseData?.courseTitle ?? 'My Learning Journey');
 
@@ -436,66 +503,57 @@ function StudentCourseContent() {
   }
 
   return (
-    <main className="min-h-screen mt-[65px] bg-[#020817] text-slate-200 selection:bg-teal-500/30 overflow-x-hidden font-sans pb-24">
+    <main className="min-h-screen mt-[65px] bg-[#020817] text-slate-200 selection:bg-teal-500/30 overflow-x-hidden font-sans pb-32 md:pb-48 relative">
       <div className="fixed inset-0 z-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-teal-900/20 via-[#020817] to-[#020817] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 lg:pt-16 relative z-10 space-y-8">
         {/* ========================================================= */}
-        {/* NEW UNIFIED, EYE-CATCHING HERO HEADER SECTION */}
+        {/* TOP HERO HEADER SECTION (Only visible when NOT in Game Mode) */}
         {/* ========================================================= */}
-        <header className="relative w-full">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-slate-900/60 backdrop-blur-3xl border border-teal-500/30 rounded-[2rem] shadow-[0_0_50px_rgba(20,184,166,0.15)] overflow-hidden flex flex-col relative"
-          >
-            {/* Background Glow Node inside header */}
-            <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-teal-500/10 rounded-full blur-[140px] pointer-events-none -translate-y-1/2 translate-x-1/3" />
+        <AnimatePresence>
+          {!isGameMode && (
+            <motion.header
+              initial={{ opacity: 0, y: -50, height: 0 }}
+              animate={{ opacity: 1, y: 0, height: 'auto' }}
+              exit={{ opacity: 0, y: -50, height: 0 }}
+              className="relative w-full mb-8"
+            >
+              <div className="bg-slate-900/60 backdrop-blur-3xl border border-teal-500/30 rounded-[2rem] shadow-[0_0_50px_rgba(20,184,166,0.15)] overflow-hidden flex flex-col relative">
+                {/* Background Glow Node inside header */}
+                <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-teal-500/10 rounded-full blur-[140px] pointer-events-none -translate-y-1/2 translate-x-1/3" />
 
-            <div className="p-6 md:p-8 lg:p-10 flex flex-col xl:flex-row gap-8 justify-between items-start xl:items-center relative z-10">
-              {/* Top Left: Title Space */}
-              <div className="flex items-start md:items-center gap-5 md:gap-6 w-full xl:w-auto">
-                <Button
-                  onClick={() => router.push('/dashboard/my-course')}
-                  variant="ghost"
-                  size="icon"
-                  className="rounded-full bg-slate-800/50 hover:bg-slate-700 text-white border border-white/5 h-12 w-12 md:h-14 md:w-14 shrink-0 transition-transform hover:-translate-x-1 shadow-lg mt-1 md:mt-0"
-                >
-                  <ArrowLeft className="h-6 w-6" />
-                </Button>
-                <div>
-                  <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-teal-100 to-teal-400 tracking-tight leading-tight">
-                    {courseTitleDisplay}
-                  </h1>
-                  <p className="text-teal-400/80 font-bold mt-2 flex items-center gap-2 text-sm md:text-base tracking-wide uppercase">
-                    <Unlock className="h-4 w-4" /> Enrolled Course Workspace
-                  </p>
-                </div>
-              </div>
-
-              {/* Top Right: Game Mode & UI Controls */}
-              <div className="flex items-center gap-3 bg-slate-950/50 p-2 md:p-3 rounded-2xl border border-white/10 shrink-0 w-full xl:w-auto overflow-x-auto custom-scrollbar justify-start xl:justify-end shadow-inner">
-                {/* Game Mode Pill */}
-                <div className="flex items-center gap-3 px-4 py-2.5 bg-slate-900/80 rounded-xl border border-white/5 transition-all hover:bg-slate-800">
-                  <div className={`p-1.5 md:p-2 rounded-lg transition-colors ${isGameMode ? 'bg-amber-500/20 text-amber-400' : 'bg-slate-800 text-slate-400'}`}>
-                    <Gamepad2 className="h-4 w-4 md:h-5 md:w-5" />
-                  </div>
-                  <div className="flex flex-col mr-2 shrink-0">
-                    <span className="text-sm font-bold text-white leading-none">Game Mode</span>
-                    <span className="text-[10px] text-slate-400 mt-1 uppercase tracking-wider">{isGameMode ? 'Active' : 'Disabled'}</span>
-                  </div>
-                  <Switch checked={isGameMode} onCheckedChange={setIsGameMode} className="data-[state=checked]:bg-amber-500 ml-2" />
-                </div>
-
-                {/* Grid Switchers (Only shows when game mode off) */}
-                <AnimatePresence>
-                  {!isGameMode && (
-                    <motion.div
-                      initial={{ opacity: 0, width: 0 }}
-                      animate={{ opacity: 1, width: 'auto' }}
-                      exit={{ opacity: 0, width: 0 }}
-                      className="flex gap-1"
+                <div className="p-6 md:p-8 lg:p-10 flex flex-col xl:flex-row gap-8 justify-between items-start xl:items-center relative z-10">
+                  {/* Top Left: Title Space */}
+                  <div className="flex items-start md:items-center gap-5 md:gap-6 w-full xl:w-auto">
+                    <Button
+                      onClick={() => router.push('/dashboard/my-course')}
+                      variant="ghost"
+                      size="icon"
+                      className="rounded-full bg-slate-800/50 hover:bg-slate-700 text-white border border-white/5 h-12 w-12 md:h-14 md:w-14 shrink-0 transition-transform hover:-translate-x-1 shadow-lg mt-1 md:mt-0"
                     >
+                      <ArrowLeft className="h-6 w-6" />
+                    </Button>
+                    <div>
+                      <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-teal-100 to-teal-400 tracking-tight leading-tight">
+                        {courseTitleDisplay}
+                      </h1>
+                    </div>
+                  </div>
+
+                  {/* Top Right: UI Controls */}
+                  <div className="flex items-center gap-3 bg-slate-950/50 p-2 md:p-3 rounded-2xl border border-white/10 shrink-0 w-full xl:w-auto overflow-x-auto custom-scrollbar justify-start xl:justify-end shadow-inner">
+                    <div className="flex items-center gap-3 px-4 py-2.5 bg-slate-900/80 rounded-xl border border-white/5 transition-all hover:bg-slate-800">
+                      <div className="p-1.5 md:p-2 rounded-lg transition-colors bg-slate-800 text-slate-400">
+                        <Gamepad2 className="h-4 w-4 md:h-5 md:w-5" />
+                      </div>
+                      <div className="flex flex-col mr-2 shrink-0">
+                        <span className="text-sm font-bold text-white leading-none">Game Mode</span>
+                        <span className="text-[10px] text-slate-400 mt-1 uppercase tracking-wider">Disabled</span>
+                      </div>
+                      <Switch checked={isGameMode} onCheckedChange={setIsGameMode} className="data-[state=checked]:bg-amber-500 ml-2" />
+                    </div>
+
+                    <div className="flex gap-1">
                       {[
                         { val: 1, icon: <List className="h-4 w-4 md:h-5 md:w-5" /> },
                         { val: 2, icon: <LayoutGrid className="h-4 w-4 md:h-5 md:w-5" /> },
@@ -513,76 +571,15 @@ function StudentCourseContent() {
                           {btn.icon}
                         </button>
                       ))}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-slate-950/40 border-t border-white/5 p-6 md:p-8 lg:px-10 relative z-10">{renderStatsPanel()}</div>
               </div>
-            </div>
-
-            {/* Bottom Row: Unified Stats Container */}
-            <div className="bg-slate-950/40 border-t border-white/5 p-6 md:p-8 lg:px-10 relative z-10">
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 divide-y lg:divide-y-0 lg:divide-x divide-white/10">
-                {/* 1. Progress Graph */}
-                <div className="flex flex-col gap-2 pb-6 lg:pb-0 lg:pr-8 col-span-2 lg:col-span-1 border-b lg:border-b-0 border-white/10">
-                  <span className="text-xs md:text-sm text-slate-400 font-bold tracking-wider uppercase flex items-center gap-2">
-                    <Target className="w-4 h-4 text-teal-500" /> Completion Progress
-                  </span>
-                  <div className="flex items-end gap-2 mt-1">
-                    <span className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-emerald-400">
-                      {progressStats.percentage}%
-                    </span>
-                  </div>
-                  <div className="w-full bg-slate-900 h-2.5 rounded-full mt-3 overflow-hidden shadow-inner border border-white/5">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${progressStats.percentage}%` }}
-                      transition={{ duration: 1.5, ease: 'easeOut' }}
-                      className="h-full bg-gradient-to-r from-teal-500 to-emerald-400 rounded-full shadow-[0_0_15px_rgba(16,185,129,0.5)] relative"
-                    >
-                      <div className="absolute top-0 right-0 bottom-0 w-8 bg-white/20 blur-md" />
-                    </motion.div>
-                  </div>
-                </div>
-
-                {/* 2. Completed */}
-                <div className="flex flex-col gap-1 lg:px-8 pt-6 lg:pt-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <div className="p-1.5 bg-emerald-500/10 rounded-md">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    </div>
-                    <span className="text-xs md:text-sm text-slate-400 font-bold tracking-wider uppercase">Mastered</span>
-                  </div>
-                  <span className="text-3xl md:text-4xl font-black text-emerald-400">{progressStats.completed}</span>
-                  <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest mt-1">Modules Done</span>
-                </div>
-
-                {/* 3. Currently Active */}
-                <div className="flex flex-col gap-1 lg:px-8 pt-6 lg:pt-0 border-l border-white/10 pl-6 lg:border-l-0 lg:pl-8">
-                  <div className="flex items-center gap-2 mb-1">
-                    <div className="p-1.5 bg-amber-500/10 rounded-md">
-                      <PlayCircle className="w-4 h-4 text-amber-400" />
-                    </div>
-                    <span className="text-xs md:text-sm text-slate-400 font-bold tracking-wider uppercase">In Progress</span>
-                  </div>
-                  <span className="text-3xl md:text-4xl font-black text-amber-400">{progressStats.active}</span>
-                  <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest mt-1">Active Modules</span>
-                </div>
-
-                {/* 4. Remaining Items */}
-                <div className="flex flex-col gap-1 lg:px-8 pt-6 lg:pt-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <div className="p-1.5 bg-slate-800 rounded-md">
-                      <Lock className="w-4 h-4 text-slate-400" />
-                    </div>
-                    <span className="text-xs md:text-sm text-slate-400 font-bold tracking-wider uppercase">Locked Ahead</span>
-                  </div>
-                  <span className="text-3xl md:text-4xl font-black text-slate-300">{progressStats.remaining}</span>
-                  <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest mt-1">Modules Left</span>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        </header>
+            </motion.header>
+          )}
+        </AnimatePresence>
 
         {/* ========================================================= */}
         {/* MAIN CLASSES CONTENT */}
@@ -596,34 +593,35 @@ function StudentCourseContent() {
           <div className="mt-12 relative">
             {isGameMode ? (
               <div className="relative py-10 max-w-4xl mx-auto flex flex-col items-center">
-                {/* Timeline background continuous vertical line */}
-                <div className="absolute top-0 bottom-0 left-[28px] md:left-1/2 w-1.5 bg-slate-800 -translate-x-1/2 rounded-full overflow-hidden z-0">
+                {/* Timeline background continuous vertical line (Grows bottom up) */}
+                <div className="absolute top-[50px] bottom-[50px] left-[28px] md:left-1/2 w-1.5 bg-slate-800 -translate-x-1/2 rounded-full overflow-hidden z-0">
                   <motion.div
                     initial={{ height: 0 }}
                     animate={{ height: `${classes.length > 0 ? (progressStats.completed / classes.length) * 100 : 0}%` }}
                     transition={{ duration: 1.5, ease: 'easeInOut' }}
-                    className="w-full bg-gradient-to-b from-teal-400 via-emerald-400 to-amber-400"
+                    className="absolute bottom-0 w-full bg-gradient-to-t from-teal-400 via-emerald-400 to-amber-400 origin-bottom"
                   />
                 </div>
 
-                {/* START CIRCLE */}
+                {/* END CIRCLE (Rendered Top of screen, reached last) */}
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="relative z-10 flex flex-col items-center justify-center w-28 h-28 rounded-full bg-gradient-to-b from-slate-900 to-slate-950 border-4 border-teal-500 shadow-[0_0_30px_rgba(20,184,166,0.3)] mb-16 ml-[56px] md:ml-0"
+                  className="relative z-10 flex flex-col items-center justify-center w-28 h-28 rounded-full bg-gradient-to-b from-slate-900 to-slate-950 border-4 border-amber-500 shadow-[0_0_30px_rgba(245,158,11,0.3)] mb-16 ml-[56px] md:ml-0"
                 >
-                  <Rocket className="h-8 w-8 text-teal-400 mb-1" />
+                  <Award className="h-8 w-8 text-amber-400 mb-1" />
                   <span className="text-[10px] font-bold text-white uppercase tracking-wider text-center leading-tight">
-                    Start Your
+                    Completed
                     <br />
-                    Journey
+                    Your Goal!
                   </span>
                 </motion.div>
 
-                {/* MODULES TIMELINE */}
+                {/* MODULES TIMELINE (Reversed Array for Bottom-to-Top Visuals) */}
                 <div className="w-full space-y-12 md:space-y-24 flex flex-col items-start md:items-center">
-                  {classes.map((cls, index) => {
-                    const isLeft = index % 2 === 0;
+                  {[...classes].reverse().map(cls => {
+                    const originalIndex = classes.findIndex(c => c.id === cls.id);
+                    const isLeft = originalIndex % 2 === 0;
                     const isLocked = cls.status === 'locked';
 
                     let nodeColor = 'bg-slate-800 border-slate-700 text-slate-500';
@@ -648,7 +646,7 @@ function StudentCourseContent() {
                         viewport={{ once: true, margin: '-100px' }}
                         variants={{
                           hidden: { opacity: 0, y: 50 },
-                          visible: { opacity: 1, y: 0, transition: { duration: 0.5, delay: index * 0.1 } },
+                          visible: { opacity: 1, y: 0, transition: { duration: 0.5, delay: 0.1 } },
                         }}
                         className={`relative flex items-center w-full group ml-[56px] md:ml-0 ${isLeft ? 'md:justify-start' : 'md:justify-end'}`}
                       >
@@ -712,18 +710,19 @@ function StudentCourseContent() {
                   })}
                 </div>
 
-                {/* END CIRCLE */}
+                {/* START CIRCLE (Rendered at bottom of screen, starting point) */}
                 <motion.div
+                  ref={timelineBottomRef}
                   initial={{ scale: 0 }}
                   whileInView={{ scale: 1 }}
                   viewport={{ once: true }}
-                  className="relative z-10 flex flex-col items-center justify-center w-28 h-28 rounded-full bg-gradient-to-b from-slate-900 to-slate-950 border-4 border-amber-500 shadow-[0_0_30px_rgba(245,158,11,0.3)] mt-16 ml-[56px] md:ml-0"
+                  className="relative z-10 flex flex-col items-center justify-center w-28 h-28 rounded-full bg-gradient-to-b from-slate-900 to-slate-950 border-4 border-teal-500 shadow-[0_0_30px_rgba(20,184,166,0.3)] mt-16 ml-[56px] md:ml-0"
                 >
-                  <Award className="h-8 w-8 text-amber-400 mb-1" />
+                  <Rocket className="h-8 w-8 text-teal-400 mb-1" />
                   <span className="text-[10px] font-bold text-white uppercase tracking-wider text-center leading-tight">
-                    Completed
+                    Start Your
                     <br />
-                    Your Goal!
+                    Journey
                   </span>
                 </motion.div>
               </div>
@@ -833,6 +832,124 @@ function StudentCourseContent() {
       </div>
 
       {/* ========================================================= */}
+      {/* GAME MODE BOTTOM TASKBAR */}
+      {/* ========================================================= */}
+      <AnimatePresence>
+        {isGameMode && isTaskbarVisible && (
+          <motion.div
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            className="fixed bottom-0 left-0 right-0 z-[60] bg-slate-950/90 backdrop-blur-2xl border-t border-teal-500/30 shadow-[0_-10px_50px_rgba(20,184,166,0.15)]"
+          >
+            {/* Center Bouncing Toggle Button */}
+            <div className="absolute left-1/2 -translate-x-1/2 -top-6 z-[61]">
+              <button
+                onClick={() => setIsStatsExpanded(!isStatsExpanded)}
+                className="bg-slate-900 border border-teal-500/50 p-2.5 rounded-full shadow-[0_0_15px_rgba(20,184,166,0.4)] hover:bg-slate-800 hover:text-teal-400 transition-colors animate-bounce text-white focus:outline-none"
+              >
+                <motion.div animate={{ rotate: isStatsExpanded ? 180 : 0 }}>
+                  <ChevronUp className="w-5 h-5" />
+                </motion.div>
+              </button>
+            </div>
+
+            {/* Expanded Stats View */}
+            <AnimatePresence>
+              {isStatsExpanded && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="overflow-hidden border-b border-white/5"
+                >
+                  <div className="p-6 md:p-8 max-w-7xl mx-auto">{renderStatsPanel()}</div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Base Taskbar */}
+            <div className="h-[72px] md:h-[88px] w-full px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4 max-w-[1600px] mx-auto">
+              {/* LEFT: Back Button & Title */}
+              <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+                <Button
+                  onClick={() => router.push('/dashboard/my-course')}
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full bg-slate-800/80 hover:bg-slate-700 text-white border border-white/5 h-10 w-10 md:h-12 md:w-12 shrink-0 transition-transform hover:-translate-x-1 shadow-lg"
+                >
+                  <ArrowLeft className="h-5 w-5" />
+                </Button>
+                <div className="flex flex-col min-w-0 hidden sm:flex overflow-hidden">
+                  <h2 className="text-sm md:text-base lg:text-lg font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-teal-100 to-teal-400 truncate leading-tight">
+                    {courseTitleDisplay}
+                  </h2>
+                </div>
+              </div>
+
+              {/* CENTER: Progress */}
+              <div className="flex-1 flex items-center justify-center gap-3 shrink-0 hidden md:flex">
+                <Target className="w-5 h-5 text-teal-500 shrink-0" />
+                <div className="flex items-center gap-2">
+                  <span className="text-xl lg:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-emerald-400">
+                    {progressStats.percentage}%
+                  </span>
+                  <span className="text-[10px] lg:text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Completed</span>
+                </div>
+                <div className="h-2 w-full max-w-[120px] lg:max-w-[200px] bg-slate-800 rounded-full overflow-hidden shadow-inner border border-white/5 ml-2 relative">
+                  <div className="h-full bg-gradient-to-r from-teal-500 to-emerald-400 rounded-full" style={{ width: `${progressStats.percentage}%` }} />
+                </div>
+              </div>
+
+              {/* RIGHT: Toggles & Close */}
+              <div className="flex items-center justify-end gap-2 sm:gap-4 flex-1">
+                {/* Mobile-only Progress indicator */}
+                <div className="flex items-center gap-1.5 md:hidden bg-slate-900/80 px-2 py-1 rounded-lg border border-white/5 shrink-0">
+                  <Target className="w-3.5 h-3.5 text-teal-500" />
+                  <span className="text-xs font-black text-emerald-400">{progressStats.percentage}%</span>
+                </div>
+
+                <div className="flex items-center gap-2 sm:gap-3 bg-slate-900/80 px-2 sm:px-4 py-1.5 sm:py-2 rounded-xl border border-white/5 shadow-inner shrink-0">
+                  <Gamepad2 className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />
+                  <span className="text-[10px] sm:text-xs font-bold text-slate-300 hidden xl:block uppercase tracking-widest">Game Mode</span>
+                  <Switch checked={isGameMode} onCheckedChange={setIsGameMode} className="data-[state=checked]:bg-amber-500 scale-[0.7] sm:scale-100" />
+                </div>
+
+                <div className="w-px h-6 sm:h-8 bg-white/10 hidden sm:block shrink-0"></div>
+
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setIsTaskbarVisible(false)}
+                  className="rounded-full bg-white/5 hover:bg-red-500/20 hover:text-red-400 text-slate-400 transition-colors h-8 w-8 sm:h-10 sm:w-10 shrink-0"
+                  aria-label="Close Taskbar"
+                >
+                  <X className="w-4 h-4 sm:w-5 sm:h-5" />
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Floating Restore Button if Taskbar is hidden in Game Mode */}
+      <AnimatePresence>
+        {isGameMode && !isTaskbarVisible && (
+          <motion.button
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0 }}
+            onClick={() => setIsTaskbarVisible(true)}
+            className="fixed bottom-6 right-6 z-50 bg-teal-600 p-4 rounded-full shadow-[0_0_30px_rgba(13,148,136,0.6)] text-white hover:bg-teal-500 transition-all hover:scale-110 active:scale-95"
+            aria-label="Show Dashboard Taskbar"
+          >
+            <LayoutGrid className="w-6 h-6" />
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* ========================================================= */}
       {/* FULLSCREEN LEARNING WORKSPACE MODAL */}
       {/* ========================================================= */}
       <AnimatePresence>
@@ -841,7 +958,7 @@ function StudentCourseContent() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed top-[65px] inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-xl"
+            className="fixed top-[65px] inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-xl"
           >
             <motion.div
               initial={{ scale: 0.95, y: 20, opacity: 0 }}
@@ -922,7 +1039,6 @@ function StudentCourseContent() {
                               <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">{resource.type}</span>
                             </div>
                           </div>
-                          {/* Syncs with DB indirectly (if module completes) & directly updates based on viewedResources state */}
                           {isResourceCompleted && <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 ml-2" />}
                         </button>
                       );
@@ -948,7 +1064,6 @@ function StudentCourseContent() {
 
               {/* Main Display Frame */}
               <div className="flex-1 bg-[#020817] relative z-10 overflow-y-auto custom-scrollbar h-full w-full flex flex-col">
-                {/* Mobile Header Toggle */}
                 <div className="lg:hidden sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-white/10 flex items-center justify-between p-4 shadow-xl">
                   <div className="flex items-center gap-3 overflow-hidden">
                     <div className="p-1.5 bg-teal-500/20 text-teal-400 rounded-lg shrink-0">
@@ -1232,7 +1347,5 @@ export default function StudentCoursePage() {
 }
 ```
 
-Now your task is update this page with the following instructions. 
-1. Change only game mode. if Game mode on then it(the page) will look like.
-  - At the bottom there is a task bar at the left side there is progress bar. and right side there is game toggle switch. and in middle there is up arrow with little bit animation. if I click up arro then it will open full sections. and also there is a toggle option for close the task bar. 
-  - up-side the task bar the circle box will show. from bottom to top. in first window we can always show bottom of the page. 
+Now update this page.tsx with the following instructions.
+1. IF it is complete throw 0 or 99.99 to 100 % then make a full page animation for congratulations students. 

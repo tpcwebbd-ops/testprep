@@ -15,7 +15,6 @@ import {
   CalendarCheck,
   Activity,
   Unlock,
-  Lock,
   X,
   Loader2,
   Sparkles,
@@ -23,6 +22,7 @@ import {
   Info,
   Clock4,
   ArrowRight,
+  Trophy,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -44,6 +44,23 @@ interface ICourse {
   challengeDay?: number;
   totalLecture?: number;
   isActive?: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  lectureData?: any;
+}
+
+interface ICourseWithProgress extends ICourse {
+  progress: number;
+}
+
+interface IAttendanceData {
+  ClassName: string;
+  status: 'complete' | 'incomplete';
+  completeDate?: string;
+}
+
+interface IAttendance {
+  courseID: string;
+  data: IAttendanceData[];
 }
 
 interface IMyCourse {
@@ -51,14 +68,15 @@ interface IMyCourse {
   courseId: ICourse | string;
   progress?: number;
   enrolledAt?: string;
+  attenDance?: IAttendance[];
 }
 
 interface IEnrollment {
   _id: string;
   studentEmail: string;
   enrollCoursesIDS: string[];
-  paymentStatus: string; // 'pending' | 'completed' | 'failed' | 'refunded'
-  studentsStatus: string; // 'blocked' | 'pending' | 'complete' | 'running'
+  paymentStatus: string;
+  studentsStatus: string;
 }
 
 const containerVariants = {
@@ -91,21 +109,19 @@ export default function MyCoursesPage() {
   // Queries
   const { data: coursesData, isLoading: isCoursesLoading, error: coursesError, refetch: refetchCourses } = useGetCoursesQuery({ page: 1, limit: 100 });
 
-  // MyCourses Query (Used for Attendance stats)
   const {
     data: myCoursesData,
     isLoading: isMyCoursesLoading,
     error: myCoursesError,
     refetch: refetchMyCourses,
-  } = useGetMyCoursesQuery({ page: 1, limit: 100 });
+  } = useGetMyCoursesQuery({ page: 1, limit: 100, q: studentInfo.email }, { skip: !studentInfo.email });
 
-  // Enrollments Query for the current user (Used for categorizing sections)
   const {
     data: enrollmentsData,
     isLoading: isEnrollmentsLoading,
     error: enrollmentsError,
     refetch: refetchEnrollments,
-  } = useGetEnrollmentsQuery({ page: 1, limit: 100, q: studentInfo.email });
+  } = useGetEnrollmentsQuery({ page: 1, limit: 100, q: studentInfo.email }, { skip: !studentInfo.email });
 
   // Mutation
   const [addEnrollment] = useAddEnrollmentMutation();
@@ -113,47 +129,114 @@ export default function MyCoursesPage() {
   const isLoading = isCoursesLoading || isMyCoursesLoading || isEnrollmentsLoading;
   const error = coursesError || myCoursesError || enrollmentsError;
 
-  // Categorize courses based on Enrollments Data
-  const { activeCourses, pendingCourses, availableCourses, hasData } = useMemo(() => {
+  // Categorize courses and calculate accurate dynamic attendance & progress
+  const { runningCourses, completedCourses, pendingCourses, availableCourses, totalAttendanceDays, isPresentToday } = useMemo(() => {
     const allCourses: ICourse[] = coursesData?.data?.courses || [];
     const myCoursesList: IMyCourse[] = myCoursesData?.data?.myCourses || [];
     const userEnrollments: IEnrollment[] = enrollmentsData?.data?.enrollments || [];
 
-    const active: ICourse[] = [];
+    const running: ICourseWithProgress[] = [];
+    const completed: ICourseWithProgress[] = [];
     const pending: ICourse[] = [];
     const available: ICourse[] = [];
 
+    // Calculate Total unique attendance days across all courses
+    const totalDaysSet = new Set<string>();
+
+    myCoursesList.forEach(mc => {
+      if (mc.attenDance && Array.isArray(mc.attenDance)) {
+        mc.attenDance.forEach(att => {
+          if (att.data && Array.isArray(att.data)) {
+            att.data.forEach(d => {
+              if (d.status === 'complete' && d.completeDate) {
+                // Get the YYYY-MM-DD portion for distinct day tracking
+                const dateStr = new Date(d.completeDate).toISOString().split('T')[0];
+                totalDaysSet.add(dateStr);
+              }
+            });
+          }
+        });
+      }
+    });
+
+    const todayStr = new Date().toISOString().split('T')[0];
+    const isPresentToday = totalDaysSet.has(todayStr);
+
     allCourses.forEach(course => {
-      // Find if the course exists in any of the user's enrollments
       const relatedEnrollments = userEnrollments.filter(e => e.enrollCoursesIDS?.includes(course._id));
 
+      // Match the correct tracking progress record for this course
+      const myCourseRecord = myCoursesList.find(mc => {
+        const mcId = typeof mc.courseId === 'string' ? mc.courseId : (mc.courseId as ICourse)?._id;
+        return mcId === course._id;
+      });
+
       if (relatedEnrollments.length > 0) {
-        // Check if there is an active enrollment (payment: completed & student: running)
+        // Active enrollment criteria
         const isActive = relatedEnrollments.some(e => e.paymentStatus === 'completed' && e.studentsStatus === 'running');
 
         if (isActive) {
-          active.push(course);
+          let calculatedProgress = myCourseRecord?.progress || 0;
+
+          // Dynamic logic mirrored from my-class/page.tsx for 100% accurate progress
+          if (course.lectureData) {
+            try {
+              let parsedData = course.lectureData;
+              if (typeof parsedData === 'string') parsedData = JSON.parse(parsedData);
+              else if (typeof parsedData === 'object' && !Array.isArray(parsedData) && parsedData !== null) {
+                parsedData = Object.values(parsedData);
+              }
+
+              if (Array.isArray(parsedData) && parsedData.length > 0) {
+                const totalClasses = parsedData.length;
+                let completedCount = 0;
+
+                const courseAtt = myCourseRecord?.attenDance?.find((a: IAttendance) => a.courseID === course._id);
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                parsedData.forEach((cls: any) => {
+                  const title = cls?.title || 'Untitled Class';
+                  const classAtt = courseAtt?.data?.find((d: IAttendanceData) => d.ClassName === title);
+                  if (classAtt?.status === 'complete') {
+                    completedCount++;
+                  }
+                });
+
+                calculatedProgress = Math.round((completedCount / totalClasses) * 100);
+              }
+            } catch (err) {
+              console.error('Failed to parse lectureData for dynamic progress calculation', err);
+            }
+          }
+
+          if (calculatedProgress >= 100) {
+            completed.push({ ...course, progress: 100 });
+          } else {
+            running.push({ ...course, progress: calculatedProgress });
+          }
         } else {
-          // Exists in enrollments but not active (e.g., pending payment or pending student status)
+          // Exists in enrollments but is pending approval or payment
           pending.push(course);
         }
       } else if (course.isActive) {
-        // Not found in any enrollments
+        // Not found in any enrollments, fully available
         available.push(course);
       }
     });
 
     return {
-      activeCourses: active,
+      runningCourses: running,
+      completedCourses: completed,
       pendingCourses: pending,
       availableCourses: available,
-      hasData: myCoursesList.length > 0,
+      totalAttendanceDays: totalDaysSet.size,
+      isPresentToday,
+      hasData: myCoursesList.length > 0 || userEnrollments.length > 0,
     };
   }, [coursesData, myCoursesData, enrollmentsData]);
 
   const displayAttendance = {
-    todaysAttendance: hasData ? 'Present' : 'In-complete',
-    totalAttendance: hasData ? 142 : 0,
+    todaysAttendance: isPresentToday ? 'Present' : 'Incomplete',
+    totalAttendance: totalAttendanceDays,
   };
 
   // Reset errors and success state when modal closes/opens
@@ -171,7 +254,6 @@ export default function MyCoursesPage() {
   };
 
   const handleAttendClass = (courseId: string) => {
-    // Open the class link in the same window using Next.js router
     router.push(`/dashboard/my-course/my-class?courseId=${courseId}`);
   };
 
@@ -182,7 +264,6 @@ export default function MyCoursesPage() {
     setEnrollmentError('');
 
     try {
-      // Check if user already applied
       const userEnrollments: IEnrollment[] = enrollmentsData?.data?.enrollments || [];
       const alreadyApplied = userEnrollments.some(enrollment => enrollment.enrollCoursesIDS?.includes(selectedCourse._id));
 
@@ -192,7 +273,6 @@ export default function MyCoursesPage() {
         return;
       }
 
-      // Submit post request via RTK Mutation
       const payload = {
         studentName: studentInfo.name,
         studentEmail: studentInfo.email,
@@ -206,11 +286,9 @@ export default function MyCoursesPage() {
 
       await addEnrollment(payload).unwrap();
 
-      // Handle Success
       setEnrollSuccess(true);
       refetchEnrollments(); // Update cache
 
-      // Auto close modal after showing success state
       setTimeout(() => {
         setEnrollSuccess(false);
         setSelectedCourse(null);
@@ -269,13 +347,15 @@ export default function MyCoursesPage() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 pt-[90px] pb-20 px-4 md:px-8 overflow-hidden relative">
       <div className="max-w-7xl mx-auto space-y-12 relative z-10">
+        {/* ========================================================= */}
         {/* Header Profile Section */}
+        {/* ========================================================= */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="relative overflow-hidden rounded-3xl border border-white/10 bg-slate-900/50 backdrop-blur-xl shadow-2xl"
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-transparent pointer-events-none" />
           <div className="relative p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 md:gap-0">
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-3">
@@ -296,86 +376,99 @@ export default function MyCoursesPage() {
 
             <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
               <div className="flex items-center gap-4 bg-slate-950/50 rounded-2xl p-4 border border-white/5 shadow-inner flex-1 md:flex-initial">
-                <div className={`p-2 rounded-xl ${hasData ? 'bg-emerald-500/20 text-emerald-400' : 'bg-orange-500/20 text-orange-400'}`}>
+                <div className={`p-2 rounded-xl ${isPresentToday ? 'bg-emerald-500/20 text-emerald-400' : 'bg-orange-500/20 text-orange-400'}`}>
                   <CalendarCheck className="h-6 w-6" />
                 </div>
                 <div>
                   <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">Today&apos;s Status</p>
-                  <p className={`text-lg font-bold ${hasData ? 'text-emerald-400' : 'text-orange-400'}`}>{displayAttendance.todaysAttendance}</p>
+                  <p className={`text-lg font-bold ${isPresentToday ? 'text-emerald-400' : 'text-orange-400'}`}>{displayAttendance.todaysAttendance}</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-4 bg-slate-950/50 rounded-2xl p-4 border border-white/5 shadow-inner flex-1 md:flex-initial">
-                <div className={`p-2 rounded-xl ${hasData ? 'bg-blue-500/20 text-blue-400' : 'bg-slate-800 text-slate-400'}`}>
+                <div className={`p-2 rounded-xl ${displayAttendance.totalAttendance > 0 ? 'bg-blue-500/20 text-blue-400' : 'bg-slate-800 text-slate-400'}`}>
                   <Activity className="h-6 w-6" />
                 </div>
                 <div>
                   <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">Total Attendance</p>
-                  <p className={`text-lg font-bold ${hasData ? 'text-blue-400' : 'text-slate-400'}`}>{displayAttendance.totalAttendance} Days</p>
+                  <p className={`text-lg font-bold ${displayAttendance.totalAttendance > 0 ? 'text-blue-400' : 'text-slate-400'}`}>
+                    {displayAttendance.totalAttendance} Days
+                  </p>
                 </div>
               </div>
             </div>
           </div>
         </motion.div>
 
-        {/* --- SECTION 1: Active Enrolled Courses --- */}
+        {/* ========================================================= */}
+        {/* SECTION 1: Active Running Courses (Indigo Theme) */}
+        {/* ========================================================= */}
         <section>
-          <div className="flex items-center gap-3 mb-8 border-b border-white/10 pb-4">
+          <div className="flex items-center gap-3 mb-8 border-b border-indigo-500/30 pb-4">
             <Unlock className="h-6 w-6 text-indigo-400" />
-            <h2 className="text-2xl md:text-3xl font-bold text-white">Active Enrolled Courses</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-white">Running Courses</h2>
           </div>
 
-          {activeCourses.length === 0 ? (
+          {runningCourses.length === 0 ? (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="flex flex-col items-center justify-center min-h-[30vh] border border-dashed border-indigo-500/30 rounded-3xl bg-indigo-950/20 p-8"
+              className="flex flex-col items-center justify-center min-h-[20vh] border border-dashed border-indigo-500/30 rounded-3xl bg-indigo-950/10 p-8"
             >
               <BookOpen className="h-12 w-12 text-indigo-400/50 mb-4" />
-              <p className="text-slate-400 text-center max-w-md">You don&apos;t have any active courses yet.</p>
+              <p className="text-slate-400 text-center max-w-md">No active courses in progress right now.</p>
             </motion.div>
           ) : (
             <motion.div variants={containerVariants} initial="hidden" animate="visible" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {activeCourses.map(course => (
+              {runningCourses.map(course => (
                 <motion.div
-                  key={`active-${course._id}`}
+                  key={`running-${course._id}`}
                   variants={itemVariants}
                   whileHover={{ y: -5, scale: 1.01 }}
-                  className="group relative bg-slate-900/60 backdrop-blur-xl rounded-3xl border border-indigo-500/20 overflow-hidden shadow-xl shadow-indigo-500/5 flex flex-col"
+                  className="group relative bg-slate-900/60 backdrop-blur-xl rounded-3xl border border-indigo-500/30 overflow-hidden shadow-xl shadow-indigo-500/10 flex flex-col"
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                  <div className="p-6 pb-4 flex-1 relative z-10">
+                  <div className="p-6 pb-4 flex-1 relative z-10 flex flex-col">
                     <div className="flex justify-between items-start mb-4">
-                      <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider text-indigo-300 bg-indigo-500/10 border border-indigo-500/20 rounded-full flex items-center gap-1">
-                        <CheckCircle className="h-3 w-3" /> Enrolled
+                      <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider text-indigo-300 bg-indigo-500/20 border border-indigo-500/30 rounded-full flex items-center gap-1">
+                        <PlayCircle className="h-3 w-3" /> In Progress
                       </span>
-                      <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
+                      <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider text-indigo-200 bg-indigo-900 border border-indigo-700 rounded-full">
                         {course.challengeDay || 0} Days
                       </span>
                     </div>
 
                     <h3 className="text-xl font-bold text-white mb-2 line-clamp-2">{course.courseTitle}</h3>
-                    <p className="text-sm text-slate-400 line-clamp-2 mb-6">{course.courseDescription || 'No description available.'}</p>
+                    <p className="text-sm text-slate-400 line-clamp-2 mb-6 flex-1">{course.courseDescription || 'No description available.'}</p>
 
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="flex items-center gap-2 text-slate-300">
-                        <PlayCircle className="h-4 w-4 text-indigo-400" />
-                        <span className="text-sm font-medium">{course.totalClass || 0} Classes</span>
+                    {/* Accurate Progress Bar inside Card */}
+                    <div className="mt-auto mb-4">
+                      <div className="flex justify-between text-xs mb-1.5 font-bold">
+                        <span className="text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                          <Activity className="w-3 h-3 text-indigo-500" /> Course Progress
+                        </span>
+                        <span className="text-indigo-400">{course.progress}%</span>
                       </div>
-                      <div className="flex items-center gap-2 text-slate-300">
-                        <Clock className="h-4 w-4 text-indigo-400" />
-                        <span className="text-sm font-medium">{course.totalDuration || 'N/A'}</span>
+                      <div className="h-2.5 w-full bg-slate-800/80 rounded-full overflow-hidden shadow-inner border border-white/5">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${course.progress}%` }}
+                          transition={{ duration: 1.2, ease: 'easeOut' }}
+                          className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 relative"
+                        >
+                          <div className="absolute top-0 right-0 bottom-0 w-4 bg-white/20 blur-sm" />
+                        </motion.div>
                       </div>
                     </div>
                   </div>
 
-                  <div className="mt-auto z-10 p-6 pt-4 border-t border-white/5 bg-slate-950/40">
+                  <div className="z-10 p-6 pt-4 border-t border-indigo-500/20 bg-slate-950/60">
                     <Button
                       onClick={() => handleAttendClass(course._id)}
                       className="w-full bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl h-12 shadow-lg shadow-indigo-500/20 group-hover:shadow-indigo-500/40 transition-all font-semibold"
                     >
-                      Attend Class
+                      Resume Learning
                       <ArrowRight className="h-4 w-4 ml-2" />
                     </Button>
                   </div>
@@ -385,10 +478,79 @@ export default function MyCoursesPage() {
           )}
         </section>
 
-        {/* --- SECTION 2: Pending/Requested Courses --- */}
+        {/* ========================================================= */}
+        {/* SECTION 2: Completed Courses (Emerald Theme) */}
+        {/* ========================================================= */}
+        {completedCourses.length > 0 && (
+          <section>
+            <div className="flex items-center gap-3 mb-8 border-b border-emerald-500/30 pb-4 mt-8">
+              <Trophy className="h-6 w-6 text-emerald-400" />
+              <h2 className="text-2xl md:text-3xl font-bold text-white">Completed Courses</h2>
+            </div>
+
+            <motion.div variants={containerVariants} initial="hidden" animate="visible" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {completedCourses.map(course => (
+                <motion.div
+                  key={`completed-${course._id}`}
+                  variants={itemVariants}
+                  whileHover={{ y: -5, scale: 1.01 }}
+                  className="group relative bg-slate-900/60 backdrop-blur-xl rounded-3xl border border-emerald-500/30 overflow-hidden shadow-xl shadow-emerald-500/10 flex flex-col"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                  <div className="p-6 pb-4 flex-1 relative z-10 flex flex-col">
+                    <div className="flex justify-between items-start mb-4">
+                      <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider text-emerald-300 bg-emerald-500/20 border border-emerald-500/30 rounded-full flex items-center gap-1">
+                        <CheckCircle className="h-3 w-3" /> Mastered
+                      </span>
+                    </div>
+
+                    <h3 className="text-xl font-bold text-white mb-2 line-clamp-2">{course.courseTitle}</h3>
+                    <p className="text-sm text-slate-400 line-clamp-2 mb-6 flex-1">{course.courseDescription || 'No description available.'}</p>
+
+                    {/* Progress Bar inside Card (100%) */}
+                    <div className="mt-auto mb-4">
+                      <div className="flex justify-between text-xs mb-1.5 font-bold">
+                        <span className="text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                          <CheckCircle className="w-3 h-3 text-emerald-500" /> Status
+                        </span>
+                        <span className="text-emerald-400">100%</span>
+                      </div>
+                      <div className="h-2.5 w-full bg-slate-800/80 rounded-full overflow-hidden shadow-inner border border-white/5">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `100%` }}
+                          transition={{ duration: 1.5, ease: 'easeOut' }}
+                          className="h-full rounded-full bg-emerald-500 relative"
+                        >
+                          <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] bg-[length:250%_250%] animate-pulse" />
+                        </motion.div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="z-10 p-6 pt-4 border-t border-emerald-500/20 bg-slate-950/60">
+                    <Button
+                      onClick={() => handleAttendClass(course._id)}
+                      variant="outline"
+                      className="w-full bg-transparent border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/10 rounded-xl h-12 transition-all font-semibold"
+                    >
+                      Review Course
+                      <BookOpen className="h-4 w-4 ml-2" />
+                    </Button>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          </section>
+        )}
+
+        {/* ========================================================= */}
+        {/* SECTION 3: Pending/Requested Courses (Orange Theme) */}
+        {/* ========================================================= */}
         {pendingCourses.length > 0 && (
           <section>
-            <div className="flex items-center gap-3 mb-8 border-b border-white/10 pb-4 mt-8">
+            <div className="flex items-center gap-3 mb-8 border-b border-orange-500/30 pb-4 mt-8">
               <Clock4 className="h-6 w-6 text-orange-400" />
               <h2 className="text-2xl md:text-3xl font-bold text-white">Pending Requests</h2>
             </div>
@@ -399,11 +561,11 @@ export default function MyCoursesPage() {
                   key={`pending-${course._id}`}
                   variants={itemVariants}
                   whileHover={{ y: -5 }}
-                  className="group relative bg-slate-900/50 backdrop-blur-sm rounded-3xl border border-orange-500/20 overflow-hidden hover:border-orange-500/40 hover:bg-slate-900/80 transition-all duration-300 flex flex-col"
+                  className="group relative bg-slate-900/50 backdrop-blur-sm rounded-3xl border border-orange-500/30 overflow-hidden hover:border-orange-500/50 hover:bg-slate-900/80 transition-all duration-300 flex flex-col"
                 >
                   <div className="p-6 pb-4 flex-1 relative z-10">
                     <div className="flex justify-between items-start mb-4">
-                      <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider text-orange-300 bg-orange-500/10 border border-orange-500/20 rounded-full flex items-center gap-1">
+                      <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider text-orange-300 bg-orange-500/20 border border-orange-500/30 rounded-full flex items-center gap-1">
                         <Loader2 className="h-3 w-3 animate-spin" /> Pending Approval
                       </span>
                     </div>
@@ -412,13 +574,9 @@ export default function MyCoursesPage() {
                     <p className="text-sm text-slate-400 line-clamp-2 mb-6">{course.courseDescription || 'No description available.'}</p>
                   </div>
 
-                  <div className="mt-auto z-10 p-6 pt-4 border-t border-white/5 bg-slate-950/40">
-                    <Button
-                      onClick={() => setSelectedCourse(course)}
-                      variant="outline"
-                      className="w-full bg-transparent text-orange-400 border-orange-500/30 hover:bg-orange-500/10 rounded-xl h-12 transition-all font-medium"
-                    >
-                      Request Enrollment
+                  <div className="mt-auto z-10 p-6 pt-4 border-t border-orange-500/20 bg-slate-950/40">
+                    <Button disabled variant="outline" className="w-full bg-orange-500/5 border-orange-500/30 text-orange-400/50 rounded-xl h-12">
+                      Waiting for Admin
                     </Button>
                   </div>
                 </motion.div>
@@ -427,10 +585,12 @@ export default function MyCoursesPage() {
           </section>
         )}
 
-        {/* --- SECTION 3: Available Courses --- */}
+        {/* ========================================================= */}
+        {/* SECTION 4: Available Courses (Purple/Slate Theme) */}
+        {/* ========================================================= */}
         <section>
-          <div className="flex items-center gap-3 mb-8 border-b border-white/10 pb-4 mt-8">
-            <Lock className="h-6 w-6 text-slate-400" />
+          <div className="flex items-center gap-3 mb-8 border-b border-purple-500/30 pb-4 mt-8">
+            <Sparkles className="h-6 w-6 text-purple-400" />
             <h2 className="text-2xl md:text-3xl font-bold text-white">Available Courses</h2>
           </div>
 
@@ -438,7 +598,7 @@ export default function MyCoursesPage() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="flex flex-col items-center justify-center min-h-[30vh] border border-dashed border-white/10 rounded-3xl bg-slate-900/20 p-8"
+              className="flex flex-col items-center justify-center min-h-[20vh] border border-dashed border-purple-500/20 rounded-3xl bg-slate-900/20 p-8"
             >
               <Award className="h-12 w-12 text-slate-500 mb-4" />
               <p className="text-slate-400 text-center max-w-md">You have enrolled or requested in all available courses! Incredible dedication.</p>
@@ -450,11 +610,11 @@ export default function MyCoursesPage() {
                   key={`available-${course._id}`}
                   variants={itemVariants}
                   whileHover={{ y: -5 }}
-                  className="group relative bg-slate-900/40 backdrop-blur-sm rounded-3xl border border-white/10 overflow-hidden hover:border-slate-500/30 hover:bg-slate-900/60 transition-all duration-300 flex flex-col grayscale-[20%] hover:grayscale-0"
+                  className="group relative bg-slate-900/40 backdrop-blur-sm rounded-3xl border border-purple-500/20 overflow-hidden hover:border-purple-500/40 hover:bg-slate-900/60 transition-all duration-300 flex flex-col"
                 >
                   <div className="p-6 pb-4 flex-1">
                     <div className="flex justify-between items-start mb-4">
-                      <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider text-slate-400 bg-slate-800 border border-slate-700 rounded-full">
+                      <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider text-purple-300 bg-purple-500/10 border border-purple-500/20 rounded-full">
                         {course.challengeDay || 0} Days
                       </span>
                     </div>
@@ -464,20 +624,20 @@ export default function MyCoursesPage() {
 
                     <div className="grid grid-cols-2 gap-4 mb-2">
                       <div className="flex items-center gap-2 text-slate-400">
-                        <PlayCircle className="h-4 w-4 text-slate-500" />
+                        <PlayCircle className="h-4 w-4 text-purple-400" />
                         <span className="text-sm font-medium">{course.totalClass || 0} Classes</span>
                       </div>
                       <div className="flex items-center gap-2 text-slate-400">
-                        <Clock className="h-4 w-4 text-slate-500" />
+                        <Clock className="h-4 w-4 text-purple-400" />
                         <span className="text-sm font-medium">{course.totalDuration || 'N/A'}</span>
                       </div>
                     </div>
                   </div>
 
                   <div className="mt-auto flex flex-col">
-                    <div className="px-6 py-4 bg-slate-950/30 border-t border-white/5 flex items-center justify-between">
+                    <div className="px-6 py-4 bg-slate-950/30 border-t border-purple-500/20 flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <BookOpen className="h-5 w-5 text-slate-600" />
+                        <BookOpen className="h-5 w-5 text-purple-400" />
                         <span className="text-sm text-slate-400">{course.totalLecture || 0} Lectures</span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -488,7 +648,7 @@ export default function MyCoursesPage() {
                     <div className="px-6 pb-6 pt-2 bg-slate-950/30">
                       <Button
                         onClick={() => setSelectedCourse(course)}
-                        className="w-full bg-slate-800 hover:bg-slate-700 text-white border border-white/10 rounded-xl h-12 transition-all group-hover:border-indigo-500/50 group-hover:text-indigo-300 font-semibold"
+                        className="w-full bg-purple-600 hover:bg-purple-500 text-white rounded-xl h-12 shadow-lg shadow-purple-500/20 transition-all font-semibold"
                       >
                         Enroll Now
                       </Button>
@@ -501,7 +661,9 @@ export default function MyCoursesPage() {
         </section>
       </div>
 
-      {/* Enrollment Modal */}
+      {/* ========================================================= */}
+      {/* Enrollment Modal (Available Courses) */}
+      {/* ========================================================= */}
       <AnimatePresence>
         {selectedCourse && (
           <motion.div
@@ -509,17 +671,16 @@ export default function MyCoursesPage() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm"
-            onClick={() => !isEnrolling && setSelectedCourse(null)} // Closes when clicking outside
+            onClick={() => !isEnrolling && setSelectedCourse(null)}
           >
             <motion.div
               initial={{ scale: 0.9, y: 20, opacity: 0 }}
               animate={{ scale: 1, y: 0, opacity: 1 }}
               exit={{ scale: 0.9, y: 20, opacity: 0 }}
-              className="bg-slate-900 border border-indigo-500/30 rounded-3xl overflow-hidden shadow-2xl shadow-indigo-500/20 w-full max-w-md relative"
-              onClick={e => e.stopPropagation()} // Prevents clicks inside the modal from bubbling to the backdrop
+              className="bg-slate-900 border border-purple-500/30 rounded-3xl overflow-hidden shadow-2xl shadow-purple-500/20 w-full max-w-md relative"
+              onClick={e => e.stopPropagation()}
             >
-              {/* Pointer-events-none to prevent gradient from capturing clicks on the close button */}
-              <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-br from-indigo-600/20 via-purple-600/20 to-transparent pointer-events-none" />
+              <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-br from-purple-600/20 via-fuchsia-600/20 to-transparent pointer-events-none" />
 
               <button
                 type="button"
@@ -530,7 +691,7 @@ export default function MyCoursesPage() {
               </button>
 
               <div className="p-8 relative z-10 flex flex-col h-full">
-                <div className="w-16 h-16 rounded-2xl bg-indigo-500/20 flex items-center justify-center border border-indigo-500/30 mb-6 text-indigo-400 shadow-inner">
+                <div className="w-16 h-16 rounded-2xl bg-purple-500/20 flex items-center justify-center border border-purple-500/30 mb-6 text-purple-400 shadow-inner">
                   {enrollSuccess ? (
                     <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="text-emerald-400">
                       <CheckCircle className="h-8 w-8" />
@@ -583,7 +744,7 @@ export default function MyCoursesPage() {
                     <Button
                       onClick={handleEnrollment}
                       disabled={isEnrolling}
-                      className="w-full h-14 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-lg shadow-indigo-500/25 transition-all text-lg font-semibold"
+                      className="w-full h-14 bg-purple-600 hover:bg-purple-500 text-white rounded-xl shadow-lg shadow-purple-500/25 transition-all text-lg font-semibold"
                     >
                       {isEnrolling ? (
                         <>

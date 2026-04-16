@@ -30,6 +30,7 @@ import {
   Loader2,
   Rocket,
   Award,
+  Trophy,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -141,6 +142,9 @@ function StudentCourseContent() {
   const [mcqSubmitted, setMcqSubmitted] = useState<Record<string, boolean>>({});
   const [viewedResources, setViewedResources] = useState<Set<string>>(new Set());
   const [autoNextCountdown, setAutoNextCountdown] = useState<number | null>(null);
+
+  // Celebration Overlay State
+  const [showCelebration, setShowCelebration] = useState(false);
 
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
@@ -269,6 +273,7 @@ function StudentCourseContent() {
     if (!selectedClass || !courseId) return;
 
     const currentTitle = selectedClass.title;
+    const previousProgress = progressStats.percentage;
 
     if (!myCourseDoc) {
       const newAttendance: IAttendance[] = [
@@ -294,7 +299,13 @@ function StudentCourseContent() {
           progress: initialProgress,
           attenDance: newAttendance,
         }).unwrap();
+
         closeClassModal();
+
+        // Check if just completed right off the bat (rare but possible for 1-module courses)
+        if (initialProgress >= 100 && previousProgress < 100) {
+          setShowCelebration(true);
+        }
       } catch (err) {
         console.error('Failed to add completion state.', err);
       }
@@ -333,6 +344,11 @@ function StudentCourseContent() {
       }).unwrap();
 
       closeClassModal();
+
+      // IF THEY JUST HIT 100%, TRIGGER THE CELEBRATION OVERLAY
+      if (newProgress >= 100 && previousProgress < 100) {
+        setShowCelebration(true);
+      }
     } catch (err) {
       console.error('Failed to update status', err);
     }
@@ -368,7 +384,8 @@ function StudentCourseContent() {
       clearTimeout(timeout);
       setAutoNextCountdown(null);
     };
-  }, [activeResourceTab, mcqSubmitted, selectedClass, handleMarkAsComplete]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeResourceTab, mcqSubmitted, selectedClass]);
 
   const getResourceIcon = (type: ResourceType, className = 'h-5 w-5') => {
     switch (type) {
@@ -605,10 +622,12 @@ function StudentCourseContent() {
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="relative z-10 flex flex-col items-center justify-center w-28 h-28 rounded-full bg-gradient-to-b from-slate-900 to-slate-950 border-4 border-amber-500 shadow-[0_0_30px_rgba(245,158,11,0.3)] mb-16 ml-[56px] md:ml-0"
+                  className={`relative z-10 flex flex-col items-center justify-center w-28 h-28 rounded-full border-4 shadow-[0_0_30px_rgba(245,158,11,0.3)] mb-16 ml-[56px] md:ml-0 transition-colors duration-1000 ${progressStats.percentage === 100 ? 'bg-gradient-to-b from-amber-400 to-orange-500 border-amber-200' : 'bg-gradient-to-b from-slate-900 to-slate-950 border-amber-500'}`}
                 >
-                  <Award className="h-8 w-8 text-amber-400 mb-1" />
-                  <span className="text-[10px] font-bold text-white uppercase tracking-wider text-center leading-tight">
+                  <Award className={`h-8 w-8 mb-1 ${progressStats.percentage === 100 ? 'text-white' : 'text-amber-400'}`} />
+                  <span
+                    className={`text-[10px] font-bold uppercase tracking-wider text-center leading-tight ${progressStats.percentage === 100 ? 'text-white' : 'text-white'}`}
+                  >
                     Completed
                     <br />
                     Your Goal!
@@ -1319,6 +1338,84 @@ function StudentCourseContent() {
                   </div>
                 )}
               </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showCelebration && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-950/95 backdrop-blur-2xl overflow-hidden"
+          >
+            {/* Floating Particles / Confetti effect */}
+            {[...Array(40)].map((_, i) => (
+              <motion.div
+                key={`particle-${i}`}
+                initial={{
+                  opacity: 1,
+                  x: '50vw',
+                  y: '50vh',
+                  scale: 0,
+                }}
+                animate={{
+                  x: `${Math.random() * 100}vw`,
+                  y: `${Math.random() * 100}vh`,
+                  scale: [0, Math.random() * 1.5 + 0.5, 0],
+                  rotate: Math.random() * 360,
+                }}
+                transition={{
+                  duration: 2 + Math.random() * 3,
+                  ease: 'easeOut',
+                  repeat: Infinity,
+                }}
+                className={`absolute w-3 h-3 rounded-full ${
+                  ['bg-amber-400', 'bg-emerald-400', 'bg-teal-400', 'bg-fuchsia-400', 'bg-orange-500'][i % 5]
+                } shadow-[0_0_15px_currentColor]`}
+                style={{ top: 0, left: 0 }}
+              />
+            ))}
+
+            {/* Central Celebration Card */}
+            <motion.div
+              initial={{ scale: 0.5, y: 50, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              transition={{ type: 'spring', bounce: 0.5 }}
+              className="relative z-10 flex flex-col items-center text-center p-8 md:p-12 w-[90%] max-w-2xl bg-slate-900/50 border border-amber-500/30 rounded-3xl shadow-[0_0_100px_rgba(245,158,11,0.2)] backdrop-blur-xl"
+            >
+              {/* Massive Golden Trophy */}
+              <motion.div
+                animate={{ rotateY: 360, y: [-10, 10, -10] }}
+                transition={{
+                  rotateY: { duration: 4, repeat: Infinity, ease: 'linear' },
+                  y: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
+                }}
+                className="w-32 h-32 md:w-48 md:h-48 bg-gradient-to-br from-amber-400 to-orange-600 rounded-full flex items-center justify-center shadow-[0_0_80px_rgba(245,158,11,0.6)] mb-8 border-4 border-amber-200"
+              >
+                <Trophy className="w-16 h-16 md:w-24 md:h-24 text-white" />
+              </motion.div>
+
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-orange-500 mb-4 tracking-tight leading-tight">
+                CONGRATULATIONS!
+              </h2>
+
+              <p className="text-lg md:text-xl text-slate-300 mb-8 leading-relaxed">
+                You have successfully completed <strong className="text-white">{courseData?.courseTitle || 'the course'}</strong>. Your dedication and hard work
+                have paid off. Keep pushing the boundaries of your knowledge!
+              </p>
+
+              <Button
+                onClick={() => {
+                  setShowCelebration(false);
+                  router.push('/dashboard/my-course');
+                }}
+                className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-8 h-14 rounded-xl text-lg transition-transform hover:scale-105 active:scale-95 shadow-[0_0_30px_rgba(245,158,11,0.3)]"
+              >
+                Continue Your Journey
+              </Button>
             </motion.div>
           </motion.div>
         )}
