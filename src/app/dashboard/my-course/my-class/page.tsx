@@ -365,6 +365,7 @@ const ClassContent = () => {
                     return (
                       <button
                         key={tab.id}
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         onClick={() => setActiveTab(tab.id as any)}
                         className={`flex items-center gap-3 w-auto md:w-full px-6 py-4 text-left transition-all border-b-2 md:border-b-0 md:border-l-4 whitespace-nowrap ${
                           isActiveTab
@@ -407,7 +408,7 @@ const ClassContent = () => {
                           </div>
                           <h3 className="text-3xl font-bold mb-4">Lecture Video Hub</h3>
                           <p className="text-gray-500 max-w-md">
-                            Watch the recording for "{selectedClass.ClassName}". All lecture resources will be synced below.
+                            Watch the recording for &quot;{selectedClass.ClassName}&quot;. All lecture resources will be synced below.
                           </p>
                           <button className="mt-8 px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full font-semibold transition-all shadow-lg shadow-indigo-500/30">
                             Play Video
