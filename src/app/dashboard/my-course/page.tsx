@@ -28,6 +28,7 @@ import { Button } from '@/components/ui/button';
 import { useGetCoursesQuery } from '@/redux/features/courses/coursesSlice';
 import { useGetMyCoursesQuery } from '@/redux/features/my-courses/myCoursesSlice';
 import { useGetEnrollmentsQuery, useAddEnrollmentMutation } from '@/redux/features/enrollments/enrollmentsSlice';
+import { useSession } from '@/lib/auth-client';
 
 interface ICourse {
   _id: string;
@@ -77,10 +78,12 @@ export default function MyCoursesPage() {
   const [isEnrolling, setIsEnrolling] = useState(false);
   const [enrollSuccess, setEnrollSuccess] = useState(false);
   const [enrollmentError, setEnrollmentError] = useState<string>('');
+  const session = useSession();
+  const user = session?.data?.user;
 
   const studentInfo = {
-    name: 'Toufiquer Rahman',
-    email: 'toufiquer.0@gmail.com',
+    name: user?.name || '',
+    email: user?.email || '',
   };
 
   // Queries
