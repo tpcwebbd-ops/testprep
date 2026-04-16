@@ -1,11 +1,3 @@
-/*
-|-----------------------------------------
-| setting up Page for the App
-| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
-| @copyright: testprep-webapp, April, 2026
-|-----------------------------------------
-*/
-
 'use client';
 
 import { useState, Suspense, useEffect, useMemo } from 'react';
@@ -31,11 +23,16 @@ import {
   Gamepad2,
   CalendarDays,
   Target,
+  ShieldAlert,
+  Mail,
+  ExternalLink,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { useGetCourseByIdQuery } from '@/redux/features/courses/coursesSlice';
+import { useGetEnrollmentsQuery } from '@/redux/features/enrollments/enrollmentsSlice';
+import { useSession } from '@/lib/auth-client';
 
 type ResourceType = 'youtube' | 'video' | 'text' | 'mcq' | 'assignment';
 
@@ -61,6 +58,14 @@ interface IClass {
   resources: IResource[];
 }
 
+interface IEnrollment {
+  _id: string;
+  studentEmail: string;
+  enrollCoursesIDS: string[];
+  paymentStatus: string;
+  studentsStatus: string;
+}
+
 type ClassStatus = 'completed' | 'missed' | 'active' | 'locked';
 
 interface ProcessedClass extends IClass {
@@ -78,6 +83,11 @@ function StudentCourseContent() {
   const router = useRouter();
   const courseId = searchParams.get('courseId');
 
+  const session = useSession();
+  const userEmail = session?.data?.user?.email || '';
+
+  const { data: enrollmentsData, isLoading: isEnrollmentsLoading } = useGetEnrollmentsQuery({ page: 1, limit: 100, q: userEmail }, { skip: !userEmail });
+
   const { data: courseResponse, isLoading: isCourseLoading } = useGetCourseByIdQuery(courseId, {
     skip: !courseId,
   });
@@ -88,6 +98,13 @@ function StudentCourseContent() {
   const [gridColumns, setGridColumns] = useState<1 | 2 | 3>(3);
   const [selectedClass, setSelectedClass] = useState<ProcessedClass | null>(null);
   const [activeResourceTab, setActiveResourceTab] = useState<string | null>(null);
+
+  const hasAccess = useMemo(() => {
+    if (!enrollmentsData?.data?.enrollments || !courseId) return false;
+    return enrollmentsData.data.enrollments.some(
+      (e: IEnrollment) => e.enrollCoursesIDS?.includes(courseId) && e.paymentStatus === 'completed' && e.studentsStatus === 'running',
+    );
+  }, [enrollmentsData, courseId]);
 
   useEffect(() => {
     if (courseData?.lectureData) {
@@ -170,7 +187,69 @@ function StudentCourseContent() {
     }
   };
 
+  // Intercept rich text anchor clicks to force them into the SAME window
+  const handleHtmlContentClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+    const anchor = target.closest('a');
+    if (anchor) {
+      e.preventDefault();
+      // Enforce opening the URL in the same window/tab
+      window.location.href = anchor.href;
+    }
+  };
+
+  const isLoading = isCourseLoading || isEnrollmentsLoading;
   const courseTitleDisplay = isCourseLoading ? 'Loading Workspace...' : (courseData?.courseTitle ?? 'My Learning Journey');
+
+  if (isLoading) {
+    return (
+      <main className="min-h-screen bg-[#020817] flex items-center justify-center p-4">
+        <div className="animate-pulse flex flex-col items-center gap-6">
+          <div className="w-20 h-20 rounded-full border-4 border-teal-500 border-t-transparent animate-spin shadow-[0_0_30px_rgba(20,184,166,0.4)]" />
+          <p className="text-teal-400 font-bold tracking-[0.2em] text-lg">INITIALIZING SYSTEM</p>
+        </div>
+      </main>
+    );
+  }
+
+  if (!hasAccess) {
+    return (
+      <main className="min-h-screen bg-[#020817] text-slate-200 flex items-center justify-center p-4 relative overflow-hidden font-sans">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-red-900/20 via-[#020817] to-[#020817] pointer-events-none" />
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          className="relative z-10 max-w-lg w-full bg-slate-900/80 backdrop-blur-xl border border-red-500/20 rounded-3xl p-8 md:p-10 text-center shadow-2xl shadow-red-500/10"
+        >
+          <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-red-500/20 shadow-[0_0_30px_rgba(239,68,68,0.2)]">
+            <ShieldAlert className="w-10 h-10 text-red-500" />
+          </div>
+          <h1 className="text-3xl font-black text-white mb-3 tracking-tight">Access Restricted</h1>
+          <p className="text-slate-400 mb-8 leading-relaxed">
+            You currently do not have active access to this course. This might be because your enrollment is pending approval, payment is incomplete, or your
+            student status is not active.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button
+              onClick={() => router.push('/dashboard/my-course')}
+              variant="outline"
+              className="bg-transparent border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800 h-12 px-6 rounded-xl"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Return to Courses
+            </Button>
+            <Button
+              onClick={() => (window.location.href = 'mailto:admin@example.com?subject=Course Enrollment Issue')}
+              className="bg-red-600 hover:bg-red-500 text-white h-12 px-6 rounded-xl shadow-lg shadow-red-500/20"
+            >
+              <Mail className="w-4 h-4 mr-2" />
+              Contact Admin
+            </Button>
+          </div>
+        </motion.div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-[#020817] text-slate-200 selection:bg-teal-500/30 overflow-x-hidden font-sans">
@@ -181,7 +260,7 @@ function StudentCourseContent() {
           <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col gap-6 w-full xl:w-1/2">
             <div className="flex items-center gap-4">
               <Button
-                onClick={() => router.push('/dashboard/courses')}
+                onClick={() => router.push('/dashboard/my-course')}
                 variant="ghost"
                 size="icon"
                 className="rounded-full bg-white/5 hover:bg-white/10 text-white backdrop-blur-md h-12 w-12 shrink-0"
@@ -282,7 +361,7 @@ function StudentCourseContent() {
         {classes.length === 0 ? (
           <div className="flex flex-col items-center justify-center min-h-[40vh]">
             <div className="w-16 h-16 border-4 border-teal-500 border-t-transparent rounded-full animate-spin mb-4" />
-            <p className="text-teal-400 font-medium tracking-widest">LOADING CONTENT...</p>
+            <p className="text-teal-400 font-medium tracking-widest">NO CONTENT AVAILABLE</p>
           </div>
         ) : (
           <div className="mt-12 relative">
@@ -291,7 +370,9 @@ function StudentCourseContent() {
                 <div className="absolute top-0 bottom-0 left-[28px] md:left-1/2 w-1.5 bg-slate-800 -translate-x-1/2 rounded-full overflow-hidden z-0">
                   <motion.div
                     initial={{ height: 0 }}
-                    animate={{ height: `${classes.length > 0 ? (classes.filter(c => c.status !== 'locked').length / classes.length) * 100 : 0}%` }}
+                    animate={{
+                      height: `${classes.length > 0 ? (classes.filter(c => c.status !== 'locked').length / classes.length) * 100 : 0}%`,
+                    }}
                     transition={{ duration: 1.5, ease: 'easeInOut' }}
                     className="w-full bg-gradient-to-b from-teal-400 via-emerald-400 to-amber-400"
                   />
@@ -335,11 +416,16 @@ function StudentCourseContent() {
                         initial="hidden"
                         whileInView="visible"
                         viewport={{ once: true, margin: '-100px' }}
-                        variants={{ hidden: { opacity: 0, y: 50 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, delay: index * 0.1 } } }}
+                        variants={{
+                          hidden: { opacity: 0, y: 50 },
+                          visible: { opacity: 1, y: 0, transition: { duration: 0.5, delay: index * 0.1 } },
+                        }}
                         className={`relative flex items-center w-full group ml-[56px] md:ml-0 ${isLeft ? 'md:justify-start' : 'md:justify-end'}`}
                       >
                         <div
-                          className={`absolute left-[-28px] md:left-1/2 w-14 h-14 -translate-x-1/2 rounded-full border-4 flex items-center justify-center z-10 transition-transform duration-300 ${isLocked ? '' : 'cursor-pointer hover:scale-110'} ${nodeColor} ${glow}`}
+                          className={`absolute left-[-28px] md:left-1/2 w-14 h-14 -translate-x-1/2 rounded-full border-4 flex items-center justify-center z-10 transition-transform duration-300 ${
+                            isLocked ? '' : 'cursor-pointer hover:scale-110'
+                          } ${nodeColor} ${glow}`}
                           onClick={() => openClassModal(cls)}
                         >
                           <Icon className="h-6 w-6" />
@@ -617,13 +703,30 @@ function StudentCourseContent() {
                             )}
 
                             {(resource.type === 'text' || resource.type === 'assignment') && (
-                              <div className="prose prose-invert prose-teal max-w-none text-slate-300 leading-relaxed space-y-4">
+                              <div
+                                className="prose prose-invert prose-teal max-w-none text-slate-300 leading-relaxed space-y-4"
+                                onClick={handleHtmlContentClick} // <-- Attached interceptor here!
+                              >
                                 {resource.content ? (
                                   <div dangerouslySetInnerHTML={{ __html: resource.content }} />
                                 ) : (
                                   <div className="flex flex-col items-center justify-center h-64 text-slate-500 border-2 border-dashed border-white/10 rounded-2xl">
                                     <FileText className="h-12 w-12 mb-4 opacity-50" />
                                     <p>No textual content available.</p>
+                                  </div>
+                                )}
+
+                                {/* Fallback explicit external link if url is provided for texts/assignments */}
+                                {resource.url && (
+                                  <div className="mt-8 pt-6 border-t border-white/10">
+                                    <a
+                                      href={resource.url}
+                                      target="_self" // Force self / same window target
+                                      className="inline-flex items-center gap-2 px-6 py-3 bg-teal-500/10 text-teal-400 hover:bg-teal-500/20 hover:text-teal-300 font-semibold border border-teal-500/20 hover:border-teal-500/50 rounded-xl transition-all shadow-[0_0_15px_rgba(20,184,166,0.1)]"
+                                    >
+                                      <ExternalLink className="h-4 w-4" />
+                                      Access External Resource
+                                    </a>
                                   </div>
                                 )}
                               </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   BookOpen,
@@ -21,7 +22,7 @@ import {
   CheckCircle,
   Info,
   Clock4,
-  ExternalLink,
+  ArrowRight,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -74,6 +75,7 @@ const itemVariants = {
 };
 
 export default function MyCoursesPage() {
+  const router = useRouter();
   const [selectedCourse, setSelectedCourse] = useState<ICourse | null>(null);
   const [isEnrolling, setIsEnrolling] = useState(false);
   const [enrollSuccess, setEnrollSuccess] = useState(false);
@@ -169,8 +171,8 @@ export default function MyCoursesPage() {
   };
 
   const handleAttendClass = (courseId: string) => {
-    // Open the class link in a new tab
-    window.open(`/dashboard/my-course/my-class?courseId=${courseId}`, '_blank');
+    // Open the class link in the same window using Next.js router
+    router.push(`/dashboard/my-course/my-class?courseId=${courseId}`);
   };
 
   const handleEnrollment = async () => {
@@ -374,7 +376,7 @@ export default function MyCoursesPage() {
                       className="w-full bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl h-12 shadow-lg shadow-indigo-500/20 group-hover:shadow-indigo-500/40 transition-all font-semibold"
                     >
                       Attend Class
-                      <ExternalLink className="h-4 w-4 ml-2" />
+                      <ArrowRight className="h-4 w-4 ml-2" />
                     </Button>
                   </div>
                 </motion.div>
