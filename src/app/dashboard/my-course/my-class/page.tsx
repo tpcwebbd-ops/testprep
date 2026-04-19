@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, Suspense, useEffect, useMemo, useRef } from 'react';
+import { useState, Suspense, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -31,6 +31,9 @@ import {
   Rocket,
   Award,
   Trophy,
+  Headphones,
+  File,
+  Download,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -40,7 +43,7 @@ import { useGetEnrollmentsQuery } from '@/redux/features/enrollments/enrollments
 import { useGetMyCoursesQuery, useUpdateMyCourseMutation, useAddMyCourseMutation } from '@/redux/features/my-courses/myCoursesSlice';
 import { useSession } from '@/lib/auth-client';
 
-type ResourceType = 'youtube' | 'video' | 'text' | 'mcq' | 'assignment';
+type ResourceType = 'youtube' | 'video' | 'text' | 'mcq' | 'assignment' | 'audio' | 'pdf' | 'docx';
 
 interface IResource {
   id: string;
@@ -113,7 +116,6 @@ function StudentCourseContent() {
   const userEmail = session?.data?.user?.email || '';
   const userName = session?.data?.user?.name || 'Student';
 
-  // API Hooks
   const { data: enrollmentsData, isLoading: isEnrollmentsLoading } = useGetEnrollmentsQuery({ page: 1, limit: 100, q: userEmail }, { skip: !userEmail });
   const { data: courseResponse, isLoading: isCourseLoading } = useGetCourseByIdQuery(courseId, { skip: !courseId });
   const { data: myCoursesData } = useGetMyCoursesQuery({ page: 1, limit: 100, q: userEmail }, { skip: !userEmail });
@@ -124,20 +126,17 @@ function StudentCourseContent() {
   const isSavingProgress = isUpdatingCourse || isAddingCourse;
   const courseData = courseResponse?.data;
 
-  // Local States
   const [classes, setClasses] = useState<ProcessedClass[]>([]);
   const [isGameMode, setIsGameMode] = useState(true);
   const [gridColumns, setGridColumns] = useState<1 | 2 | 3>(3);
   const [selectedClass, setSelectedClass] = useState<ProcessedClass | null>(null);
   const [activeResourceTab, setActiveResourceTab] = useState<string | null>(null);
 
-  // Progress/Activity States
   const [mcqAnswers, setMcqAnswers] = useState<Record<string, number>>({});
   const [mcqSubmitted, setMcqSubmitted] = useState<Record<string, boolean>>({});
   const [viewedResources, setViewedResources] = useState<Set<string>>(new Set());
   const [autoNextCountdown, setAutoNextCountdown] = useState<number | null>(null);
 
-  // Celebration & Layout States
   const [showCelebration, setShowCelebration] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isTaskbarVisible, setIsTaskbarVisible] = useState(true);
@@ -145,7 +144,6 @@ function StudentCourseContent() {
 
   const timelineBottomRef = useRef<HTMLDivElement>(null);
 
-  // Access Checks & Record Fetch
   const hasAccess = useMemo(() => {
     if (!enrollmentsData?.data?.enrollments || !courseId) return false;
     return enrollmentsData.data.enrollments.some(
@@ -228,11 +226,11 @@ function StudentCourseContent() {
     setIsMobileSidebarOpen(true);
   };
 
-  const closeClassModal = () => {
+  const closeClassModal = useCallback(() => {
     setSelectedClass(null);
     setActiveResourceTab(null);
     setIsMobileSidebarOpen(false);
-  };
+  }, []);
 
   useEffect(() => {
     if (activeResourceTab) {
@@ -245,15 +243,25 @@ function StudentCourseContent() {
   }, [activeResourceTab]);
 
   useEffect(() => {
-    if (isGameMode && classes.length > 0) {
+    if (classes.length > 0) {
       const timer = setTimeout(() => {
-        timelineBottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const activeClass = classes.find(c => c.status === 'active');
+        if (activeClass) {
+          const activeElement = document.getElementById(`class-node-${activeClass.id}`);
+          if (activeElement) {
+            activeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+          }
+        }
+        if (isGameMode && timelineBottomRef.current) {
+          timelineBottomRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [isGameMode, classes.length]);
+  }, [isGameMode, classes]);
 
-  const handleMarkAsComplete = async () => {
+  const handleMarkAsComplete = useCallback(async () => {
     if (!selectedClass || !courseId) return;
 
     const currentTitle = selectedClass.title;
@@ -280,9 +288,7 @@ function StudentCourseContent() {
 
         closeClassModal();
         if (initialProgress >= 100 && previousProgress < 100) setShowCelebration(true);
-      } catch (err) {
-        console.error('Failed to add completion state.', err);
-      }
+      } catch {}
       return;
     }
 
@@ -310,10 +316,8 @@ function StudentCourseContent() {
       await updateMyCourse({ id: myCourseDoc._id, attenDance: newAttendance, progress: newProgress }).unwrap();
       closeClassModal();
       if (newProgress >= 100 && previousProgress < 100) setShowCelebration(true);
-    } catch (err) {
-      console.error('Failed to update status', err);
-    }
-  };
+    } catch {}
+  }, [addMyCourse, classes.length, closeClassModal, courseId, myCourseDoc, progressStats.percentage, selectedClass, updateMyCourse, userEmail, userName]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -344,8 +348,7 @@ function StudentCourseContent() {
       clearTimeout(timeout);
       setAutoNextCountdown(null);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeResourceTab, mcqSubmitted, selectedClass]);
+  }, [activeResourceTab, mcqSubmitted, selectedClass, handleMarkAsComplete]);
 
   const getResourceIcon = (type: ResourceType, className = 'h-4 w-4') => {
     switch (type) {
@@ -353,6 +356,12 @@ function StudentCourseContent() {
         return <Youtube className={`text-red-500 ${className}`} />;
       case 'video':
         return <VideoIcon className={`text-indigo-400 ${className}`} />;
+      case 'audio':
+        return <Headphones className={`text-purple-400 ${className}`} />;
+      case 'pdf':
+        return <FileText className={`text-rose-400 ${className}`} />;
+      case 'docx':
+        return <File className={`text-blue-400 ${className}`} />;
       case 'text':
         return <FileText className={`text-teal-400 ${className}`} />;
       case 'mcq':
@@ -592,6 +601,7 @@ function StudentCourseContent() {
                     return (
                       <motion.div
                         key={cls.id}
+                        id={`class-node-${cls.id}`}
                         initial="hidden"
                         whileInView="visible"
                         viewport={{ once: true, margin: '-50px' }}
@@ -692,6 +702,7 @@ function StudentCourseContent() {
                   return (
                     <motion.div
                       key={cls.id}
+                      id={`class-node-${cls.id}`}
                       variants={itemVariants}
                       onClick={() => openClassModal(cls)}
                       className={`group relative flex flex-col h-full bg-slate-900/60 rounded-2xl border backdrop-blur-xl overflow-hidden transition-all duration-300 ${
@@ -900,7 +911,6 @@ function StudentCourseContent() {
                 )}
               </AnimatePresence>
 
-              {/* Sidebar */}
               <div
                 className={`absolute lg:relative top-0 left-0 h-full w-[85%] sm:w-[320px] bg-slate-950/95 lg:bg-slate-950/80 border-r border-white/10 flex flex-col shrink-0 z-[70] lg:z-10 transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none ${
                   isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
@@ -974,7 +984,6 @@ function StudentCourseContent() {
                 </div>
               </div>
 
-              {/* Main Content Area - Strict Flexbox preventing nested scrollbars */}
               <div className="flex-1 flex flex-col relative z-10 w-full h-full overflow-hidden">
                 <div className="lg:hidden shrink-0 sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-white/10 flex items-center justify-between p-2 sm:p-3">
                   <div className="flex items-center gap-2 overflow-hidden">
@@ -1023,7 +1032,6 @@ function StudentCourseContent() {
                           animate={{ opacity: 1, y: 0 }}
                           className="flex flex-col h-full overflow-hidden w-full"
                         >
-                          {/* Resource Header Fixed */}
                           <div className="flex items-center gap-3 pb-3 border-b border-white/10 shrink-0 mb-3">
                             <div className="p-2 bg-slate-900 border border-white/10 rounded-lg shadow-inner hidden sm:block">
                               {getResourceIcon(resource.type, 'h-6 w-6')}
@@ -1036,7 +1044,6 @@ function StudentCourseContent() {
                             </div>
                           </div>
 
-                          {/* Scrollable Resource Content Only */}
                           <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar bg-slate-900/40 rounded-xl p-3 sm:p-4 md:p-6 border border-white/5">
                             {(resource.type === 'youtube' || resource.type === 'video') && (
                               <div className="w-full max-w-4xl mx-auto aspect-video bg-black rounded-xl overflow-hidden border border-white/10 shadow-2xl flex items-center justify-center">
@@ -1050,6 +1057,81 @@ function StudentCourseContent() {
                                   <div className="flex flex-col items-center text-slate-500">
                                     <VideoIcon className="h-8 w-8 mb-2 opacity-50" />
                                     <p className="text-xs">Video source missing.</p>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
+                            {resource.type === 'audio' && (
+                              <div className="w-full max-w-2xl mx-auto bg-slate-900 rounded-xl p-6 md:p-8 border border-white/10 shadow-2xl flex flex-col items-center justify-center gap-6">
+                                <div className="w-20 h-20 bg-purple-500/20 rounded-full flex items-center justify-center border-2 border-purple-500/50 shadow-[0_0_30px_rgba(168,85,247,0.3)]">
+                                  <Headphones className="w-10 h-10 text-purple-400" />
+                                </div>
+                                <div className="text-center space-y-2">
+                                  <h3 className="text-lg font-bold text-white">{resource.title}</h3>
+                                  <p className="text-sm text-slate-400">Listen to the audio lesson</p>
+                                </div>
+                                {resource.url ? (
+                                  <audio controls className="w-full h-12 outline-none rounded-full" controlsList="nodownload">
+                                    <source src={resource.url} />
+                                    Your browser does not support the audio element.
+                                  </audio>
+                                ) : (
+                                  <p className="text-xs text-slate-500">Audio source missing.</p>
+                                )}
+                              </div>
+                            )}
+
+                            {resource.type === 'pdf' && (
+                              <div className="w-full h-full min-h-[60vh] max-w-5xl mx-auto bg-slate-950 rounded-xl overflow-hidden border border-white/10 shadow-2xl flex flex-col">
+                                {resource.url ? (
+                                  <iframe src={`${resource.url}#view=FitH`} className="w-full flex-1 min-h-[60vh]" title={resource.title} />
+                                ) : (
+                                  <div className="flex flex-col items-center justify-center flex-1 text-slate-500">
+                                    <FileText className="h-8 w-8 mb-2 opacity-50" />
+                                    <p className="text-xs">PDF source missing.</p>
+                                  </div>
+                                )}
+                                {resource.url && (
+                                  <div className="p-4 border-t border-white/10 bg-slate-900 flex justify-end">
+                                    <a
+                                      href={resource.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center gap-2 px-4 py-2 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 text-xs font-semibold rounded-lg transition-all"
+                                    >
+                                      <ExternalLink className="h-4 w-4" /> Open PDF Externally
+                                    </a>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
+                            {resource.type === 'docx' && (
+                              <div className="w-full h-full min-h-[60vh] max-w-5xl mx-auto bg-slate-950 rounded-xl overflow-hidden border border-white/10 shadow-2xl flex flex-col">
+                                {resource.url ? (
+                                  <iframe
+                                    src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(resource.url)}`}
+                                    className="w-full flex-1 min-h-[60vh]"
+                                    title={resource.title}
+                                  />
+                                ) : (
+                                  <div className="flex flex-col items-center justify-center flex-1 text-slate-500 bg-slate-900">
+                                    <File className="h-8 w-8 mb-2 opacity-50" />
+                                    <p className="text-xs">Document source missing.</p>
+                                  </div>
+                                )}
+                                {resource.url && (
+                                  <div className="p-4 border-t border-white/10 bg-slate-900 flex justify-between items-center">
+                                    <p className="text-xs text-slate-500">If the document doesn&lsquo;t load, try downloading it.</p>
+                                    <a
+                                      href={resource.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 text-xs font-semibold rounded-lg transition-all"
+                                    >
+                                      <Download className="h-4 w-4" /> Download DOCX
+                                    </a>
                                   </div>
                                 )}
                               </div>
@@ -1163,7 +1245,6 @@ function StudentCourseContent() {
                             )}
                           </div>
 
-                          {/* Resource Footer Fixed */}
                           <div className="pt-3 mt-2 border-t border-white/10 flex items-center justify-between shrink-0">
                             <Button
                               variant="outline"

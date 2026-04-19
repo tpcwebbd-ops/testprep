@@ -25,6 +25,8 @@ import {
   ClipboardList,
   Save,
   Check,
+  Headphones,
+  File,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -34,9 +36,12 @@ import { Switch } from '@/components/ui/switch';
 import { useGetCourseByIdQuery, useUpdateCourseMutation } from '@/redux/features/courses/coursesSlice';
 import YouTubeVideoUploadManagerSingle from '@/app/dashboard/media/example/yt-videos/components/YTVideoUploadManagerSingle';
 import VideoUploadManagerSingle from '@/app/dashboard/media/example/uploadthings/components/VideoUploadMangerSingle';
+import AudioUploadManagerSingle from '@/app/dashboard/media/example/uploadthings/components/AudioUploadManagerSingle';
+import PdfUploadManagerSingle from '@/app/dashboard/media/example/uploadthings/components/PdfUploadManagerSingle';
+import DocxUploadManagerSingle from '@/app/dashboard/media/example/uploadthings/components/DocxUploadManagerSingle';
 import RichTextEditorField from '@/components/dashboard-ui/RichTextEditorField';
 
-type ResourceType = 'youtube' | 'video' | 'text' | 'mcq' | 'assignment';
+type ResourceType = 'youtube' | 'video' | 'text' | 'mcq' | 'assignment' | 'audio' | 'pdf' | 'docx';
 
 interface IResource {
   id: string;
@@ -353,6 +358,12 @@ function CourseEditorContent() {
         return <Youtube className="h-4 w-4 text-red-400" />;
       case 'video':
         return <VideoIcon className="h-4 w-4 text-indigo-400" />;
+      case 'audio':
+        return <Headphones className="h-4 w-4 text-purple-400" />;
+      case 'pdf':
+        return <FileText className="h-4 w-4 text-rose-400" />;
+      case 'docx':
+        return <File className="h-4 w-4 text-blue-400" />;
       case 'text':
         return <FileText className="h-4 w-4 text-teal-400" />;
       case 'mcq':
@@ -682,7 +693,7 @@ function CourseEditorContent() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-4xl bg-slate-900 border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+              className="relative w-full max-w-5xl bg-slate-900 border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
             >
               <div className="flex items-center justify-between p-6 border-b border-white/10 bg-white/5">
                 <div className="flex items-center gap-4">
@@ -717,7 +728,7 @@ function CourseEditorContent() {
 
               <div className="p-6 overflow-y-auto custom-scrollbar flex-1">
                 {!resourceType ? (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     {[
                       {
                         type: 'youtube' as ResourceType,
@@ -731,6 +742,14 @@ function CourseEditorContent() {
                         icon: <VideoIcon className="h-8 w-8 text-indigo-500" />,
                         desc: 'Upload or select video',
                       },
+                      {
+                        type: 'audio' as ResourceType,
+                        title: 'Audio File',
+                        icon: <Headphones className="h-8 w-8 text-purple-500" />,
+                        desc: 'Upload audio file',
+                      },
+                      { type: 'pdf' as ResourceType, title: 'PDF Document', icon: <FileText className="h-8 w-8 text-rose-500" />, desc: 'Upload PDF file' },
+                      { type: 'docx' as ResourceType, title: 'Word Document', icon: <File className="h-8 w-8 text-blue-500" />, desc: 'Upload DOCX file' },
                       { type: 'text' as ResourceType, title: 'Text Content', icon: <FileText className="h-8 w-8 text-teal-500" />, desc: 'Rich text editor' },
                       {
                         type: 'mcq' as ResourceType,
@@ -779,6 +798,24 @@ function CourseEditorContent() {
                     {resourceType === 'video' && (
                       <div className="bg-slate-950 p-4 rounded-xl border border-white/10">
                         <VideoUploadManagerSingle value={resourceUrlData} onChange={setResourceUrlData} label="Select Source Video" />
+                      </div>
+                    )}
+
+                    {resourceType === 'audio' && (
+                      <div className="bg-slate-950 p-4 rounded-xl border border-white/10">
+                        <AudioUploadManagerSingle value={resourceUrlData} onChange={setResourceUrlData} label="Select Audio File" />
+                      </div>
+                    )}
+
+                    {resourceType === 'pdf' && (
+                      <div className="bg-slate-950 p-4 rounded-xl border border-white/10">
+                        <PdfUploadManagerSingle value={resourceUrlData} onChange={setResourceUrlData} label="Select PDF Document" />
+                      </div>
+                    )}
+
+                    {resourceType === 'docx' && (
+                      <div className="bg-slate-950 p-4 rounded-xl border border-white/10">
+                        <DocxUploadManagerSingle value={resourceUrlData} onChange={setResourceUrlData} label="Select Word Document" />
                       </div>
                     )}
 
