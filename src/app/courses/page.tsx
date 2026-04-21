@@ -2,68 +2,24 @@
 
 import React from 'react';
 import { motion, Variants } from 'framer-motion';
-import { ArrowRight, BookOpen, CheckCircle, Clock, FileText, MonitorPlay, PlayCircle, Star, Users, Video } from 'lucide-react';
+import { ArrowRight, BookOpen, CheckCircle, Clock, FileText, Loader2, MonitorPlay, PlayCircle, Star, Users, Video } from 'lucide-react';
+import Link from 'next/link';
 
-// --- Types ---
+import { useGetCoursesQuery } from '@/redux/features/courses/coursesSlice';
+
+
 interface Course {
-  id: string;
-  title: string;
-  fee: number;
-  oldFee: number;
-  duration: string;
-  totalClasses: number;
-  tests: number;
-  assignments: number;
-  badge?: string;
-  popular?: boolean;
+  _id: string;
+  courseTitle: string;
+  courseDescription?: string;
+  totalClass?: number;
+  totalAssignment?: number;
+  totalDuration?: string;
+  totalMockTest?: number;
+  realPrice?: number;
+  discountPrice?: number;
+  isActive?: boolean;
 }
-
-// --- Data ---
-const courses: Course[] = [
-  {
-    id: 'ielts',
-    title: 'IELTS Preparation',
-    fee: 5000,
-    oldFee: 8000,
-    duration: '3 months',
-    totalClasses: 50,
-    tests: 12, // Mock tests
-    assignments: 25,
-    badge: 'Bestseller',
-    popular: true,
-  },
-  {
-    id: 'spoken-english',
-    title: 'Spoken English',
-    fee: 5000,
-    oldFee: 8000,
-    duration: '3 months',
-    totalClasses: 50,
-    tests: 12,
-    assignments: 25,
-  },
-  {
-    id: 'kids-english',
-    title: 'Kids English',
-    fee: 2000,
-    oldFee: 5000,
-    duration: '3 months',
-    totalClasses: 30,
-    tests: 12,
-    assignments: 10,
-    badge: '60% OFF',
-  },
-  {
-    id: 'junior-english',
-    title: 'Junior English',
-    fee: 4000,
-    oldFee: 8000,
-    duration: '3 months',
-    totalClasses: 30,
-    tests: 12,
-    assignments: 10,
-  },
-];
 
 const benefits = [
   {
@@ -103,6 +59,9 @@ const fadeInUp: Variants = {
 };
 
 const Page = () => {
+  const { data: coursesData } = useGetCoursesQuery({ page: 1, limit: 50 });
+  const courses: Course[] = (coursesData?.data?.courses || []).filter((c: Course) => c.isActive !== false);
+
   return (
     <main className="min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-blue-200">
       {/* --- HERO SECTION --- */}
@@ -227,74 +186,94 @@ const Page = () => {
             </motion.p>
           </div>
 
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, margin: '-50px' }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
-          >
-            {courses.map(course => (
-              <motion.div
-                key={course.id}
-                variants={fadeInUp}
-                whileHover={{ y: -10 }}
-                className={`bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 border overflow-hidden flex flex-col relative ${
-                  course.popular ? 'border-blue-400 ring-2 ring-blue-400/20' : 'border-slate-100'
-                }`}
-              >
-                {course.badge && (
-                  <div className="absolute top-4 right-4 bg-red-100 text-red-600 text-xs font-bold px-3 py-1 rounded-full z-10">{course.badge}</div>
-                )}
-                {course.popular && <div className="bg-blue-600 text-white text-xs font-bold text-center py-1.5 uppercase tracking-wider">Most Popular</div>}
+          {courses.length === 0 ? (
+            <div className="flex items-center justify-center py-24 text-slate-400">
+              <Loader2 className="w-8 h-8 animate-spin mr-3 text-blue-400" />
+              <span className="text-lg">Loading courses...</span>
+            </div>
+          ) : (
+            <motion.div
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, margin: '-50px' }}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+            >
+              {courses.map(course => (
+                <motion.div
+                  key={course._id}
+                  variants={fadeInUp}
+                  whileHover={{ y: -10 }}
+                  className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-slate-100 overflow-hidden flex flex-col relative"
+                >
+                  <div className="p-6 grow">
+                    <h3 className="text-xl font-bold text-slate-900 mb-2">{course.courseTitle}</h3>
+                    {course.courseDescription && (
+                      <p className="text-slate-500 text-sm mb-3 line-clamp-2">{course.courseDescription}</p>
+                    )}
+                    <div className="flex items-baseline gap-2 mb-6">
+                      {course.discountPrice && course.discountPrice > 0 ? (
+                        <>
+                          <span className="text-3xl font-extrabold text-blue-600">৳{course.discountPrice}</span>
+                          {course.realPrice && course.realPrice > 0 && (
+                            <span className="text-lg text-slate-400 line-through font-medium">৳{course.realPrice}</span>
+                          )}
+                        </>
+                      ) : course.realPrice && course.realPrice > 0 ? (
+                        <span className="text-3xl font-extrabold text-blue-600">৳{course.realPrice}</span>
+                      ) : (
+                        <span className="text-sm text-slate-400 italic">Price on request</span>
+                      )}
+                    </div>
 
-                <div className="p-6 flex-grow">
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">{course.title}</h3>
-                  <div className="flex items-baseline gap-2 mb-6">
-                    <span className="text-3xl font-extrabold text-blue-600">৳{course.fee}</span>
-                    <span className="text-lg text-slate-400 line-through font-medium">৳{course.oldFee}</span>
+                    <div className="space-y-4 mb-8">
+                      {course.totalDuration && (
+                        <div className="flex items-center gap-3 text-slate-600 text-sm font-medium">
+                          <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
+                            <Clock className="w-4 h-4" />
+                          </div>
+                          Duration: {course.totalDuration}
+                        </div>
+                      )}
+                      {course.totalClass != null && (
+                        <div className="flex items-center gap-3 text-slate-600 text-sm font-medium">
+                          <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
+                            <MonitorPlay className="w-4 h-4" />
+                          </div>
+                          Total Classes: {course.totalClass}
+                        </div>
+                      )}
+                      {course.totalMockTest != null && (
+                        <div className="flex items-center gap-3 text-slate-600 text-sm font-medium">
+                          <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
+                            <FileText className="w-4 h-4" />
+                          </div>
+                          Mock Tests: {course.totalMockTest}
+                        </div>
+                      )}
+                      {course.totalAssignment != null && (
+                        <div className="flex items-center gap-3 text-slate-600 text-sm font-medium">
+                          <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
+                            <BookOpen className="w-4 h-4" />
+                          </div>
+                          Assignments: {course.totalAssignment}
+                        </div>
+                      )}
+                    </div>
                   </div>
 
-                  <div className="space-y-4 mb-8">
-                    <div className="flex items-center gap-3 text-slate-600 text-sm font-medium">
-                      <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
-                        <Clock className="w-4 h-4" />
-                      </div>
-                      Duration: {course.duration}
-                    </div>
-                    <div className="flex items-center gap-3 text-slate-600 text-sm font-medium">
-                      <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
-                        <MonitorPlay className="w-4 h-4" />
-                      </div>
-                      Total Classes: {course.totalClasses}
-                    </div>
-                    <div className="flex items-center gap-3 text-slate-600 text-sm font-medium">
-                      <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
-                        <FileText className="w-4 h-4" />
-                      </div>
-                      {course.id === 'ielts' ? 'Mock Tests' : 'Tests'}: {course.tests}
-                    </div>
-                    <div className="flex items-center gap-3 text-slate-600 text-sm font-medium">
-                      <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
-                        <BookOpen className="w-4 h-4" />
-                      </div>
-                      Assignments: {course.assignments}
-                    </div>
+                  <div className="p-6 pt-0 mt-auto">
+                    <Link
+                      href={`/purchase?courseId=${course._id}`}
+                      className="w-full py-3 rounded-xl font-semibold transition-colors bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-200 flex items-center justify-center"
+                    >
+                      Enroll Now
+                    </Link>
                   </div>
-                </div>
-
-                <div className="p-6 pt-0 mt-auto">
-                  <button
-                    className={`w-full py-3 rounded-xl font-semibold transition-colors ${
-                      course.popular ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-200' : 'bg-slate-100 hover:bg-slate-200 text-slate-800'
-                    }`}
-                  >
-                    Enroll Now
-                  </button>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
         </div>
       </section>
 
