@@ -2,7 +2,7 @@
 |-----------------------------------------
 | setting up PWAPopUp for the App
 | @author: Toufiquer Rahman<toufiquer.0@gmail.com>
-| @copyright: Toufiquer, April, 2026
+| @copyright: AmarCart , April, 2026
 |-----------------------------------------
 */
 
@@ -10,7 +10,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Download, Clock, Smartphone, Zap, ShieldCheck } from 'lucide-react';
+import { X, Download, Clock, Smartphone, Zap, ShieldCheck, EyeOff } from 'lucide-react';
+import { Button } from '../ui/button';
 
 interface ButtonConfig {
   text: string;
@@ -60,9 +61,8 @@ export default function PWAPopUp() {
             setConfig(data);
           }
         }
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
-        console.warn('PWA Config fetch failed, using default settings.');
+        console.warn('PWA Config fetch failed, using default settings.', error);
       } finally {
         setIsConfigLoaded(true);
       }
@@ -90,6 +90,10 @@ export default function PWAPopUp() {
     if (!config.isEnabled) return;
 
     if (!deferredPrompt) return;
+
+    const neverShow = localStorage.getItem('pwa_popup_never_show');
+
+    if (neverShow === 'true') return;
 
     const nextShowTime = localStorage.getItem('pwa_popup_next_show');
     const now = new Date().getTime();
@@ -119,6 +123,11 @@ export default function PWAPopUp() {
   const handleMaybeLater = () => {
     const nextShow = new Date().getTime() + 24 * 60 * 60 * 1000;
     localStorage.setItem('pwa_popup_next_show', nextShow.toString());
+    setIsVisible(false);
+  };
+
+  const handleNeverShowAgain = () => {
+    localStorage.setItem('pwa_popup_never_show', 'true');
     setIsVisible(false);
   };
 
@@ -196,25 +205,32 @@ export default function PWAPopUp() {
                 <h3 className="text-2xl font-bold text-white mb-2">{config.title}</h3>
                 <p className="text-gray-400 text-sm leading-relaxed mb-8 max-w-[280px]">{config.description}</p>
 
-                <div className="w-full space-y-3">
-                  <button
+                <div className="w-full flex items-center justify-between flex-col space-y-3">
+                  <Button
+                    variant="outlineGlassy"
+                    className={getSizeClasses(config.installBtn.size) + ' ' + getAnimClass(config.installBtn.animation) + ' w-full '}
                     onClick={handleInstall}
                     style={{ backgroundColor: config.installBtn.bgColor, color: config.installBtn.textColor }}
-                    className={`w-full relative overflow-hidden rounded-xl font-bold shadow-lg shadow-indigo-500/25 transition-transform active:scale-[0.98] group flex items-center justify-center gap-2 ${getSizeClasses(config.installBtn.size)} ${getAnimClass(config.installBtn.animation)}`}
                   >
                     <Download className="w-4 h-4" />
                     {config.installBtn.text}
                     {config.installBtn.animation === 'none' && <Zap className="w-3 h-3 fill-current hidden group-hover:block animate-bounce" />}
-                  </button>
+                  </Button>
 
-                  <button
+                  <Button
+                    variant="outlineGlassy"
                     onClick={handleMaybeLater}
                     style={{ backgroundColor: config.laterBtn.bgColor, color: config.laterBtn.textColor }}
-                    className={`w-full rounded-xl font-semibold border border-white/5 hover:border-white/10 transition-all duration-200 flex items-center justify-center gap-2 ${getSizeClasses(config.laterBtn.size)} ${getAnimClass(config.laterBtn.animation)}`}
+                    className="w-full"
                   >
                     <Clock className="w-4 h-4" />
                     {config.laterBtn.text}
-                  </button>
+                  </Button>
+
+                  <Button onClick={handleNeverShowAgain} variant="outlineGlassy" className="w-full">
+                    <EyeOff className="w-3.5 h-3.5" />
+                    Never show again
+                  </Button>
                 </div>
               </div>
             </div>
