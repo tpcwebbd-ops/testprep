@@ -1,6 +1,8 @@
 import { NextResponse, NextRequest } from 'next/server';
 import connectDB from '@/app/api/utils/mongoose';
 import Enrollment from '@/app/api/enrollments/v1/model';
+import { sendCapiPurchase, getClientIp, getUserAgent, getFbCookies } from '@/lib/fb-capi';
+import { sendGA4Purchase, extractGA4ClientId } from '@/lib/ga4-mp';
 
 const IS_SANDBOX = process.env.SSLCOMMERZ_SANDBOX !== 'false';
 const VALIDATE_URL = IS_SANDBOX
@@ -16,6 +18,41 @@ function getBaseUrl(req: NextRequest): string {
 
 function redirect303(url: string) {
   return NextResponse.redirect(url, { status: 303 });
+}
+
+async function fireServerTracking(
+  req: NextRequest,
+  tranId: string,
+  value: number,
+  email: string,
+  gaCookie: string | undefined,
+): Promise<void> {
+  const headers = req.headers;
+  const { fbp, fbc } = getFbCookies(headers);
+
+  // Run both in parallel — don't block the redirect
+  await Promise.allSettled([
+    sendCapiPurchase({
+      tranId,
+      value,
+      currency: 'BDT',
+      userData: {
+        email,
+        clientIp: getClientIp(headers),
+        userAgent: getUserAgent(headers),
+        fbp,
+        fbc,
+      },
+      sourceUrl: req.headers.get('referer') ?? undefined,
+    }),
+    sendGA4Purchase(
+      extractGA4ClientId(gaCookie),
+      tranId,
+      value,
+      'BDT',
+      [],
+    ),
+  ]);
 }
 
 export async function POST(req: NextRequest) {
@@ -53,10 +90,24 @@ export async function POST(req: NextRequest) {
     }
 
     await connectDB();
-    await Enrollment.findOneAndUpdate(
+
+    const enrollment = await Enrollment.findOneAndUpdate(
       { tranId },
       { paymentStatus: 'completed', studentsStatus: 'running', sslValId: valId },
+      { new: true },
     );
+
+    // Fire CAPI + GA4 server-side — non-blocking, best-effort
+    if (enrollment) {
+      const gaCookie = req.cookies.get('_ga')?.value;
+      fireServerTracking(
+        req,
+        tranId,
+        enrollment.paymentAmount ?? 0,
+        enrollment.studentEmail ?? '',
+        gaCookie,
+      ).catch(err => console.error('Server tracking error:', err));
+    }
 
     return redirect303(`${base}/payment/success?tran_id=${tranId}`);
   } catch (err) {
