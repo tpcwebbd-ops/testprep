@@ -1,10 +1,10 @@
 'use client';
 
 import { Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle, ArrowRight } from 'lucide-react';
-
+// url example = 'https://testprep-bd.vercel.app/payment/success?tran_id=TXN-b35a784e-7ee4-4494-966e-a0025d343613'
 function SuccessContent() {
   const params = useSearchParams();
   const tranId = params.get('tran_id');
@@ -16,9 +16,7 @@ function SuccessContent() {
       </div>
 
       <h1 className="text-5xl font-black text-white mb-4 tracking-tight">Payment Successful</h1>
-      <p className="text-zinc-400 text-lg mb-6 leading-relaxed">
-        Your payment has been confirmed and enrollment is being activated.
-      </p>
+      <p className="text-zinc-400 text-lg mb-6 leading-relaxed">Your payment has been confirmed and enrollment is being activated.</p>
 
       {tranId && (
         <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-7 py-4 mb-10 inline-block text-left">
