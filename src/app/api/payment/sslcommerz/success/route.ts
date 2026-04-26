@@ -10,14 +10,16 @@ const VALIDATE_URL = IS_SANDBOX
 function getBaseUrl(req: NextRequest): string {
   const configured = process.env.NEXT_PUBLIC_BASE_URL;
   if (configured) return configured.replace(/\/$/, '');
-  // derive from request origin as fallback
   const { protocol, host } = req.nextUrl;
   return `${protocol}//${host}`;
 }
 
+function redirect303(url: string) {
+  return NextResponse.redirect(url, { status: 303 });
+}
+
 export async function POST(req: NextRequest) {
   const base = getBaseUrl(req);
-
   let tranId = '';
   let valId = '';
   let status = '';
@@ -28,11 +30,11 @@ export async function POST(req: NextRequest) {
     valId = (formData.get('val_id') as string) || '';
     status = (formData.get('status') as string) || '';
   } catch {
-    return NextResponse.redirect(`${base}/payment/fail?reason=bad_request`);
+    return redirect303(`${base}/payment/fail?reason=bad_request`);
   }
 
   if (status !== 'VALID' && status !== 'VALIDATED') {
-    return NextResponse.redirect(`${base}/payment/fail?tran_id=${tranId}&reason=invalid_status`);
+    return redirect303(`${base}/payment/fail?tran_id=${tranId}&reason=invalid_status`);
   }
 
   try {
@@ -47,7 +49,7 @@ export async function POST(req: NextRequest) {
     const valData = await valRes.json();
 
     if (valData?.status !== 'VALID' && valData?.status !== 'VALIDATED') {
-      return NextResponse.redirect(`${base}/payment/fail?tran_id=${tranId}&reason=validation_failed`);
+      return redirect303(`${base}/payment/fail?tran_id=${tranId}&reason=validation_failed`);
     }
 
     await connectDB();
@@ -56,15 +58,13 @@ export async function POST(req: NextRequest) {
       { paymentStatus: 'completed', studentsStatus: 'running', sslValId: valId },
     );
 
-    return NextResponse.redirect(`${base}/payment/success?tran_id=${tranId}`);
+    return redirect303(`${base}/payment/success?tran_id=${tranId}`);
   } catch (err) {
     console.error('SSLCommerz success handler error:', err);
-    return NextResponse.redirect(`${base}/payment/fail?tran_id=${tranId}&reason=server_error`);
+    return redirect303(`${base}/payment/fail?tran_id=${tranId}&reason=server_error`);
   }
 }
 
-// handle browser GET (some gateways redirect with GET after POST)
 export async function GET(req: NextRequest) {
-  const base = getBaseUrl(req);
-  return NextResponse.redirect(`${base}/payment/fail?reason=method_not_allowed`);
+  return redirect303(`${getBaseUrl(req)}/payment/fail?reason=method_not_allowed`);
 }
