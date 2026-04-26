@@ -18,6 +18,8 @@ import PWAPopup from '@/components/common/PWAPopUp';
 import FooterServer from '@/components/common/FooterServer';
 import MenuComponentWithSession from '@/components/common/MenuWithSession';
 import GtmRouteChange from '@/components/gtm-route-change';
+import FacebookPixel from '@/components/facebook-pixel';
+import FacebookPixelPageView from '@/components/facebook-pixel-pageview';
 
 import './globals.css';
 
@@ -36,6 +38,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
+  const pixelId = process.env.NEXT_PUBLIC_FB_PIXEL_ID;
 
   return (
     <html lang="en" className="scroll-smooth" data-scroll-behavior="smooth">
@@ -47,8 +50,10 @@ export default async function RootLayout({
           <FooterServer />
           <PWAPopup />
         </ReduxProvider>
+        <FacebookPixel pixelId={pixelId} />
         <Suspense fallback={null}>
           <GtmRouteChange />
+          <FacebookPixelPageView />
         </Suspense>
         <Toaster position="top-right" richColors closeButton theme="light" />
         <ToastContainer style={{ top: '80px', zIndex: 9999 }} toastClassName="backdrop-blur-md bg-white/90 shadow-xl border border-slate-100 rounded-xl" />
