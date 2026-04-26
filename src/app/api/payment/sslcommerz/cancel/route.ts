@@ -7,6 +7,10 @@ function getBaseUrl(req: NextRequest): string {
   return `${protocol}//${host}`;
 }
 
+function redirect303(url: string) {
+  return NextResponse.redirect(url, { status: 303 });
+}
+
 export async function POST(req: NextRequest) {
   const base = getBaseUrl(req);
   let tranId = '';
@@ -16,10 +20,9 @@ export async function POST(req: NextRequest) {
   } catch {
     // ignore
   }
-  return NextResponse.redirect(`${base}/payment/cancel?tran_id=${tranId}`);
+  return redirect303(`${base}/payment/cancel?tran_id=${tranId}`);
 }
 
 export async function GET(req: NextRequest) {
-  const base = getBaseUrl(req);
-  return NextResponse.redirect(`${base}/payment/cancel`);
+  return redirect303(`${getBaseUrl(req)}/payment/cancel`);
 }
