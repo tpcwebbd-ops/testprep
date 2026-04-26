@@ -1,4 +1,4 @@
-import { redirect } from 'next/navigation';
+import { NextResponse } from 'next/server';
 import connectDB from '@/app/api/utils/mongoose';
 import Enrollment from '@/app/api/enrollments/v1/model';
 
@@ -7,6 +7,8 @@ const VALIDATE_URL = IS_SANDBOX
   ? 'https://sandbox.sslcommerz.com/validator/api/validationserverAPI.php'
   : 'https://securepay.sslcommerz.com/validator/api/validationserverAPI.php';
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+
 export async function POST(req: Request) {
   const formData = await req.formData();
   const tranId = formData.get('tran_id') as string;
@@ -14,7 +16,7 @@ export async function POST(req: Request) {
   const status = formData.get('status') as string;
 
   if (status !== 'VALID' && status !== 'VALIDATED') {
-    redirect(`/payment/fail?tran_id=${tranId}&reason=invalid_status`);
+    return NextResponse.redirect(`${BASE_URL}/payment/fail?tran_id=${tranId}&reason=invalid_status`);
   }
 
   try {
@@ -29,21 +31,17 @@ export async function POST(req: Request) {
     const valData = await valRes.json();
 
     if (valData?.status !== 'VALID' && valData?.status !== 'VALIDATED') {
-      redirect(`/payment/fail?tran_id=${tranId}&reason=validation_failed`);
+      return NextResponse.redirect(`${BASE_URL}/payment/fail?tran_id=${tranId}&reason=validation_failed`);
     }
 
     await connectDB();
     await Enrollment.findOneAndUpdate(
       { tranId },
-      {
-        paymentStatus: 'completed',
-        studentsStatus: 'running',
-        sslValId: valId,
-      },
+      { paymentStatus: 'completed', studentsStatus: 'running', sslValId: valId },
     );
 
-    redirect(`/payment/success?tran_id=${tranId}`);
+    return NextResponse.redirect(`${BASE_URL}/payment/success?tran_id=${tranId}`);
   } catch {
-    redirect(`/payment/fail?tran_id=${tranId}&reason=server_error`);
+    return NextResponse.redirect(`${BASE_URL}/payment/fail?tran_id=${tranId}&reason=server_error`);
   }
 }
