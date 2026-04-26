@@ -40,8 +40,6 @@ interface Course {
   isActive?: boolean;
 }
 
-const PAYMENT_METHODS = ['Card', 'PayPal', 'Bank Transfer', 'bKash', 'Nagad'];
-
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 24 },
   show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } },
@@ -71,7 +69,7 @@ function PurchasePageContent() {
   const [form, setForm] = useState({
     studentName: '',
     studentEmail: '',
-    paymentMethod: 'Card',
+    paymentMethod: 'SSLCommerz',
     couponCode: '',
   });
 
@@ -127,21 +125,25 @@ function PurchasePageContent() {
       return;
     }
     try {
-      const res = await addEnrollment({
-        studentName: form.studentName.trim(),
-        studentEmail: form.studentEmail.trim(),
-        studentsStatus: 'pending',
-        enrollCoursesIDS: selectedCourseIds,
-        realPrice: totalReal,
-        discountPrice: totalDiscount,
-        paymentAmount: payAmount,
-        paymentMethod: form.paymentMethod,
-        couponCode: form.couponCode.trim() || null,
-        checkedbyEmail: '',
-        paymentStatus: 'pending',
-      }).unwrap();
-      if (res?.ok) setStep('success');
-      else toast.error(res?.message || 'Purchase failed');
+      const res = await fetch('/api/payment/sslcommerz/init', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          studentName: form.studentName.trim(),
+          studentEmail: form.studentEmail.trim(),
+          enrollCoursesIDS: selectedCourseIds,
+          realPrice: totalReal,
+          discountPrice: totalDiscount,
+          paymentAmount: payAmount,
+          couponCode: form.couponCode.trim() || null,
+        }),
+      });
+      const data = await res.json();
+      if (data?.ok && data?.redirectUrl) {
+        window.location.href = data.redirectUrl;
+      } else {
+        toast.error(data?.message || 'Payment init failed');
+      }
     } catch {
       toast.error('Something went wrong. Try again.');
     }
@@ -503,21 +505,14 @@ function PurchasePageContent() {
                   <label className="flex items-center gap-2 text-xs font-bold text-zinc-500 uppercase tracking-widest mb-4">
                     <CreditCard className="w-4 h-4" /> Payment Method
                   </label>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
-                    {PAYMENT_METHODS.map(method => (
-                      <button
-                        key={method}
-                        type="button"
-                        onClick={() => setForm(f => ({ ...f, paymentMethod: method }))}
-                        className={`py-3 px-4 rounded-xl border text-sm font-bold transition-all duration-150 ${
-                          form.paymentMethod === method
-                            ? 'border-amber-400 bg-amber-400/10 text-amber-400'
-                            : 'border-zinc-800 text-zinc-600 hover:border-zinc-600 hover:text-zinc-400'
-                        }`}
-                      >
-                        {method}
-                      </button>
-                    ))}
+                  <div className="flex items-center gap-4 p-4 rounded-xl border border-amber-400 bg-amber-400/5">
+                    <div className="w-10 h-10 rounded-lg bg-amber-400/10 flex items-center justify-center flex-shrink-0">
+                      <CreditCard className="w-5 h-5 text-amber-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-black text-white">SSLCommerz</p>
+                      <p className="text-xs text-zinc-500 font-semibold">Card · bKash · Nagad · Rocket · Bank</p>
+                    </div>
                   </div>
                 </div>
 
@@ -545,7 +540,7 @@ function PurchasePageContent() {
                   className="w-full py-5 bg-amber-400 hover:bg-amber-300 disabled:bg-zinc-700 disabled:text-zinc-500 text-zinc-900 font-black rounded-xl shadow-lg shadow-amber-400/10 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-3 text-base tracking-wide"
                 >
                   {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <ShoppingCart className="w-5 h-5" />}
-                  {isSubmitting ? 'Processing…' : `Complete Enrollment — ৳${payAmount}`}
+                  {isSubmitting ? 'Processing…' : `Pay with SSLCommerz — ৳${payAmount}`}
                 </button>
               </form>
 
