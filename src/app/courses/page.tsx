@@ -18,7 +18,7 @@ interface Course {
 
 export default async function CoursesPage() {
   const result = await getAllCourses();
-  const allCourses: Course[] = result?.data?.courses ?? [];
+  const allCourses: Course[] = (result?.data as { courses?: Course[] })?.courses ?? [];
   const courses = allCourses.filter((c: Course) => c.isActive !== false);
 
   return <CoursesPageClient courses={courses} />;

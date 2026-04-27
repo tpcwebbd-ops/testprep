@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion, Variants } from 'framer-motion';
-import { ArrowRight, BookOpen, CheckCircle, Clock, FileText, MonitorPlay, PlayCircle, Star, Users, Video } from 'lucide-react';
+import { BookOpen, CheckCircle, Clock, FileText, MonitorPlay, PlayCircle, Star, Users, Video } from 'lucide-react';
 import Link from 'next/link';
 
 interface Course {
@@ -67,112 +67,13 @@ const fadeIn: Variants = {
 
 export default function CoursesPageClient({ courses }: { courses: Course[] }) {
   return (
-    <main className="min-h-screen bg-[#0a0a0f] text-white selection:bg-sky-500/30 selection:text-white overflow-x-hidden">
-      {/* ── HERO ── */}
-      <section className="relative min-h-screen flex flex-col justify-center pt-20 pb-16 overflow-hidden">
-        <div
-          className="absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage: 'linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
-          }}
-        />
-        <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full bg-sky-500/10 blur-[120px] pointer-events-none" />
-        <div className="absolute top-1/3 -left-32 w-[400px] h-[400px] rounded-full bg-violet-500/10 blur-[100px] pointer-events-none" />
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
-          <div className="max-w-5xl">
-            <motion.div
-              initial={{ opacity: 0, x: -16 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full border border-sky-500/30 bg-sky-500/10 text-sky-300 text-xs font-semibold tracking-widest uppercase mb-8"
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
-              Admissions Open — 2026 Batches
-            </motion.div>
-
-            <motion.h1
-              initial={{ opacity: 0, y: 32 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-              className="text-5xl sm:text-6xl lg:text-[80px] font-black leading-[1.05] tracking-tight mb-8"
-              style={{ fontFamily: "'Playfair Display', serif" }}
-            >
-              Master English.
-              <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-sky-300 to-violet-400">Ace Every Exam.</span>
-            </motion.h1>
-
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.25 }}
-              className="text-lg text-white/50 max-w-xl mb-12 leading-relaxed"
-            >
-              Bangladesh&apos;s premier platform for IELTS and English language learning — combining live instruction with on-demand flexibility.
-            </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.38 }}
-              className="flex flex-wrap gap-4"
-            >
-              <Link
-                href="#courses"
-                className="group inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-semibold text-sm transition-all duration-200 shadow-lg shadow-sky-500/25 hover:shadow-sky-400/40 hover:-translate-y-0.5"
-              >
-                Explore Courses
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <Link
-                href="#about"
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white font-semibold text-sm transition-all duration-200"
-              >
-                <PlayCircle className="w-4 h-4" />
-                Watch Demo
-              </Link>
-            </motion.div>
-          </div>
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.55 }}
-            className="absolute bottom-16 right-8 hidden lg:block"
-          >
-            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 text-center min-w-[140px]">
-              <p className="text-4xl font-black text-sky-300 tracking-tight">10k+</p>
-              <p className="text-xs text-white/40 mt-1 font-medium uppercase tracking-wider">Students Placed</p>
-            </div>
-          </motion.div>
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.2 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-        >
-          <div className="w-px h-12 bg-gradient-to-b from-transparent via-white/30 to-transparent" />
-        </motion.div>
-      </section>
-
+    <main className="min-h-screen pt-12 bg-[#0a0a0f] text-white selection:bg-sky-500/30 selection:text-white overflow-x-hidden">
       {/* ── COURSES ── */}
       <section id="courses" className="py-28 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0f] via-[#0d0d18] to-[#0a0a0f]" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="mb-16">
-            <motion.p
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              className="text-sky-400 text-xs font-bold uppercase tracking-[0.2em] mb-3"
-            >
-              Programs
-            </motion.p>
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
