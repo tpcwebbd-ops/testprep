@@ -10,7 +10,7 @@
 const MP_ENDPOINT = 'https://www.google-analytics.com/mp/collect';
 
 interface GA4EventParam {
-  [key: string]: string | number | boolean | undefined;
+  [key: string]: string | number | boolean | GA4Item[] | undefined;
 }
 
 interface GA4Item {
@@ -31,11 +31,7 @@ interface GA4Event {
  * client_id must match the GA4 cookie (_ga) value from the browser.
  * session_id is optional but improves session stitching.
  */
-export async function sendGA4Events(
-  clientId: string,
-  events: GA4Event[],
-  sessionId?: string,
-): Promise<void> {
+export async function sendGA4Events(clientId: string, events: GA4Event[], sessionId?: string): Promise<void> {
   const measurementId = process.env.GA4_MEASUREMENT_ID;
   const apiSecret = process.env.GA4_API_SECRET;
 
@@ -102,18 +98,8 @@ export async function sendGA4Purchase(
 /**
  * Fire a GA4 `begin_checkout` event server-side.
  */
-export async function sendGA4BeginCheckout(
-  clientId: string,
-  value: number,
-  currency = 'BDT',
-  items: GA4Item[] = [],
-  sessionId?: string,
-): Promise<void> {
-  await sendGA4Events(
-    clientId,
-    [{ name: 'begin_checkout', params: { value, currency, items } }],
-    sessionId,
-  );
+export async function sendGA4BeginCheckout(clientId: string, value: number, currency = 'BDT', items: GA4Item[] = [], sessionId?: string): Promise<void> {
+  await sendGA4Events(clientId, [{ name: 'begin_checkout', params: { value, currency, items } }], sessionId);
 }
 
 /**
