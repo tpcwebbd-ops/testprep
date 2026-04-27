@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation'; // <-- Added import
 import { toast } from 'react-toastify';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Edit, Trash2, BookOpen, Clock, Award, PlayCircle, FileText, AlertTriangle, RefreshCw, X, Layers, Power } from 'lucide-react';
+import { Plus, Edit, Trash2, BookOpen, Clock, Award, PlayCircle, FileText, AlertTriangle, RefreshCw, X, Layers, Power, Globe } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -44,6 +44,7 @@ const defaultFormData = {
 
 export default function CoursesPage() {
   const router = useRouter(); // <-- Initialized router
+  const [isRevalidating, setIsRevalidating] = useState(false);
   const { data: coursesData, isLoading, error, refetch } = useGetCoursesQuery({ page: 1, limit: 100 });
   const [addCourse, { isLoading: isAdding }] = useAddCourseMutation();
   const [updateCourse, { isLoading: isUpdating }] = useUpdateCourseMutation();
@@ -165,6 +166,22 @@ export default function CoursesPage() {
     }
   };
 
+  const handleRevalidateCourses = async () => {
+    setIsRevalidating(true);
+    try {
+      const res = await fetch('/api/revalidate/courses', { method: 'POST' });
+      if (res.ok) {
+        toast.success('Courses page revalidated');
+      } else {
+        toast.error('Revalidation failed');
+      }
+    } catch {
+      toast.error('Revalidation failed');
+    } finally {
+      setIsRevalidating(false);
+    }
+  };
+
   const handleManageClasses = (id: string) => {
     // <-- Updated to use router.push for same-window navigation
     router.push(`/dashboard/courses/edit?id=${id}`);
@@ -225,8 +242,17 @@ export default function CoursesPage() {
             </h1>
           </motion.div>
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex gap-3">
-            <Button onClick={() => refetch()} size="icon" className="bg-white/5 border border-white/10 hover:bg-white/10 text-white transition-all">
+            <Button onClick={() => refetch()} size="icon" className="bg-white/5 border border-white/10 hover:bg-white/10 text-white transition-all" title="Refresh list">
               <RefreshCw className="h-4 w-4" />
+            </Button>
+            <Button
+              onClick={handleRevalidateCourses}
+              disabled={isRevalidating}
+              className="bg-sky-500/10 border border-sky-500/20 hover:bg-sky-500/20 text-sky-400 transition-all gap-2"
+              title="Revalidate public courses page"
+            >
+              <Globe className={`h-4 w-4 ${isRevalidating ? 'animate-spin' : ''}`} />
+              {isRevalidating ? 'Revalidating…' : 'Revalidate Page'}
             </Button>
             <Button
               onClick={handleOpenAddModal}
