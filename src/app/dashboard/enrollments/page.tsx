@@ -132,18 +132,29 @@ const Page = () => {
   }, [data, sortConfig]);
 
   const stats = useMemo(() => {
-    if (!data?.data?.enrollments) return { month: 0, week: 0, total: 0 };
+    const empty = { total: 0, pending: 0, completed: 0, failed: 0, refunded: 0 };
+    if (!data?.data?.enrollments) return { month: empty, week: empty, all: { ...empty } };
+
     const now = new Date();
     const thirtyDaysAgo = new Date(now.setDate(now.getDate() - 30));
     const sevenDaysAgo = new Date(new Date().setDate(new Date().getDate() - 7));
 
-    const monthCount = data.data.enrollments.filter((e: Enrollment) => new Date(e.enrollmentDate) >= thirtyDaysAgo).length;
-    const weekCount = data.data.enrollments.filter((e: Enrollment) => new Date(e.enrollmentDate) >= sevenDaysAgo).length;
+    const countByStatus = (arr: Enrollment[]) => ({
+      total: arr.length,
+      pending: arr.filter((e: Enrollment) => e.paymentStatus === 'pending').length,
+      completed: arr.filter((e: Enrollment) => e.paymentStatus === 'completed').length,
+      failed: arr.filter((e: Enrollment) => e.paymentStatus === 'failed').length,
+      refunded: arr.filter((e: Enrollment) => e.paymentStatus === 'refunded').length,
+    });
+
+    const monthArr = data.data.enrollments.filter((e: Enrollment) => new Date(e.enrollmentDate) >= thirtyDaysAgo);
+    const weekArr = data.data.enrollments.filter((e: Enrollment) => new Date(e.enrollmentDate) >= sevenDaysAgo);
+    const allCounts = countByStatus(data.data.enrollments);
 
     return {
-      month: monthCount,
-      week: weekCount,
-      total: data.data.total || 0,
+      month: countByStatus(monthArr),
+      week: countByStatus(weekArr),
+      all: { ...allCounts, total: data.data.total || allCounts.total },
     };
   }, [data]);
 
@@ -326,9 +337,9 @@ const Page = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
-            { label: 'Last 30 Days', value: stats.month, icon: Calendar, color: 'from-emerald-500/20 to-teal-500/20', text: 'text-emerald-400' },
-            { label: 'Last 7 Days', value: stats.week, icon: Tag, color: 'from-cyan-500/20 to-blue-500/20', text: 'text-cyan-400' },
-            { label: 'Total Enrollments', value: stats.total, icon: User, color: 'from-violet-500/20 to-fuchsia-500/20', text: 'text-violet-400' },
+            { label: 'Last 30 Days', data: stats.month, icon: Calendar, color: 'from-emerald-500/20 to-teal-500/20', text: 'text-emerald-400' },
+            { label: 'Last 7 Days', data: stats.week, icon: Tag, color: 'from-cyan-500/20 to-blue-500/20', text: 'text-cyan-400' },
+            { label: 'Total Enrollments', data: stats.all, icon: User, color: 'from-violet-500/20 to-fuchsia-500/20', text: 'text-violet-400' },
           ].map((stat, idx) => (
             <motion.div
               key={stat.label}
@@ -343,8 +354,30 @@ const Page = () => {
               </div>
               <p className="text-slate-400 font-medium mb-2">{stat.label}</p>
               <motion.h3 initial={{ opacity: 0 }} animate={{ opacity: 1 }} className={`text-5xl font-bold tracking-tight ${stat.text}`}>
-                {stat.value}
+                {stat.data.total}
               </motion.h3>
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                <div className="flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/20 rounded-lg px-2 py-1">
+                  <span className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0" />
+                  <span className="text-[11px] text-amber-400 font-medium">Pending</span>
+                  <span className="ml-auto text-[11px] font-bold text-amber-300">{stat.data.pending}</span>
+                </div>
+                <div className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-2 py-1">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0" />
+                  <span className="text-[11px] text-emerald-400 font-medium">Complete</span>
+                  <span className="ml-auto text-[11px] font-bold text-emerald-300">{stat.data.completed}</span>
+                </div>
+                <div className="flex items-center gap-1.5 bg-red-500/10 border border-red-500/20 rounded-lg px-2 py-1">
+                  <span className="w-2 h-2 rounded-full bg-red-400 flex-shrink-0" />
+                  <span className="text-[11px] text-red-400 font-medium">Failed</span>
+                  <span className="ml-auto text-[11px] font-bold text-red-300">{stat.data.failed}</span>
+                </div>
+                <div className="flex items-center gap-1.5 bg-slate-500/10 border border-slate-500/20 rounded-lg px-2 py-1">
+                  <span className="w-2 h-2 rounded-full bg-slate-400 flex-shrink-0" />
+                  <span className="text-[11px] text-slate-400 font-medium">Refunded</span>
+                  <span className="ml-auto text-[11px] font-bold text-slate-300">{stat.data.refunded}</span>
+                </div>
+              </div>
               <div
                 className={`absolute inset-0 bg-gradient-to-br ${stat.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}
               />
