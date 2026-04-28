@@ -2,15 +2,13 @@
 
 ## বর্তমান Implementation Status
 
-| বিষয়                                          | অবস্থা           | ফাইল                                             | Branch |
-|-----------------------------------------------|----------------|--------------------------------------------------|--------|
-| FacebookPixel Component (base code)           | ✅ তৈরি        | `src/components/facebook-pixel.tsx`              | `claude/fbp` |
-| FacebookPixelPageView (SPA tracking)          | ✅ তৈরি        | `src/components/facebook-pixel-pageview.tsx`     | `claude/fbp` |
-| Unified Tracking Helpers                      | ✅ তৈরি        | `src/lib/tracking.ts`                            | `claude/fbp` |
-| Root Layout-এ FBP যোগ                         | ⚠️ **main branch-এ নেই** | `src/app/layout.tsx`                 | main-এ merge দরকার |
-| Server-side Conversions API (CAPI)            | ✅ সম্পন্ন       | `src/lib/fb-capi.ts`                             | `claude/fbp` + worktree |
-
-> **সতর্কতা:** Facebook Pixel components শুধু `claude/fbp` branch-এ আছে। `main` branch-এ merge না করলে production-এ client-side tracking কাজ করবে না। CAPI (`fb-capi.ts`) ইতোমধ্যে `claude/quizzical-borg-51f67e` worktree-তেও আছে।
+| বিষয়                                | অবস্থা                   | ফাইল                                         | Branch                  |
+| ------------------------------------ | ------------------------ | -------------------------------------------- | ----------------------- |
+| FacebookPixel Component (base code)  | ✅ তৈরি                  | `src/components/facebook-pixel.tsx`          | `claude/fbp`            |
+| FacebookPixelPageView (SPA tracking) | ✅ তৈরি                  | `src/components/facebook-pixel-pageview.tsx` | `claude/fbp`            |
+| Unified Tracking Helpers             | ✅ তৈরি                  | `src/lib/tracking.ts`                        | `claude/fbp`            |
+| Root Layout-এ FBP যোগ                | ⚠️ **main branch-এ নেই** | `src/app/layout.tsx`                         | main-এ merge দরকার      |
+| Server-side Conversions API (CAPI)   | ✅ সম্পন্ন               | `src/lib/fb-capi.ts`                         | `claude/fbp` + worktree |
 
 ---
 
@@ -36,11 +34,13 @@ Ad Platform → Conversion record, audience তৈরি
 ```
 
 **সুবিধা:**
+
 - Setup সহজ, শুধু script বসালেই হয়
 - Real-time event testing (Meta Events Manager-এ)
 - Standard events (PageView, Purchase) built-in support
 
 **অসুবিধা:**
+
 - **Ad blocker block করে** — iOS/Android Safari ও block করে
 - **iOS 14+ ATT (App Tracking Transparency)** — user permission না দিলে data পায় না
 - Browser বন্ধ হলে event miss হয়
@@ -64,6 +64,7 @@ Ad Platform → highly accurate conversion data (ad blocker bypass)
 ```
 
 **সুবিধা:**
+
 - Ad blocker bypass — server থেকে পাঠালে block হওয়ার সুযোগ নেই
 - iOS 14+ ATT restriction-এর প্রভাব নেই
 - Purchase event SSLCommerz validation-এর পরে পাঠানো হয় — 100% reliable
@@ -72,6 +73,7 @@ Ad Platform → highly accurate conversion data (ad blocker bypass)
 - PII (email) SHA-256 hashed — Meta-র requirement পূরণ হয়
 
 **অসুবিধা:**
+
 - `event_id` দিয়ে client + server event deduplicate করতে হয়
 - `FB_ACCESS_TOKEN` সুরক্ষিত রাখতে হবে (server-only env var)
 
@@ -88,12 +90,12 @@ Facebook উভয় event receive করে কিন্তু event_id দি
 
 ### কোনটা ব্যবহার করবেন?
 
-| পরিস্থিতি | সুপারিশ |
-|-----------|---------|
-| শুরুতে, সীমিত budget | Client-side যথেষ্ট |
-| বিজ্ঞাপনে ব্যয় বেশি (৳৫০,০০০+/মাস) | Client + Server CAPI |
-| Purchase/Revenue এর accurate data চাই | Server CAPI অবশ্যই |
-| iOS user অনেক বেশি | Server CAPI দরকার |
+| পরিস্থিতি                             | সুপারিশ              |
+| ------------------------------------- | -------------------- |
+| শুরুতে, সীমিত budget                  | Client-side যথেষ্ট   |
+| বিজ্ঞাপনে ব্যয় বেশি (৳৫০,০০০+/মাস)   | Client + Server CAPI |
+| Purchase/Revenue এর accurate data চাই | Server CAPI অবশ্যই   |
+| iOS user অনেক বেশি                    | Server CAPI দরকার    |
 
 ---
 
@@ -164,11 +166,11 @@ fbq('track', 'PageView');`}
 
 **কেন `strategy="afterInteractive"`?**
 
-| Strategy | কখন load হয় | Pixel-এর জন্য? |
-|----------|-------------|----------------|
+| Strategy            | কখন load হয়                | Pixel-এর জন্য?          |
+| ------------------- | --------------------------- | ----------------------- |
 | `beforeInteractive` | Page interactive হওয়ার আগে | ❌ Performance নষ্ট করে |
-| `afterInteractive` | Page interactive হওয়ার পরে | ✅ সঠিক |
-| `lazyOnload` | সব শেষে | ⚠️ দেরিতে fire হয় |
+| `afterInteractive`  | Page interactive হওয়ার পরে | ✅ সঠিক                 |
+| `lazyOnload`        | সব শেষে                     | ⚠️ দেরিতে fire হয়      |
 
 ### ধাপ ৩: FacebookPixelPageView Component
 
@@ -275,13 +277,13 @@ export function trackViewContent(courseId: string, value?: number, currency = 'B
 
 ## Standard Events — কোনটা কখন fire করবেন
 
-| Event | Function | কোথায় fire করবেন |
-|-------|----------|-----------------|
-| `PageView` | Auto | প্রতিটি route change-এ (automatic) |
-| `ViewContent` | `trackViewContent()` | Course detail page |
-| `AddToCart` | `trackAddToCart()` | Course select করলে |
-| `InitiateCheckout` | `trackEnrollmentStart()` | Checkout button ক্লিক |
-| `Purchase` | `trackPurchase()` | `/payment/success` page-এ (টাকা confirm হওয়ার পর) |
+| Event              | Function                 | কোথায় fire করবেন                                  |
+| ------------------ | ------------------------ | -------------------------------------------------- |
+| `PageView`         | Auto                     | প্রতিটি route change-এ (automatic)                 |
+| `ViewContent`      | `trackViewContent()`     | Course detail page                                 |
+| `AddToCart`        | `trackAddToCart()`       | Course select করলে                                 |
+| `InitiateCheckout` | `trackEnrollmentStart()` | Checkout button ক্লিক                              |
+| `Purchase`         | `trackPurchase()`        | `/payment/success` page-এ (টাকা confirm হওয়ার পর) |
 
 ---
 
@@ -341,15 +343,15 @@ FB_ACCESS_TOKEN=EAAxxxxxxxxxxxxxxxx
 
 ```typescript
 // server-side purchase event (SSLCommerz success-এ call হয়)
-sendCapiPurchase({ tranId, value, currency, userData, sourceUrl })
+sendCapiPurchase({ tranId, value, currency, userData, sourceUrl });
 
 // server-side checkout initiation
-sendCapiInitiateCheckout({ value, currency, userData, contentIds, sourceUrl })
+sendCapiInitiateCheckout({ value, currency, userData, contentIds, sourceUrl });
 
 // request header থেকে data extract করার helpers
-getClientIp(headers)    // x-forwarded-for / x-real-ip
-getUserAgent(headers)   // User-Agent string
-getFbCookies(headers)   // _fbp এবং _fbc cookies
+getClientIp(headers); // x-forwarded-for / x-real-ip
+getUserAgent(headers); // User-Agent string
+getFbCookies(headers); // _fbp এবং _fbc cookies
 ```
 
 ### SSLCommerz Success Route-এ Integration
@@ -367,11 +369,11 @@ await sendCapiPurchase({
   value: enrollment.paymentAmount,
   currency: 'BDT',
   userData: {
-    email: enrollment.studentEmail,  // SHA-256 হয় inside the function
+    email: enrollment.studentEmail, // SHA-256 হয় inside the function
     clientIp: getClientIp(req.headers),
     userAgent: getUserAgent(req.headers),
-    fbp,   // _fbp cookie — match rate বাড়ায়
-    fbc,   // _fbc cookie — click attribution উন্নত করে
+    fbp, // _fbp cookie — match rate বাড়ায়
+    fbc, // _fbc cookie — click attribution উন্নত করে
   },
   sourceUrl: req.headers.get('referer') ?? undefined,
 });
@@ -385,7 +387,7 @@ CAPI-তে PII (Personally Identifiable Information) hash করে পাঠ�
 // আপনাকে manually hash করতে হবে না
 // raw email দিলেই function SHA-256 hash করে পাঠাবে
 userData: {
-  email: 'user@example.com'  // ✅ — fb-capi.ts নিজেই hash করবে
+  email: 'user@example.com'; // ✅ — fb-capi.ts নিজেই hash করবে
 }
 ```
 
@@ -434,11 +436,13 @@ POST https://graph.facebook.com/v19.0/{FB_PIXEL_ID}/events?access_token={FB_ACCE
 ## Verify করুন
 
 **Meta Events Manager-এ:**
+
 1. Events Manager → আপনার Pixel
 2. "Test Events" tab
 3. Website visit করুন → events real-time দেখা যাবে
 
 **Browser Console-এ:**
+
 ```javascript
 // Pixel load হয়েছে কিনা check
 console.log(typeof window.fbq); // "function" হলে load হয়েছে
@@ -448,14 +452,14 @@ console.log(typeof window.fbq); // "function" হলে load হয়েছে
 
 ## সারসংক্ষেপ
 
-| ফাইল | উদ্দেশ্য | Status | Branch |
-|------|---------|--------|--------|
-| `src/components/facebook-pixel.tsx` | Base Pixel code load | ✅ | `claude/fbp` |
-| `src/components/facebook-pixel-pageview.tsx` | SPA PageView tracking | ✅ | `claude/fbp` |
-| `src/lib/tracking.ts` | GTM + FBP client-side unified helpers | ✅ | `claude/fbp` |
-| `src/lib/fb-capi.ts` | Server-side Conversions API | ✅ | `claude/fbp` + worktree |
-| `src/app/layout.tsx` — FBP added | FBP globally load | ⚠️ main-এ merge দরকার | `claude/fbp` |
-| `src/app/api/payment/sslcommerz/success/route.ts` | Server-side CAPI fire | ✅ | worktree |
+| ফাইল                                              | উদ্দেশ্য                              | Status                | Branch                  |
+| ------------------------------------------------- | ------------------------------------- | --------------------- | ----------------------- |
+| `src/components/facebook-pixel.tsx`               | Base Pixel code load                  | ✅                    | `claude/fbp`            |
+| `src/components/facebook-pixel-pageview.tsx`      | SPA PageView tracking                 | ✅                    | `claude/fbp`            |
+| `src/lib/tracking.ts`                             | GTM + FBP client-side unified helpers | ✅                    | `claude/fbp`            |
+| `src/lib/fb-capi.ts`                              | Server-side Conversions API           | ✅                    | `claude/fbp` + worktree |
+| `src/app/layout.tsx` — FBP added                  | FBP globally load                     | ⚠️ main-এ merge দরকার | `claude/fbp`            |
+| `src/app/api/payment/sslcommerz/success/route.ts` | Server-side CAPI fire                 | ✅                    | worktree                |
 
 ## সব Env Vars একসাথে
 

@@ -12,6 +12,7 @@ import { withDB } from '@/app/api/utils/db';
 import { formatResponse, IResponse } from '@/app/api/utils/utils';
 
 import Enrollment from './model';
+import AccessManagement from '@/app/api/accessManagements/v1/model';
 
 interface MongoError extends Error {
   code?: number;
@@ -94,6 +95,18 @@ export async function updateEnrollment(req: Request): Promise<IResponse> {
         runValidators: false,
       });
       if (!updated) return formatResponse(null, 'Not found', 404);
+
+      if (updateData.paymentStatus === 'completed' && updated.studentEmail) {
+        const existing = await AccessManagement.findOne({ user_email: updated.studentEmail });
+        if (!existing) {
+          await AccessManagement.create({
+            given_by_email: 'tpc_payment@gmail.com',
+            user_name: updated.studentName,
+            user_email: updated.studentEmail,
+            assign_role: ['Student'],
+          });
+        }
+      }
 
       return formatResponse(updated, 'Updated successfully', 200);
     } catch (error: unknown) {

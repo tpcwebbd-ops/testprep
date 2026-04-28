@@ -1,2 +1,1 @@
 1. update 'src/app/dashboard/enrollments/page.tsx' with the following instructions.
-    - add summery for all payments Status like [Pending, Complete, Failed, Refuend] inside every summery box [30 days, last 7 days, total]
