@@ -28,6 +28,17 @@ export async function createEnrollment(req: Request): Promise<IResponse> {
     try {
       const enrollmentData = await req.json();
       const newEnrollment = await Enrollment.create(enrollmentData);
+      if (enrollmentData.paymentStatus === 'completed' && enrollmentData.studentEmail) {
+        const existing = await AccessManagement.findOne({ user_email: enrollmentData.studentEmail });
+        if (!existing) {
+          await AccessManagement.create({
+            given_by_email: 'tpc_payment@gmail.com',
+            user_name: enrollmentData.studentName,
+            user_email: enrollmentData.studentEmail,
+            assign_role: ['Student'],
+          });
+        }
+      }
       return formatResponse(newEnrollment, 'Enrollment created successfully', 201);
     } catch (error: unknown) {
       if (isMongoError(error) && error.code === 11000) {
@@ -95,18 +106,6 @@ export async function updateEnrollment(req: Request): Promise<IResponse> {
         runValidators: false,
       });
       if (!updated) return formatResponse(null, 'Not found', 404);
-
-      if (updateData.paymentStatus === 'completed' && updated.studentEmail) {
-        const existing = await AccessManagement.findOne({ user_email: updated.studentEmail });
-        if (!existing) {
-          await AccessManagement.create({
-            given_by_email: 'tpc_payment@gmail.com',
-            user_name: updated.studentName,
-            user_email: updated.studentEmail,
-            assign_role: ['Student'],
-          });
-        }
-      }
 
       return formatResponse(updated, 'Updated successfully', 200);
     } catch (error: unknown) {

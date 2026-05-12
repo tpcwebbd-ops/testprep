@@ -22,6 +22,11 @@ const courseSchema = new Schema(
     challengeDay: { type: Number },
     totalLecture: { type: Number },
     lectureData: { type: Schema.Types.Mixed, default: {} },
+    level: { type: String },
+    levelColorClass: { type: String },
+    features: { type: [String], default: [] },
+    popular: { type: Boolean, default: false },
+    schedule: { type: [String], default: [] },
   },
   { _id: true, timestamps: true },
 );

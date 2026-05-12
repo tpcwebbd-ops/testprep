@@ -14,6 +14,11 @@ interface Course {
   realPrice?: number;
   discountPrice?: number;
   isActive?: boolean;
+  level?: string;
+  levelColorClass?: string;
+  features?: string[];
+  popular?: boolean;
+  schedule?: string[];
 }
 
 export default async function CoursesPage() {

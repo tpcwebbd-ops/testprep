@@ -1,6 +1,8 @@
-If a student successfully enroll and after check the payment a function will invode for add role as student inside '/src/app/api/accessManagements/v1/controller.ts' createAccessManagement() 
-
-given_by_email : testpreptr@gmail.com 
-userName : from user 
-userEmail : from user 
-assignrole : ['Student']
+Project: TPC WebApp
+Date: 23,26/4/2026
+Progress: 22, 23, 24/35 
+Current Status: Complete
+Task Name: 
+    - Payment Gateway [99%]
+    - Google tag manager [50%]
+    - Facebook tag manager [50%]

@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, Variants } from 'framer-motion';
-import { BookOpen, CheckCircle, Clock, FileText, MonitorPlay, PlayCircle, Star, Users, Video } from 'lucide-react';
+import { BookOpen, Check, CheckCircle, Clock, FileText, MonitorPlay, PlayCircle, Star, Users, Video, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 interface Course {
@@ -15,6 +15,12 @@ interface Course {
   totalMockTest?: number;
   realPrice?: number;
   discountPrice?: number;
+  isActive?: boolean;
+  level?: string;
+  levelColorClass?: string;
+  features?: string[];
+  popular?: boolean;
+  schedule?: string[];
 }
 
 const benefits = [
@@ -52,7 +58,7 @@ const checklistItems = ['Interactive Live Sessions with Q&A', 'High-Quality Reco
 
 const stagger: Variants = {
   hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.12 } },
+  show: { opacity: 1, transition: { staggerChildren: 0.15 } },
 };
 
 const riseUp: Variants = {
@@ -65,28 +71,166 @@ const fadeIn: Variants = {
   show: { opacity: 1, transition: { duration: 0.7 } },
 };
 
-export default function CoursesPageClient({ courses }: { courses: Course[] }) {
-  return (
-    <main className="min-h-screen pt-12 bg-[#0a0a0f] text-white selection:bg-sky-500/30 selection:text-white overflow-x-hidden">
-      {/* ── COURSES ── */}
-      <section id="courses" className="py-28 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0f] via-[#0d0d18] to-[#0a0a0f]" />
+function CourseCard({ course }: { course: Course }) {
+  const price = course.discountPrice && course.discountPrice > 0
+    ? `৳${course.discountPrice}`
+    : course.realPrice && course.realPrice > 0
+    ? `৳${course.realPrice}`
+    : undefined;
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="mb-16">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-4xl lg:text-5xl font-black text-white tracking-tight"
-              style={{ fontFamily: "'Playfair Display', serif" }}
-            >
-              Our Popular Courses
-            </motion.h2>
+  const level = course.level || 'Course';
+  const levelColorClass = course.levelColorClass || 'bg-blue-100 text-blue-700';
+  const features = course.features && course.features.length > 0 ? course.features : [];
+  const schedule = course.schedule && course.schedule.length > 0 ? course.schedule : [];
+  const popular = course.popular ?? false;
+
+  return (
+    <div
+      className={`relative bg-white rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border flex flex-col h-full ${
+        popular ? 'border-red-200 ring-2 ring-red-100' : 'border-gray-100'
+      }`}
+    >
+      {popular && (
+        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+          <div className="bg-gradient-to-r from-red-500 to-orange-500 text-white px-6 py-1.5 rounded-full text-xs font-bold shadow-lg uppercase tracking-wider flex items-center gap-1">
+            <span>🔥 Most Popular</span>
+          </div>
+        </div>
+      )}
+
+      <div className="flex items-start justify-between mb-6">
+        <div className="flex items-start space-x-4">
+          <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center shrink-0">
+            <BookOpen className="w-7 h-7 text-red-500" />
+          </div>
+          <div>
+            <h3 className="text-2xl font-bold text-gray-900 leading-tight mb-2">{course.courseTitle}</h3>
+            <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold tracking-wide ${levelColorClass}`}>{level}</span>
+          </div>
+        </div>
+      </div>
+
+      {price && (
+        <div className="mb-6 pb-6 border-b border-gray-100">
+          <div className="flex items-baseline gap-1">
+            <span className="text-4xl font-extrabold text-red-500 tracking-tight">{price}</span>
+            <span className="text-gray-400 text-sm font-medium">/ course</span>
+            {course.discountPrice && course.discountPrice > 0 && course.realPrice && course.realPrice > 0 && (
+              <span className="ml-2 text-sm text-gray-400 line-through">৳{course.realPrice}</span>
+            )}
+          </div>
+        </div>
+      )}
+
+      {course.courseDescription && (
+        <p className="text-gray-600 mb-6 leading-relaxed text-sm flex-grow">{course.courseDescription}</p>
+      )}
+
+      {schedule.length > 0 && (
+        <div className="mb-6 bg-red-50/50 p-4 rounded-xl border border-red-100/50">
+          <h4 className="font-semibold text-gray-900 mb-3 flex items-center text-sm">
+            <Clock className="w-4 h-4 mr-2 text-red-500" />
+            Class Schedule
+          </h4>
+          <div className="space-y-2">
+            {schedule.map((time, index) => (
+              <div key={index} className="flex items-center text-gray-600 text-xs font-medium">
+                <div className="w-1.5 h-1.5 bg-red-400 rounded-full mr-2.5"></div>
+                {time}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {features.length > 0 && (
+        <div className="space-y-3 mb-8">
+          {features.map((feature, index) => (
+            <div key={index} className="flex items-start space-x-3">
+              <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                <Check className="w-3 h-3 text-green-600" />
+              </div>
+              <span className="text-gray-600 text-sm font-medium">{feature}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="grid grid-cols-2 gap-4 mb-8 mt-auto">
+        {course.totalDuration && (
+          <div className="bg-gray-50 rounded-xl p-3 text-center border border-gray-100">
+            <div className="text-lg font-bold text-gray-900 mb-0.5">{course.totalDuration}</div>
+            <div className="text-gray-500 text-[10px] uppercase tracking-wider font-semibold">Duration</div>
+          </div>
+        )}
+        {course.totalClass != null && (
+          <div className="bg-gray-50 rounded-xl p-3 text-center border border-gray-100">
+            <div className="text-lg font-bold text-gray-900 mb-0.5">{course.totalClass}+</div>
+            <div className="text-gray-500 text-[10px] uppercase tracking-wider font-semibold">Classes</div>
+          </div>
+        )}
+        {course.totalMockTest != null && (
+          <div className="bg-gray-50 rounded-xl p-3 text-center border border-gray-100">
+            <div className="flex items-center justify-center gap-1 mb-0.5">
+              <FileText className="w-4 h-4 text-gray-700" />
+              <div className="text-lg font-bold text-gray-900">{course.totalMockTest}</div>
+            </div>
+            <div className="text-gray-500 text-[10px] uppercase tracking-wider font-semibold">Mock Tests</div>
+          </div>
+        )}
+        {course.totalAssignment != null && (
+          <div className="bg-gray-50 rounded-xl p-3 text-center border border-gray-100">
+            <div className="text-lg font-bold text-gray-900 mb-0.5">{course.totalAssignment}</div>
+            <div className="text-gray-500 text-[10px] uppercase tracking-wider font-semibold">Assignments</div>
+          </div>
+        )}
+      </div>
+
+      <Link
+        href={`/purchase?courseId=${course._id}&checkout=true`}
+        className={`w-full py-4 rounded-xl font-bold text-base transition-all duration-300 flex items-center justify-center group ${
+          popular
+            ? 'bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white shadow-lg hover:shadow-red-500/30'
+            : 'bg-white text-gray-900 border-2 border-gray-200 hover:border-red-500 hover:text-red-500'
+        }`}
+      >
+        Enroll Now
+        <ArrowRight
+          className={`w-5 h-5 ml-2 transition-transform duration-300 group-hover:translate-x-1 ${popular ? 'text-white' : 'text-gray-400 group-hover:text-red-500'}`}
+        />
+      </Link>
+    </div>
+  );
+}
+
+export default function CoursesPageClient({ courses }: { courses: Course[] }) {
+  const [isVisible] = useState(true);
+
+  return (
+    <main className="min-h-screen pt-12 text-white selection:bg-sky-500/30 selection:text-white overflow-x-hidden">
+      {/* ── COURSES ── */}
+      <section
+        id="courses"
+        className="py-20 px-4 md:px-8 bg-gradient-to-br from-red-50 via-orange-50 to-pink-50"
+      >
+        <div className="max-w-7xl mx-auto">
+          <div
+            className={`text-center mb-16 transform transition-all duration-1000 ease-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}
+          >
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 mb-6 leading-tight">
+              Our{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-orange-600">
+                Popular
+              </span>{' '}
+              Courses
+            </h1>
+            <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed font-medium">
+              Choose the right course for your learning goals
+            </p>
           </div>
 
           {courses.length === 0 ? (
-            <div className="flex items-center justify-center py-32 text-white/30">
+            <div className="flex items-center justify-center py-32 text-slate-400">
               <span className="text-sm">No courses available.</span>
             </div>
           ) : (
@@ -95,68 +239,15 @@ export default function CoursesPageClient({ courses }: { courses: Course[] }) {
               initial="hidden"
               whileInView="show"
               viewport={{ once: true, margin: '-40px' }}
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
             >
-              {courses.map(course => (
+              {courses.map((course, index) => (
                 <motion.div
                   key={course._id}
                   variants={riseUp}
-                  whileHover={{ y: -6 }}
-                  className="group relative flex flex-col bg-white/[0.03] border border-white/8 rounded-2xl overflow-hidden hover:border-sky-500/40 hover:bg-white/[0.055] transition-all duration-300"
+                  style={{ transitionDelay: `${index * 150}ms` }}
                 >
-                  <div className="h-px w-full bg-gradient-to-r from-transparent via-sky-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-
-                  <div className="p-6 flex flex-col flex-1">
-                    <h3 className="text-base font-bold text-white mb-1.5 leading-snug">{course.courseTitle}</h3>
-                    {course.courseDescription && <p className="text-white/40 text-xs mb-5 line-clamp-2 leading-relaxed">{course.courseDescription}</p>}
-
-                    <div className="flex items-baseline gap-2 mb-6">
-                      {course.discountPrice && course.discountPrice > 0 ? (
-                        <>
-                          <span className="text-2xl font-extrabold text-sky-300">৳{course.discountPrice}</span>
-                          {course.realPrice && course.realPrice > 0 && <span className="text-sm text-white/25 line-through">৳{course.realPrice}</span>}
-                        </>
-                      ) : course.realPrice && course.realPrice > 0 ? (
-                        <span className="text-2xl font-extrabold text-sky-300">৳{course.realPrice}</span>
-                      ) : (
-                        <span className="text-xs text-white/30 italic">Price on request</span>
-                      )}
-                    </div>
-
-                    <ul className="space-y-2.5 flex-1">
-                      {course.totalDuration && (
-                        <li className="flex items-center gap-2.5 text-white/50 text-xs">
-                          <Clock className="w-3.5 h-3.5 shrink-0 text-white/30" />
-                          {course.totalDuration}
-                        </li>
-                      )}
-                      {course.totalClass != null && (
-                        <li className="flex items-center gap-2.5 text-white/50 text-xs">
-                          <MonitorPlay className="w-3.5 h-3.5 shrink-0 text-white/30" />
-                          {course.totalClass} Classes
-                        </li>
-                      )}
-                      {course.totalMockTest != null && (
-                        <li className="flex items-center gap-2.5 text-white/50 text-xs">
-                          <FileText className="w-3.5 h-3.5 shrink-0 text-white/30" />
-                          {course.totalMockTest} Mock Tests
-                        </li>
-                      )}
-                      {course.totalAssignment != null && (
-                        <li className="flex items-center gap-2.5 text-white/50 text-xs">
-                          <BookOpen className="w-3.5 h-3.5 shrink-0 text-white/30" />
-                          {course.totalAssignment} Assignments
-                        </li>
-                      )}
-                    </ul>
-
-                    <Link
-                      href={`/purchase?courseId=${course._id}&checkout=true`}
-                      className="mt-6 block w-full py-2.5 rounded-xl text-center text-sm font-semibold bg-sky-500/10 hover:bg-sky-500 text-sky-300 hover:text-white border border-sky-500/20 hover:border-sky-500 transition-all duration-200"
-                    >
-                      Enroll Now
-                    </Link>
-                  </div>
+                  <CourseCard course={course} />
                 </motion.div>
               ))}
             </motion.div>
@@ -165,7 +256,7 @@ export default function CoursesPageClient({ courses }: { courses: Course[] }) {
       </section>
 
       {/* ── ABOUT ── */}
-      <section id="about" className="py-28 relative overflow-hidden">
+      <section id="about" className="py-28 relative overflow-hidden bg-[#0a0a0f]">
         <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-violet-500/8 blur-[100px] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -184,7 +275,6 @@ export default function CoursesPageClient({ courses }: { courses: Course[] }) {
                   <PlayCircle className="w-7 h-7 text-white" />
                 </button>
               </div>
-
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
@@ -222,9 +312,7 @@ export default function CoursesPageClient({ courses }: { courses: Course[] }) {
       </section>
 
       {/* ── BENEFITS ── */}
-      <section className="py-28 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0f] via-[#0d0d18] to-[#0a0a0f]" />
-
+      <section className="py-28 relative bg-[#0d0d18]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="max-w-xl mb-16">
             <motion.p
