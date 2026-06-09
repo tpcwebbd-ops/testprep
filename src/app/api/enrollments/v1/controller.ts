@@ -12,6 +12,7 @@ import { withDB } from '@/app/api/utils/db';
 import { formatResponse, IResponse } from '@/app/api/utils/utils';
 
 import Enrollment from './model';
+import AccessManagement from '@/app/api/accessManagements/v1/model';
 
 interface MongoError extends Error {
   code?: number;
@@ -27,6 +28,17 @@ export async function createEnrollment(req: Request): Promise<IResponse> {
     try {
       const enrollmentData = await req.json();
       const newEnrollment = await Enrollment.create(enrollmentData);
+      if (enrollmentData.paymentStatus === 'completed' && enrollmentData.studentEmail) {
+        const existing = await AccessManagement.findOne({ user_email: enrollmentData.studentEmail });
+        if (!existing) {
+          await AccessManagement.create({
+            given_by_email: 'tpc_payment@gmail.com',
+            user_name: enrollmentData.studentName,
+            user_email: enrollmentData.studentEmail,
+            assign_role: ['Student'],
+          });
+        }
+      }
       return formatResponse(newEnrollment, 'Enrollment created successfully', 201);
     } catch (error: unknown) {
       if (isMongoError(error) && error.code === 11000) {

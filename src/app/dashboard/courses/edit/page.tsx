@@ -25,6 +25,8 @@ import {
   ClipboardList,
   Save,
   Check,
+  Headphones,
+  File,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -34,9 +36,12 @@ import { Switch } from '@/components/ui/switch';
 import { useGetCourseByIdQuery, useUpdateCourseMutation } from '@/redux/features/courses/coursesSlice';
 import YouTubeVideoUploadManagerSingle from '@/app/dashboard/media/example/yt-videos/components/YTVideoUploadManagerSingle';
 import VideoUploadManagerSingle from '@/app/dashboard/media/example/uploadthings/components/VideoUploadMangerSingle';
+import AudioUploadManagerSingle from '@/app/dashboard/media/example/uploadthings/components/AudioUploadManagerSingle';
+import PdfUploadManagerSingle from '@/app/dashboard/media/example/uploadthings/components/PdfUploadManagerSingle';
+import DocxUploadManagerSingle from '@/app/dashboard/media/example/uploadthings/components/DocxUploadManagerSingle';
 import RichTextEditorField from '@/components/dashboard-ui/RichTextEditorField';
 
-type ResourceType = 'youtube' | 'video' | 'text' | 'mcq' | 'assignment';
+type ResourceType = 'youtube' | 'video' | 'text' | 'mcq' | 'assignment' | 'audio' | 'pdf' | 'docx';
 
 interface IResource {
   id: string;
@@ -83,6 +88,25 @@ function CourseEditorContent() {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const initialLoad = useRef(true);
+
+  const [courseLevel, setCourseLevel] = useState('');
+  const [courseLevelColorClass, setCourseLevelColorClass] = useState('bg-blue-100 text-blue-700');
+  const [courseFeatures, setCourseFeatures] = useState<string[]>([]);
+  const [coursePopular, setCoursePopular] = useState(false);
+  const [courseSchedule, setCourseSchedule] = useState<string[]>([]);
+  const [newFeature, setNewFeature] = useState('');
+  const [newSchedule, setNewSchedule] = useState('');
+  const [metaSaveStatus, setMetaSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+
+  useEffect(() => {
+    if (courseData) {
+      setCourseLevel(courseData.level || '');
+      setCourseLevelColorClass(courseData.levelColorClass || 'bg-blue-100 text-blue-700');
+      setCourseFeatures(Array.isArray(courseData.features) ? courseData.features : []);
+      setCoursePopular(courseData.popular ?? false);
+      setCourseSchedule(Array.isArray(courseData.schedule) ? courseData.schedule : []);
+    }
+  }, [courseData]);
 
   useEffect(() => {
     if (courseData?.lectureData) {
@@ -153,6 +177,27 @@ function CourseEditorContent() {
 
     return () => clearTimeout(timer);
   }, [classes, hasUnsavedChanges, courseId, updateCourse]);
+
+  const handleSaveCourseDetails = async () => {
+    if (!courseId) return;
+    setMetaSaveStatus('saving');
+    try {
+      await updateCourse({
+        id: courseId,
+        level: courseLevel,
+        levelColorClass: courseLevelColorClass,
+        features: courseFeatures,
+        popular: coursePopular,
+        schedule: courseSchedule,
+      }).unwrap();
+      setMetaSaveStatus('saved');
+      toast.success('Course details saved');
+      setTimeout(() => setMetaSaveStatus('idle'), 3000);
+    } catch {
+      setMetaSaveStatus('error');
+      toast.error('Failed to save course details');
+    }
+  };
 
   const updateClassesState = (newClasses: IClass[]) => {
     setClasses(newClasses);
@@ -353,6 +398,12 @@ function CourseEditorContent() {
         return <Youtube className="h-4 w-4 text-red-400" />;
       case 'video':
         return <VideoIcon className="h-4 w-4 text-indigo-400" />;
+      case 'audio':
+        return <Headphones className="h-4 w-4 text-purple-400" />;
+      case 'pdf':
+        return <FileText className="h-4 w-4 text-rose-400" />;
+      case 'docx':
+        return <File className="h-4 w-4 text-blue-400" />;
       case 'text':
         return <FileText className="h-4 w-4 text-teal-400" />;
       case 'mcq':
@@ -413,6 +464,177 @@ function CourseEditorContent() {
             </motion.div>
           </div>
         </div>
+
+        {/* ── Course Details Panel ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-slate-900/60 border border-white/10 rounded-3xl p-6 backdrop-blur-xl"
+        >
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+              <BookOpen className="h-5 w-5 text-emerald-400" />
+              Course Details
+            </h2>
+            <Button
+              onClick={handleSaveCourseDetails}
+              disabled={metaSaveStatus === 'saving'}
+              className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white border-none shadow-lg shadow-emerald-500/25 h-10 px-5 rounded-xl font-semibold text-sm"
+            >
+              {metaSaveStatus === 'saving' && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {metaSaveStatus === 'saved' && <CheckCircle2 className="h-4 w-4 mr-2 text-white" />}
+              {metaSaveStatus === 'error' && <AlertTriangle className="h-4 w-4 mr-2" />}
+              {metaSaveStatus === 'saving' ? 'Saving...' : metaSaveStatus === 'saved' ? 'Saved' : 'Save Details'}
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Level */}
+            <div className="space-y-2">
+              <Label className="text-slate-300">Level Label</Label>
+              <Input
+                placeholder="e.g. Beginner Level"
+                className="bg-slate-950 border-white/10 text-white placeholder:text-slate-600 focus:border-emerald-500 h-11 rounded-xl"
+                value={courseLevel}
+                onChange={e => setCourseLevel(e.target.value)}
+              />
+            </div>
+
+            {/* Level Color */}
+            <div className="space-y-2">
+              <Label className="text-slate-300">Level Badge Color</Label>
+              <select
+                className="w-full bg-slate-950 border border-white/10 text-white focus:border-emerald-500 h-11 rounded-xl px-3 outline-none"
+                value={courseLevelColorClass}
+                onChange={e => setCourseLevelColorClass(e.target.value)}
+              >
+                <option value="bg-blue-100 text-blue-700">Blue (Beginner)</option>
+                <option value="bg-green-100 text-green-700">Green (Intermediate)</option>
+                <option value="bg-red-100 text-red-700">Red (Intensive)</option>
+                <option value="bg-purple-100 text-purple-700">Purple (Advanced)</option>
+                <option value="bg-amber-100 text-amber-700">Amber (Expert)</option>
+                <option value="bg-teal-100 text-teal-700">Teal (Pro)</option>
+              </select>
+            </div>
+
+            {/* Popular Toggle */}
+            <div className="flex items-center justify-between bg-slate-950 border border-white/10 rounded-xl p-4">
+              <div>
+                <Label className="text-slate-300 text-base">Most Popular</Label>
+                <p className="text-sm text-slate-500 mt-1">{coursePopular ? 'Highlighted with popular badge' : 'Standard display'}</p>
+              </div>
+              <Switch
+                checked={coursePopular}
+                onCheckedChange={setCoursePopular}
+                className="data-[state=checked]:bg-emerald-500 data-[state=unchecked]:bg-slate-700"
+              />
+            </div>
+
+            {/* Preview Badge */}
+            <div className="flex items-center gap-3 bg-slate-950 border border-white/10 rounded-xl p-4">
+              <Label className="text-slate-300 shrink-0">Badge Preview</Label>
+              {courseLevel ? (
+                <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold tracking-wide ${courseLevelColorClass}`}>
+                  {courseLevel}
+                </span>
+              ) : (
+                <span className="text-slate-600 text-xs italic">Set level label to preview</span>
+              )}
+            </div>
+          </div>
+
+          {/* Features */}
+          <div className="mt-6 space-y-3">
+            <Label className="text-slate-300">Course Features</Label>
+            <div className="flex gap-2">
+              <Input
+                placeholder="Add a feature..."
+                className="bg-slate-950 border-white/10 text-white placeholder:text-slate-600 focus:border-emerald-500 h-10 rounded-xl flex-1"
+                value={newFeature}
+                onChange={e => setNewFeature(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' && newFeature.trim()) {
+                    setCourseFeatures([...courseFeatures, newFeature.trim()]);
+                    setNewFeature('');
+                  }
+                }}
+              />
+              <Button
+                onClick={() => {
+                  if (newFeature.trim()) {
+                    setCourseFeatures([...courseFeatures, newFeature.trim()]);
+                    setNewFeature('');
+                  }
+                }}
+                className="h-10 px-4 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 rounded-xl"
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {courseFeatures.map((f, i) => (
+                <div key={i} className="flex items-center gap-1.5 bg-slate-800 text-slate-300 text-xs px-3 py-1.5 rounded-full border border-white/10">
+                  <Check className="h-3 w-3 text-emerald-400" />
+                  <span>{f}</span>
+                  <button
+                    onClick={() => setCourseFeatures(courseFeatures.filter((_, idx) => idx !== i))}
+                    className="ml-1 text-slate-500 hover:text-red-400 transition-colors"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ))}
+              {courseFeatures.length === 0 && <p className="text-xs text-slate-600 italic">No features added yet.</p>}
+            </div>
+          </div>
+
+          {/* Schedule */}
+          <div className="mt-6 space-y-3">
+            <Label className="text-slate-300">Class Schedule (optional)</Label>
+            <div className="flex gap-2">
+              <Input
+                placeholder="e.g. Morning Batch: 10:00 AM - 1:30 PM"
+                className="bg-slate-950 border-white/10 text-white placeholder:text-slate-600 focus:border-emerald-500 h-10 rounded-xl flex-1"
+                value={newSchedule}
+                onChange={e => setNewSchedule(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' && newSchedule.trim()) {
+                    setCourseSchedule([...courseSchedule, newSchedule.trim()]);
+                    setNewSchedule('');
+                  }
+                }}
+              />
+              <Button
+                onClick={() => {
+                  if (newSchedule.trim()) {
+                    setCourseSchedule([...courseSchedule, newSchedule.trim()]);
+                    setNewSchedule('');
+                  }
+                }}
+                className="h-10 px-4 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 rounded-xl"
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="flex flex-col gap-2">
+              {courseSchedule.map((s, i) => (
+                <div key={i} className="flex items-center justify-between bg-slate-800 text-slate-300 text-xs px-3 py-2 rounded-xl border border-white/10">
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-3 w-3 text-emerald-400 shrink-0" />
+                    <span>{s}</span>
+                  </div>
+                  <button
+                    onClick={() => setCourseSchedule(courseSchedule.filter((_, idx) => idx !== i))}
+                    className="text-slate-500 hover:text-red-400 transition-colors"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ))}
+              {courseSchedule.length === 0 && <p className="text-xs text-slate-600 italic">No schedule added yet.</p>}
+            </div>
+          </div>
+        </motion.div>
 
         {classes.length === 0 ? (
           <motion.div
@@ -682,7 +904,7 @@ function CourseEditorContent() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-4xl bg-slate-900 border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+              className="relative w-full max-w-5xl bg-slate-900 border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
             >
               <div className="flex items-center justify-between p-6 border-b border-white/10 bg-white/5">
                 <div className="flex items-center gap-4">
@@ -717,7 +939,7 @@ function CourseEditorContent() {
 
               <div className="p-6 overflow-y-auto custom-scrollbar flex-1">
                 {!resourceType ? (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     {[
                       {
                         type: 'youtube' as ResourceType,
@@ -731,6 +953,14 @@ function CourseEditorContent() {
                         icon: <VideoIcon className="h-8 w-8 text-indigo-500" />,
                         desc: 'Upload or select video',
                       },
+                      {
+                        type: 'audio' as ResourceType,
+                        title: 'Audio File',
+                        icon: <Headphones className="h-8 w-8 text-purple-500" />,
+                        desc: 'Upload audio file',
+                      },
+                      { type: 'pdf' as ResourceType, title: 'PDF Document', icon: <FileText className="h-8 w-8 text-rose-500" />, desc: 'Upload PDF file' },
+                      { type: 'docx' as ResourceType, title: 'Word Document', icon: <File className="h-8 w-8 text-blue-500" />, desc: 'Upload DOCX file' },
                       { type: 'text' as ResourceType, title: 'Text Content', icon: <FileText className="h-8 w-8 text-teal-500" />, desc: 'Rich text editor' },
                       {
                         type: 'mcq' as ResourceType,
@@ -779,6 +1009,24 @@ function CourseEditorContent() {
                     {resourceType === 'video' && (
                       <div className="bg-slate-950 p-4 rounded-xl border border-white/10">
                         <VideoUploadManagerSingle value={resourceUrlData} onChange={setResourceUrlData} label="Select Source Video" />
+                      </div>
+                    )}
+
+                    {resourceType === 'audio' && (
+                      <div className="bg-slate-950 p-4 rounded-xl border border-white/10">
+                        <AudioUploadManagerSingle value={resourceUrlData} onChange={setResourceUrlData} label="Select Audio File" />
+                      </div>
+                    )}
+
+                    {resourceType === 'pdf' && (
+                      <div className="bg-slate-950 p-4 rounded-xl border border-white/10">
+                        <PdfUploadManagerSingle value={resourceUrlData} onChange={setResourceUrlData} label="Select PDF Document" />
+                      </div>
+                    )}
+
+                    {resourceType === 'docx' && (
+                      <div className="bg-slate-950 p-4 rounded-xl border border-white/10">
+                        <DocxUploadManagerSingle value={resourceUrlData} onChange={setResourceUrlData} label="Select Word Document" />
                       </div>
                     )}
 

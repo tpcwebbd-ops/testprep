@@ -22,6 +22,8 @@ const enrollmentSchema = new Schema(
     couponCode: { type: String, default: null },
     checkedbyEmail: { type: String },
     paymentStatus: { type: String, enum: ['pending', 'completed', 'failed', 'refunded'], default: 'pending' },
+    tranId: { type: String, default: null },
+    sslValId: { type: String, default: null },
   },
   { _id: true, timestamps: true },
 );
