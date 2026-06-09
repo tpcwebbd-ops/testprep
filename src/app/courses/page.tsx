@@ -23,11 +23,6 @@ import {
 } from 'lucide-react';
 import { useGetCoursesQuery } from '@/redux/features/courses/coursesSlice';
 
-// ─── DESIGN TOKENS ─────────────────────────────────────────────────────────────
-// Palette: Deep violet hero (#1A0533) → Electric magenta accent (#E8006F) →
-//          Saffron highlight (#FF9500) → Mint success (#00D4A1) → Off-white (#FAF7FF)
-// Signature: Diagonal gradient "rip" divider between sections + floating orb particles
-
 const staggerContainer: Variants = {
   hidden: { opacity: 0 },
   show: { opacity: 1, transition: { staggerChildren: 0.12 } },
@@ -43,7 +38,6 @@ const scaleIn: Variants = {
   show: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: 'backOut' } },
 };
 
-// ─── FLOATING ORB ──────────────────────────────────────────────────────────────
 const FloatingOrb = ({ style }: { style: React.CSSProperties }) => (
   <motion.div
     className="absolute rounded-full pointer-events-none"
@@ -53,7 +47,6 @@ const FloatingOrb = ({ style }: { style: React.CSSProperties }) => (
   />
 );
 
-// ─── STAT COUNTER ──────────────────────────────────────────────────────────────
 const stats = [
   { label: 'সক্রিয় শিক্ষার্থী', value: '১২,০০০+', icon: Users, color: '#E8006F' },
   { label: 'কোর্স সম্পন্ন', value: '৯৮%', icon: CheckCircle, color: '#00D4A1' },
@@ -61,7 +54,6 @@ const stats = [
   { label: 'ক্যারিয়ার প্লেসমেন্ট', value: '৮৫%', icon: TrendingUp, color: '#7C3AED' },
 ];
 
-// ─── FEATURES ──────────────────────────────────────────────────────────────────
 const features = [
   {
     icon: Zap,
@@ -93,7 +85,6 @@ const features = [
   },
 ];
 
-// ─── TESTIMONIALS ──────────────────────────────────────────────────────────────
 const testimonials = [
   {
     name: 'রাহেলা আক্তার',
@@ -211,7 +202,6 @@ const CourseCard = ({ course, index }: { course: any; index: number }) => {
   );
 };
 
-// ─── MAIN PAGE ─────────────────────────────────────────────────────────────────
 const Page = () => {
   const { data, isLoading } = useGetCoursesQuery({ page: 1, limit: 100 });
   const courses = data?.data?.courses || [];
