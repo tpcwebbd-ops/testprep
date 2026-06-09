@@ -108,7 +108,7 @@ const Page = () => {
   };
 
   const handleEdit = (path: string) => {
-    window.open(`/dashboard/page-builder/edit-page?pathTitle=${path}`, '_blank');
+    window.open(`/dashboard/admin/page-builder/edit-page?pathTitle=${path}`);
   };
 
   const initiateDelete = (page: IPage) => {
@@ -131,14 +131,14 @@ const Page = () => {
   };
 
   const handlePreview = (path: string) => {
-    window.open(`/dashboard/page-builder/preview-page?pathTitle=${path}`, '_blank');
+    window.open(`/dashboard/admin/page-builder/preview-page?pathTitle=${path}`);
   };
 
   const handleLiveLink = (path: string) => {
-    window.open(path, '_blank');
+    window.open(path);
   };
   const handleFormDataPage = (path: string) => {
-    window.open(`/dashboard/page-builder/form-data?pathTitle=${path}`, '_blank');
+    window.open(`/dashboard/admin/page-builder/form-data?pathTitle=${path}`);
   };
 
   const handleToggleActive = async (page: IPage) => {
