@@ -108,7 +108,7 @@ export default function MyCoursesPage() {
 
   // Queries
   const { data: coursesData, isLoading: isCoursesLoading, error: coursesError, refetch: refetchCourses } = useGetCoursesQuery({ page: 1, limit: 100 });
-
+  console.log('coursesData', coursesData);
   const {
     data: myCoursesData,
     isLoading: isMyCoursesLoading,
