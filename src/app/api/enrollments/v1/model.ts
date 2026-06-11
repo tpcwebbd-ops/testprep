@@ -31,5 +31,6 @@ const enrollmentSchema = new Schema(
 enrollmentSchema.index({ studentEmail: 1 });
 enrollmentSchema.index({ studentName: 1 });
 enrollmentSchema.index({ couponCode: 1 });
+enrollmentSchema.index({ tranId: 1 }, { sparse: true });
 
 export default mongoose.models.Enrollment || mongoose.model('Enrollment', enrollmentSchema);

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, Variants, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import {
   ArrowRight,
@@ -117,6 +118,12 @@ const CourseCard = ({ course, index }: { course: any; index: number }) => {
   const accentColors = ['#E8006F', '#7C3AED', '#FF9500', '#00D4A1'];
   const accent = accentColors[index % accentColors.length];
   const [hovered, setHovered] = useState(false);
+  const router = useRouter();
+
+  const handlePurchase = () => {
+    if (!course?._id) return;
+    router.push(`/purchase?courseId=${encodeURIComponent(course._id)}&checkout=true`);
+  };
 
   return (
     <motion.div
@@ -174,7 +181,10 @@ const CourseCard = ({ course, index }: { course: any; index: number }) => {
           </span>
         </div>
         <motion.button
+          type="button"
+          onClick={handlePurchase}
           whileTap={{ scale: 0.97 }}
+          aria-label={`Enroll in ${course.courseTitle}`}
           className="w-full py-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all duration-300"
           style={{
             background: hovered ? accent : 'rgba(255,255,255,0.07)',

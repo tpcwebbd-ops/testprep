@@ -2,11 +2,7 @@ import { NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 import connectDB from '@/app/api/utils/mongoose';
 import Enrollment from '@/app/api/enrollments/v1/model';
-
-const IS_SANDBOX = process.env.SSLCOMMERZ_SANDBOX !== 'false';
-const INIT_URL = IS_SANDBOX
-  ? 'https://sandbox.sslcommerz.com/gwprocess/v4/api.php'
-  : 'https://securepay.sslcommerz.com/gwprocess/v4/api.php';
+import { getSslCredentials, INIT_URL } from '../utils';
 
 export async function POST(req: Request) {
   try {
@@ -27,8 +23,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, message: 'Missing required fields' }, { status: 400 });
     }
 
+    const credentials = getSslCredentials();
+    if (!credentials) {
+      return NextResponse.json({ ok: false, message: 'SSLCommerz credentials are not configured' }, { status: 500 });
+    }
+
     const tranId = `TXN-${uuidv4()}`;
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const baseUrl = (process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000').replace(/\/$/, '');
 
     const enrollment = await Enrollment.create({
       studentName,
@@ -46,8 +47,8 @@ export async function POST(req: Request) {
     });
 
     const params = new URLSearchParams({
-      store_id: process.env.SSLCOMMERZ_STORE_ID || '',
-      store_passwd: process.env.SSLCOMMERZ_STORE_PASSWORD || '',
+      store_id: credentials.storeId,
+      store_passwd: credentials.storePassword,
       total_amount: String(paymentAmount),
       currency: 'BDT',
       tran_id: tranId,

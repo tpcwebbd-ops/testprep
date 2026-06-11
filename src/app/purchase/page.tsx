@@ -64,6 +64,7 @@ function PurchasePageContent() {
 
   const [selectedCourseIds, setSelectedCourseIds] = useState<string[]>([]);
   const [step, setStep] = useState<Step>('select');
+  const [isSslSubmitting, setIsSslSubmitting] = useState(false);
   const [isCashSubmitting, setIsCashSubmitting] = useState(false);
 
   const [form, setForm] = useState({
@@ -124,6 +125,7 @@ function PurchasePageContent() {
       toast.error('No courses selected');
       return;
     }
+    setIsSslSubmitting(true);
     try {
       const res = await fetch('/api/payment/sslcommerz/init', {
         method: 'POST',
@@ -146,6 +148,8 @@ function PurchasePageContent() {
       }
     } catch {
       toast.error('Something went wrong. Try again.');
+    } finally {
+      setIsSslSubmitting(false);
     }
   };
 
@@ -536,11 +540,11 @@ function PurchasePageContent() {
 
                 <button
                   type="submit"
-                  disabled={isSubmitting || isCashSubmitting}
+                  disabled={isSubmitting || isCashSubmitting || isSslSubmitting}
                   className="w-full py-5 bg-amber-400 hover:bg-amber-300 disabled:bg-zinc-700 disabled:text-zinc-500 text-zinc-900 font-black rounded-xl shadow-lg shadow-amber-400/10 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-3 text-base tracking-wide"
                 >
-                  {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <ShoppingCart className="w-5 h-5" />}
-                  {isSubmitting ? 'Processing…' : `Pay with SSLCommerz — ৳${payAmount}`}
+                  {isSslSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <ShoppingCart className="w-5 h-5" />}
+                  {isSslSubmitting ? 'Processing…' : `Pay with SSLCommerz — ৳${payAmount}`}
                 </button>
               </form>
 
