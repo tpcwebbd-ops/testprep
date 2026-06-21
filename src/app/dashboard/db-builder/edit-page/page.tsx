@@ -34,7 +34,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useGetPagesQuery, useUpdatePageMutation } from '@/redux/features/db-builder/pageBuilderSlice';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -72,6 +71,116 @@ const getFieldPlaceholder = (fieldKey: string) => {
 const fieldHasPlaceholder = (fieldKey: string) => {
   const data = getFieldConfigData(fieldKey);
   return Boolean(data && 'fieldPlaceHolder' in data);
+};
+
+const getPreparedFieldData = (form: FieldFormState) => {
+  const config = Allfields[form.fieldKey as keyof typeof Allfields];
+  if (!config || typeof config.data !== 'object' || config.data === null) return config?.data;
+
+  return {
+    ...config.data,
+    fieldName: form.fieldName.trim() || config.data.fieldName,
+    fieldPlaceHolder: form.fieldPlaceHolder,
+  };
+};
+
+interface FieldPickerDialogProps {
+  open: boolean;
+  selectedKey: string;
+  onOpenChange: (open: boolean) => void;
+  onSelect: (fieldKey: string) => void;
+}
+
+const FieldPickerDialog = ({ open, selectedKey, onOpenChange, onSelect }: FieldPickerDialogProps) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const normalizedSearchTerm = searchTerm.trim().toLowerCase();
+  const shouldFilter = normalizedSearchTerm.length >= 3;
+  const visibleFieldKeys = shouldFilter
+    ? AllfieldsKeys.filter(key => {
+        const data = getFieldConfigData(key);
+        const fieldType = data && 'fieldType' in data ? data.fieldType : key;
+        const searchableText = `${key} ${getFieldDisplayName(key)} ${fieldType}`.toLowerCase();
+
+        return searchableText.includes(normalizedSearchTerm);
+      })
+    : AllfieldsKeys;
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="bg-slate-900 border-white/10 text-white max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>Select Field</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-2">
+          <Label htmlFor="field-picker-search" className="text-slate-300">
+            Search Field
+          </Label>
+          <Input
+            id="field-picker-search"
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            placeholder="Type at least 3 characters"
+            className="bg-slate-950 border-white/10 text-white placeholder:text-slate-600"
+          />
+        </div>
+        <ScrollArea className="max-h-[60vh] pr-3">
+          {visibleFieldKeys.length === 0 ? (
+            <div className="rounded-lg border border-white/10 bg-slate-950/80 p-6 text-center text-sm text-slate-400">No field found.</div>
+          ) : (
+            <div className="grid gap-2 sm:grid-cols-2">
+              {visibleFieldKeys.map(key => {
+              const isSelected = selectedKey === key;
+              const data = getFieldConfigData(key);
+              const fieldType = data && 'fieldType' in data ? data.fieldType : key;
+
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => {
+                    onSelect(key);
+                    onOpenChange(false);
+                  }}
+                  className={`rounded-lg border p-3 text-left transition-all hover:border-blue-400/70 hover:bg-blue-500/10 ${
+                    isSelected ? 'border-blue-400 bg-blue-500/15' : 'border-white/10 bg-slate-950/80'
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="mt-0.5 rounded-md bg-blue-500/10 p-2 text-blue-300">
+                      <Database className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-white">{getFieldDisplayName(key)}</p>
+                      <p className="mt-1 truncate text-xs text-slate-400">{fieldType}</p>
+                    </div>
+                  </div>
+                </button>
+              );
+              })}
+            </div>
+          )}
+        </ScrollArea>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+const FieldPreview = ({ form }: { form: FieldFormState }) => {
+  const config = Allfields[form.fieldKey as keyof typeof Allfields];
+  if (!config) return null;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const PreviewField = (config as any).add;
+  const previewData = getPreparedFieldData(form);
+
+  return (
+    <div className="space-y-2 rounded-xl border border-white/10 bg-slate-950/70 p-4">
+      <Label className="text-slate-300">Preview Field</Label>
+      <div className="rounded-lg border border-white/10 bg-black/20 p-3">
+        {PreviewField ? <PreviewField data={previewData} /> : <p className="text-sm text-slate-500">No preview available.</p>}
+      </div>
+    </div>
+  );
 };
 
 const getTypeStyles = (type: ItemType) => {
@@ -250,6 +359,8 @@ function EditPageContent() {
   const [movingItem, setMovingItem] = useState<PageContent | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [isAddFieldDialogOpen, setIsAddFieldDialogOpen] = useState(false);
+  const [isAddFieldPickerOpen, setIsAddFieldPickerOpen] = useState(false);
+  const [isEditFieldPickerOpen, setIsEditFieldPickerOpen] = useState(false);
   const [addFieldForm, setAddFieldForm] = useState<FieldFormState>({
     fieldName: '',
     fieldKey: AllfieldsKeys[0] || '',
@@ -322,8 +433,7 @@ function EditPageContent() {
       return;
     }
 
-    const fieldData =
-      typeof config.data === 'object' && config.data !== null ? { ...config.data, fieldName, fieldPlaceHolder: addFieldForm.fieldPlaceHolder } : config.data;
+    const fieldData = getPreparedFieldData({ ...addFieldForm, fieldName });
     const newItem: PageContent = {
       id: `${type}-${key}-${Date.now()}`,
       key: key,
@@ -374,8 +484,7 @@ function EditPageContent() {
       return;
     }
 
-    const fieldData =
-      typeof config.data === 'object' && config.data !== null ? { ...config.data, fieldName, fieldPlaceHolder: editFieldForm.fieldPlaceHolder } : config.data;
+    const fieldData = getPreparedFieldData({ ...editFieldForm, fieldName });
 
     setItems(items.map(item => (item.id === editingItem.id ? { ...item, key, name: fieldName, heading: fieldName, path: `/${key}`, data: fieldData } : item)));
     setEditingItem(null);
@@ -594,21 +703,10 @@ function EditPageContent() {
             </div>
             <div className="space-y-2">
               <Label className="text-slate-300">Field</Label>
-              <Select
-                value={addFieldForm.fieldKey}
-                onValueChange={value => setAddFieldForm(prev => ({ ...prev, fieldKey: value, fieldPlaceHolder: getFieldPlaceholder(value) }))}
-              >
-                <SelectTrigger className="bg-slate-950 border-white/10 text-white">
-                  <SelectValue placeholder="Select a field" />
-                </SelectTrigger>
-                <SelectContent className="bg-slate-900 border-white/10 text-white">
-                  {AllfieldsKeys.map(key => (
-                    <SelectItem key={key} value={key} className="focus:bg-white/10 focus:text-white">
-                      {getFieldDisplayName(key)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Button type="button" variant="outlineGlassy" onClick={() => setIsAddFieldPickerOpen(true)} className="w-full justify-between">
+                <span>Select Field</span>
+                <span className="truncate text-xs text-slate-300">{addFieldForm.fieldKey ? getFieldDisplayName(addFieldForm.fieldKey) : 'None selected'}</span>
+              </Button>
             </div>
             {fieldHasPlaceholder(addFieldForm.fieldKey) && (
               <div className="space-y-2">
@@ -624,6 +722,7 @@ function EditPageContent() {
                 />
               </div>
             )}
+            <FieldPreview form={addFieldForm} />
           </div>
           <div className="flex justify-end gap-3">
             <Button variant="ghost" onClick={() => setIsAddFieldDialogOpen(false)} className="text-slate-400 hover:text-white hover:bg-white/5">
@@ -639,6 +738,14 @@ function EditPageContent() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <FieldPickerDialog
+        open={isAddFieldPickerOpen}
+        selectedKey={addFieldForm.fieldKey}
+        onOpenChange={setIsAddFieldPickerOpen}
+        onSelect={fieldKey => setAddFieldForm(prev => ({ ...prev, fieldKey, fieldPlaceHolder: getFieldPlaceholder(fieldKey) }))}
+      />
+
       <Dialog open={!!movingItem} onOpenChange={() => setMovingItem(null)}>
         <DialogContent className="bg-slate-900 border-white/10 text-white">
           <DialogHeader>
@@ -715,21 +822,10 @@ function EditPageContent() {
               </div>
               <div className="space-y-2">
                 <Label className="text-slate-300">Field</Label>
-                <Select
-                  value={editFieldForm.fieldKey}
-                  onValueChange={value => setEditFieldForm(prev => ({ ...prev, fieldKey: value, fieldPlaceHolder: getFieldPlaceholder(value) }))}
-                >
-                  <SelectTrigger className="bg-slate-950 border-white/10 text-white">
-                    <SelectValue placeholder="Select a field" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-slate-900 border-white/10 text-white">
-                    {AllfieldsKeys.map(key => (
-                      <SelectItem key={key} value={key} className="focus:bg-white/10 focus:text-white">
-                        {getFieldDisplayName(key)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Button type="button" variant="outlineGlassy" onClick={() => setIsEditFieldPickerOpen(true)} className="w-full justify-between">
+                  <span>Select Field</span>
+                  <span className="truncate text-xs text-slate-300">{editFieldForm.fieldKey ? getFieldDisplayName(editFieldForm.fieldKey) : 'None selected'}</span>
+                </Button>
               </div>
               {fieldHasPlaceholder(editFieldForm.fieldKey) && (
                 <div className="space-y-2">
@@ -745,6 +841,7 @@ function EditPageContent() {
                   />
                 </div>
               )}
+              <FieldPreview form={editFieldForm} />
               <div className="flex justify-end gap-3 pt-2">
                 <Button variant="ghost" onClick={() => setEditingItem(null)} className="text-slate-400 hover:text-white hover:bg-white/5">
                   Cancel
@@ -761,6 +858,13 @@ function EditPageContent() {
           </ScrollArea>
         </DialogContent>
       </Dialog>
+
+      <FieldPickerDialog
+        open={isEditFieldPickerOpen}
+        selectedKey={editFieldForm.fieldKey}
+        onOpenChange={setIsEditFieldPickerOpen}
+        onSelect={fieldKey => setEditFieldForm(prev => ({ ...prev, fieldKey, fieldPlaceHolder: getFieldPlaceholder(fieldKey) }))}
+      />
     </main>
   );
 }

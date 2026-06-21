@@ -22,7 +22,8 @@ please update 'field-1/View.tsx' and 'field-2/View.tsx' so it can render inside 
 
 
 Now look at the preview-page 'src/app/dashboard/db-builder/edit-page/page.tsx' and implement those features as the following instructions. 
-1. When I add a field than at the top there is an option name Buld Edit: I can choose from those field I created. if found 1 Field then it will be selected. 
+1. remove Field selected option. 
+    - It will show a button named 'Select Field' it will open a pop-up. and inside the pop-up there is list of Field. I can choose form them. 
 
 
 
@@ -35,3 +36,5 @@ Now look at the preview-page 'src/app/dashboard/db-builder/preview-page/page.tsx
 3. When I click Bulk Export then it will open a model and there is two option name CSV and xlm(MS xl).
 
 Add a conformation model to delete each item inside table. 
+
+
