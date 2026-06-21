@@ -17,7 +17,7 @@ export interface Ifield1Data {
 }
 
 export const defaultDatafield1: Ifield1Data = {
-  fieldName: 'Input Field',
+  fieldName: 'Input Text Field',
   fieldData: '',
-  fieldPlaceHolder: 'Enter your name',
+  fieldPlaceHolder: 'Enter your text',
 };

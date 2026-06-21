@@ -10,7 +10,7 @@
 
 import { useSearchParams } from 'next/navigation';
 import { useState, useEffect, Suspense, useMemo, type ComponentType } from 'react';
-import { AlertTriangle, Download, Edit, Eye, Plus, RefreshCw, Search, Trash2, X } from 'lucide-react';
+import { AlertTriangle, Download, Edit, Eye, Plus, RefreshCw, Search, Trash2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -37,7 +37,12 @@ interface DbRecord {
 }
 
 type ModalMode = 'add' | 'view' | 'edit' | null;
-type FieldRenderer = ComponentType<{ data?: unknown }>;
+type BulkModalMode = 'edit' | 'delete' | 'export' | null;
+type FieldRenderer = ComponentType<{
+  data?: unknown;
+  value?: string;
+  onChange?: (value: string) => void;
+}>;
 
 const ITEMS_PER_PAGE_OPTIONS = [2, 10, 50, 100, 300, 1000];
 
@@ -50,6 +55,8 @@ const makeEmptyValues = (fields: PageContent[]) =>
   }, {});
 
 const escapeCsvValue = (value: string) => `"${value.replace(/"/g, '""')}"`;
+const escapeXmlValue = (value: string) =>
+  value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
 
 function PreviewPageContent() {
   const searchParams = useSearchParams();
@@ -96,7 +103,11 @@ function PreviewPageContent() {
   const [currentPageNumber, setCurrentPageNumber] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [modalMode, setModalMode] = useState<ModalMode>(null);
+  const [bulkModalMode, setBulkModalMode] = useState<BulkModalMode>(null);
+  const [bulkEditFieldId, setBulkEditFieldId] = useState('');
+  const [bulkEditValue, setBulkEditValue] = useState('');
   const [activeRecord, setActiveRecord] = useState<DbRecord | null>(null);
+  const [recordToDelete, setRecordToDelete] = useState<DbRecord | null>(null);
   const [draftValues, setDraftValues] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -150,6 +161,18 @@ function PreviewPageContent() {
     setDraftValues(makeEmptyValues(fields));
   };
 
+  const openBulkEditDialog = () => {
+    setBulkEditFieldId(fields[0]?.id || '');
+    setBulkEditValue('');
+    setBulkModalMode('edit');
+  };
+
+  const closeBulkModal = () => {
+    setBulkModalMode(null);
+    setBulkEditFieldId('');
+    setBulkEditValue('');
+  };
+
   const saveRecord = () => {
     if (modalMode === 'add') {
       const newRecord: DbRecord = {
@@ -173,6 +196,12 @@ function PreviewPageContent() {
     setSelectedIds(prev => prev.filter(id => id !== recordId));
   };
 
+  const confirmDeleteRecord = () => {
+    if (!recordToDelete) return;
+    deleteRecord(recordToDelete.id);
+    setRecordToDelete(null);
+  };
+
   const toggleSelected = (recordId: string) => {
     setSelectedIds(prev => (prev.includes(recordId) ? prev.filter(id => id !== recordId) : [...prev, recordId]));
   };
@@ -185,49 +214,87 @@ function PreviewPageContent() {
     });
   };
 
-  const bulkEdit = () => {
+  const confirmBulkEdit = () => {
+    if (!bulkEditFieldId) return;
+
     setRecords(prev =>
       prev.map(record =>
         selectedIds.includes(record.id)
           ? {
               ...record,
-              values: Object.fromEntries(Object.entries(record.values).map(([key, value]) => [key, value ? `${value} (edited)` : 'Bulk edited'])),
+              values: {
+                ...record.values,
+                [bulkEditFieldId]: bulkEditValue,
+              },
             }
           : record,
       ),
     );
+    closeBulkModal();
   };
 
-  const bulkDelete = () => {
+  const confirmBulkDelete = () => {
     setRecords(prev => prev.filter(record => !selectedIds.includes(record.id)));
     setSelectedIds([]);
+    closeBulkModal();
   };
 
-  const exportRecords = (recordsToExport: DbRecord[]) => {
-    const headers = ['ID', ...fields.map(getFieldLabel), 'Created At'];
-    const rows = recordsToExport.map(record => [record.id, ...fields.map(field => record.values[field.id] || ''), record.createdAt]);
-    const csv = [headers, ...rows].map(row => row.map(value => escapeCsvValue(String(value))).join(',')).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const downloadBlob = (content: string, type: string, extension: string) => {
+    const blob = new Blob([content], { type });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `${currentPage?.pageName || 'db-builder'}-export.csv`;
+    link.download = `${currentPage?.pageName || 'db-builder'}-export.${extension}`;
     link.click();
     URL.revokeObjectURL(url);
   };
 
-  const bulkExport = () => {
-    exportRecords(records.filter(record => selectedIds.includes(record.id)));
+  const buildExportRows = (recordsToExport: DbRecord[]) => {
+    const headers = ['ID', ...fields.map(getFieldLabel), 'Created At'];
+    const rows = recordsToExport.map(record => [record.id, ...fields.map(field => record.values[field.id] || ''), record.createdAt]);
+    return { headers, rows };
   };
 
-  const renderFieldPreview = (field: PageContent) => {
+  const exportRecordsAsCsv = (recordsToExport: DbRecord[]) => {
+    const { headers, rows } = buildExportRows(recordsToExport);
+    const csv = [headers, ...rows].map(row => row.map(value => escapeCsvValue(String(value))).join(',')).join('\n');
+    downloadBlob(csv, 'text/csv;charset=utf-8;', 'csv');
+  };
+
+  const exportRecordsAsXlsx = (recordsToExport: DbRecord[]) => {
+    const { headers, rows } = buildExportRows(recordsToExport);
+    const xmlRows = [headers, ...rows]
+      .map(row => `<Row>${row.map(value => `<Cell><Data ss:Type="String">${escapeXmlValue(String(value))}</Data></Cell>`).join('')}</Row>`)
+      .join('');
+    const xml = `<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+  <Worksheet ss:Name="Export">
+    <Table>${xmlRows}</Table>
+  </Worksheet>
+</Workbook>`;
+    downloadBlob(xml, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8;', 'xlsx');
+  };
+
+  const confirmBulkExport = (format: 'csv' | 'xlsx') => {
+    const recordsToExport = records.filter(record => selectedIds.includes(record.id));
+    if (format === 'csv') {
+      exportRecordsAsCsv(recordsToExport);
+    } else {
+      exportRecordsAsXlsx(recordsToExport);
+    }
+    closeBulkModal();
+  };
+
+  const renderFieldInput = (field: PageContent) => {
     const config = Allfields[field.key as keyof typeof Allfields];
-    const AddField = config?.add as FieldRenderer | undefined;
-    if (!AddField) return null;
+    const modeComponent = modalMode === 'view' ? config?.view : modalMode === 'edit' ? config?.update : config?.add;
+    const FieldComponent = modeComponent as FieldRenderer | undefined;
+    if (!FieldComponent) return null;
 
     return (
-      <div className="rounded-lg border border-white/10 bg-black/20 p-3 text-slate-300">
-        <AddField data={field.data} />
+      <div className="">
+        <FieldComponent data={field.data} value={draftValues[field.id] || ''} onChange={value => setDraftValues(prev => ({ ...prev, [field.id]: value }))} />
       </div>
     );
   };
@@ -239,21 +306,12 @@ function PreviewPageContent() {
           <label htmlFor={`field-${field.id}`} className="text-sm font-medium text-slate-300">
             {getFieldLabel(field)}
           </label>
-          {modalMode === 'add' && renderFieldPreview(field)}
-          {modalMode === 'view' ? (
-            <div className="min-h-10 rounded-lg border border-white/10 bg-slate-950 px-3 py-2 text-slate-200">{draftValues[field.id] || '-'}</div>
-          ) : (
-            <Input
-              id={`field-${field.id}`}
-              value={draftValues[field.id] || ''}
-              onChange={e => setDraftValues(prev => ({ ...prev, [field.id]: e.target.value }))}
-              placeholder={typeof field.data === 'object' && field.data && 'fieldPlaceHolder' in field.data ? String(field.data.fieldPlaceHolder) : 'Enter value'}
-              className="bg-slate-950 border-white/10 text-white placeholder:text-slate-600"
-            />
-          )}
+          {renderFieldInput(field)}
         </div>
       ))}
-      {fields.length === 0 && <div className="rounded-lg border border-white/10 bg-black/20 p-6 text-center text-slate-400">No fields configured for this DB page.</div>}
+      {fields.length === 0 && (
+        <div className="rounded-lg border border-white/10 bg-black/20 p-6 text-center text-slate-400">No fields configured for this DB page.</div>
+      )}
     </div>
   );
 
@@ -317,15 +375,15 @@ function PreviewPageContent() {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <Button onClick={bulkEdit} disabled={selectedIds.length === 0} variant="outlineGlassy" size="sm" className="gap-2">
+            <Button onClick={openBulkEditDialog} disabled={selectedIds.length === 0 || fields.length === 0} variant="outlineGlassy" size="sm" className="gap-2">
               <Edit className="h-4 w-4" />
               Bulk Edit
             </Button>
-            <Button onClick={bulkDelete} disabled={selectedIds.length === 0} variant="outlineFire" size="sm" className="gap-2">
+            <Button onClick={() => setBulkModalMode('delete')} disabled={selectedIds.length === 0} variant="outlineFire" size="sm" className="gap-2">
               <Trash2 className="h-4 w-4" />
               Bulk Delete
             </Button>
-            <Button onClick={bulkExport} disabled={selectedIds.length === 0} variant="outlineGlassy" size="sm" className="gap-2">
+            <Button onClick={() => setBulkModalMode('export')} disabled={selectedIds.length === 0} variant="outlineGlassy" size="sm" className="gap-2">
               <Download className="h-4 w-4" />
               Bulk Export
             </Button>
@@ -369,7 +427,7 @@ function PreviewPageContent() {
                         <Button onClick={() => openEditDialog(record)} variant="outlineGlassy" size="sm" className="min-w-1" title="Edit">
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button onClick={() => deleteRecord(record.id)} variant="outlineFire" size="sm" className="min-w-1" title="Delete">
+                        <Button onClick={() => setRecordToDelete(record)} variant="outlineFire" size="sm" className="min-w-1" title="Delete">
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
@@ -413,13 +471,15 @@ function PreviewPageContent() {
                 <Button onClick={() => openEditDialog(record)} variant="outlineGlassy" size="sm" className="min-w-1">
                   <Edit className="h-4 w-4" />
                 </Button>
-                <Button onClick={() => deleteRecord(record.id)} variant="outlineFire" size="sm" className="min-w-1">
+                <Button onClick={() => setRecordToDelete(record)} variant="outlineFire" size="sm" className="min-w-1">
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
             </div>
           ))}
-          {paginatedRecords.length === 0 && <div className="rounded-xl border border-white/10 bg-white/5 p-10 text-center text-slate-500">No records found.</div>}
+          {paginatedRecords.length === 0 && (
+            <div className="rounded-xl border border-white/10 bg-white/5 p-10 text-center text-slate-500">No records found.</div>
+          )}
         </div>
 
         <div className="flex flex-col gap-3 rounded-xl border border-white/10 bg-white/5 p-4 sm:flex-row sm:items-center sm:justify-between">
@@ -463,9 +523,6 @@ function PreviewPageContent() {
           <DialogHeader>
             <div className="flex items-center justify-between gap-3">
               <DialogTitle>{modalMode === 'add' ? 'Add Record' : modalMode === 'edit' ? 'Edit Record' : 'View Record'}</DialogTitle>
-              <Button variant="ghost" size="icon" onClick={closeModal} className="text-slate-400 hover:bg-white/10 hover:text-white">
-                <X className="h-4 w-4" />
-              </Button>
             </div>
           </DialogHeader>
           {renderRecordForm()}
@@ -479,6 +536,123 @@ function PreviewPageContent() {
               </Button>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={bulkModalMode === 'edit'} onOpenChange={open => !open && closeBulkModal()}>
+        <DialogContent className="bg-slate-900 border-white/10 text-white">
+          <DialogHeader>
+            <DialogTitle>Bulk Edit</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-slate-400">Update {selectedIds.length} selected item(s).</p>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-300">Field</label>
+              <Select value={bulkEditFieldId} onValueChange={setBulkEditFieldId}>
+                <SelectTrigger className="bg-slate-950 border-white/10 text-white">
+                  <SelectValue placeholder="Select field" />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-900 border-white/10 text-white">
+                  {fields.map(field => (
+                    <SelectItem key={field.id} value={field.id}>
+                      {getFieldLabel(field)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="bulk-edit-value" className="text-sm font-medium text-slate-300">
+                Value
+              </label>
+              <Input
+                id="bulk-edit-value"
+                value={bulkEditValue}
+                onChange={e => setBulkEditValue(e.target.value)}
+                placeholder="Enter new value"
+                className="bg-slate-950 border-white/10 text-white placeholder:text-slate-600"
+              />
+            </div>
+            <div className="flex justify-end gap-3">
+              <Button variant="ghost" onClick={closeBulkModal} className="text-slate-400 hover:bg-white/5 hover:text-white">
+                Cancel
+              </Button>
+              <Button onClick={confirmBulkEdit} disabled={!bulkEditFieldId} className="bg-blue-600 text-white hover:bg-blue-500">
+                Update Selected
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={bulkModalMode === 'delete'} onOpenChange={open => !open && closeBulkModal()}>
+        <DialogContent className="bg-slate-900 border-red-500/20 text-white">
+          <DialogHeader>
+            <DialogTitle>Bulk Delete</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-5">
+            <p className="text-slate-300">
+              Are you sure you want to delete <span className="font-semibold text-white">{selectedIds.length}</span> selected item(s)?
+            </p>
+            <div className="flex justify-end gap-3">
+              <Button variant="ghost" onClick={closeBulkModal} className="text-slate-400 hover:bg-white/5 hover:text-white">
+                Cancel
+              </Button>
+              <Button onClick={confirmBulkDelete} className="bg-red-600 text-white hover:bg-red-500">
+                Confirm Delete
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={bulkModalMode === 'export'} onOpenChange={open => !open && closeBulkModal()}>
+        <DialogContent className="bg-slate-900 border-white/10 text-white">
+          <DialogHeader>
+            <DialogTitle>Bulk Export</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-5">
+            <p className="text-sm text-slate-400">Choose an export format for {selectedIds.length} selected item(s).</p>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <Button onClick={() => confirmBulkExport('csv')} variant="outlineGlassy" className="h-16 gap-2">
+                <Download className="h-4 w-4" />
+                CSV
+              </Button>
+              <Button onClick={() => confirmBulkExport('xlsx')} variant="outlineGlassy" className="h-16 gap-2">
+                <Download className="h-4 w-4" />
+                xlsx
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!recordToDelete} onOpenChange={open => !open && setRecordToDelete(null)}>
+        <DialogContent className="bg-slate-900 border-red-500/20 text-white">
+          <DialogHeader>
+            <DialogTitle>Delete Item?</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-5">
+            <p className="text-slate-300">Are you sure you want to delete this item? This action cannot be undone.</p>
+            {recordToDelete && (
+              <div className="space-y-2 rounded-lg border border-white/10 bg-black/20 p-3">
+                {fields.slice(0, 2).map((field, idx) => (
+                  <div key={field.id} className={`flex items-center justify-between py-1 border-t border-white/10 ${idx === 0 ? 'border-t-0' : ''}`}>
+                    <div className="text-xs uppercase text-slate-500">{getFieldLabel(field)}</div>
+                    <div className="mt-1 text-sm text-slate-200">{recordToDelete.values[field.id] || '-'}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="flex justify-end gap-3">
+              <Button variant="ghost" onClick={() => setRecordToDelete(null)} className="text-slate-400 hover:bg-white/5 hover:text-white">
+                Cancel
+              </Button>
+              <Button onClick={confirmDeleteRecord} className="bg-red-600 text-white hover:bg-red-500">
+                Confirm Delete
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </main>

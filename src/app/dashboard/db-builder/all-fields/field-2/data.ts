@@ -17,7 +17,7 @@ export interface Ifield2Data {
 }
 
 export const defaultDatafield2: Ifield2Data = {
-  fieldName: 'Input Field',
+  fieldName: 'Input Email Field',
   fieldData: '',
   fieldPlaceHolder: 'Enter your email',
 };

@@ -48,6 +48,32 @@ const COMPONENT_MAP: Record<string, { collection: any; keys: string[]; label: st
   field: { collection: Allfields, keys: AllfieldsKeys, label: 'Fields', icon: Database, color: 'text-blue-400 from-cyan-500 to-blue-500' },
 };
 
+interface FieldFormState {
+  fieldName: string;
+  fieldKey: string;
+  fieldPlaceHolder: string;
+}
+
+const getFieldConfigData = (fieldKey: string) => {
+  const config = Allfields[fieldKey as keyof typeof Allfields];
+  return config?.data;
+};
+
+const getFieldDisplayName = (fieldKey: string) => {
+  const data = getFieldConfigData(fieldKey);
+  return data?.fieldName || fieldKey;
+};
+
+const getFieldPlaceholder = (fieldKey: string) => {
+  const data = getFieldConfigData(fieldKey);
+  return data && 'fieldPlaceHolder' in data ? data.fieldPlaceHolder : '';
+};
+
+const fieldHasPlaceholder = (fieldKey: string) => {
+  const data = getFieldConfigData(fieldKey);
+  return Boolean(data && 'fieldPlaceHolder' in data);
+};
+
 const getTypeStyles = (type: ItemType) => {
   switch (type) {
     case 'field':
@@ -224,7 +250,16 @@ function EditPageContent() {
   const [movingItem, setMovingItem] = useState<PageContent | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [isAddFieldDialogOpen, setIsAddFieldDialogOpen] = useState(false);
-  const [addFieldForm, setAddFieldForm] = useState({ fieldText: '', fieldKey: AllfieldsKeys[0] || '' });
+  const [addFieldForm, setAddFieldForm] = useState<FieldFormState>({
+    fieldName: '',
+    fieldKey: AllfieldsKeys[0] || '',
+    fieldPlaceHolder: getFieldPlaceholder(AllfieldsKeys[0] || ''),
+  });
+  const [editFieldForm, setEditFieldForm] = useState<FieldFormState>({
+    fieldName: '',
+    fieldKey: AllfieldsKeys[0] || '',
+    fieldPlaceHolder: getFieldPlaceholder(AllfieldsKeys[0] || ''),
+  });
   const [, setIsScrolled] = useState(false);
   const [isDockExpanded, setIsDockExpanded] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -273,9 +308,9 @@ function EditPageContent() {
 
   const handleAddField = () => {
     const key = addFieldForm.fieldKey;
-    const fieldText = addFieldForm.fieldText.trim();
-    if (!fieldText || !key) {
-      toast.error('Please enter field text and select a field');
+    const fieldName = addFieldForm.fieldName.trim();
+    if (!fieldName || !key) {
+      toast.error('Please enter field name and select a field');
       return;
     }
 
@@ -287,26 +322,35 @@ function EditPageContent() {
       return;
     }
 
-    const fieldData = typeof config.data === 'object' && config.data !== null ? { ...config.data, fieldName: fieldText } : config.data;
+    const fieldData =
+      typeof config.data === 'object' && config.data !== null ? { ...config.data, fieldName, fieldPlaceHolder: addFieldForm.fieldPlaceHolder } : config.data;
     const newItem: PageContent = {
       id: `${type}-${key}-${Date.now()}`,
       key: key,
-      name: fieldText,
+      name: fieldName,
       type: type,
-      heading: fieldText,
+      heading: fieldName,
       path: `/${key}`,
       data: fieldData,
     };
     setItems([...items, newItem]);
 
-    toast.success(`${fieldText} added to page`);
+    toast.success(`${fieldName} added to page`);
     setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 100);
 
-    setAddFieldForm({ fieldText: '', fieldKey: AllfieldsKeys[0] || '' });
+    setAddFieldForm({ fieldName: '', fieldKey: AllfieldsKeys[0] || '', fieldPlaceHolder: getFieldPlaceholder(AllfieldsKeys[0] || '') });
     setIsAddFieldDialogOpen(false);
   };
 
-  const handleEdit = (item: PageContent) => setEditingItem(item);
+  const handleEdit = (item: PageContent) => {
+    const data = typeof item.data === 'object' && item.data !== null ? (item.data as { fieldName?: string; fieldPlaceHolder?: string }) : {};
+    setEditFieldForm({
+      fieldName: item.heading || item.name || data.fieldName || '',
+      fieldKey: item.key,
+      fieldPlaceHolder: data.fieldPlaceHolder || getFieldPlaceholder(item.key),
+    });
+    setEditingItem(item);
+  };
   const handleDeleteClick = (item: PageContent) => setDeletingItem(item);
   const handleOpenMoveDialog = (item: PageContent) => setMovingItem(item);
   const handlePreviewPage = (path: string) => {
@@ -319,8 +363,21 @@ function EditPageContent() {
     }
   };
 
-  const onSubmitEdit = (updatedData: unknown) => {
-    if (editingItem) setItems(items.map(item => (item.id === editingItem.id ? { ...item, data: updatedData } : item)));
+  const handleSubmitEditField = () => {
+    if (!editingItem) return;
+
+    const key = editFieldForm.fieldKey;
+    const fieldName = editFieldForm.fieldName.trim();
+    const config = COMPONENT_MAP.field.collection[key];
+    if (!fieldName || !key || !config) {
+      toast.error('Please enter field name and select a field');
+      return;
+    }
+
+    const fieldData =
+      typeof config.data === 'object' && config.data !== null ? { ...config.data, fieldName, fieldPlaceHolder: editFieldForm.fieldPlaceHolder } : config.data;
+
+    setItems(items.map(item => (item.id === editingItem.id ? { ...item, key, name: fieldName, heading: fieldName, path: `/${key}`, data: fieldData } : item)));
     setEditingItem(null);
   };
 
@@ -457,13 +514,7 @@ function EditPageContent() {
             <SortableContext items={items.map(s => s.id)} strategy={verticalListSortingStrategy}>
               <div className="flex flex-col gap-8">
                 {items.map(item => (
-                  <SortableItem
-                    key={item.id}
-                    item={item}
-                    onEdit={handleEdit}
-                    onDelete={handleDeleteClick}
-                    onOpenMoveDialog={handleOpenMoveDialog}
-                  />
+                  <SortableItem key={item.id} item={item} onEdit={handleEdit} onDelete={handleDeleteClick} onOpenMoveDialog={handleOpenMoveDialog} />
                 ))}
               </div>
             </SortableContext>
@@ -531,37 +582,58 @@ function EditPageContent() {
           <div className="space-y-4 py-2">
             <div className="space-y-2">
               <Label htmlFor="field-text" className="text-slate-300">
-                Text
+                Field Name
               </Label>
               <Input
                 id="field-text"
-                value={addFieldForm.fieldText}
-                onChange={e => setAddFieldForm(prev => ({ ...prev, fieldText: e.target.value }))}
+                value={addFieldForm.fieldName}
+                onChange={e => setAddFieldForm(prev => ({ ...prev, fieldName: e.target.value }))}
                 placeholder="e.g. Student Name"
                 className="bg-slate-950 border-white/10 text-white placeholder:text-slate-600"
               />
             </div>
             <div className="space-y-2">
               <Label className="text-slate-300">Field</Label>
-              <Select value={addFieldForm.fieldKey} onValueChange={value => setAddFieldForm(prev => ({ ...prev, fieldKey: value }))}>
+              <Select
+                value={addFieldForm.fieldKey}
+                onValueChange={value => setAddFieldForm(prev => ({ ...prev, fieldKey: value, fieldPlaceHolder: getFieldPlaceholder(value) }))}
+              >
                 <SelectTrigger className="bg-slate-950 border-white/10 text-white">
                   <SelectValue placeholder="Select a field" />
                 </SelectTrigger>
                 <SelectContent className="bg-slate-900 border-white/10 text-white">
                   {AllfieldsKeys.map(key => (
                     <SelectItem key={key} value={key} className="focus:bg-white/10 focus:text-white">
-                      {key}
+                      {getFieldDisplayName(key)}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
+            {fieldHasPlaceholder(addFieldForm.fieldKey) && (
+              <div className="space-y-2">
+                <Label htmlFor="field-placeholder" className="text-slate-300">
+                  Update Place Holder
+                </Label>
+                <Input
+                  id="field-placeholder"
+                  value={addFieldForm.fieldPlaceHolder}
+                  onChange={e => setAddFieldForm(prev => ({ ...prev, fieldPlaceHolder: e.target.value }))}
+                  placeholder="e.g. Enter value"
+                  className="bg-slate-950 border-white/10 text-white placeholder:text-slate-600"
+                />
+              </div>
+            )}
           </div>
           <div className="flex justify-end gap-3">
             <Button variant="ghost" onClick={() => setIsAddFieldDialogOpen(false)} className="text-slate-400 hover:text-white hover:bg-white/5">
               Cancel
             </Button>
-            <Button onClick={handleAddField} disabled={!addFieldForm.fieldText.trim() || !addFieldForm.fieldKey} className="bg-blue-600 hover:bg-blue-500 text-white">
+            <Button
+              onClick={handleAddField}
+              disabled={!addFieldForm.fieldName.trim() || !addFieldForm.fieldKey}
+              className="bg-blue-600 hover:bg-blue-500 text-white"
+            >
               Add Field
             </Button>
           </div>
@@ -628,19 +700,63 @@ function EditPageContent() {
             </DialogTitle>
           </DialogHeader>
           <ScrollArea className="flex-1 min-h-0 w-full -mt-4">
-            <div className="">
-              {editingItem &&
-                (() => {
-                  const meta = COMPONENT_MAP[editingItem.type];
-                  const config = meta.collection[editingItem.key];
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  const UpdateField = (config as any).update;
-                  return UpdateField ? (
-                    <UpdateField data={editingItem.data} onSubmit={onSubmitEdit} />
-                  ) : (
-                    <div className="p-4 text-center text-slate-500">No settings available</div>
-                  );
-                })()}
+            <div className="p-6 space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-field-name" className="text-slate-300">
+                  Field Name
+                </Label>
+                <Input
+                  id="edit-field-name"
+                  value={editFieldForm.fieldName}
+                  onChange={e => setEditFieldForm(prev => ({ ...prev, fieldName: e.target.value }))}
+                  placeholder="e.g. Student Name"
+                  className="bg-slate-950 border-white/10 text-white placeholder:text-slate-600"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-slate-300">Field</Label>
+                <Select
+                  value={editFieldForm.fieldKey}
+                  onValueChange={value => setEditFieldForm(prev => ({ ...prev, fieldKey: value, fieldPlaceHolder: getFieldPlaceholder(value) }))}
+                >
+                  <SelectTrigger className="bg-slate-950 border-white/10 text-white">
+                    <SelectValue placeholder="Select a field" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-slate-900 border-white/10 text-white">
+                    {AllfieldsKeys.map(key => (
+                      <SelectItem key={key} value={key} className="focus:bg-white/10 focus:text-white">
+                        {getFieldDisplayName(key)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              {fieldHasPlaceholder(editFieldForm.fieldKey) && (
+                <div className="space-y-2">
+                  <Label htmlFor="edit-field-placeholder" className="text-slate-300">
+                    Update Place Holder
+                  </Label>
+                  <Input
+                    id="edit-field-placeholder"
+                    value={editFieldForm.fieldPlaceHolder}
+                    onChange={e => setEditFieldForm(prev => ({ ...prev, fieldPlaceHolder: e.target.value }))}
+                    placeholder="e.g. Enter value"
+                    className="bg-slate-950 border-white/10 text-white placeholder:text-slate-600"
+                  />
+                </div>
+              )}
+              <div className="flex justify-end gap-3 pt-2">
+                <Button variant="ghost" onClick={() => setEditingItem(null)} className="text-slate-400 hover:text-white hover:bg-white/5">
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleSubmitEditField}
+                  disabled={!editFieldForm.fieldName.trim() || !editFieldForm.fieldKey}
+                  className="bg-blue-600 hover:bg-blue-500 text-white"
+                >
+                  Save
+                </Button>
+              </div>
             </div>
           </ScrollArea>
         </DialogContent>
