@@ -10,7 +10,7 @@
 
 import { toast } from 'react-toastify';
 import { useEffect, useState, useMemo } from 'react';
-import { Plus, Edit, Trash2, Eye, ExternalLink, FolderOpen, Layout, X, AlertTriangle, RefreshCw, Database } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye, FolderOpen, Layout, X, AlertTriangle, RefreshCw } from 'lucide-react';
 
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
@@ -132,13 +132,6 @@ const Page = () => {
 
   const handlePreview = (path: string) => {
     window.location.href = `/dashboard/db-builder/preview-page?pathTitle=${path}`;
-  };
-
-  const handleLiveLink = (path: string) => {
-    window.location.href = path;
-  };
-  const handleFormDataPage = (path: string) => {
-    window.location.href = `/dashboard/db-builder/form-data?pathTitle=${path}`;
   };
 
   const handleToggleActive = async (page: IPage) => {
@@ -305,19 +298,6 @@ const Page = () => {
 
                               <Button size="sm" variant="outlineGlassy" className="min-w-1" onClick={() => handlePreview(page.path)} title="Preview Page">
                                 <Eye className="h-4 w-4" />
-                              </Button>
-
-                              <Button size="sm" variant="outlineGlassy" className="min-w-1" onClick={() => handleLiveLink(page.path)} title="Visit Live Page">
-                                <ExternalLink className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outlineGlassy"
-                                className="min-w-1"
-                                onClick={() => handleFormDataPage(page.path)}
-                                title="Visit Live Page"
-                              >
-                                <Database className="h-4 w-4" />
                               </Button>
 
                               <Button

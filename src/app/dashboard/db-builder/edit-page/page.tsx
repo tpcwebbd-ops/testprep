@@ -22,8 +22,6 @@ import {
   FolderOpen,
   ArrowUpDown,
   ChevronDown,
-  ChevronLeft,
-  ChevronRight,
   GripVertical,
   AlertTriangle,
 } from 'lucide-react';
@@ -33,7 +31,10 @@ import { useState, useEffect, Suspense, useMemo } from 'react';
 
 import { CSS } from '@dnd-kit/utilities';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useGetPagesQuery, useUpdatePageMutation } from '@/redux/features/db-builder/pageBuilderSlice';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -222,23 +223,17 @@ function EditPageContent() {
   const [deletingItem, setDeletingItem] = useState<PageContent | null>(null);
   const [movingItem, setMovingItem] = useState<PageContent | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [activeAddType, setActiveAddType] = useState<ItemType | null>(null);
+  const [isAddFieldDialogOpen, setIsAddFieldDialogOpen] = useState(false);
+  const [addFieldForm, setAddFieldForm] = useState({ fieldText: '', fieldKey: AllfieldsKeys[0] || '' });
   const [, setIsScrolled] = useState(false);
   const [isDockExpanded, setIsDockExpanded] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-
-  const [paginationPage, setPaginationPage] = useState(1);
-  const ITEMS_PER_PAGE = 10;
 
   useEffect(() => {
     if (currentPage?.content) {
       setItems(Array.isArray(currentPage.content) ? currentPage.content : []);
     }
   }, [currentPage]);
-
-  useEffect(() => {
-    setPaginationPage(1);
-  }, [activeAddType]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -276,24 +271,39 @@ function EditPageContent() {
     if (index < items.length - 1) setItems(prevItems => arrayMove(prevItems, index, index + 1));
   };
 
-  const handleAddItem = (type: ItemType, key: string) => {
-    const mapEntry = COMPONENT_MAP[type];
+  const handleAddField = () => {
+    const key = addFieldForm.fieldKey;
+    const fieldText = addFieldForm.fieldText.trim();
+    if (!fieldText || !key) {
+      toast.error('Please enter field text and select a field');
+      return;
+    }
+
+    const type: ItemType = 'field';
+    const mapEntry = COMPONENT_MAP.field;
     const config = mapEntry.collection[key];
+    if (!config) {
+      toast.error('Selected field was not found');
+      return;
+    }
+
+    const fieldData = typeof config.data === 'object' && config.data !== null ? { ...config.data, fieldName: fieldText } : config.data;
     const newItem: PageContent = {
       id: `${type}-${key}-${Date.now()}`,
       key: key,
-      name: config.name || `${mapEntry.label} ${key}`,
+      name: fieldText,
       type: type,
-      heading: `${mapEntry.label} ${key}`,
+      heading: fieldText,
       path: `/${key}`,
-      data: config.data,
+      data: fieldData,
     };
     setItems([...items, newItem]);
 
-    toast.success(`${key} added to page`);
+    toast.success(`${fieldText} added to page`);
     setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 100);
 
-    setActiveAddType(null);
+    setAddFieldForm({ fieldText: '', fieldKey: AllfieldsKeys[0] || '' });
+    setIsAddFieldDialogOpen(false);
   };
 
   const handleEdit = (item: PageContent) => setEditingItem(item);
@@ -335,8 +345,6 @@ function EditPageContent() {
       setIsSaving(false);
     }
   };
-
-  const topMenuButtons: ItemType[] = ['field'];
 
   if (error) {
     const errorMessage =
@@ -492,34 +500,10 @@ function EditPageContent() {
           `}
         >
           <div className="pointer-events-auto flex items-center gap-2 sm:gap-3 p-2.5">
-            {topMenuButtons.map(type => {
-              const meta = COMPONENT_MAP[type];
-              const Icon = meta.icon;
-              const isActive = activeAddType === type;
-
-              return (
-                <button
-                  key={type}
-                  onClick={() => setActiveAddType(type)}
-                  className={`
-                      group relative flex flex-col items-center justify-center w-14 h-14 sm:w-16 sm:h-14 rounded-xl transition-all duration-300
-                      ${isActive ? 'bg-white/10' : 'hover:bg-white/5'}
-                    `}
-                >
-                  <span
-                    className={`
-                       flex items-center justify-center w-8 h-8 rounded-full mb-1 transition-all duration-300 shadow-lg
-                       bg-gradient-to-br ${meta.color} text-white
-                       group-hover:scale-110 group-hover:shadow-lg
-                    `}
-                  >
-                    <Icon className="h-4 w-4" />
-                  </span>
-                  <span className="text-[10px] font-semibold text-slate-400 group-hover:text-white transition-colors">{meta.label}</span>
-                  {isActive && <div className="absolute -bottom-1 w-1 h-1 rounded-full bg-white shadow-[0_0_5px_white]" />}
-                </button>
-              );
-            })}
+            <Button onClick={() => setIsAddFieldDialogOpen(true)} variant="outlineGlassy" className="gap-2">
+              <Plus className="h-4 w-4" />
+              Add Field
+            </Button>
           </div>
           <div className="w-full flex items-center justify-end gap-2 pointer-events-auto pr-4">
             <Button size="sm" variant="outlineGlassy" className="min-w-1" onClick={() => handlePreviewPage(currentPage.path)} title="Preview Page">
@@ -539,107 +523,48 @@ function EditPageContent() {
         </div>
       </div>
 
-      <Dialog open={!!activeAddType} onOpenChange={() => setActiveAddType(null)}>
-        <DialogContent
-          className={`
-            p-0 overflow-hidden bg-slate-950/95 backdrop-blur-3xl border-white/10 shadow-2xl text-white gap-0 flex flex-col max-w-[90vw] min-w-[90vw] h-[85vh] mt-10
-        `}
-        >
-          {activeAddType &&
-            (() => {
-              const meta = COMPONENT_MAP[activeAddType];
-              const totalItems = meta.keys.length;
-              const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
-              const paginatedItems = meta.keys.slice((paginationPage - 1) * ITEMS_PER_PAGE, paginationPage * ITEMS_PER_PAGE);
-
-              return (
-                <>
-                  <div className="shrink-0 flex flex-col bg-white/5 border-b border-white/10">
-                    <div className="flex items-center justify-between p-6 pb-4">
-                      <div className="flex items-center gap-4">
-                        <div className={`p-3 rounded-xl bg-gradient-to-br ${meta.color} shadow-lg`}>
-                          <meta.icon className="h-6 w-6 text-white" />
-                        </div>
-                        <div>
-                          <DialogTitle className="text-2xl font-bold text-white flex items-center gap-3">
-                            Add {meta.label}
-                            <span className="text-xs bg-white/10 px-2 py-0.5 rounded-full text-slate-300 font-mono">{totalItems} Total</span>
-                          </DialogTitle>
-                          <p className="text-slate-400 text-sm mt-1">Choose a field to add to this DB page.</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <ScrollArea className="flex-1 min-h-0 w-full bg-black/20">
-                    <div className="p-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-10">
-                        {paginatedItems.map(key => {
-                          const config = meta.collection[key];
-                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                          const DisplayComponent = (config as any).add;
-
-                          return (
-                            <div
-                              key={key}
-                              onClick={() => handleAddItem(activeAddType, key)}
-                              className="group cursor-pointer rounded-2xl border border-white/10 bg-black/20 overflow-hidden hover:border-white/30 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
-                            >
-                              <div className="h-[180px] bg-slate-900/50 relative overflow-hidden p-4 flex items-center justify-center border-b border-white/5">
-                                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10"></div>
-                                <div className="scale-[0.8] w-full h-full origin-center flex items-center justify-center pointer-events-none">
-                                  {DisplayComponent ? <DisplayComponent data={config.data} /> : <span className="text-slate-500">Preview</span>}
-                                </div>
-                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
-                                  <div className="bg-white text-black px-4 py-2 rounded-full font-semibold flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-transform">
-                                    <Plus className="h-4 w-4" /> Add This
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="p-4 bg-white/5 flex justify-between items-center">
-                                <span className="font-semibold text-slate-200 text-sm">{key}</span>
-                                <span className="text-[10px] bg-white/10 px-2 py-1 rounded text-slate-400 uppercase tracking-wider">{meta.label}</span>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </ScrollArea>
-
-                  {totalPages > 1 && (
-                    <div className="shrink-0 p-4 border-t border-white/10 bg-slate-900/50 backdrop-blur-md flex items-center justify-between z-20">
-                      <div className="text-xs text-slate-500 font-mono hidden sm:block">
-                        Showing {(paginationPage - 1) * ITEMS_PER_PAGE + 1} - {Math.min(paginationPage * ITEMS_PER_PAGE, totalItems)} of {totalItems}
-                      </div>
-                      <div className="flex items-center gap-2 mx-auto sm:mx-0">
-                        <Button
-                          variant="outlineGlassy"
-                          size="sm"
-                          onClick={() => setPaginationPage(p => Math.max(1, p - 1))}
-                          disabled={paginationPage === 1}
-                          className="w-10 h-10 p-0 rounded-full"
-                        >
-                          <ChevronLeft className="h-4 w-4" />
-                        </Button>
-                        <span className="text-sm font-medium text-slate-300 min-w-[3rem] text-center">
-                          {paginationPage} / {totalPages}
-                        </span>
-                        <Button
-                          variant="outlineGlassy"
-                          size="sm"
-                          onClick={() => setPaginationPage(p => Math.min(totalPages, p + 1))}
-                          disabled={paginationPage === totalPages}
-                          className="w-10 h-10 p-0 rounded-full"
-                        >
-                          <ChevronRight className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                </>
-              );
-            })()}
+      <Dialog open={isAddFieldDialogOpen} onOpenChange={setIsAddFieldDialogOpen}>
+        <DialogContent className="bg-slate-900 border-white/10 text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add Field</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="field-text" className="text-slate-300">
+                Text
+              </Label>
+              <Input
+                id="field-text"
+                value={addFieldForm.fieldText}
+                onChange={e => setAddFieldForm(prev => ({ ...prev, fieldText: e.target.value }))}
+                placeholder="e.g. Student Name"
+                className="bg-slate-950 border-white/10 text-white placeholder:text-slate-600"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-slate-300">Field</Label>
+              <Select value={addFieldForm.fieldKey} onValueChange={value => setAddFieldForm(prev => ({ ...prev, fieldKey: value }))}>
+                <SelectTrigger className="bg-slate-950 border-white/10 text-white">
+                  <SelectValue placeholder="Select a field" />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-900 border-white/10 text-white">
+                  {AllfieldsKeys.map(key => (
+                    <SelectItem key={key} value={key} className="focus:bg-white/10 focus:text-white">
+                      {key}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="flex justify-end gap-3">
+            <Button variant="ghost" onClick={() => setIsAddFieldDialogOpen(false)} className="text-slate-400 hover:text-white hover:bg-white/5">
+              Cancel
+            </Button>
+            <Button onClick={handleAddField} disabled={!addFieldForm.fieldText.trim() || !addFieldForm.fieldKey} className="bg-blue-600 hover:bg-blue-500 text-white">
+              Add Field
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
       <Dialog open={!!movingItem} onOpenChange={() => setMovingItem(null)}>

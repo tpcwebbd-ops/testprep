@@ -9,9 +9,6 @@
 import AddField1 from '../field-1/Add';
 import AddField2 from '../field-2/Add';
 
-import DeleteField1 from '../field-1/Delete';
-import DeleteField2 from '../field-2/Delete';
-
 import UpdateField1 from '../field-1/Update';
 import UpdateField2 from '../field-2/Update';
 
@@ -23,13 +20,11 @@ export type { Ifield1Data, Ifield2Data };
 export const Allfields = {
   'field-uid-1': {
     add: AddField1,
-    delete: DeleteField1,
     update: UpdateField1,
     data: defaultDatafield1,
   },
   'field-uid-2': {
     add: AddField2,
-    delete: DeleteField2,
     update: UpdateField2,
     data: defaultDatafield2,
   },

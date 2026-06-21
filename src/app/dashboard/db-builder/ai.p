@@ -15,6 +15,13 @@ Api:
 'src/app/api/db-builder/v1/route.ts'
 
 Now your task is implement those featues as the following instructins.
-1. Remove open in new tab. inside home 'src/app/dashboard/db-builder/page.tsx' and edit-page 'src/app/dashboard/db-builder/edit-page/page.tsx'
-2. inside edit-page pease remove Form and Sections. and please implement 
-    - Fields. from './all-fields/all-fields-index'
+1. for home page in 'src/app/dashboard/db-builder/page.tsx'
+    - only use Edit Icon 
+    - Preview Icon
+    - Delete Icon
+    - and remove all others icon.
+    
+
+
+2. inside edit-page 'src/app/dashboard/db-builder/edit-page/page.tsx'  
+    - Femove 'Fields' button and implement a button named 'Add Field' it will open a pop-up. insdie the pop there are two field. One is text and second is selected. It will select from 'Fields' button. 

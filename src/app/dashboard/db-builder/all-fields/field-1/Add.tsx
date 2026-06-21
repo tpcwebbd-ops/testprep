@@ -6,6 +6,6 @@
 |-----------------------------------------
 */
 const Add = () => {
-  return <main>Add Input Field</main>;
+  return <main>This Div is visible insdie Add.tsx</main>;
 };
 export default Add;
