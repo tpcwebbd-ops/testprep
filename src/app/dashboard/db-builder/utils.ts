@@ -6,7 +6,7 @@
 |-----------------------------------------
 */
 
-export type ItemType = 'section' | 'form' | 'button' | 'title' | 'description' | 'paragraph' | 'sliders' | 'tagSliders' | 'logoSliders' | 'gellery';
+export type ItemType = 'field';
 
 export interface PageContent {
   id: string;
@@ -20,12 +20,12 @@ export interface PageContent {
 
 export const defaultPageContent: PageContent = {
   id: '1',
-  key: 'heading',
+  key: 'field-uid-1',
   name: 'Name',
-  type: 'title',
-  heading: 'Heading',
-  path: '/heading',
-  data: '',
+  type: 'field',
+  heading: 'Field',
+  path: '/field-uid-1',
+  data: {},
 };
 
 export interface IPage {

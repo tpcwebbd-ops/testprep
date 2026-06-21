@@ -15,7 +15,7 @@ const pageContentSchema = new Schema(
     type: {
       type: String,
       required: true,
-      enum: ['section', 'form', 'button', 'title', 'description', 'paragraph', 'sliders', 'tagSliders', 'logoSliders', 'gellery'],
+      enum: ['field'],
     },
     heading: { type: String, required: true },
     path: { type: String, required: true },

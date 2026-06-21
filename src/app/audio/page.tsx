@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { Play, Pause, Volume2, VolumeX, SkipForward, SkipBack, Loader2, AlertCircle, Smartphone, Info, Music, Sparkles, X, ExternalLink } from 'lucide-react';
+import Image from 'next/image';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { Play, Pause, Volume2, VolumeX, SkipForward, SkipBack, Loader2, AlertCircle, Smartphone, Music, Sparkles, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 // Easily configurable audio source
@@ -33,7 +34,7 @@ export default function AudioPlayerPage() {
   };
 
   // Setup Media Session API (for lock screen & background controls)
-  const updateMediaSession = () => {
+  const updateMediaSession = useCallback(() => {
     if (typeof window !== 'undefined' && 'mediaSession' in navigator) {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: AUDIO_TITLE,
@@ -54,10 +55,10 @@ export default function AudioPlayerPage() {
         console.error('Failed to update mediaSession position state:', error);
       }
     }
-  };
+  }, [duration, currentTime]);
 
   // Playback handlers
-  const handlePlay = async () => {
+  const handlePlay = useCallback(async () => {
     setUserInteracted(true);
     if (!audioRef.current) return;
 
@@ -70,13 +71,13 @@ export default function AudioPlayerPage() {
       setIsPlaying(false);
       setErrorMsg('Playback was blocked or failed. Please interact with the screen first to grant browser audio permissions.');
     }
-  };
+  }, []);
 
-  const handlePause = () => {
+  const handlePause = useCallback(() => {
     if (!audioRef.current) return;
     audioRef.current.pause();
     setIsPlaying(false);
-  };
+  }, []);
 
   const togglePlayPause = () => {
     if (isPlaying) {
@@ -87,7 +88,7 @@ export default function AudioPlayerPage() {
   };
 
   // Seeking forward / backward (seconds)
-  const seek = (seconds: number) => {
+  const seek = useCallback((seconds: number) => {
     if (!audioRef.current) return;
     let targetTime = audioRef.current.currentTime + seconds;
     if (targetTime < 0) targetTime = 0;
@@ -95,7 +96,7 @@ export default function AudioPlayerPage() {
 
     audioRef.current.currentTime = targetTime;
     setCurrentTime(targetTime);
-  };
+  }, [duration]);
 
   // Seek bar scrubber manual change
   const handleScrubChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -150,7 +151,7 @@ export default function AudioPlayerPage() {
         console.warn('Media Session API action handlers rejected:', err);
       }
     }
-  }, [duration, currentTime]);
+  }, [handlePlay, handlePause, seek]);
 
   // Audio lifecycle & setup
   useEffect(() => {
@@ -162,7 +163,6 @@ export default function AudioPlayerPage() {
       setDuration(audioObj.duration);
       setIsLoading(false);
       setErrorMsg(null);
-      updateMediaSession();
     };
 
     const onTimeUpdate = () => {
@@ -180,24 +180,16 @@ export default function AudioPlayerPage() {
     const onPlaying = () => {
       setIsPlaying(true);
       setIsLoading(false);
-      updateMediaSession();
     };
 
     const onPause = () => {
       setIsPlaying(false);
     };
 
-    const onError = (e: ErrorEvent) => {
+    const onError = (e: Event) => {
       console.error('Audio error event:', e);
       setIsLoading(false);
       setErrorMsg('Failed to stream background audio. Please verify your internet connection or the audio source URL.');
-    };
-
-    // Keep background audio active. Browser tab visibilities won't auto-stop audio.
-    const handleVisibilityPrevent = (e: Event) => {
-      // Real background play relies on keeping audio playback uninterrupted
-      // We explicitly bypass pausing the audio inside page/document focus/visibility loss
-      e.stopPropagation();
     };
 
     // Attach native media listeners
@@ -207,8 +199,7 @@ export default function AudioPlayerPage() {
     audioObj.addEventListener('waiting', onWaiting);
     audioObj.addEventListener('playing', onPlaying);
     audioObj.addEventListener('pause', onPause);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    audioObj.addEventListener('error', onError as any);
+    audioObj.addEventListener('error', onError);
 
     // Apply initial configuration safely
     audioObj.volume = volume;
@@ -221,15 +212,14 @@ export default function AudioPlayerPage() {
       audioObj.removeEventListener('waiting', onWaiting);
       audioObj.removeEventListener('playing', onPlaying);
       audioObj.removeEventListener('pause', onPause);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      audioObj.removeEventListener('error', onError as any);
+      audioObj.removeEventListener('error', onError);
     };
   }, [volume, isMuted]);
 
   // Update Media Session state when duration or currentTime changes
   useEffect(() => {
     updateMediaSession();
-  }, [duration, currentTime]);
+  }, [updateMediaSession]);
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between p-4 md:p-8 font-sans antialiased relative overflow-hidden selection:bg-cyan-500/30 selection:text-cyan-200">
@@ -286,11 +276,14 @@ export default function AudioPlayerPage() {
 
           {/* Interactive vinyl-like image or artwork */}
           <div className="relative w-48 h-48 md:w-56 md:h-56 rounded-2xl overflow-hidden shadow-2xl mb-6 border-2 border-white/5">
-            <img
+            <Image
               src={AUDIO_ARTWORK_URL}
               alt={AUDIO_TITLE}
-              className={`w-full h-full object-cover select-none transition-transform duration-10000 ease-linear ${isPlaying ? 'scale-105' : 'scale-100'}`}
+              fill
+              sizes="(min-width: 768px) 224px, 192px"
+              className={`object-cover select-none transition-transform duration-10000 ease-linear ${isPlaying ? 'scale-105' : 'scale-100'}`}
               referrerPolicy="no-referrer"
+              priority
             />
 
             {/* Play state indicator layer */}

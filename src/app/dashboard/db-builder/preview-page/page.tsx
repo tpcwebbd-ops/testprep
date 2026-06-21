@@ -10,19 +10,17 @@
 
 import { useSearchParams } from 'next/navigation';
 import { useState, useEffect, Suspense, useMemo } from 'react';
-import { AlertTriangle, Type, Layers, RefreshCw } from 'lucide-react';
+import { AlertTriangle, Database, RefreshCw } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { useGetPagesQuery } from '@/redux/features/db-builder/pageBuilderSlice';
-import { AllForms, AllFormsKeys } from '@/components/all-form/all-form-index/all-form';
-import { AllSections, AllSectionsKeys } from '@/components/all-section/all-section-index/all-sections';
 
 import { PageContent } from '../utils';
+import { Allfields, AllfieldsKeys } from '../all-fields/all-fields-index';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const COMPONENT_MAP: Record<string, { collection: any; keys: string[]; label: string; icon: any; color: string }> = {
-  form: { collection: AllForms, keys: AllFormsKeys, label: 'Forms', icon: Type, color: 'text-blue-400' },
-  section: { collection: AllSections, keys: AllSectionsKeys, label: 'Sections', icon: Layers, color: 'text-purple-400' },
+  field: { collection: Allfields, keys: AllfieldsKeys, label: 'Fields', icon: Database, color: 'text-blue-400' },
 };
 
 interface ReadOnlyItemProps {
@@ -37,25 +35,12 @@ const ReadOnlyItem = ({ item }: ReadOnlyItemProps) => {
     return null;
   }
 
-  let ComponentToRender;
-  if (item.type === 'form') {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ComponentToRender = (config as any).FormField;
-  } else {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ComponentToRender = (config as any).query;
-  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ComponentToRender = (config as any).add;
 
   return (
     <div className="w-full">
-      {ComponentToRender &&
-        (item.type !== 'form' ? (
-          <ComponentToRender data={JSON.stringify(item.data)} />
-        ) : (
-          <div className="pointer-events-auto">
-            <ComponentToRender data={item.data} />
-          </div>
-        ))}
+      {ComponentToRender && <ComponentToRender data={item.data} />}
     </div>
   );
 };

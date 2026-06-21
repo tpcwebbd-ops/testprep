@@ -108,7 +108,7 @@ const Page = () => {
   };
 
   const handleEdit = (path: string) => {
-    window.open(`/dashboard/db-builder/edit-page?pathTitle=${path}`);
+    window.location.href = `/dashboard/db-builder/edit-page?pathTitle=${path}`;
   };
 
   const initiateDelete = (page: IPage) => {
@@ -131,14 +131,14 @@ const Page = () => {
   };
 
   const handlePreview = (path: string) => {
-    window.open(`/dashboard/db-builder/preview-page?pathTitle=${path}`);
+    window.location.href = `/dashboard/db-builder/preview-page?pathTitle=${path}`;
   };
 
   const handleLiveLink = (path: string) => {
-    window.open(path);
+    window.location.href = path;
   };
   const handleFormDataPage = (path: string) => {
-    window.open(`/dashboard/db-builder/form-data?pathTitle=${path}`);
+    window.location.href = `/dashboard/db-builder/form-data?pathTitle=${path}`;
   };
 
   const handleToggleActive = async (page: IPage) => {
