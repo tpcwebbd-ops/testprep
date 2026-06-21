@@ -21,6 +21,7 @@ export const apiSlice = createApi({
     'tagTypeProfile',
     'tagTypeCourses',
     'tagTypePageBuilder',
+    'tagTypeDbBuilder',
     'Footer',
     'tagTypeFormSubmission',
     'tagTypeEnrollments',
