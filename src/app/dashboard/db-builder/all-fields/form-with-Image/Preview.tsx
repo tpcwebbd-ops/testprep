@@ -1,4 +1,4 @@
-/*
+﻿/*
 |-----------------------------------------
 | setting up Preview for the App
 | @author: Toufiquer Rahman<toufiquer.0@gmail.com>
@@ -35,9 +35,9 @@ const PreviewForm7 = ({ data }: PreviewProps) => {
     const ext = url.split('.').pop()?.toUpperCase().substring(0, 4) || 'FILE';
 
     return (
-      <div className="flex items-center justify-between p-3 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-colors group">
+      <div className="flex items-center justify-between p-3 bg-white/5 border border-white/10 rounded-sm hover:bg-white/10 transition-colors group">
         <div className="flex items-center gap-3 overflow-hidden">
-          <div className={`p-2.5 rounded-lg bg-opacity-20 ${colorClass.replace('text-', 'bg-')} ${colorClass}`}>{getIcon(url)}</div>
+          <div className={`p-2.5 rounded-sm bg-opacity-20 ${colorClass.replace('text-', 'bg-')} ${colorClass}`}>{getIcon(url)}</div>
           <div className="flex flex-col overflow-hidden">
             <span className="text-sm text-gray-200 font-medium truncate">{title}</span>
             <span className="text-[10px] text-gray-500 font-mono">{ext}</span>
@@ -47,7 +47,7 @@ const PreviewForm7 = ({ data }: PreviewProps) => {
           href={url}
           target="_blank"
           rel="noopener noreferrer"
-          className="p-2 rounded-md bg-white/5 hover:bg-white/20 text-gray-400 hover:text-white transition-all"
+          className="p-2 rounded-sm bg-white/5 hover:bg-white/20 text-gray-400 hover:text-white transition-all"
           title="Download"
         >
           <Download className="h-4 w-4" />
@@ -57,7 +57,7 @@ const PreviewForm7 = ({ data }: PreviewProps) => {
   };
 
   return (
-    <div className="relative overflow-hidden bg-slate-900/80 backdrop-blur-md border border-white/10 shadow-2xl rounded-xl p-6">
+    <div className="relative overflow-hidden bg-white/10 backdrop-blur-md backdrop-blur-md border border-white/10 shadow-2xl rounded-sm p-6">
       <div className="absolute -top-20 -right-20 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -77,7 +77,7 @@ const PreviewForm7 = ({ data }: PreviewProps) => {
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-2 text-sm text-gray-300 bg-white/5 px-4 py-2 rounded-lg border border-white/5">
+        <div className="flex items-center gap-2 text-sm text-gray-300 bg-white/5 px-4 py-2 rounded-sm border border-white/5">
           <Phone className="h-4 w-4 text-emerald-400" />
           <span className="font-mono">{formData.mobile_number || 'N/A'}</span>
         </div>
@@ -116,3 +116,5 @@ const PreviewForm7 = ({ data }: PreviewProps) => {
 };
 
 export default PreviewForm7;
+
+

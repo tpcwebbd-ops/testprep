@@ -1,4 +1,4 @@
-/*
+﻿/*
 |-----------------------------------------
 | setting up View for the App
 | @author: Toufiquer Rahman<toufiquer.0@gmail.com>
@@ -13,6 +13,8 @@ interface ViewProps extends field22Props {
 }
 
 const View = ({ value = '' }: ViewProps) => {
-  return <div className="min-h-10 whitespace-pre-wrap rounded-md bg-slate-950 px-3 py-2 text-slate-200">{value || '-'}</div>;
+  return <div className="min-h-10 whitespace-pre-wrap rounded-sm bg-white/10 backdrop-blur-md px-3 py-2 text-white">{value || '-'}</div>;
 };
 export default View;
+
+

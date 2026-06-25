@@ -1,4 +1,4 @@
-/*
+﻿/*
 |-----------------------------------------
 | setting up Allfield for the App
 | @author: Toufiquer Rahman<toufiquer.0@gmail.com>
@@ -286,3 +286,5 @@ export const Allfields = {
 };
 
 export const AllfieldsKeys = Object.keys(Allfields);
+
+

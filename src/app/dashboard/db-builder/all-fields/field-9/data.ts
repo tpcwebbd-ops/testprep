@@ -1,4 +1,4 @@
-/*
+﻿/*
 |-----------------------------------------
 | setting up Data for the App
 | @author: Toufiquer Rahman<toufiquer.0@gmail.com>
@@ -24,3 +24,5 @@ export const defaultDatafield9: Ifield9Data = {
   fieldPlaceHolder: 'Enter description',
   fieldType: 'DESCRIPTION',
 };
+
+

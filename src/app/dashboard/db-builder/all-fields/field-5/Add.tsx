@@ -1,4 +1,4 @@
-/*
+﻿/*
 |-----------------------------------------
 | setting up Add for the App
 | @author: Toufiquer Rahman<toufiquer.0@gmail.com>
@@ -57,19 +57,19 @@ const Add = ({ data, value = '', onChange }: AddProps) => {
         value={value}
         onChange={e => onChange?.(e.target.value)}
         placeholder={fieldData.fieldPlaceHolder}
-        className="min-h-24 w-full rounded-md border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+        className="min-h-24 w-full rounded-sm border border-white/10 bg-white/10 backdrop-blur-md px-3 py-2 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
       />
     );
   }
 
   if (["boolean","checkbox"].includes(normalizedType)) {
     return (
-      <label className="flex min-h-10 items-center gap-3 rounded-md border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white">
+      <label className="flex min-h-10 items-center gap-3 rounded-sm border border-white/10 bg-white/10 backdrop-blur-md px-3 py-2 text-sm text-white">
         <input
           type="checkbox"
           checked={value === 'true'}
           onChange={e => onChange?.(String(e.target.checked))}
-          className="h-4 w-4 rounded border-white/10 bg-slate-900"
+          className="h-4 w-4 rounded border-white/10 bg-white/10 backdrop-blur-md"
         />
         {fieldData.fieldPlaceHolder}
       </label>
@@ -83,7 +83,7 @@ const Add = ({ data, value = '', onChange }: AddProps) => {
       <select
         value={value}
         onChange={e => onChange?.(e.target.value)}
-        className="h-10 w-full rounded-md border border-white/10 bg-slate-950 px-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+        className="h-10 w-full rounded-sm border border-white/10 bg-white/10 backdrop-blur-md px-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500/40"
       >
         <option value="">{fieldData.fieldPlaceHolder}</option>
         {options.map(option => (
@@ -101,8 +101,10 @@ const Add = ({ data, value = '', onChange }: AddProps) => {
       value={value}
       onChange={e => onChange?.(e.target.value)}
       placeholder={fieldData.fieldPlaceHolder}
-      className="bg-slate-950 border-white/10 text-white placeholder:text-slate-600"
+      className="bg-white/10 backdrop-blur-md border-white/10 text-white placeholder:text-white/40"
     />
   );
 };
 export default Add;
+
+

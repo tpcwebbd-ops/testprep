@@ -1,4 +1,4 @@
-/*
+﻿/*
 |-----------------------------------------
 | setting up FormField for the App
 | @author: Toufiquer Rahman<toufiquer.0@gmail.com>
@@ -53,8 +53,8 @@ const FormFieldForm7 = ({ data, onSubmit }: Form7Props) => {
     if (!file) return;
 
     const url = URL.createObjectURL(file);
-    console.log('📂 File Selected:', file.name);
-    console.log('🔗 Local Path:', url);
+    console.log('ðŸ“‚ File Selected:', file.name);
+    console.log('ðŸ”— Local Path:', url);
 
     callback(url, file.name);
     toast.success('File Attached');
@@ -101,8 +101,8 @@ const FormFieldForm7 = ({ data, onSubmit }: Form7Props) => {
     const isImage = url.match(/\.(jpeg|jpg|gif|png|webp|ico)$/i) || url.startsWith('blob:');
 
     return (
-      <div className="flex items-center gap-3 w-full bg-slate-800/50 p-2 rounded-md border border-slate-700">
-        <div className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-md border border-slate-600 bg-slate-900 flex items-center justify-center group">
+      <div className="flex items-center gap-3 w-full bg-white/10 backdrop-blur-md p-2 rounded-sm border border-white/10">
+        <div className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-sm border border-white/10 bg-white/10 backdrop-blur-md flex items-center justify-center group">
           {isImage ? (
             <Image src={url} width={200} height={200} alt={name} className="h-full w-full object-cover" />
           ) : (
@@ -111,7 +111,7 @@ const FormFieldForm7 = ({ data, onSubmit }: Form7Props) => {
         </div>
 
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-slate-200 truncate">{name || 'Untitled Document'}</p>
+          <p className="text-sm font-medium text-white truncate">{name || 'Untitled Document'}</p>
           <a href={url} target="_blank" rel="noreferrer" className="text-[10px] text-blue-400 hover:underline truncate block">
             {url}
           </a>
@@ -124,7 +124,7 @@ const FormFieldForm7 = ({ data, onSubmit }: Form7Props) => {
     const currentUrl = formData.documents[docKey];
 
     return (
-      <div className="p-4 border border-dashed border-slate-700 rounded-lg bg-slate-900/50 hover:bg-slate-900/80 transition-colors relative flex flex-col justify-center min-h-[110px]">
+      <div className="p-4 border border-dashed border-white/10 rounded-sm bg-white/10 backdrop-blur-md hover:bg-white/10 backdrop-blur-md transition-colors relative flex flex-col justify-center min-h-[110px]">
         <div className="flex justify-between items-center mb-3">
           <Label className="text-slate-300 font-medium">{label}</Label>
           {currentUrl && <CheckCircle className="h-4 w-4 text-emerald-500 animate-in zoom-in" />}
@@ -153,7 +153,7 @@ const FormFieldForm7 = ({ data, onSubmit }: Form7Props) => {
             />
             <label
               htmlFor={docKey}
-              className="flex items-center justify-center gap-2 w-full h-10 px-4 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm cursor-pointer transition-all border border-slate-600 hover:border-slate-500"
+              className="flex items-center justify-center gap-2 w-full h-10 px-4 rounded-sm bg-white/10 backdrop-blur-md hover:bg-white/15 text-white text-sm cursor-pointer transition-all border border-white/10 hover:border-white/30"
             >
               <UploadCloud className="h-4 w-4" />
               <span>Select File</span>
@@ -167,7 +167,7 @@ const FormFieldForm7 = ({ data, onSubmit }: Form7Props) => {
   return (
     <div className="space-y-8 p-2 text-white">
       <div className="space-y-4">
-        <div className="flex items-center gap-2 border-b border-slate-700 pb-2">
+        <div className="flex items-center gap-2 border-b border-white/10 pb-2">
           <div className="h-1 w-1 rounded-full bg-blue-500" />
           <h3 className="font-semibold text-blue-400">Student Information</h3>
         </div>
@@ -178,7 +178,7 @@ const FormFieldForm7 = ({ data, onSubmit }: Form7Props) => {
               placeholder="Enter full name"
               value={formData.student_name}
               onChange={e => updateField('student_name', e.target.value)}
-              className="bg-slate-800/50 border-slate-700 focus:border-blue-500 focus:ring-blue-500/20 transition-all"
+              className="bg-white/10 backdrop-blur-md border-white/10 focus:border-blue-500 focus:ring-blue-500/20 transition-all"
             />
           </div>
           <div className="space-y-2">
@@ -187,14 +187,14 @@ const FormFieldForm7 = ({ data, onSubmit }: Form7Props) => {
               placeholder="+880..."
               value={formData.mobile_number}
               onChange={e => updateField('mobile_number', e.target.value)}
-              className="bg-slate-800/50 border-slate-700 focus:border-blue-500 focus:ring-blue-500/20 transition-all"
+              className="bg-white/10 backdrop-blur-md border-white/10 focus:border-blue-500 focus:ring-blue-500/20 transition-all"
             />
           </div>
         </div>
       </div>
 
       <div className="space-y-4">
-        <div className="flex items-center gap-2 border-b border-slate-700 pb-2">
+        <div className="flex items-center gap-2 border-b border-white/10 pb-2">
           <div className="h-1 w-1 rounded-full bg-purple-500" />
           <h3 className="font-semibold text-purple-400">Required Documents</h3>
         </div>
@@ -209,7 +209,7 @@ const FormFieldForm7 = ({ data, onSubmit }: Form7Props) => {
       </div>
 
       <div className="space-y-4">
-        <div className="w-full flex items-center justify-between  border-b border-slate-700">
+        <div className="w-full flex items-center justify-between  border-b border-white/10">
           <div className="flex items-center gap-2 pb-2">
             <div className="h-1 w-1 rounded-full bg-emerald-500" />
             <h3 className="font-semibold text-emerald-400">Additional Documents</h3>
@@ -230,7 +230,7 @@ const FormFieldForm7 = ({ data, onSubmit }: Form7Props) => {
           {formData.documents.others.map((doc, index) => (
             <div
               key={doc.id}
-              className="flex flex-col gap-2 p-3 bg-slate-900/40 rounded-lg border border-slate-700 animate-in fade-in slide-in-from-left-2 h-full"
+              className="flex flex-col gap-2 p-3 bg-white/10 backdrop-blur-md rounded-sm border border-white/10 animate-in fade-in slide-in-from-left-2 h-full"
             >
               <div className="flex items-center gap-3">
                 <span className="text-xs text-slate-500 font-mono w-6">#{index + 1}</span>
@@ -238,7 +238,7 @@ const FormFieldForm7 = ({ data, onSubmit }: Form7Props) => {
                   placeholder="Document Name (e.g. Awards)"
                   value={doc.name}
                   onChange={e => updateOtherDoc(doc.id, 'name', e.target.value)}
-                  className="h-8 text-xs bg-slate-800 border-slate-600"
+                  className="h-8 text-xs bg-white/10 backdrop-blur-md border-white/10"
                 />
                 <Button
                   variant="ghost"
@@ -263,7 +263,7 @@ const FormFieldForm7 = ({ data, onSubmit }: Form7Props) => {
                     />
                     <label
                       htmlFor={`other-${doc.id}`}
-                      className="flex items-center justify-center gap-2 w-full h-12 border-2 border-dashed border-slate-700 hover:border-emerald-500/50 hover:bg-emerald-500/5 rounded-md cursor-pointer transition-all text-slate-400 hover:text-emerald-400"
+                      className="flex items-center justify-center gap-2 w-full h-12 border-2 border-dashed border-white/10 hover:border-emerald-500/50 hover:bg-emerald-500/5 rounded-sm cursor-pointer transition-all text-slate-400 hover:text-emerald-400"
                     >
                       <Plus className="h-5 w-5" />
                       <span className="text-sm">Click to Upload Document</span>
@@ -292,3 +292,6 @@ const FormFieldForm7 = ({ data, onSubmit }: Form7Props) => {
 };
 
 export default FormFieldForm7;
+
+
+

@@ -1,4 +1,4 @@
-/*
+﻿/*
 |-----------------------------------------
 | setting up Page for the App
 | @author: Toufiquer Rahman<toufiquer.0@gmail.com>
@@ -156,7 +156,7 @@ const Page = () => {
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-purple-950 pt-[90px] pb-20 px-4 md:px-8">
+      <main className="min-h-screen bg-transparent text-slate-200 pt-[90px] pb-20 px-4 md:px-12 font-sans overflow-x-hidden">
         <div className="max-w-7xl mx-auto flex items-center justify-center min-h-[50vh]">
           <div className="flex flex-col items-center gap-4 animate-in fade-in zoom-in-95 duration-500">
             <div className="relative">
@@ -178,7 +178,7 @@ const Page = () => {
       'status' in error ? `Error ${error.status}: ${JSON.stringify(error.data)}` : 'message' in error ? error.message : 'An unexpected error occurred';
 
     return (
-      <main className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-purple-950 pt-[90px] pb-20 px-4 md:px-8">
+      <main className="min-h-screen bg-transparent text-slate-200 pt-[90px] pb-20 px-4 md:px-12 font-sans overflow-x-hidden">
         <div className="max-w-7xl mx-auto flex items-center justify-center min-h-[50vh]">
           <div className="flex flex-col items-center gap-6 animate-in fade-in zoom-in-95 duration-500 max-w-md">
             <div className="relative">
@@ -205,12 +205,14 @@ const Page = () => {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-purple-950 pt-[90px] pb-20 px-4 md:px-8">
+    <main className="min-h-screen bg-transparent text-slate-200 pt-[90px] pb-20 px-4 md:px-12 font-sans overflow-x-hidden">
       <div className="max-w-7xl mx-auto space-y-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6">
           <div>
-            <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">DB Management</h1>
-            <p className="text-slate-400 mt-1 text-sm">Manage your application routes, structure, and visibility.</p>
+            <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-white/40">
+              DB Management
+            </h1>
+            <p className="text-white/50 mt-2 text-sm">Manage your application routes, structure, and visibility.</p>
           </div>
           <div className="flex gap-2">
             <Button onClick={() => refetch()} variant="outlineGlassy" size="icon" title="Refresh Data">
@@ -224,10 +226,10 @@ const Page = () => {
         </div>
 
         {pages.length === 0 ? (
-          <div className="animate-in fade-in zoom-in-95 duration-700 flex flex-col items-center justify-center min-h-[50vh] border-2 border-dashed border-white/10 rounded-2xl bg-white/5 backdrop-blur-sm p-12">
+          <div className="animate-in fade-in zoom-in-95 duration-700 flex flex-col items-center justify-center min-h-[50vh] border border-white/10 rounded-2xl bg-white/5 backdrop-blur-2xl p-12">
             <div className="relative mb-6">
               <div className="absolute inset-0 bg-purple-500/30 blur-3xl rounded-full animate-pulse" />
-              <div className="relative w-24 h-24 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-2xl">
+              <div className="relative w-24 h-24 rounded-2xl bg-white/10 border border-white/10 backdrop-blur-2xl flex items-center justify-center shadow-2xl">
                 <FolderOpen className="h-12 w-12 text-white" />
               </div>
             </div>
@@ -242,7 +244,7 @@ const Page = () => {
           <div className="space-y-10">
             {Object.entries(groupedPages).map(([groupName, groupPages]) => (
               <div key={groupName} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div className="flex items-center gap-2 mb-4 text-slate-300">
+                <div className="flex items-center gap-2 mb-4 text-white/70">
                   <FolderOpen className="h-5 w-5 text-blue-400" />
                   <h2 className="text-lg font-semibold capitalize tracking-wide">{groupName === 'Root Pages' ? 'Main Pages' : groupName.replace('/', '')}</h2>
                   <span className="text-xs bg-white/10 px-2 py-0.5 rounded-full text-slate-400">{groupPages.length}</span>
@@ -253,11 +255,11 @@ const Page = () => {
                     <div
                       key={page._id}
                       className={`
-                        relative group overflow-hidden rounded-xl border backdrop-blur-md transition-all duration-300
+                        relative group overflow-hidden rounded-2xl border backdrop-blur-2xl transition-all duration-300
                         ${
                           page.isActive
-                            ? 'bg-slate-900/60 border-white/10 hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/10'
-                            : 'bg-slate-900/30 border-white/5 opacity-70 grayscale-[0.5] hover:opacity-100 hover:grayscale-0'
+                            ? 'bg-white/5 border-white/10 hover:border-blue-500/50 hover:bg-white/10'
+                            : 'bg-white/5 border-white/5 opacity-70 grayscale-[0.5] hover:opacity-100 hover:grayscale-0'
                         }
                       `}
                     >
@@ -265,10 +267,10 @@ const Page = () => {
                         <div className="space-y-1">
                           <div className="flex items-start justify-between">
                             <div className="flex items-center gap-2 max-w-[70%]">
-                              <div className={`p-1.5 rounded-md shrink-0 ${page.isActive ? 'bg-blue-500/20 text-blue-400' : 'bg-slate-700/20 text-slate-500'}`}>
+                              <div className={`p-2.5 rounded-xl border border-white/5 shrink-0 ${page.isActive ? 'bg-gradient-to-br from-blue-500/10 to-purple-500/10 text-blue-400' : 'bg-white/5 text-slate-500'}`}>
                                 <Layout className="h-4 w-4" />
                               </div>
-                              <h3 className="font-bold text-slate-100 truncate" title={page.pageName}>
+                              <h3 className="font-semibold text-white truncate" title={page.pageName}>
                                 {page.pageName}
                               </h3>
                             </div>
@@ -284,7 +286,7 @@ const Page = () => {
 
                         <div className="w-full flex flex-col gap-2 items-start justify-between">
                           <p
-                            className="text-xs font-mono text-slate-400 bg-black/20 inline-block px-2 py-1 rounded border border-white/5 max-w-[120px] truncate"
+                            className="text-xs font-mono text-white/50 bg-white/5 inline-block px-2 py-1 rounded-full border border-white/5 max-w-[120px] truncate"
                             title={page.path}
                           >
                             {page.path}
@@ -323,9 +325,9 @@ const Page = () => {
       </div>
 
       {isAddDialogOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-slate-900 border border-white/10 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between p-6 border-b border-white/10 bg-white/5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-transparent backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white/10 rounded-sm bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-30 border border-gray-100 shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between p-6 border-b border-white/5 bg-white/5">
               <h2 className="text-xl font-semibold text-white">Create New DB Page</h2>
               <Button variant="ghost" size="icon" onClick={() => setIsAddDialogOpen(false)} className="hover:bg-white/10 text-slate-400 hover:text-white">
                 <X className="h-5 w-5" />
@@ -339,7 +341,7 @@ const Page = () => {
                 <Input
                   id="title"
                   placeholder="e.g. About Us"
-                  className="bg-slate-950 border-white/10 text-white placeholder:text-slate-600 focus:border-blue-500"
+                  className="bg-white/5 border-white/10 h-12 rounded-2xl text-white placeholder:text-white/40 focus:ring-2 focus:ring-blue-500"
                   value={formData.pageName}
                   onChange={e => setFormData({ ...formData, pageName: e.target.value })}
                 />
@@ -351,7 +353,7 @@ const Page = () => {
                 <Input
                   id="path"
                   placeholder="e.g. /about/us"
-                  className="bg-slate-950 border-white/10 text-white placeholder:text-slate-600 focus:border-blue-500 font-mono text-sm"
+                  className="bg-white/5 border-white/10 h-12 rounded-2xl text-white placeholder:text-white/40 focus:ring-2 focus:ring-blue-500 font-mono text-sm"
                   value={formData.path}
                   onChange={e => setFormData({ ...formData, path: e.target.value })}
                 />
@@ -370,8 +372,8 @@ const Page = () => {
       )}
 
       {isDeleteDialogOpen && pageToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-slate-900 border border-red-500/20 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-transparent backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white/10 rounded-sm text-white bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-30 border border-gray-100 shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between p-6 border-b border-white/10 bg-red-500/5">
               <div className="flex items-center gap-2 text-red-400">
                 <AlertTriangle className="h-5 w-5" />
@@ -407,3 +409,4 @@ const Page = () => {
 };
 
 export default Page;
+

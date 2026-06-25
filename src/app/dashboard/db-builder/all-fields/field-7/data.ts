@@ -1,4 +1,4 @@
-/*
+﻿/*
 |-----------------------------------------
 | setting up Data for the App
 | @author: Toufiquer Rahman<toufiquer.0@gmail.com>
@@ -24,3 +24,5 @@ export const defaultDatafield7: Ifield7Data = {
   fieldPlaceHolder: 'Enter image URLs separated by comma',
   fieldType: 'IMAGES',
 };
+
+

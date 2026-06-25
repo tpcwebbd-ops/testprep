@@ -1,4 +1,4 @@
-/*
+﻿/*
 |-----------------------------------------
 | setting up Page for the App
 | @author: Toufiquer Rahman<toufiquer.0@gmail.com>
@@ -107,7 +107,7 @@ const FieldPickerDialog = ({ open, selectedKey, onOpenChange, onSelect }: FieldP
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-slate-900 border-white/10 text-white max-w-2xl">
+      <DialogContent className="bg-white/10 rounded-sm bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-30 border border-gray-100 text-white max-w-2xl">
         <DialogHeader>
           <DialogTitle>Select Field</DialogTitle>
         </DialogHeader>
@@ -120,12 +120,12 @@ const FieldPickerDialog = ({ open, selectedKey, onOpenChange, onSelect }: FieldP
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
             placeholder="Type at least 3 characters"
-            className="bg-slate-950 border-white/10 text-white placeholder:text-slate-600"
+            className="bg-white/10 border-white/10 text-white placeholder:text-white/40"
           />
         </div>
         <ScrollArea className="max-h-[60vh] pr-3">
           {visibleFieldKeys.length === 0 ? (
-            <div className="rounded-lg border border-white/10 bg-slate-950/80 p-6 text-center text-sm text-slate-400">No field found.</div>
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center text-sm text-white/50">No field found.</div>
           ) : (
             <div className="grid gap-2 sm:grid-cols-2">
               {visibleFieldKeys.map(key => {
@@ -141,8 +141,8 @@ const FieldPickerDialog = ({ open, selectedKey, onOpenChange, onSelect }: FieldP
                     onSelect(key);
                     onOpenChange(false);
                   }}
-                  className={`rounded-lg border p-3 text-left transition-all hover:border-blue-400/70 hover:bg-blue-500/10 ${
-                    isSelected ? 'border-blue-400 bg-blue-500/15' : 'border-white/10 bg-slate-950/80'
+                  className={`rounded-2xl border p-3 text-left backdrop-blur-2xl transition-all hover:border-blue-400/70 hover:bg-white/10 ${
+                    isSelected ? 'border-blue-400 bg-blue-500/20' : 'border-white/10 bg-white/5'
                   }`}
                 >
                   <div className="flex items-start gap-3">
@@ -174,9 +174,9 @@ const FieldPreview = ({ form }: { form: FieldFormState }) => {
   const previewData = getPreparedFieldData(form);
 
   return (
-    <div className="space-y-2 rounded-xl border border-white/10 bg-slate-950/70 p-4">
+    <div className="space-y-2 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-2xl p-4">
       <Label className="text-slate-300">Preview Field</Label>
-      <div className="rounded-lg border border-white/10 bg-black/20 p-3">
+      <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
         {PreviewField ? <PreviewField data={previewData} /> : <p className="text-sm text-slate-500">No preview available.</p>}
       </div>
     </div>
@@ -188,7 +188,7 @@ const getTypeStyles = (type: ItemType) => {
     case 'field':
       return {
         border: 'border-blue-500/30 hover:border-blue-400/60',
-        bg: 'bg-slate-900/60',
+        bg: 'bg-white/5',
         badge: 'bg-blue-500/10 text-blue-300 border-blue-500/20',
         icon: 'text-blue-400',
         glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(59,130,246,0.3)]',
@@ -196,7 +196,7 @@ const getTypeStyles = (type: ItemType) => {
     default:
       return {
         border: 'border-purple-500/30 hover:border-purple-400/60',
-        bg: 'bg-slate-900/40',
+        bg: 'bg-white/5',
         badge: 'bg-purple-500/10 text-purple-300 border-purple-500/20',
         icon: 'text-purple-400',
         glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(168,85,247,0.3)]',
@@ -253,7 +253,7 @@ const SortableItem = ({ item, onEdit, onDelete, onOpenMoveDialog }: SortableItem
         <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
         <div className="relative">
-          <div className="absolute top-0 left-0 right-0 h-12 flex items-center justify-between px-4 z-20 border-b border-white/5 bg-black/20 backdrop-blur-sm">
+          <div className="absolute top-0 left-0 right-0 h-12 flex items-center justify-between px-4 z-20 border-b border-white/5 bg-white/5 backdrop-blur-sm">
             <div className="flex items-center gap-3">
               <button onClick={() => onOpenMoveDialog(item)} className="md:hidden p-2 rounded-full hover:bg-white/10 text-yellow-400 transition-all">
                 <ArrowUpDown className="h-4 w-4" />
@@ -517,7 +517,7 @@ function EditPageContent() {
       'status' in error ? `Error ${error.status}: ${JSON.stringify(error.data)}` : 'message' in error ? error.message : 'An unexpected error occurred';
 
     return (
-      <main className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
+      <main className="min-h-screen bg-transparent flex items-center justify-center p-4">
         <div className="flex flex-col items-center gap-6 animate-in fade-in zoom-in-95 duration-500 max-w-lg">
           <div className="relative">
             <div className="absolute inset-0 bg-red-500/30 blur-3xl rounded-full" />
@@ -549,7 +549,7 @@ function EditPageContent() {
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-slate-950 flex items-center justify-center">
+      <main className="min-h-screen bg-transparent flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="relative">
             <div className="absolute inset-0 bg-blue-500/30 blur-3xl rounded-full animate-pulse" />
@@ -563,7 +563,7 @@ function EditPageContent() {
 
   if (!currentPage) {
     return (
-      <main className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
+      <main className="min-h-screen bg-transparent flex items-center justify-center p-4">
         <div className="flex flex-col items-center gap-6 animate-in fade-in zoom-in-95 duration-500 max-w-lg">
           <div className="relative">
             <div className="absolute inset-0 bg-red-500/30 blur-3xl rounded-full" />
@@ -592,7 +592,7 @@ function EditPageContent() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 overflow-x-hidden selection:bg-purple-500/30">
+    <main className="min-h-screen bg-transparent text-slate-200 overflow-x-hidden selection:bg-purple-500/30 font-sans">
       <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
         <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-blue-900/20 blur-[120px] animate-pulse" />
         <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-purple-900/20 blur-[120px] animate-pulse delay-1000" />
@@ -601,14 +601,16 @@ function EditPageContent() {
 
       <div className="relative z-10 container mx-auto px-4 pt-24 pb-8 max-w-5xl">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-white mb-2 tracking-tight">{currentPage.pageName}</h1>
-          <p className="text-slate-400 font-mono text-sm bg-white/5 inline-block px-3 py-1 rounded-full border border-white/5">{currentPage.path}</p>
+          <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-white/40">
+            {currentPage.pageName}
+          </h1>
+          <p className="text-white/50 font-mono text-sm bg-white/5 inline-block px-3 py-1 rounded-full border border-white/5 mt-3">{currentPage.path}</p>
         </div>
       </div>
 
       <div className="relative z-10 container mx-auto px-4 pb-60 max-w-5xl">
         {items.length === 0 ? (
-          <div className="animate-in zoom-in-95 duration-700 fade-in flex flex-col items-center justify-center min-h-[50vh] border-2 border-dashed border-white/10 rounded-3xl bg-white/5 backdrop-blur-sm p-8">
+          <div className="animate-in zoom-in-95 duration-700 fade-in flex flex-col items-center justify-center min-h-[50vh] border border-white/10 rounded-2xl bg-white/5 backdrop-blur-2xl p-8">
             <div className="relative mb-6">
               <div className="absolute inset-0 bg-blue-500/30 blur-2xl rounded-full" />
               <div className="relative w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-white/10 flex items-center justify-center shadow-2xl">
@@ -630,7 +632,7 @@ function EditPageContent() {
 
             <DragOverlay>
               {activeId ? (
-                <div className="backdrop-blur-xl shadow-2xl rounded-xl border border-blue-500/30 bg-slate-900/90 p-4 flex items-center gap-4 transform scale-105 cursor-grabbing">
+                <div className="backdrop-blur-xl shadow-2xl rounded-xl border border-purple-300/30 bg-transparent p-4 flex items-center gap-4 transform scale-105 cursor-grabbing">
                   <GripVertical className="h-6 w-6 text-blue-400" />
                   <span className="text-white font-medium text-lg">Moving Item...</span>
                 </div>
@@ -645,7 +647,7 @@ function EditPageContent() {
           onClick={() => setIsDockExpanded(!isDockExpanded)}
           className={`
             pointer-events-auto flex items-center justify-center w-12 h-8 rounded-full 
-            bg-slate-950/80 backdrop-blur-xl border border-white/10 shadow-lg 
+            bg-white/5 backdrop-blur-2xl border border-white/10 shadow-lg 
             text-slate-400 hover:text-white hover:bg-white/10 transition-all duration-300
             ${!isDockExpanded ? 'animate-bounce ring-1 ring-blue-500/50 shadow-blue-500/20' : ''}
           `}
@@ -655,7 +657,7 @@ function EditPageContent() {
 
         <div
           className={`
-            flex items-center gap-4 transition-all duration-500 ease-in-out origin-bottom rounded-2xl bg-slate-950/80 backdrop-blur-2xl border border-white/10 shadow-2xl ring-1 ring-white/5 justify-between w-[95%] md:w-2xl lg:w-4xl 
+            flex items-center gap-4 transition-all duration-500 ease-in-out origin-bottom rounded-2xl bg-white/5 backdrop-blur-2xl border border-white/10 shadow-2xl ring-1 ring-white/5 justify-between w-[95%] md:w-2xl lg:w-4xl 
             ${isDockExpanded ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-20 opacity-0 scale-95 pointer-events-none absolute bottom-0'}
           `}
         >
@@ -684,7 +686,7 @@ function EditPageContent() {
       </div>
 
       <Dialog open={isAddFieldDialogOpen} onOpenChange={setIsAddFieldDialogOpen}>
-        <DialogContent className="bg-slate-900 border-white/10 text-white max-w-md">
+        <DialogContent className="bg-white/10 rounded-sm bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-30 border border-gray-100 text-white max-w-md">
           <DialogHeader>
             <DialogTitle>Add Field</DialogTitle>
           </DialogHeader>
@@ -698,7 +700,7 @@ function EditPageContent() {
                 value={addFieldForm.fieldName}
                 onChange={e => setAddFieldForm(prev => ({ ...prev, fieldName: e.target.value }))}
                 placeholder="e.g. Student Name"
-                className="bg-slate-950 border-white/10 text-white placeholder:text-slate-600"
+                className="bg-white/10 border-white/10 text-white placeholder:text-white/40"
               />
             </div>
             <div className="space-y-2">
@@ -718,7 +720,7 @@ function EditPageContent() {
                   value={addFieldForm.fieldPlaceHolder}
                   onChange={e => setAddFieldForm(prev => ({ ...prev, fieldPlaceHolder: e.target.value }))}
                   placeholder="e.g. Enter value"
-                  className="bg-slate-950 border-white/10 text-white placeholder:text-slate-600"
+                  className="bg-white/10 border-white/10 text-white placeholder:text-white/40"
                 />
               </div>
             )}
@@ -747,7 +749,7 @@ function EditPageContent() {
       />
 
       <Dialog open={!!movingItem} onOpenChange={() => setMovingItem(null)}>
-        <DialogContent className="bg-slate-900 border-white/10 text-white">
+        <DialogContent className="bg-white/10 rounded-sm bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-30 border border-gray-100 text-white">
           <DialogHeader>
             <DialogTitle className="text-center">Reorder {movingItem?.key}</DialogTitle>
           </DialogHeader>
@@ -763,7 +765,7 @@ function EditPageContent() {
       </Dialog>
 
       <Dialog open={!!deletingItem} onOpenChange={() => setDeletingItem(null)}>
-        <DialogContent className="bg-slate-900 border-white/10 text-white max-w-md">
+        <DialogContent className="bg-white/10 rounded-sm bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-30 border border-gray-100 text-white max-w-md">
           <div className="flex flex-col items-center text-center p-4">
             <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
               <AlertTriangle className="h-8 w-8 text-red-500" />
@@ -781,7 +783,7 @@ function EditPageContent() {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const DeleteField = (config as any).delete;
                 return DeleteField ? (
-                  <div className="mb-6 w-full rounded-lg border border-white/10 bg-black/20 p-4">
+                  <div className="mb-6 w-full rounded-lg border border-white/10 bg-white/5 p-4">
                     <DeleteField data={deletingItem.data} />
                   </div>
                 ) : null;
@@ -799,7 +801,7 @@ function EditPageContent() {
       </Dialog>
 
       <Dialog open={!!editingItem} onOpenChange={() => setEditingItem(null)}>
-        <DialogContent className="max-w-4xl md:max-w-6xl h-[85vh] mt-10 p-0 bg-slate-900/95 backdrop-blur-xl border-white/10 text-white flex flex-col">
+        <DialogContent className="max-w-4xl md:max-w-6xl h-[85vh] mt-10 p-0 bg-white/10 rounded-sm bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-30 border border-gray-100 text-white flex flex-col">
           <DialogHeader className="p-4 border-b border-white/10 bg-white/5 shrink-0">
             <DialogTitle className="flex items-center gap-2 text-xl">
               <Edit className="h-5 w-5 text-blue-400" />
@@ -817,7 +819,7 @@ function EditPageContent() {
                   value={editFieldForm.fieldName}
                   onChange={e => setEditFieldForm(prev => ({ ...prev, fieldName: e.target.value }))}
                   placeholder="e.g. Student Name"
-                  className="bg-slate-950 border-white/10 text-white placeholder:text-slate-600"
+                  className="bg-white/10 border-white/10 text-white placeholder:text-white/40"
                 />
               </div>
               <div className="space-y-2">
@@ -837,7 +839,7 @@ function EditPageContent() {
                     value={editFieldForm.fieldPlaceHolder}
                     onChange={e => setEditFieldForm(prev => ({ ...prev, fieldPlaceHolder: e.target.value }))}
                     placeholder="e.g. Enter value"
-                    className="bg-slate-950 border-white/10 text-white placeholder:text-slate-600"
+                    className="bg-white/10 border-white/10 text-white placeholder:text-white/40"
                   />
                 </div>
               )}
@@ -873,7 +875,7 @@ export default function Page() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="min-h-screen bg-transparent flex items-center justify-center">
           <div className="text-white">Loading...</div>
         </div>
       }
@@ -882,3 +884,4 @@ export default function Page() {
     </Suspense>
   );
 }
+

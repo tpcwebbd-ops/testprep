@@ -1,4 +1,4 @@
-/*
+﻿/*
 |-----------------------------------------
 | setting up Page for the App
 | @author: Toufiquer Rahman<toufiquer.0@gmail.com>
@@ -310,14 +310,14 @@ function PreviewPageContent() {
         </div>
       ))}
       {fields.length === 0 && (
-        <div className="rounded-lg border border-white/10 bg-black/20 p-6 text-center text-slate-400">No fields configured for this DB page.</div>
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center text-slate-300">No fields configured for this DB page.</div>
       )}
     </div>
   );
 
   if (error) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-slate-950 text-white">
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-transparent text-white">
         <div className="flex items-center gap-2 text-red-400 mb-4">
           <AlertTriangle className="h-6 w-6" />
           <h2 className="text-xl font-bold">Failed to Load</h2>
@@ -331,7 +331,7 @@ function PreviewPageContent() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950">
+      <div className="min-h-screen flex items-center justify-center bg-transparent">
         <div className="text-slate-400 animate-pulse">Loading...</div>
       </div>
     );
@@ -339,7 +339,7 @@ function PreviewPageContent() {
 
   if (!currentPage) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-white">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-transparent text-white">
         <h2 className="text-2xl font-bold mb-2">Page Not Found</h2>
         <p className="text-slate-400 mb-6">Path: {pathTitle}</p>
         <Button onClick={() => (window.location.href = '/dashboard/db-builder')} variant="outline">
@@ -350,27 +350,29 @@ function PreviewPageContent() {
   }
 
   return (
-    <main className="min-h-screen w-full bg-slate-950 pt-[90px] pb-12 px-4 text-white">
+    <main className="min-h-screen w-full bg-transparent pt-[90px] pb-12 px-4 md:px-12 text-slate-200 font-sans overflow-x-hidden">
       <div className="mx-auto max-w-7xl space-y-6">
         <div className="flex flex-col gap-4 border-b border-white/10 pb-6 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-3xl font-bold">{currentPage.pageName}</h1>
-            <p className="mt-1 font-mono text-sm text-slate-400">{currentPage.path}</p>
+            <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-white/40">
+              {currentPage.pageName}
+            </h1>
+            <p className="mt-2 font-mono text-sm text-white/50">{currentPage.path}</p>
           </div>
-          <Button onClick={openAddDialog} className="gap-2 bg-blue-600 text-white hover:bg-blue-500">
+          <Button onClick={openAddDialog} variant="outlineGlassy" className="gap-2">
             <Plus className="h-4 w-4" />
             Add
           </Button>
         </div>
 
-        <div className="flex flex-col gap-3 rounded-xl border border-white/10 bg-white/5 p-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-2xl p-4 md:flex-row md:items-center md:justify-between">
           <div className="relative w-full md:max-w-md">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
             <Input
               value={searchValue}
               onChange={e => setSearchValue(e.target.value)}
               placeholder="Search after 3 characters..."
-              className="bg-slate-950 border-white/10 pl-9 text-white placeholder:text-slate-600"
+              className="bg-white/5 border-white/10 pl-9 text-white placeholder:text-white/40 rounded-2xl"
             />
           </div>
 
@@ -390,10 +392,10 @@ function PreviewPageContent() {
           </div>
         </div>
 
-        <div className="hidden overflow-hidden rounded-xl border border-white/10 bg-slate-900/70 md:block">
+        <div className="hidden overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-2xl md:block">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[760px] text-left text-sm">
-              <thead className="border-b border-white/10 bg-white/5 text-xs uppercase text-slate-400">
+              <thead className="border-b border-white/10 bg-white/5 text-xs uppercase text-white/50">
                 <tr>
                   <th className="w-12 px-4 py-3">
                     <input type="checkbox" checked={isAllCurrentPageSelected} onChange={toggleSelectPage} aria-label="Select visible records" />
@@ -409,7 +411,7 @@ function PreviewPageContent() {
               </thead>
               <tbody>
                 {paginatedRecords.map(record => (
-                  <tr key={record.id} className="border-b border-white/5 text-slate-200 last:border-0">
+                  <tr key={record.id} className="border-b border-white/5 text-slate-200 last:border-0 hover:bg-white/5 transition-colors">
                     <td className="px-4 py-3">
                       <input type="checkbox" checked={selectedIds.includes(record.id)} onChange={() => toggleSelected(record.id)} aria-label="Select record" />
                     </td>
@@ -448,7 +450,7 @@ function PreviewPageContent() {
 
         <div className="space-y-3 md:hidden">
           {paginatedRecords.map(record => (
-            <div key={record.id} className="rounded-xl border border-white/10 bg-slate-900/70 p-4">
+            <div key={record.id} className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-2xl p-4">
               <div className="mb-3 flex items-center justify-between gap-3">
                 <label className="flex items-center gap-2 text-sm text-slate-300">
                   <input type="checkbox" checked={selectedIds.includes(record.id)} onChange={() => toggleSelected(record.id)} />
@@ -458,7 +460,7 @@ function PreviewPageContent() {
               </div>
               <div className="space-y-2">
                 {fields.map(field => (
-                  <div key={field.id} className="rounded-lg bg-black/20 p-3">
+                  <div key={field.id} className="rounded-2xl border border-white/5 bg-white/5 p-3">
                     <div className="text-xs uppercase text-slate-500">{getFieldLabel(field)}</div>
                     <div className="mt-1 text-slate-100">{record.values[field.id] || '-'}</div>
                   </div>
@@ -478,21 +480,21 @@ function PreviewPageContent() {
             </div>
           ))}
           {paginatedRecords.length === 0 && (
-            <div className="rounded-xl border border-white/10 bg-white/5 p-10 text-center text-slate-500">No records found.</div>
+            <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-2xl p-10 text-center text-slate-500">No records found.</div>
           )}
         </div>
 
-        <div className="flex flex-col gap-3 rounded-xl border border-white/10 bg-white/5 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-2xl p-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="text-sm text-slate-400">
             Showing {paginatedRecords.length === 0 ? 0 : (safeCurrentPage - 1) * itemsPerPage + 1}-
             {Math.min(safeCurrentPage * itemsPerPage, visibleRecords.length)} of {visibleRecords.length}
           </div>
           <div className="flex items-center gap-2">
             <Select value={String(itemsPerPage)} onValueChange={value => setItemsPerPage(Number(value))}>
-              <SelectTrigger className="w-[120px] bg-slate-950 border-white/10 text-white">
+              <SelectTrigger className="w-[120px] bg-white/10 border-white/10 text-white">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-slate-900 border-white/10 text-white">
+              <SelectContent className="bg-white/10 backdrop-blur-2xl border-white/10 text-white">
                 {ITEMS_PER_PAGE_OPTIONS.map(option => (
                   <SelectItem key={option} value={String(option)}>
                     {option}
@@ -519,7 +521,7 @@ function PreviewPageContent() {
       </div>
 
       <Dialog open={!!modalMode} onOpenChange={open => !open && closeModal()}>
-        <DialogContent className="max-h-[85vh] overflow-y-auto bg-slate-900 border-white/10 text-white">
+        <DialogContent className="max-h-[85vh] overflow-y-auto bg-white/10 rounded-sm bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-30 border border-gray-100 text-white">
           <DialogHeader>
             <div className="flex items-center justify-between gap-3">
               <DialogTitle>{modalMode === 'add' ? 'Add Record' : modalMode === 'edit' ? 'Edit Record' : 'View Record'}</DialogTitle>
@@ -540,7 +542,7 @@ function PreviewPageContent() {
       </Dialog>
 
       <Dialog open={bulkModalMode === 'edit'} onOpenChange={open => !open && closeBulkModal()}>
-        <DialogContent className="bg-slate-900 border-white/10 text-white">
+        <DialogContent className="bg-white/10 rounded-sm bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-30 border border-gray-100 text-white">
           <DialogHeader>
             <DialogTitle>Bulk Edit</DialogTitle>
           </DialogHeader>
@@ -549,10 +551,10 @@ function PreviewPageContent() {
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-300">Field</label>
               <Select value={bulkEditFieldId} onValueChange={setBulkEditFieldId}>
-                <SelectTrigger className="bg-slate-950 border-white/10 text-white">
+                <SelectTrigger className="bg-white/10 border-white/10 text-white">
                   <SelectValue placeholder="Select field" />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-900 border-white/10 text-white">
+                <SelectContent className="bg-white/10 backdrop-blur-2xl border-white/10 text-white">
                   {fields.map(field => (
                     <SelectItem key={field.id} value={field.id}>
                       {getFieldLabel(field)}
@@ -570,7 +572,7 @@ function PreviewPageContent() {
                 value={bulkEditValue}
                 onChange={e => setBulkEditValue(e.target.value)}
                 placeholder="Enter new value"
-                className="bg-slate-950 border-white/10 text-white placeholder:text-slate-600"
+                className="bg-white/10 border-white/10 text-white placeholder:text-white/40"
               />
             </div>
             <div className="flex justify-end gap-3">
@@ -586,7 +588,7 @@ function PreviewPageContent() {
       </Dialog>
 
       <Dialog open={bulkModalMode === 'delete'} onOpenChange={open => !open && closeBulkModal()}>
-        <DialogContent className="bg-slate-900 border-red-500/20 text-white">
+        <DialogContent className="bg-white/10 rounded-sm bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-30 border border-gray-100 text-white">
           <DialogHeader>
             <DialogTitle>Bulk Delete</DialogTitle>
           </DialogHeader>
@@ -607,7 +609,7 @@ function PreviewPageContent() {
       </Dialog>
 
       <Dialog open={bulkModalMode === 'export'} onOpenChange={open => !open && closeBulkModal()}>
-        <DialogContent className="bg-slate-900 border-white/10 text-white">
+        <DialogContent className="bg-white/10 rounded-sm bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-30 border border-gray-100 text-white">
           <DialogHeader>
             <DialogTitle>Bulk Export</DialogTitle>
           </DialogHeader>
@@ -628,14 +630,14 @@ function PreviewPageContent() {
       </Dialog>
 
       <Dialog open={!!recordToDelete} onOpenChange={open => !open && setRecordToDelete(null)}>
-        <DialogContent className="bg-slate-900 border-red-500/20 text-white">
+        <DialogContent className="bg-white/10 rounded-sm bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-30 border border-gray-100 text-white">
           <DialogHeader>
             <DialogTitle>Delete Item?</DialogTitle>
           </DialogHeader>
           <div className="space-y-5">
             <p className="text-slate-300">Are you sure you want to delete this item? This action cannot be undone.</p>
             {recordToDelete && (
-              <div className="space-y-2 rounded-lg border border-white/10 bg-black/20 p-3">
+              <div className="space-y-2 rounded-2xl border border-white/10 bg-white/5 p-3">
                 {fields.slice(0, 2).map((field, idx) => (
                   <div key={field.id} className={`flex items-center justify-between py-1 border-t border-white/10 ${idx === 0 ? 'border-t-0' : ''}`}>
                     <div className="text-xs uppercase text-slate-500">{getFieldLabel(field)}</div>
@@ -661,8 +663,9 @@ function PreviewPageContent() {
 
 export default function Page() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-slate-950 text-white">Loading...</div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-transparent text-white">Loading...</div>}>
       <PreviewPageContent />
     </Suspense>
   );
 }
+

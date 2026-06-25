@@ -1,4 +1,4 @@
-/*
+﻿/*
 |-----------------------------------------
 | setting up Update for the App
 | @author: Toufiquer Rahman<toufiquer.0@gmail.com>
@@ -35,8 +35,10 @@ const Update = ({ data, value = '', onChange }: UpdateProps) => {
       value={value}
       onChange={e => onChange?.(e.target.value)}
       placeholder={fieldData.fieldPlaceHolder}
-      className="bg-slate-950 border-white/10 text-white placeholder:text-slate-600"
+      className="bg-white/10 backdrop-blur-md border-white/10 text-white placeholder:text-white/40"
     />
   );
 };
 export default Update;
+
+

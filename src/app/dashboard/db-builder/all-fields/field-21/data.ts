@@ -1,4 +1,4 @@
-/*
+﻿/*
 |-----------------------------------------
 | setting up Data for the App
 | @author: Toufiquer Rahman<toufiquer.0@gmail.com>
@@ -24,3 +24,5 @@ export const defaultDatafield21: Ifield21Data = {
   fieldPlaceHolder: 'Search or enter value',
   fieldType: 'AUTOCOMPLETE',
 };
+
+

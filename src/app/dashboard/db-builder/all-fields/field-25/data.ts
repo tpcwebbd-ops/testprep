@@ -1,4 +1,4 @@
-/*
+﻿/*
 |-----------------------------------------
 | setting up Data for the App
 | @author: Toufiquer Rahman<toufiquer.0@gmail.com>
@@ -25,3 +25,5 @@ export const defaultDatafield25: Ifield25Data = {
   fieldType: 'MULTIOPTIONS',
   fieldOptions: ['Option 1', 'Option 2', 'Option 3'],
 };
+
+
