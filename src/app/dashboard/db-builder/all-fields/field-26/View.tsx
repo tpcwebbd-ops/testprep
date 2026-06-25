@@ -7,13 +7,16 @@
 */
 
 import { field26Props } from './data';
+import { parseStudentsValue } from './students-utils';
 
 interface ViewProps extends field26Props {
   value?: string;
 }
 
 const View = ({ value = '' }: ViewProps) => {
-  return <div className="min-h-10 whitespace-pre-wrap rounded-sm bg-white/10 backdrop-blur-md px-3 py-2 text-white">{value || '-'}</div>;
+  const students = parseStudentsValue(value);
+
+  return <pre className="mt-1 overflow-auto rounded-md bg-white/5 p-2 text-[11px] text-white/90">{students.length ? JSON.stringify(students, null, 2) : 'N/A'}</pre>;
 };
 export default View;
 

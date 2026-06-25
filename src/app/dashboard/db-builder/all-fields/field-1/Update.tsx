@@ -6,7 +6,7 @@
 |-----------------------------------------
 */
 
-import { Input } from '@/components/ui/input';
+import InputFieldForString from '@/components/dashboard-ui/InputFieldForString';
 
 import { field1Props, Ifield1Data } from './data';
 
@@ -29,13 +29,15 @@ const resolveData = (data?: Ifield1Data | string): Ifield1Data => {
 
 const Update = ({ data, value = '', onChange }: UpdateProps) => {
   const fieldData = resolveData(data);
+  const fieldId = fieldData.fieldName.toLowerCase().replace(/\s+/g, '-');
 
   return (
-    <Input
+    <InputFieldForString
+      id={fieldId}
       value={value}
-      onChange={e => onChange?.(e.target.value)}
+      onChange={next => onChange?.(next)}
       placeholder={fieldData.fieldPlaceHolder}
-      className="bg-white/10 backdrop-blur-md border-white/10 text-white placeholder:text-white/40"
+      className="text-white"
     />
   );
 };

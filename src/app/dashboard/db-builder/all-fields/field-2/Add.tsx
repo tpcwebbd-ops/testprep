@@ -6,7 +6,7 @@
 |-----------------------------------------
 */
 
-import { Input } from '@/components/ui/input';
+import InputFieldForEmail from '@/components/dashboard-ui/InputFieldForEmail';
 
 import { field2Props, Ifield2Data } from './data';
 
@@ -29,14 +29,15 @@ const resolveData = (data?: Ifield2Data | string): Ifield2Data => {
 
 const Add = ({ data, value = '', onChange }: AddProps) => {
   const fieldData = resolveData(data);
+  const fieldId = fieldData.fieldName.toLowerCase().replace(/\s+/g, '-');
 
   return (
-    <Input
-      type="email"
+    <InputFieldForEmail
+      id={fieldId}
       value={value}
-      onChange={e => onChange?.(e.target.value)}
+      onChange={next => onChange?.(next)}
       placeholder={fieldData.fieldPlaceHolder}
-      className="bg-white/10 backdrop-blur-md border-white/10 text-white placeholder:text-white/40"
+      className="text-white"
     />
   );
 };

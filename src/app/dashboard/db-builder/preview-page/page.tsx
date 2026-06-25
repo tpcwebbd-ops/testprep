@@ -10,11 +10,13 @@
 
 import { useSearchParams } from 'next/navigation';
 import { useState, useEffect, Suspense, useMemo, type ComponentType } from 'react';
-import { AlertTriangle, Columns3, Download, Edit, Eye, Plus, RefreshCw, Search, Trash2 } from 'lucide-react';
+import { AlertTriangle, Columns3, Download, Edit, Eye, Filter, Plus, RefreshCcw, RefreshCw, Search, Trash2, TrendingUp } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useGetPagesQuery } from '@/redux/features/db-builder/pageBuilderSlice';
 
@@ -38,6 +40,7 @@ interface DbRecord {
 
 type ModalMode = 'add' | 'view' | 'edit' | null;
 type BulkModalMode = 'edit' | 'delete' | 'export' | null;
+type ActionDialog = 'summary' | 'filter' | null;
 type FieldRenderer = ComponentType<{
   data?: unknown;
   value?: string;
@@ -45,8 +48,10 @@ type FieldRenderer = ComponentType<{
 }>;
 
 const ITEMS_PER_PAGE_OPTIONS = [2, 10, 50, 100, 300, 1000];
+const summaryColors = ['#60a5fa', '#34d399', '#fbbf24', '#f87171', '#a78bfa', '#fb923c'];
 
 const getFieldLabel = (field: PageContent) => field.heading || field.name || field.key;
+const formatDateInput = (date: Date) => date.toISOString().slice(0, 10);
 
 const makeEmptyValues = (fields: PageContent[]) =>
   fields.reduce<Record<string, string>>((acc, field) => {
@@ -105,6 +110,12 @@ function PreviewPageContent() {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [modalMode, setModalMode] = useState<ModalMode>(null);
   const [bulkModalMode, setBulkModalMode] = useState<BulkModalMode>(null);
+  const [actionDialog, setActionDialog] = useState<ActionDialog>(null);
+  const [filterMode, setFilterMode] = useState<'month' | 'range'>('month');
+  const [selectedMonth, setSelectedMonth] = useState(() => new Date().toISOString().slice(0, 7));
+  const [rangeStart, setRangeStart] = useState(() => formatDateInput(new Date()));
+  const [rangeEnd, setRangeEnd] = useState(() => formatDateInput(new Date()));
+  const [activeDateFilter, setActiveDateFilter] = useState<{ label: string; start: string; end: string } | null>(null);
   const [bulkEditFieldId, setBulkEditFieldId] = useState('');
   const [bulkEditValue, setBulkEditValue] = useState('');
   const [activeRecord, setActiveRecord] = useState<DbRecord | null>(null);
@@ -123,17 +134,26 @@ function PreviewPageContent() {
 
   useEffect(() => {
     setCurrentPageNumber(1);
-  }, [searchValue, itemsPerPage]);
+  }, [searchValue, itemsPerPage, activeDateFilter]);
 
   const visibleRecords = useMemo(() => {
     const query = searchValue.trim().toLowerCase();
-    if (query.length < 3) return records;
+    const dateFilteredRecords = activeDateFilter
+      ? records.filter(record => {
+          const createdTime = new Date(record.createdAt).getTime();
+          const startTime = new Date(`${activeDateFilter.start}T00:00:00`).getTime();
+          const endTime = new Date(`${activeDateFilter.end}T23:59:59`).getTime();
+          return createdTime >= startTime && createdTime <= endTime;
+        })
+      : records;
 
-    return records.filter(record => {
+    if (query.length < 3) return dateFilteredRecords;
+
+    return dateFilteredRecords.filter(record => {
       const searchable = [record.id, record.createdAt, ...Object.values(record.values)].join(' ').toLowerCase();
       return searchable.includes(query);
     });
-  }, [records, searchValue]);
+  }, [activeDateFilter, records, searchValue]);
 
   const totalPages = Math.max(1, Math.ceil(visibleRecords.length / itemsPerPage));
   const safeCurrentPage = Math.min(currentPageNumber, totalPages);
@@ -141,6 +161,27 @@ function PreviewPageContent() {
   const isAllCurrentPageSelected = paginatedRecords.length > 0 && paginatedRecords.every(record => selectedIds.includes(record.id));
   const visibleFields = useMemo(() => fields.filter(field => visibleFieldIds.includes(field.id)), [fields, visibleFieldIds]);
   const displayColumnCount = Math.max(visibleFields.length, 1);
+  const summaryData = useMemo(() => {
+    const now = Date.now();
+    const oneDayAgo = now - 24 * 60 * 60 * 1000;
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+    const monthlyMap = records.reduce<Record<string, number>>((acc, record) => {
+      const date = new Date(record.createdAt);
+      const key = date.toLocaleString('default', { month: 'short', year: 'numeric' });
+      acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    }, {});
+
+    return {
+      totalRecords: records.length,
+      filteredRecords: visibleRecords.length,
+      recordsLast24Hours: records.filter(record => new Date(record.createdAt).getTime() >= oneDayAgo).length,
+      recordsLastMonth: records.filter(record => new Date(record.createdAt).getTime() >= oneMonthAgo.getTime()).length,
+      monthlyRows: Object.entries(monthlyMap).map(([month, count]) => ({ month, count })),
+    };
+  }, [records, visibleRecords.length]);
 
   const toggleVisibleField = (fieldId: string) => {
     setVisibleFieldIds(prev => (prev.includes(fieldId) ? prev.filter(id => id !== fieldId) : [...prev, fieldId]));
@@ -295,6 +336,33 @@ function PreviewPageContent() {
     closeBulkModal();
   };
 
+  const applyDateFilter = () => {
+    if (filterMode === 'month') {
+      const [year, month] = selectedMonth.split('-').map(Number);
+      if (!year || !month) return;
+      const start = new Date(year, month - 1, 1);
+      const end = new Date(year, month, 0);
+      setActiveDateFilter({
+        label: `${formatDateInput(start)} to ${formatDateInput(end)}`,
+        start: formatDateInput(start),
+        end: formatDateInput(end),
+      });
+      setActionDialog(null);
+      return;
+    }
+
+    if (!rangeStart || !rangeEnd) return;
+    const start = rangeStart <= rangeEnd ? rangeStart : rangeEnd;
+    const end = rangeStart <= rangeEnd ? rangeEnd : rangeStart;
+    setActiveDateFilter({ label: `${start} to ${end}`, start, end });
+    setActionDialog(null);
+  };
+
+  const clearDateFilter = () => {
+    setActiveDateFilter(null);
+    setActionDialog(null);
+  };
+
   const renderFieldInput = (field: PageContent) => {
     const config = Allfields[field.key as keyof typeof Allfields];
     const modeComponent = modalMode === 'view' ? config?.view : modalMode === 'edit' ? config?.update : config?.add;
@@ -302,19 +370,19 @@ function PreviewPageContent() {
     if (!FieldComponent) return null;
 
     return (
-      <div className="">
+      <div className="col-span-3">
         <FieldComponent data={field.data} value={draftValues[field.id] || ''} onChange={value => setDraftValues(prev => ({ ...prev, [field.id]: value }))} />
       </div>
     );
   };
 
   const renderRecordForm = () => (
-    <div className="space-y-4">
+    <div className="grid gap-4 py-4 px-6 text-white">
       {fields.map(field => (
-        <div key={field.id} className="space-y-2">
-          <label htmlFor={`field-${field.id}`} className="text-sm font-medium text-slate-300">
+        <div key={field.id} className={`grid grid-cols-1 md:grid-cols-4 gap-4 pr-1 ${modalMode === 'view' ? 'items-center border-b border-white/10 py-2' : 'items-center'}`}>
+          <Label htmlFor={`field-${field.id}`} className={`${modalMode === 'view' ? 'text-sm text-white/80' : 'text-right'}`}>
             {getFieldLabel(field)}
-          </label>
+          </Label>
           {renderFieldInput(field)}
         </div>
       ))}
@@ -368,10 +436,21 @@ function PreviewPageContent() {
             </h1>
             <p className="mt-2 font-mono text-sm text-white/50">{currentPage.path}</p>
           </div>
-          <Button onClick={openAddDialog} variant="outlineGlassy" className="gap-2">
-            <Plus className="h-4 w-4" />
-            Add
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button size="sm" variant="outlineGlassy" onClick={() => setActionDialog('summary')}>
+              <TrendingUp className="mr-2 h-4 w-4" /> Summary
+            </Button>
+            <Button size="sm" variant="outlineWater" onClick={() => setActionDialog('filter')}>
+              <Filter className="mr-2 h-4 w-4" /> Filter
+            </Button>
+            <Button size="sm" variant="outlineWater" onClick={() => refetch()}>
+              <RefreshCcw className="mr-2 h-4 w-4" /> Reload
+            </Button>
+            <Button onClick={openAddDialog} variant="outlineGlassy" size="sm" className="gap-2">
+              <Plus className="h-4 w-4" />
+              Add
+            </Button>
+          </div>
         </div>
 
         <div className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-2xl p-4 md:flex-row md:items-center md:justify-between">
@@ -384,6 +463,12 @@ function PreviewPageContent() {
               className="bg-white/5 border-white/10 pl-9 text-white placeholder:text-white/40 rounded-2xl"
             />
           </div>
+
+          {activeDateFilter && (
+            <div className="rounded-sm border border-white/10 bg-white/10 px-3 py-2 text-sm text-white/80">
+              Filtering from {activeDateFilter.label}
+            </div>
+          )}
 
           <div className="flex flex-wrap gap-2">
             <Button onClick={() => setIsColumnDialogOpen(true)} disabled={fields.length === 0} variant="outlineGlassy" size="sm" className="gap-2">
@@ -538,6 +623,123 @@ function PreviewPageContent() {
         </div>
       </div>
 
+      <Dialog open={actionDialog === 'filter'} onOpenChange={open => !open && setActionDialog(null)}>
+        <DialogContent className="bg-white/10 rounded-sm bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-30 border border-gray-100 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-white bg-clip-text bg-linear-to-r from-white to-blue-200">Filter {currentPage.pageName}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-5">
+            <div className="grid grid-cols-2 gap-2 rounded-sm border border-white/10 bg-white/5 p-1">
+              <Button size="sm" variant={filterMode === 'month' ? 'outlineGarden' : 'ghost'} onClick={() => setFilterMode('month')}>
+                By Month
+              </Button>
+              <Button size="sm" variant={filterMode === 'range' ? 'outlineGarden' : 'ghost'} onClick={() => setFilterMode('range')}>
+                By Date Range
+              </Button>
+            </div>
+
+            {filterMode === 'month' ? (
+              <div className="space-y-2">
+                <Label className="text-white">Select Month</Label>
+                <Input
+                  type="month"
+                  value={selectedMonth}
+                  onChange={event => setSelectedMonth(event.target.value)}
+                  className="bg-white/10 border-white/10 text-white"
+                />
+              </div>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label className="text-white">Start Date</Label>
+                  <Input
+                    type="date"
+                    value={rangeStart}
+                    onChange={event => setRangeStart(event.target.value)}
+                    className="bg-white/10 border-white/10 text-white"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-white">End Date</Label>
+                  <Input
+                    type="date"
+                    value={rangeEnd}
+                    onChange={event => setRangeEnd(event.target.value)}
+                    className="bg-white/10 border-white/10 text-white"
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className="flex flex-wrap justify-end gap-2">
+              <Button size="sm" variant="outlineFire" onClick={clearDateFilter}>
+                Clear Filter
+              </Button>
+              <Button size="sm" variant="outlineGarden" onClick={applyDateFilter} disabled={filterMode === 'month' ? !selectedMonth : !rangeStart || !rangeEnd}>
+                Apply Filter
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={actionDialog === 'summary'} onOpenChange={open => !open && setActionDialog(null)}>
+        <DialogContent className="max-w-4xl bg-white/10 rounded-sm bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-30 border border-gray-100 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-white bg-clip-text bg-linear-to-r from-white to-blue-200">{currentPage.pageName} Summary</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                { label: 'Total Records', value: summaryData.totalRecords },
+                { label: 'Filtered Records', value: summaryData.filteredRecords },
+                { label: 'Last 24 Hours', value: summaryData.recordsLast24Hours },
+                { label: 'Last Month', value: summaryData.recordsLastMonth },
+              ].map((item, index) => (
+                <div key={item.label} className="rounded-xl border border-white/10 bg-white/5 p-4">
+                  <p className="text-sm text-white/70">{item.label}</p>
+                  <p className="mt-2 text-3xl font-bold" style={{ color: summaryColors[index % summaryColors.length] }}>
+                    {item.value}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            <div className="overflow-hidden rounded-xl border border-white/10 bg-white/5">
+              <div className="border-b border-white/10 px-4 py-3 text-sm font-medium text-white/80">Monthly Records</div>
+              <div className="max-h-[45vh] overflow-auto">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-white/5 text-xs uppercase text-white/50">
+                    <tr>
+                      <th className="px-4 py-3">Month</th>
+                      <th className="px-4 py-3">Records</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {summaryData.monthlyRows.length > 0 ? (
+                      summaryData.monthlyRows.map((row, index) => (
+                        <tr key={row.month} className="border-t border-white/10">
+                          <td className="px-4 py-3">{row.month}</td>
+                          <td className="px-4 py-3 font-semibold" style={{ color: summaryColors[index % summaryColors.length] }}>
+                            {row.count}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={2} className="px-4 py-10 text-center text-white/60">
+                          No records found.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={isColumnDialogOpen} onOpenChange={setIsColumnDialogOpen}>
         <DialogContent className="bg-white/10 rounded-sm bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-30 border border-gray-100 text-white">
           <DialogHeader>
@@ -569,19 +771,21 @@ function PreviewPageContent() {
       </Dialog>
 
       <Dialog open={!!modalMode} onOpenChange={open => !open && closeModal()}>
-        <DialogContent className="max-h-[85vh] overflow-y-auto bg-white/10 rounded-sm bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-30 border border-gray-100 text-white">
-          <DialogHeader>
-            <div className="flex items-center justify-between gap-3">
-              <DialogTitle>{modalMode === 'add' ? 'Add Record' : modalMode === 'edit' ? 'Edit Record' : 'View Record'}</DialogTitle>
-            </div>
-          </DialogHeader>
-          {renderRecordForm()}
+        <DialogContent className="sm:max-w-[825px] rounded-xl border mt-[35px] border-white/20 bg-white/10 backdrop-blur-2xl shadow-2xl overflow-hidden transition-all duration-300 p-0 text-white">
+          <ScrollArea className="h-[75vh] max-h-[calc(100vh-2rem)] rounded-xl">
+            <DialogHeader className="p-6 pb-3">
+              <DialogTitle className="text-xl font-semibold bg-clip-text text-transparent bg-linear-to-r from-white to-blue-200 drop-shadow-md">
+                {modalMode === 'add' ? 'Add Record' : modalMode === 'edit' ? 'Edit Record' : 'View Record'}
+              </DialogTitle>
+            </DialogHeader>
+            {renderRecordForm()}
+          </ScrollArea>
           {modalMode !== 'view' && (
-            <div className="flex justify-end gap-3 pt-2">
-              <Button variant="ghost" onClick={closeModal} className="text-slate-400 hover:bg-white/5 hover:text-white">
+            <div className="flex justify-end gap-3 p-6 pt-4">
+              <Button variant="outlineWater" onClick={closeModal} size="sm">
                 Cancel
               </Button>
-              <Button onClick={saveRecord} disabled={fields.length === 0} className="bg-blue-600 text-white hover:bg-blue-500">
+              <Button onClick={saveRecord} disabled={fields.length === 0} variant="outlineGarden" size="sm">
                 Save
               </Button>
             </div>

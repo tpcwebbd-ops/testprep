@@ -41,5 +41,6 @@ Add a conformation model to delete each item inside table.
 Look at the color combination, border, and style from 'src/app/dashboard/admin/sidebar/page.tsx' and implement the style in 'src/app/dashboard/db-bulder/edit-page/page.tsx' and 'src/app/dashboard/db-bulder/page.tsx' and 'src/app/dashboard/db-bulder/preview-page/page.tsx'
 
 
-Now look at the preview-page 'src/app/dashboard/db-builder/edit-page/page.tsx' and implement those features as the following instructions. 
-1. Add a features name 'Clumn' so I can check which column is render and hide inside table. and make sure it will also work inside card on Mobile device. 
+Now look at the preview-page 'src/app/dashboard/db-builder/preview-page/page.tsx' 
+and please look at the news page 'src/app/dashboard/news/page.tsx' 
+You found button named 'Summery' 'Filder' 'Reload' Now add those button and it's functionaly in bg-buider/preview-page/page.tsx

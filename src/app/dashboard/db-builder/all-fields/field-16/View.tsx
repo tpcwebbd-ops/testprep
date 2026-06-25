@@ -13,7 +13,12 @@ interface ViewProps extends field16Props {
 }
 
 const View = ({ value = '' }: ViewProps) => {
-  return <div className="min-h-10 whitespace-pre-wrap rounded-sm bg-white/10 backdrop-blur-md px-3 py-2 text-white">{value || '-'}</div>;
+  try {
+    const parsed = value ? JSON.parse(value) : {};
+    return <span className="text-sm text-white">{`${parsed.start || 'N/A'} - ${parsed.end || 'N/A'}`}</span>;
+  } catch {
+    return <span className="text-sm text-white">N/A - N/A</span>;
+  }
 };
 export default View;
 

@@ -13,7 +13,12 @@ interface ViewProps extends field17Props {
 }
 
 const View = ({ value = '' }: ViewProps) => {
-  return <div className="min-h-10 whitespace-pre-wrap rounded-sm bg-white/10 backdrop-blur-md px-3 py-2 text-white">{value || '-'}</div>;
+  return (
+    <div className="flex items-center gap-2">
+      <span>{value || 'N/A'}</span>
+      {value && <div className="w-5 h-5 rounded-full border border-white/20" style={{ backgroundColor: value }} />}
+    </div>
+  );
 };
 export default View;
 

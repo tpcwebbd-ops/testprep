@@ -12,8 +12,20 @@ interface ViewProps extends field25Props {
   value?: string;
 }
 
+const parseMultiValue = (value: string): string[] => {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    if (Array.isArray(parsed)) return parsed.filter((item): item is string => typeof item === 'string');
+  } catch {
+    return value.split(',').map(item => item.trim()).filter(Boolean);
+  }
+  return [];
+};
+
 const View = ({ value = '' }: ViewProps) => {
-  return <div className="min-h-10 whitespace-pre-wrap rounded-sm bg-white/10 backdrop-blur-md px-3 py-2 text-white">{value || '-'}</div>;
+  const values = parseMultiValue(value);
+  return <span className="text-sm text-white">{values.length ? values.join(', ') : 'N/A'}</span>;
 };
 export default View;
 

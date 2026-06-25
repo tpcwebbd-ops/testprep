@@ -35,6 +35,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import InputFieldForString from '@/components/dashboard-ui/InputFieldForString';
 import { useGetPagesQuery, useUpdatePageMutation } from '@/redux/features/db-builder/pageBuilderSlice';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent, DragOverlay, DragStartEvent } from '@dnd-kit/core';
@@ -287,9 +288,7 @@ const SortableItem = ({ item, onEdit, onDelete, onOpenMoveDialog }: SortableItem
       style={style}
       className={`relative group animate-in fade-in-50 slide-in-from-bottom-6 duration-300 ${isDragging ? 'opacity-40 scale-95 z-50' : 'z-0'}`}
     >
-      <div
-        className={`relative backdrop-blur-3xl transition-all duration-300 overflow-hidden rounded-lg border ${styles.border} ${styles.bg} ${styles.glow}`}
-      >
+      <div className={`relative backdrop-blur-3xl transition-all duration-300 overflow-hidden rounded-lg border ${styles.border} ${styles.bg} ${styles.glow}`}>
         <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
         <div className="relative">
@@ -307,9 +306,14 @@ const SortableItem = ({ item, onEdit, onDelete, onOpenMoveDialog }: SortableItem
                   <GripVertical className="h-4 w-4" />
                 </div>
               </button>
-              <button type="button" onClick={() => setIsOpen(prev => !prev)} className="flex min-w-0 items-center gap-1.5 rounded-md px-1.5 py-1 text-left hover:bg-white/10">
+              <button
+                type="button"
+                onClick={() => setIsOpen(prev => !prev)}
+                className="flex min-w-0 items-center gap-1.5 rounded-md px-1.5 py-1 text-left hover:bg-white/10"
+              >
                 <ChevronDown className={`h-4 w-4 shrink-0 text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-                <span className="truncate text-xs font-medium text-slate-200">{item.heading || item.key}</span>
+                <span className="truncate text-xs font-medium text-slate-200">{item.heading || 'No Heading Found'}</span>
+                <span className="truncate text-xs font-medium text-slate-200/50">({item.key || 'No Key Found'})</span>
               </button>
             </div>
 
@@ -731,22 +735,26 @@ function EditPageContent() {
       </div>
 
       <Dialog open={isAddFieldDialogOpen} onOpenChange={setIsAddFieldDialogOpen}>
-        <DialogContent className="bg-white/10 rounded-sm bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-30 border border-gray-100 text-white max-w-md">
-          <DialogHeader>
-            <DialogTitle>Add Field</DialogTitle>
+        <DialogContent className="sm:max-w-[825px] rounded-xl border mt-[35px] border-white/20 bg-white/10 backdrop-blur-2xl shadow-2xl overflow-hidden transition-all duration-300 p-0 text-white">
+          <DialogHeader className="p-6 pb-3">
+            <DialogTitle className="text-xl font-semibold bg-clip-text text-transparent bg-linear-to-r from-white to-blue-200 drop-shadow-md">
+              Add Field
+            </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div className="space-y-2">
-              <Label htmlFor="field-text" className="text-slate-300">
+          <div className="grid gap-4 py-4 px-6 text-white">
+            <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
+              <Label htmlFor="field-text" className="text-right">
                 Field Name
               </Label>
-              <Input
-                id="field-text"
-                value={addFieldForm.fieldName}
-                onChange={e => setAddFieldForm(prev => ({ ...prev, fieldName: e.target.value }))}
-                placeholder="e.g. Student Name"
-                className="bg-white/10 border-white/10 text-white placeholder:text-white/40"
-              />
+              <div className="col-span-3">
+                <InputFieldForString
+                  id="field-text"
+                  value={addFieldForm.fieldName}
+                  onChange={next => setAddFieldForm(prev => ({ ...prev, fieldName: next }))}
+                  placeholder="e.g. Student Name"
+                  className="text-white"
+                />
+              </div>
             </div>
             <div className="space-y-2">
               <Label className="text-slate-300">Field</Label>
@@ -771,15 +779,11 @@ function EditPageContent() {
             )}
             <FieldPreview form={addFieldForm} />
           </div>
-          <div className="flex justify-end gap-3">
-            <Button variant="ghost" onClick={() => setIsAddFieldDialogOpen(false)} className="text-slate-400 hover:text-white hover:bg-white/5">
+          <div className="flex justify-end gap-3 p-6 pt-4">
+            <Button variant="outlineWater" onClick={() => setIsAddFieldDialogOpen(false)} size="sm">
               Cancel
             </Button>
-            <Button
-              onClick={handleAddField}
-              disabled={!addFieldForm.fieldName.trim() || !addFieldForm.fieldKey}
-              className="bg-blue-600 hover:bg-blue-500 text-white"
-            >
+            <Button onClick={handleAddField} disabled={!addFieldForm.fieldName.trim() || !addFieldForm.fieldKey} variant="outlineGarden" size="sm">
               Add Field
             </Button>
           </div>
@@ -846,26 +850,28 @@ function EditPageContent() {
       </Dialog>
 
       <Dialog open={!!editingItem} onOpenChange={() => setEditingItem(null)}>
-        <DialogContent className="max-w-4xl md:max-w-6xl h-[85vh] mt-10 p-0 bg-white/10 rounded-sm bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-30 border border-gray-100 text-white flex flex-col">
-          <DialogHeader className="p-4 border-b border-white/10 bg-white/5 shrink-0">
-            <DialogTitle className="flex items-center gap-2 text-xl">
+        <DialogContent className="sm:max-w-[825px] h-[85vh] mt-[35px] p-0 rounded-xl border border-white/20 bg-white/10 backdrop-blur-2xl shadow-2xl overflow-hidden transition-all duration-300 text-white flex flex-col">
+          <DialogHeader className="p-6 pb-3 shrink-0">
+            <DialogTitle className="flex items-center gap-2 text-xl font-semibold bg-clip-text text-transparent bg-linear-to-r from-white to-blue-200 drop-shadow-md">
               <Edit className="h-5 w-5 text-blue-400" />
               Edit Component
             </DialogTitle>
           </DialogHeader>
           <ScrollArea className="flex-1 min-h-0 w-full -mt-4">
-            <div className="p-6 space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="edit-field-name" className="text-slate-300">
+            <div className="grid gap-4 py-4 px-6 text-white">
+              <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 pr-1">
+                <Label htmlFor="edit-field-name" className="text-right">
                   Field Name
                 </Label>
-                <Input
-                  id="edit-field-name"
-                  value={editFieldForm.fieldName}
-                  onChange={e => setEditFieldForm(prev => ({ ...prev, fieldName: e.target.value }))}
-                  placeholder="e.g. Student Name"
-                  className="bg-white/10 border-white/10 text-white placeholder:text-white/40"
-                />
+                <div className="col-span-3">
+                  <InputFieldForString
+                    id="edit-field-name"
+                    value={editFieldForm.fieldName}
+                    onChange={next => setEditFieldForm(prev => ({ ...prev, fieldName: next }))}
+                    placeholder="e.g. Student Name"
+                    className="text-white"
+                  />
+                </div>
               </div>
               <div className="space-y-2">
                 <Label className="text-slate-300">Field</Label>
@@ -892,14 +898,10 @@ function EditPageContent() {
               )}
               <FieldPreview form={editFieldForm} />
               <div className="flex justify-end gap-3 pt-2">
-                <Button variant="ghost" onClick={() => setEditingItem(null)} className="text-slate-400 hover:text-white hover:bg-white/5">
+                <Button variant="outlineWater" onClick={() => setEditingItem(null)} size="sm">
                   Cancel
                 </Button>
-                <Button
-                  onClick={handleSubmitEditField}
-                  disabled={!editFieldForm.fieldName.trim() || !editFieldForm.fieldKey}
-                  className="bg-blue-600 hover:bg-blue-500 text-white"
-                >
+                <Button onClick={handleSubmitEditField} disabled={!editFieldForm.fieldName.trim() || !editFieldForm.fieldKey} variant="outlineGarden" size="sm">
                   Save
                 </Button>
               </div>

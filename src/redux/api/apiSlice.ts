@@ -27,6 +27,7 @@ export const apiSlice = createApi({
     'tagTypeEnrollments',
     'DashboardEditor',
     'tagTypeMedia',
+    'tagTypeNews',
     'tagTypeMyCourses',
   ],
   reducerPath: 'api',

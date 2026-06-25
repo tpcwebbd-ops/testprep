@@ -12,8 +12,17 @@ interface ViewProps extends field27Props {
   value?: string;
 }
 
+const formatJsonValue = (value: string) => {
+  if (!value) return '';
+  try {
+    return JSON.stringify(JSON.parse(value), null, 2);
+  } catch {
+    return value;
+  }
+};
+
 const View = ({ value = '' }: ViewProps) => {
-  return <div className="min-h-10 whitespace-pre-wrap rounded-sm bg-white/10 backdrop-blur-md px-3 py-2 text-white">{value || '-'}</div>;
+  return <pre className="mt-1 overflow-auto rounded-md bg-white/5 p-2 text-[11px] text-white/90">{value ? formatJsonValue(value) : 'N/A'}</pre>;
 };
 export default View;
 

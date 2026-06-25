@@ -33,49 +33,22 @@ Please Update
 
 
 Please look at the file 'src/app/dashboard/news/page.tsx' Inside the page you found Model named 'Add', 'View', and 'Edit'. inside the model you found field named 
-- Title
+- ComplexValue 
 
 * Now please copy Style and How it render inside Add, View, Edit Model.
 
 please also look at the page 'src/app/dashboard/db-builder/edit-page/page.tsx' and you find the following fild inside Add Field Model. 
 Now your task is Update Add, Edit, Vew Model inside db-builder based on news/page.tsx here as the naming referance. 
 
-STRING  [fieldType | 'bg-builder']         ->    Title [Field Name | 'news/page.tsx']
+JsonVALUEFIELD  [fieldType | 'bg-builder']         ->    ComplexValue  [Field Name | 'news/page.tsx']
 
 
 ---------------------------------------------------------------------------------
+
 ---------------------------------------------------------------------------------
----------------------------------------------------------------------------------
-STRING           ->    Title
-EMAIL            ->    Email
-PASSWORD         ->    Password
-PASSCODE         ->    Passcode
-SELECT           ->    Area
-DYNAMICSELECT    ->    Sub Area
-IMAGES           ->    Products Images 
-IMAGE            ->    Personal Image 
-DESCRIPTION      ->    Description 
 
-INTNUMBER       ->    Age
-FLOATNUMBER     ->    Amount
-BOOLEAN         ->    IsActive
-DATE            ->    Start Date 
-TIME            ->    Start Time 
-DATERANGE       ->    Schedule Date
-TIMERANGE       ->    Schedule Time 
 
-COLORPICKER     ->    Favorite Color 
-PHONE           ->    Number
-URL             ->    Profile
-RICHTEXT        ->    Test
-AUTOCOMPLETE    ->    Info 
-RADIOBUTTON     ->    Shift
-
-CHECKBOX        ->    Policy
-MULTICHECKBOX   ->    Hobbies   
-MULTIOPTIONS    ->    Ideas 
-STRINGARRAY     ->    Students   
-JsonVALUEFIELD  ->    ComplexValue
+-------------------------------------------
 ---------------------------------------------------------------------------------
 - Title
 - Email
@@ -104,3 +77,34 @@ JsonVALUEFIELD  ->    ComplexValue
 - Ideas
 - Students
 - ComplexValue
+---------------------------------------------------------------------------------
+STRING           ->    Title
+EMAIL            ->    Email
+PASSWORD         ->    Password
+PASSCODE         ->    Passcode
+SELECT           ->    Area
+DYNAMICSELECT    ->    Sub Area
+IMAGES           ->    Products Images 
+IMAGE            ->    Personal Image 
+DESCRIPTION      ->    Description 
+INTNUMBER       ->    Age
+
+FLOATNUMBER     ->    Amount
+BOOLEAN         ->    IsActive
+DATE            ->    Start Date 
+TIME            ->    Start Time 
+DATERANGE       ->    Schedule Date
+TIMERANGE       ->    Schedule Time 
+
+COLORPICKER     ->    Favorite Color 
+PHONE           ->    Number
+URL             ->    Profile
+RICHTEXT        ->    Test
+AUTOCOMPLETE    ->    Info 
+RADIOBUTTON     ->    Shift
+
+CHECKBOX        ->    Policy
+MULTICHECKBOX   ->    Hobbies   
+MULTIOPTIONS    ->    Ideas 
+STRINGARRAY     ->    Students   
+JsonVALUEFIELD  ->    ComplexValue 

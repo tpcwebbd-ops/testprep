@@ -6,6 +6,8 @@
 |-----------------------------------------
 */
 
+import { format } from 'date-fns';
+
 import { field15Props } from './data';
 
 interface ViewProps extends field15Props {
@@ -13,7 +15,19 @@ interface ViewProps extends field15Props {
 }
 
 const View = ({ value = '' }: ViewProps) => {
-  return <div className="min-h-10 whitespace-pre-wrap rounded-sm bg-white/10 backdrop-blur-md px-3 py-2 text-white">{value || '-'}</div>;
+  const formatValue = (date?: string | Date) => {
+    if (!date) return 'N/A';
+    const parsed = new Date(date);
+    if (Number.isNaN(parsed.getTime())) return 'Invalid';
+    return format(parsed, 'MMM dd, yyyy');
+  };
+
+  try {
+    const parsed = value ? JSON.parse(value) : {};
+    return <span className="text-sm text-white">{`${formatValue(parsed.from)} - ${formatValue(parsed.to)}`}</span>;
+  } catch {
+    return <span className="text-sm text-white">N/A</span>;
+  }
 };
 export default View;
 

@@ -6,7 +6,7 @@
 |-----------------------------------------
 */
 
-import { Input } from '@/components/ui/input';
+import ImageUploadManagerSingle from '@/components/dashboard-ui/imageBB/ImageUploadManagerSingle';
 
 import { field8Props, Ifield8Data } from './data';
 
@@ -14,6 +14,8 @@ interface UpdateProps extends field8Props {
   value?: string;
   onChange?: (value: string) => void;
 }
+
+type ImageValue = { url: string; name: string };
 
 const fallbackData: Ifield8Data = {
   fieldName: 'Image Field',
@@ -34,76 +36,27 @@ const resolveData = (data?: Ifield8Data | string): Ifield8Data => {
   return data;
 };
 
-const getInputType = (fieldType: string) => {
-  const normalizedType = fieldType.toLowerCase();
-  if (normalizedType.includes('email')) return 'email';
-  if (normalizedType.includes('password') || normalizedType.includes('passcode')) return 'password';
-  if (normalizedType.includes('number') || normalizedType.includes('int') || normalizedType.includes('float')) return 'number';
-  if (normalizedType.includes('date')) return 'date';
-  if (normalizedType === 'time') return 'time';
-  if (normalizedType.includes('color')) return 'color';
-  if (normalizedType.includes('phone')) return 'tel';
-  if (normalizedType.includes('url') || normalizedType.includes('image')) return 'url';
-  return 'text';
+const parseImage = (value: string): ImageValue => {
+  if (!value.trim()) return { url: '', name: '' };
+
+  try {
+    const parsed = JSON.parse(value);
+
+    if (typeof parsed === 'string') return { url: parsed, name: parsed.split('/').pop() || 'Image' };
+    if (parsed && typeof parsed === 'object' && 'url' in parsed && typeof parsed.url === 'string') {
+      return { url: parsed.url, name: 'name' in parsed && typeof parsed.name === 'string' ? parsed.name : parsed.url.split('/').pop() || 'Image' };
+    }
+  } catch {
+    return { url: value, name: value.split('/').pop() || 'Image' };
+  }
+
+  return { url: '', name: '' };
 };
 
 const Update = ({ data, value = '', onChange }: UpdateProps) => {
   const fieldData = resolveData(data);
-  const normalizedType = fieldData.fieldType.toLowerCase();
 
-  if (["description","richtext","stringarray","jsonvaluefield","images","daterange","timerange"].includes(normalizedType)) {
-    return (
-      <textarea
-        value={value}
-        onChange={e => onChange?.(e.target.value)}
-        placeholder={fieldData.fieldPlaceHolder}
-        className="min-h-24 w-full rounded-sm border border-white/10 bg-white/10 backdrop-blur-md px-3 py-2 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
-      />
-    );
-  }
-
-  if (["boolean","checkbox"].includes(normalizedType)) {
-    return (
-      <label className="flex min-h-10 items-center gap-3 rounded-sm border border-white/10 bg-white/10 backdrop-blur-md px-3 py-2 text-sm text-white">
-        <input
-          type="checkbox"
-          checked={value === 'true'}
-          onChange={e => onChange?.(String(e.target.checked))}
-          className="h-4 w-4 rounded border-white/10 bg-white/10 backdrop-blur-md"
-        />
-        {fieldData.fieldPlaceHolder}
-      </label>
-    );
-  }
-
-  if (["select","dynamicselect","radiobutton","multicheckbox","multioptions"].includes(normalizedType)) {
-    const options = fieldData.fieldOptions?.length ? fieldData.fieldOptions : ['Option 1', 'Option 2', 'Option 3'];
-
-    return (
-      <select
-        value={value}
-        onChange={e => onChange?.(e.target.value)}
-        className="h-10 w-full rounded-sm border border-white/10 bg-white/10 backdrop-blur-md px-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500/40"
-      >
-        <option value="">{fieldData.fieldPlaceHolder}</option>
-        {options.map(option => (
-          <option key={option} value={option}>
-            {option}
-          </option>
-        ))}
-      </select>
-    );
-  }
-
-  return (
-    <Input
-      type={getInputType(fieldData.fieldType)}
-      value={value}
-      onChange={e => onChange?.(e.target.value)}
-      placeholder={fieldData.fieldPlaceHolder}
-      className="bg-white/10 backdrop-blur-md border-white/10 text-white placeholder:text-white/40"
-    />
-  );
+  return <ImageUploadManagerSingle value={parseImage(value)} onChange={next => onChange?.(JSON.stringify(next))} label={fieldData.fieldName} />;
 };
 export default Update;
 
