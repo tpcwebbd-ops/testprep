@@ -14,12 +14,12 @@ export interface Ifield2Data {
   fieldName: string;
   fieldData: string;
   fieldPlaceHolder: string;
+  fieldType: string;
 }
 
 export const defaultDatafield2: Ifield2Data = {
   fieldName: 'Input Email Field',
   fieldData: '',
   fieldPlaceHolder: 'Enter your email',
+  fieldType: 'EMAIL',
 };
-
-

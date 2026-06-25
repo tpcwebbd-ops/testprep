@@ -16,12 +16,12 @@ interface AddProps extends field2Props {
 }
 
 const resolveData = (data?: Ifield2Data | string): Ifield2Data => {
-  if (!data) return { fieldName: 'Input Field', fieldData: '', fieldPlaceHolder: 'Enter your email' };
+  if (!data) return { fieldName: 'Input Field', fieldData: '', fieldPlaceHolder: 'Enter your email', fieldType: 'EMAIL' };
   if (typeof data === 'string') {
     try {
       return JSON.parse(data) as Ifield2Data;
     } catch {
-      return { fieldName: 'Input Field', fieldData: '', fieldPlaceHolder: data };
+      return { fieldName: 'Input Field', fieldData: '', fieldPlaceHolder: data, fieldType: 'EMAIL' };
     }
   }
   return data;
@@ -41,5 +41,3 @@ const Add = ({ data, value = '', onChange }: AddProps) => {
   );
 };
 export default Add;
-
-

@@ -10,7 +10,7 @@
 
 import { useSearchParams } from 'next/navigation';
 import { useState, useEffect, Suspense, useMemo, type ComponentType } from 'react';
-import { AlertTriangle, Download, Edit, Eye, Plus, RefreshCw, Search, Trash2 } from 'lucide-react';
+import { AlertTriangle, Columns3, Download, Edit, Eye, Plus, RefreshCw, Search, Trash2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -97,6 +97,7 @@ function PreviewPageContent() {
   }, [normalizedPages, pathTitle]);
 
   const [fields, setFields] = useState<PageContent[]>([]);
+  const [visibleFieldIds, setVisibleFieldIds] = useState<string[]>([]);
   const [records, setRecords] = useState<DbRecord[]>([]);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [searchValue, setSearchValue] = useState('');
@@ -108,12 +109,14 @@ function PreviewPageContent() {
   const [bulkEditValue, setBulkEditValue] = useState('');
   const [activeRecord, setActiveRecord] = useState<DbRecord | null>(null);
   const [recordToDelete, setRecordToDelete] = useState<DbRecord | null>(null);
+  const [isColumnDialogOpen, setIsColumnDialogOpen] = useState(false);
   const [draftValues, setDraftValues] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (currentPage?.content) {
       const content = Array.isArray(currentPage.content) ? currentPage.content : [];
       setFields(content);
+      setVisibleFieldIds(content.slice(0, 3).map(field => field.id));
       setDraftValues(makeEmptyValues(content));
     }
   }, [currentPage]);
@@ -136,6 +139,12 @@ function PreviewPageContent() {
   const safeCurrentPage = Math.min(currentPageNumber, totalPages);
   const paginatedRecords = visibleRecords.slice((safeCurrentPage - 1) * itemsPerPage, safeCurrentPage * itemsPerPage);
   const isAllCurrentPageSelected = paginatedRecords.length > 0 && paginatedRecords.every(record => selectedIds.includes(record.id));
+  const visibleFields = useMemo(() => fields.filter(field => visibleFieldIds.includes(field.id)), [fields, visibleFieldIds]);
+  const displayColumnCount = Math.max(visibleFields.length, 1);
+
+  const toggleVisibleField = (fieldId: string) => {
+    setVisibleFieldIds(prev => (prev.includes(fieldId) ? prev.filter(id => id !== fieldId) : [...prev, fieldId]));
+  };
 
   const openAddDialog = () => {
     setActiveRecord(null);
@@ -377,6 +386,10 @@ function PreviewPageContent() {
           </div>
 
           <div className="flex flex-wrap gap-2">
+            <Button onClick={() => setIsColumnDialogOpen(true)} disabled={fields.length === 0} variant="outlineGlassy" size="sm" className="gap-2">
+              <Columns3 className="h-4 w-4" />
+              Clumn
+            </Button>
             <Button onClick={openBulkEditDialog} disabled={selectedIds.length === 0 || fields.length === 0} variant="outlineGlassy" size="sm" className="gap-2">
               <Edit className="h-4 w-4" />
               Bulk Edit
@@ -400,11 +413,12 @@ function PreviewPageContent() {
                   <th className="w-12 px-4 py-3">
                     <input type="checkbox" checked={isAllCurrentPageSelected} onChange={toggleSelectPage} aria-label="Select visible records" />
                   </th>
-                  {fields.map(field => (
+                  {visibleFields.map(field => (
                     <th key={field.id} className="px-4 py-3">
                       {getFieldLabel(field)}
                     </th>
                   ))}
+                  {visibleFields.length === 0 && <th className="px-4 py-3">Columns</th>}
                   <th className="px-4 py-3">Created</th>
                   <th className="px-4 py-3 text-right">Actions</th>
                 </tr>
@@ -415,11 +429,12 @@ function PreviewPageContent() {
                     <td className="px-4 py-3">
                       <input type="checkbox" checked={selectedIds.includes(record.id)} onChange={() => toggleSelected(record.id)} aria-label="Select record" />
                     </td>
-                    {fields.map(field => (
+                    {visibleFields.map(field => (
                       <td key={field.id} className="px-4 py-3">
                         {record.values[field.id] || '-'}
                       </td>
                     ))}
+                    {visibleFields.length === 0 && <td className="px-4 py-3 text-slate-500">No columns selected.</td>}
                     <td className="px-4 py-3 font-mono text-xs text-slate-400">{new Date(record.createdAt).toLocaleString()}</td>
                     <td className="px-4 py-3">
                       <div className="flex justify-end gap-2">
@@ -438,7 +453,7 @@ function PreviewPageContent() {
                 ))}
                 {paginatedRecords.length === 0 && (
                   <tr>
-                    <td colSpan={fields.length + 3} className="px-4 py-12 text-center text-slate-500">
+                    <td colSpan={displayColumnCount + 3} className="px-4 py-12 text-center text-slate-500">
                       No records found.
                     </td>
                   </tr>
@@ -459,12 +474,15 @@ function PreviewPageContent() {
                 <span className="font-mono text-xs text-slate-500">{new Date(record.createdAt).toLocaleDateString()}</span>
               </div>
               <div className="space-y-2">
-                {fields.map(field => (
+                {visibleFields.map(field => (
                   <div key={field.id} className="rounded-2xl border border-white/5 bg-white/5 p-3">
                     <div className="text-xs uppercase text-slate-500">{getFieldLabel(field)}</div>
                     <div className="mt-1 text-slate-100">{record.values[field.id] || '-'}</div>
                   </div>
                 ))}
+                {visibleFields.length === 0 && (
+                  <div className="rounded-2xl border border-white/5 bg-white/5 p-3 text-sm text-slate-500">No columns selected.</div>
+                )}
               </div>
               <div className="mt-4 flex justify-end gap-2">
                 <Button onClick={() => openViewDialog(record)} variant="outlineGlassy" size="sm" className="min-w-1">
@@ -519,6 +537,36 @@ function PreviewPageContent() {
           </div>
         </div>
       </div>
+
+      <Dialog open={isColumnDialogOpen} onOpenChange={setIsColumnDialogOpen}>
+        <DialogContent className="bg-white/10 rounded-sm bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-30 border border-gray-100 text-white">
+          <DialogHeader>
+            <DialogTitle>Clumn</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="text-sm text-slate-300">
+              Columns ({visibleFieldIds.length}/{fields.length})
+            </div>
+            <div className="max-h-[50vh] space-y-2 overflow-y-auto rounded-xl border border-white/10 bg-white/5 p-2">
+              {fields.map(field => (
+                <label
+                  key={field.id}
+                  className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 hover:bg-white/10"
+                >
+                  <span className="min-w-0 truncate">{getFieldLabel(field)}</span>
+                  <input
+                    type="checkbox"
+                    checked={visibleFieldIds.includes(field.id)}
+                    onChange={() => toggleVisibleField(field.id)}
+                    aria-label={`Toggle ${getFieldLabel(field)} column`}
+                  />
+                </label>
+              ))}
+              {fields.length === 0 && <div className="rounded-lg border border-white/10 bg-white/5 p-4 text-center text-sm text-slate-500">No columns found.</div>}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={!!modalMode} onOpenChange={open => !open && closeModal()}>
         <DialogContent className="max-h-[85vh] overflow-y-auto bg-white/10 rounded-sm bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-30 border border-gray-100 text-white">
@@ -668,4 +716,3 @@ export default function Page() {
     </Suspense>
   );
 }
-

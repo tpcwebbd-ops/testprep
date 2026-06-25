@@ -30,4 +30,4 @@ Please Update
 
 
 Look at the page 'src/app/dashboard/db-builder/edit-page/page.tsx'
-And you found a modle named 'Select Field' It will show in two line. make it one single line and add index inside each line.
+It will Display Each Item line by line and it has bigger gap between each line. Now I want it with small gap. and each Item will be accordian. If I open it then I can see the Preview. and remove padding and margin as much as you can. default accordion is hide the inner data.

@@ -93,6 +93,7 @@ interface FieldPickerDialogProps {
 
 const FieldPickerDialog = ({ open, selectedKey, onOpenChange, onSelect }: FieldPickerDialogProps) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [previewFieldKey, setPreviewFieldKey] = useState<string | null>(null);
   const normalizedSearchTerm = searchTerm.trim().toLowerCase();
   const shouldFilter = normalizedSearchTerm.length >= 3;
   const visibleFieldKeys = shouldFilter
@@ -104,64 +105,102 @@ const FieldPickerDialog = ({ open, selectedKey, onOpenChange, onSelect }: FieldP
         return searchableText.includes(normalizedSearchTerm);
       })
     : AllfieldsKeys;
+  const previewConfig = previewFieldKey ? Allfields[previewFieldKey as keyof typeof Allfields] : null;
+  const previewData = previewFieldKey
+    ? getPreparedFieldData({
+        fieldName: getFieldDisplayName(previewFieldKey),
+        fieldKey: previewFieldKey,
+        fieldPlaceHolder: getFieldPlaceholder(previewFieldKey),
+      })
+    : null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const PreviewField = previewConfig ? (previewConfig as any).add : null;
+
+  useEffect(() => {
+    if (!open) setPreviewFieldKey(null);
+  }, [open]);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-white/10 rounded-sm bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-30 border border-gray-100 text-white max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>Select Field</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-2">
-          <Label htmlFor="field-picker-search" className="text-slate-300">
-            Search Field
-          </Label>
-          <Input
-            id="field-picker-search"
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-            placeholder="Type at least 3 characters"
-            className="bg-white/10 border-white/10 text-white placeholder:text-white/40"
-          />
-        </div>
-        <ScrollArea className="max-h-[60vh] pr-3">
-          {visibleFieldKeys.length === 0 ? (
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center text-sm text-white/50">No field found.</div>
-          ) : (
-            <div className="grid gap-2 sm:grid-cols-2">
-              {visibleFieldKeys.map(key => {
-              const isSelected = selectedKey === key;
-              const data = getFieldConfigData(key);
-              const fieldType = data && 'fieldType' in data ? data.fieldType : key;
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="bg-white/10 rounded-sm bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-30 border border-gray-100 text-white max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Select Field</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2">
+            <Label htmlFor="field-picker-search" className="text-slate-300">
+              Search Field
+            </Label>
+            <Input
+              id="field-picker-search"
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              placeholder="Type at least 3 characters"
+              className="bg-white/10 border-white/10 text-white placeholder:text-white/40"
+            />
+          </div>
+          <ScrollArea className="max-h-[60vh] pr-3">
+            {visibleFieldKeys.length === 0 ? (
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center text-sm text-white/50">No field found.</div>
+            ) : (
+              <div className="grid gap-2">
+                {visibleFieldKeys.map((key, index) => {
+                  const isSelected = selectedKey === key;
+                  const data = getFieldConfigData(key);
+                  const fieldType = data && 'fieldType' in data ? data.fieldType : key;
 
-              return (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => {
-                    onSelect(key);
-                    onOpenChange(false);
-                  }}
-                  className={`rounded-2xl border p-3 text-left backdrop-blur-2xl transition-all hover:border-blue-400/70 hover:bg-white/10 ${
-                    isSelected ? 'border-blue-400 bg-blue-500/20' : 'border-white/10 bg-white/5'
-                  }`}
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="mt-0.5 rounded-md bg-blue-500/10 p-2 text-blue-300">
-                      <Database className="h-4 w-4" />
+                  return (
+                    <div
+                      key={key}
+                      className={`rounded-2xl border p-3 text-left backdrop-blur-2xl transition-all hover:border-blue-400/70 hover:bg-white/10 ${
+                        isSelected ? 'border-blue-400 bg-blue-500/20' : 'border-white/10 bg-white/5'
+                      }`}
+                    >
+                      <div className="flex min-w-0 items-center gap-3">
+                        <span className="flex h-7 w-9 shrink-0 items-center justify-center rounded-md bg-white/10 text-xs font-semibold text-slate-300">
+                          {index + 1}
+                        </span>
+                        <div className="flex min-w-0 flex-1 items-center">
+                          <p className="truncate text-xs text-slate-400">{fieldType}</p>
+                        </div>
+                        <div className="flex shrink-0 items-center gap-2">
+                          <Button type="button" size="sm" variant="outlineGlassy" onClick={() => setPreviewFieldKey(key)} className="min-w-1">
+                            View
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outlineWater"
+                            size="sm"
+                            onClick={() => {
+                              onSelect(key);
+                              onOpenChange(false);
+                            }}
+                            className="min-w-1"
+                          >
+                            Add
+                          </Button>
+                        </div>
+                      </div>
                     </div>
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-white">{getFieldDisplayName(key)}</p>
-                      <p className="mt-1 truncate text-xs text-slate-400">{fieldType}</p>
-                    </div>
-                  </div>
-                </button>
-              );
-              })}
-            </div>
-          )}
-        </ScrollArea>
-      </DialogContent>
-    </Dialog>
+                  );
+                })}
+              </div>
+            )}
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={Boolean(previewFieldKey)} onOpenChange={isOpen => !isOpen && setPreviewFieldKey(null)}>
+        <DialogContent className="bg-white/10 rounded-sm bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-30 border border-gray-100 text-white max-w-xl">
+          <DialogHeader>
+            <DialogTitle>{previewFieldKey ? getFieldDisplayName(previewFieldKey) : 'View Field'}</DialogTitle>
+          </DialogHeader>
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+            {PreviewField && previewData ? <PreviewField data={previewData} /> : <p className="text-sm text-slate-500">No preview available.</p>}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
@@ -213,6 +252,7 @@ interface SortableItemProps {
 
 const SortableItem = ({ item, onEdit, onDelete, onOpenMoveDialog }: SortableItemProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id });
+  const [isOpen, setIsOpen] = useState(false);
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -245,60 +285,65 @@ const SortableItem = ({ item, onEdit, onDelete, onOpenMoveDialog }: SortableItem
     <div
       ref={setNodeRef}
       style={style}
-      className={`relative group animate-in fade-in-50 slide-in-from-bottom-6 duration-700 ${isDragging ? 'opacity-40 scale-95 z-50' : 'z-0'}`}
+      className={`relative group animate-in fade-in-50 slide-in-from-bottom-6 duration-300 ${isDragging ? 'opacity-40 scale-95 z-50' : 'z-0'}`}
     >
       <div
-        className={`relative backdrop-blur-3xl shadow-xl transition-all duration-300 overflow-hidden rounded-xl border ${styles.border} ${styles.bg} ${styles.glow}`}
+        className={`relative backdrop-blur-3xl transition-all duration-300 overflow-hidden rounded-lg border ${styles.border} ${styles.bg} ${styles.glow}`}
       >
         <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
         <div className="relative">
-          <div className="absolute top-0 left-0 right-0 h-12 flex items-center justify-between px-4 z-20 border-b border-white/5 bg-white/5 backdrop-blur-sm">
-            <div className="flex items-center gap-3">
-              <button onClick={() => onOpenMoveDialog(item)} className="md:hidden p-2 rounded-full hover:bg-white/10 text-yellow-400 transition-all">
+          <div className={`flex items-center justify-between gap-2 px-2 py-1.5 bg-white/5 backdrop-blur-sm ${isOpen ? 'border-b border-white/5' : ''}`}>
+            <div className="flex min-w-0 items-center gap-1.5">
+              <button onClick={() => onOpenMoveDialog(item)} className="md:hidden p-1 rounded-md hover:bg-white/10 text-yellow-400 transition-all">
                 <ArrowUpDown className="h-4 w-4" />
               </button>
               <button
                 {...attributes}
                 {...listeners}
-                className={`cursor-grab active:cursor-grabbing p-1.5 rounded-lg hover:bg-white/10 transition-colors ${styles.icon}`}
+                className={`cursor-grab active:cursor-grabbing p-1 rounded-md hover:bg-white/10 transition-colors ${styles.icon}`}
               >
                 <div className="w-full flex items-center justify-center">
-                  <GripVertical className="h-5 w-5" />
+                  <GripVertical className="h-4 w-4" />
                 </div>
               </button>
-              <div className="flex flex-col small text-slate-400">
-                <span className="text-xs font-medium text-slate-200 tracking-wide truncate max-w-[150px]">{item.heading || item.key}</span>
-              </div>
+              <button type="button" onClick={() => setIsOpen(prev => !prev)} className="flex min-w-0 items-center gap-1.5 rounded-md px-1.5 py-1 text-left hover:bg-white/10">
+                <ChevronDown className={`h-4 w-4 shrink-0 text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                <span className="truncate text-xs font-medium text-slate-200">{item.heading || item.key}</span>
+              </button>
             </div>
 
-            <div className="flex items-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity duration-300">
-              <Button onClick={() => onEdit(item)} size="sm" className="min-w-1" variant="outlineGlassy">
-                <Edit className="h-4 w-4" />
+            <div className="flex shrink-0 items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity duration-300">
+              <Button onClick={() => onEdit(item)} size="sm" className="h-7 min-w-1 px-2" variant="outlineGlassy">
+                <Edit className="h-3.5 w-3.5" />
               </Button>
 
-              <Button onClick={() => onDelete(item)} size="sm" className="min-w-1" variant="outlineGlassy">
-                <Trash2 className="h-4 w-4" />
+              <Button onClick={() => onDelete(item)} size="sm" className="h-7 min-w-1 px-2" variant="outlineGlassy">
+                <Trash2 className="h-3.5 w-3.5" />
               </Button>
             </div>
           </div>
 
-          <div className="w-full h-auto hidden lg:block">
-            <div className="p-6 pt-16 text-slate-300 min-h-[100px]">
-              <div className="z-10 pointer-events-none select-none opacity-90 group-hover:opacity-100 transition-opacity">
-                {ComponentToRender && <ComponentToRender data={item.data} />}
-              </div>
-            </div>
-          </div>
-          <div className="w-full h-auto block lg:hidden">
-            <div className="p-6 pt-16 text-slate-300 min-h-[100px]">
-              <div className="z-10 select-none opacity-90 group-hover:opacity-100 transition-opacity">
-                <div className="w-full h-[400px] max-w-[340px] overflow-scroll border border-gray-300">
-                  {ComponentToRender && <ComponentToRender data={item.data} />}
+          {isOpen && (
+            <>
+              <div className="w-full h-auto hidden lg:block">
+                <div className="p-2 text-slate-300">
+                  <div className="z-10 pointer-events-none select-none opacity-90 group-hover:opacity-100 transition-opacity">
+                    {ComponentToRender && <ComponentToRender data={item.data} />}
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
+              <div className="w-full h-auto block lg:hidden">
+                <div className="p-2 text-slate-300">
+                  <div className="z-10 select-none opacity-90 group-hover:opacity-100 transition-opacity">
+                    <div className="w-full max-w-[340px] overflow-auto border border-gray-300">
+                      {ComponentToRender && <ComponentToRender data={item.data} />}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>
@@ -623,7 +668,7 @@ function EditPageContent() {
         ) : (
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             <SortableContext items={items.map(s => s.id)} strategy={verticalListSortingStrategy}>
-              <div className="flex flex-col gap-8">
+              <div className="flex flex-col gap-1.5">
                 {items.map(item => (
                   <SortableItem key={item.id} item={item} onEdit={handleEdit} onDelete={handleDeleteClick} onOpenMoveDialog={handleOpenMoveDialog} />
                 ))}
@@ -826,7 +871,9 @@ function EditPageContent() {
                 <Label className="text-slate-300">Field</Label>
                 <Button type="button" variant="outlineGlassy" onClick={() => setIsEditFieldPickerOpen(true)} className="w-full justify-between">
                   <span>Select Field</span>
-                  <span className="truncate text-xs text-slate-300">{editFieldForm.fieldKey ? getFieldDisplayName(editFieldForm.fieldKey) : 'None selected'}</span>
+                  <span className="truncate text-xs text-slate-300">
+                    {editFieldForm.fieldKey ? getFieldDisplayName(editFieldForm.fieldKey) : 'None selected'}
+                  </span>
                 </Button>
               </div>
               {fieldHasPlaceholder(editFieldForm.fieldKey) && (
@@ -884,4 +931,3 @@ export default function Page() {
     </Suspense>
   );
 }
-

@@ -16,12 +16,12 @@ interface AddProps extends field1Props {
 }
 
 const resolveData = (data?: Ifield1Data | string): Ifield1Data => {
-  if (!data) return { fieldName: 'Input Field', fieldData: '', fieldPlaceHolder: 'Enter your name' };
+  if (!data) return { fieldName: 'Input Field', fieldData: '', fieldPlaceHolder: 'Enter your name', fieldType: 'STRING' };
   if (typeof data === 'string') {
     try {
       return JSON.parse(data) as Ifield1Data;
     } catch {
-      return { fieldName: 'Input Field', fieldData: '', fieldPlaceHolder: data };
+      return { fieldName: 'Input Field', fieldData: '', fieldPlaceHolder: data, fieldType: 'STRING' };
     }
   }
   return data;
@@ -40,5 +40,3 @@ const Add = ({ data, value = '', onChange }: AddProps) => {
   );
 };
 export default Add;
-
-

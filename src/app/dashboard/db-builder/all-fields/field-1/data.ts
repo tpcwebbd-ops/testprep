@@ -14,12 +14,12 @@ export interface Ifield1Data {
   fieldName: string;
   fieldData: string;
   fieldPlaceHolder: string;
+  fieldType: string;
 }
 
 export const defaultDatafield1: Ifield1Data = {
   fieldName: 'Input Text Field',
   fieldData: '',
   fieldPlaceHolder: 'Enter your text',
+  fieldType: 'STRING',
 };
-
-
