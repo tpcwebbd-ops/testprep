@@ -70,6 +70,50 @@ export const dbBuilderApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: [{ type: 'tagTypeDbBuilder', id: 'LIST' }],
     }),
+    getDbBuilderRecords: builder.query({
+      query: pageId => `/api/db-builder/v1?resource=records&pageId=${encodeURIComponent(pageId)}`,
+      providesTags: (result, error, pageId) => [{ type: 'tagTypeDbBuilder', id: `RECORDS-${pageId}` }],
+    }),
+    addDbBuilderRecord: builder.mutation({
+      query: newRecord => ({
+        url: '/api/db-builder/v1?resource=records',
+        method: 'POST',
+        body: newRecord,
+      }),
+      invalidatesTags: (result, error, { pageId }) => [{ type: 'tagTypeDbBuilder', id: `RECORDS-${pageId}` }],
+    }),
+    updateDbBuilderRecord: builder.mutation({
+      query: ({ id, ...data }) => ({
+        url: '/api/db-builder/v1?resource=records',
+        method: 'PUT',
+        body: { id, ...data },
+      }),
+      invalidatesTags: (result, error, { pageId }) => [{ type: 'tagTypeDbBuilder', id: `RECORDS-${pageId}` }],
+    }),
+    deleteDbBuilderRecord: builder.mutation({
+      query: ({ id, pageId }) => ({
+        url: '/api/db-builder/v1?resource=records',
+        method: 'DELETE',
+        body: { id, pageId },
+      }),
+      invalidatesTags: (result, error, { pageId }) => [{ type: 'tagTypeDbBuilder', id: `RECORDS-${pageId}` }],
+    }),
+    bulkUpdateDbBuilderRecords: builder.mutation({
+      query: bulkData => ({
+        url: '/api/db-builder/v1?resource=records&bulk=true',
+        method: 'PUT',
+        body: bulkData,
+      }),
+      invalidatesTags: (result, error, { pageId }) => [{ type: 'tagTypeDbBuilder', id: `RECORDS-${pageId}` }],
+    }),
+    bulkDeleteDbBuilderRecords: builder.mutation({
+      query: bulkData => ({
+        url: '/api/db-builder/v1?resource=records&bulk=true',
+        method: 'DELETE',
+        body: bulkData,
+      }),
+      invalidatesTags: (result, error, { pageId }) => [{ type: 'tagTypeDbBuilder', id: `RECORDS-${pageId}` }],
+    }),
   }),
 });
 
@@ -81,4 +125,10 @@ export const {
   useDeleteDbBuilderPageMutation: useDeletePageMutation,
   useBulkUpdateDbBuilderPagesMutation: useBulkUpdatePagesMutation,
   useBulkDeleteDbBuilderPagesMutation: useBulkDeletePagesMutation,
+  useGetDbBuilderRecordsQuery: useGetRecordsQuery,
+  useAddDbBuilderRecordMutation: useAddRecordMutation,
+  useUpdateDbBuilderRecordMutation: useUpdateRecordMutation,
+  useDeleteDbBuilderRecordMutation: useDeleteRecordMutation,
+  useBulkUpdateDbBuilderRecordsMutation: useBulkUpdateRecordsMutation,
+  useBulkDeleteDbBuilderRecordsMutation: useBulkDeleteRecordsMutation,
 } = dbBuilderApi;

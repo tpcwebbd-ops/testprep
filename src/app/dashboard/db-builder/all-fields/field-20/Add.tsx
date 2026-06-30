@@ -39,11 +39,13 @@ const Add = ({ data, value = '', onChange }: AddProps) => {
   const fieldId = fieldData.fieldName.toLowerCase().replace(/\s+/g, '-');
 
   return (
-    <RichTextEditorField
-      id={fieldId}
-      value={value}
-      onChange={next => onChange?.(next)}
-    />
+    <div className="w-full min-w-0">
+      <RichTextEditorField
+        id={fieldId}
+        value={value || '<p></p>'}
+        onChange={next => onChange?.(next)}
+      />
+    </div>
   );
 };
 export default Add;

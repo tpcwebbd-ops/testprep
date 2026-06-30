@@ -11,7 +11,19 @@ import { revalidatePath } from 'next/cache';
 import { formatResponse, IResponse } from '@/app/api/utils/jwt-verify';
 
 import { handleRateLimit } from '../../utils/rate-limit';
-import { getPages, createPage, updatePage, deletePage, getPageById } from './controller';
+import {
+  getPages,
+  createPage,
+  updatePage,
+  deletePage,
+  getPageById,
+  getRecords,
+  createRecord,
+  updateRecord,
+  deleteRecord,
+  bulkUpdateRecords,
+  bulkDeleteRecords,
+} from './controller';
 import { isUserHasAccessByRole, IWantAccess } from '../../utils/is-user-has-access-by-role';
 
 export async function GET(req: Request) {
@@ -25,8 +37,10 @@ export async function GET(req: Request) {
     const isAccess = await isUserHasAccessByRole(wantToAccess);
     if (isAccess) return isAccess;
   }
-  const id = new URL(req.url).searchParams.get('id');
-  const result: IResponse = id ? await getPageById(req) : await getPages(req);
+  const url = new URL(req.url);
+  const id = url.searchParams.get('id');
+  const resource = url.searchParams.get('resource');
+  const result: IResponse = resource === 'records' ? await getRecords(req) : id ? await getPageById(req) : await getPages(req);
 
   return formatResponse(result.data, result.message, result.status);
 }
@@ -42,7 +56,8 @@ export async function POST(req: Request) {
     const isAccess = await isUserHasAccessByRole(wantToAccess);
     if (isAccess) return isAccess;
   }
-  const result = await createPage(req);
+  const resource = new URL(req.url).searchParams.get('resource');
+  const result = resource === 'records' ? await createRecord(req) : await createPage(req);
 
   if (result.status === 200 || result.status === 201) {
     revalidatePath('/db builder');
@@ -62,7 +77,10 @@ export async function PUT(req: Request) {
     const isAccess = await isUserHasAccessByRole(wantToAccess);
     if (isAccess) return isAccess;
   }
-  const result = await updatePage(req);
+  const url = new URL(req.url);
+  const resource = url.searchParams.get('resource');
+  const isBulk = url.searchParams.get('bulk') === 'true';
+  const result = resource === 'records' ? (isBulk ? await bulkUpdateRecords(req) : await updateRecord(req)) : await updatePage(req);
 
   if (result.status === 200) {
     revalidatePath('/db builder');
@@ -82,7 +100,10 @@ export async function DELETE(req: Request) {
     const isAccess = await isUserHasAccessByRole(wantToAccess);
     if (isAccess) return isAccess;
   }
-  const result = await deletePage(req);
+  const url = new URL(req.url);
+  const resource = url.searchParams.get('resource');
+  const isBulk = url.searchParams.get('bulk') === 'true';
+  const result = resource === 'records' ? (isBulk ? await bulkDeleteRecords(req) : await deleteRecord(req)) : await deletePage(req);
 
   if (result.status === 200) {
     revalidatePath('/db builder');

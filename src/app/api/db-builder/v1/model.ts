@@ -38,4 +38,16 @@ dbBuilderSchema.index({ path: 1 });
 dbBuilderSchema.index({ isActive: 1 });
 dbBuilderSchema.index({ 'content.type': 1 });
 
+const dbBuilderRecordSchema = new Schema(
+  {
+    pageId: { type: Schema.Types.ObjectId, ref: 'DbBuilder', required: true, index: true },
+    values: { type: Schema.Types.Mixed, default: {} },
+  },
+  { _id: true, timestamps: true },
+);
+
+dbBuilderRecordSchema.index({ pageId: 1, createdAt: -1 });
+
+export const DbBuilderRecord = mongoose.models.DbBuilderRecord || mongoose.model('DbBuilderRecord', dbBuilderRecordSchema);
+
 export default mongoose.models.DbBuilder || mongoose.model('DbBuilder', dbBuilderSchema);

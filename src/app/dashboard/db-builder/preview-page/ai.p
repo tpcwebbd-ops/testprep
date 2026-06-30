@@ -42,5 +42,9 @@ Look at the color combination, border, and style from 'src/app/dashboard/admin/s
 
 
 Now look at the preview-page 'src/app/dashboard/db-builder/preview-page/page.tsx' 
-and please look at the news page 'src/app/dashboard/news/page.tsx' 
-You found button named 'Summery' 'Filder' 'Reload' Now add those button and it's functionaly in bg-buider/preview-page/page.tsx
+api:
+'src/app/api/db-builder/v1/controller.ts'
+'src/app/api/db-builder/v1/model.ts'
+'src/app/api/db-builder/v1/route.ts'
+
+Now please implement functionality so I can add, edit, and delete data and it will sync with database. 

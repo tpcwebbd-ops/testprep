@@ -9,6 +9,7 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
+import { skipToken } from '@reduxjs/toolkit/query';
 import { useState, useEffect, Suspense, useMemo, type ComponentType } from 'react';
 import { AlertTriangle, Columns3, Download, Edit, Eye, Filter, Plus, RefreshCcw, RefreshCw, Search, Trash2, TrendingUp } from 'lucide-react';
 
@@ -18,7 +19,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useGetPagesQuery } from '@/redux/features/db-builder/pageBuilderSlice';
+import {
+  useAddRecordMutation,
+  useBulkDeleteRecordsMutation,
+  useBulkUpdateRecordsMutation,
+  useDeleteRecordMutation,
+  useGetPagesQuery,
+  useGetRecordsQuery,
+  useUpdateRecordMutation,
+} from '@/redux/features/db-builder/pageBuilderSlice';
 
 import { PageContent } from '../utils';
 import { Allfields } from '../all-fields/all-fields-index';
@@ -36,6 +45,7 @@ interface DbRecord {
   id: string;
   values: Record<string, string>;
   createdAt: string;
+  updatedAt?: string;
 }
 
 type ModalMode = 'add' | 'view' | 'edit' | null;
@@ -101,9 +111,21 @@ function PreviewPageContent() {
     return normalizedPages.find(p => p.path === pathTitle);
   }, [normalizedPages, pathTitle]);
 
+  const {
+    data: recordsData,
+    isLoading: isRecordsLoading,
+    isFetching: isRecordsFetching,
+    error: recordsError,
+    refetch: refetchRecords,
+  } = useGetRecordsQuery(currentPage?._id ?? skipToken);
+  const [addRecord, { isLoading: isAddingRecord }] = useAddRecordMutation();
+  const [updateRecord, { isLoading: isUpdatingRecord }] = useUpdateRecordMutation();
+  const [deleteRecordMutation, { isLoading: isDeletingRecord }] = useDeleteRecordMutation();
+  const [bulkUpdateRecords, { isLoading: isBulkUpdatingRecords }] = useBulkUpdateRecordsMutation();
+  const [bulkDeleteRecords, { isLoading: isBulkDeletingRecords }] = useBulkDeleteRecordsMutation();
+
   const [fields, setFields] = useState<PageContent[]>([]);
   const [visibleFieldIds, setVisibleFieldIds] = useState<string[]>([]);
-  const [records, setRecords] = useState<DbRecord[]>([]);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [searchValue, setSearchValue] = useState('');
   const [currentPageNumber, setCurrentPageNumber] = useState(1);
@@ -122,6 +144,21 @@ function PreviewPageContent() {
   const [recordToDelete, setRecordToDelete] = useState<DbRecord | null>(null);
   const [isColumnDialogOpen, setIsColumnDialogOpen] = useState(false);
   const [draftValues, setDraftValues] = useState<Record<string, string>>({});
+  const isMutatingRecords = isAddingRecord || isUpdatingRecord || isDeletingRecord || isBulkUpdatingRecords || isBulkDeletingRecords;
+
+  const records = useMemo<DbRecord[]>(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rawRecords = recordsData?.data?.records || (recordsData as any)?.records || [];
+    if (!Array.isArray(rawRecords)) return [];
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return rawRecords.map((record: any) => ({
+      id: record._id || record.id,
+      values: record.values || {},
+      createdAt: record.createdAt || new Date().toISOString(),
+      updatedAt: record.updatedAt,
+    }));
+  }, [recordsData]);
 
   useEffect(() => {
     if (currentPage?.content) {
@@ -135,6 +172,10 @@ function PreviewPageContent() {
   useEffect(() => {
     setCurrentPageNumber(1);
   }, [searchValue, itemsPerPage, activeDateFilter]);
+
+  useEffect(() => {
+    setSelectedIds(prev => prev.filter(id => records.some(record => record.id === id)));
+  }, [records]);
 
   const visibleRecords = useMemo(() => {
     const query = searchValue.trim().toLowerCase();
@@ -223,32 +264,41 @@ function PreviewPageContent() {
     setBulkEditValue('');
   };
 
-  const saveRecord = () => {
-    if (modalMode === 'add') {
-      const newRecord: DbRecord = {
-        id: `record-${Date.now()}`,
-        values: draftValues,
-        createdAt: new Date().toISOString(),
-      };
-      setRecords(prev => [newRecord, ...prev]);
-      closeModal();
-      return;
-    }
+  const saveRecord = async () => {
+    if (!currentPage?._id) return;
 
-    if (modalMode === 'edit' && activeRecord) {
-      setRecords(prev => prev.map(record => (record.id === activeRecord.id ? { ...record, values: draftValues } : record)));
-      closeModal();
+    try {
+      if (modalMode === 'add') {
+        await addRecord({ pageId: currentPage._id, values: draftValues }).unwrap();
+        closeModal();
+        return;
+      }
+
+      if (modalMode === 'edit' && activeRecord) {
+        await updateRecord({ id: activeRecord.id, pageId: currentPage._id, values: draftValues }).unwrap();
+        closeModal();
+      }
+    } catch (err) {
+      console.error('Failed to save record:', err);
+      window.alert('Failed to save record. Please try again.');
     }
   };
 
-  const deleteRecord = (recordId: string) => {
-    setRecords(prev => prev.filter(record => record.id !== recordId));
-    setSelectedIds(prev => prev.filter(id => id !== recordId));
+  const deleteRecord = async (recordId: string) => {
+    if (!currentPage?._id) return;
+
+    try {
+      await deleteRecordMutation({ id: recordId, pageId: currentPage._id }).unwrap();
+      setSelectedIds(prev => prev.filter(id => id !== recordId));
+    } catch (err) {
+      console.error('Failed to delete record:', err);
+      window.alert('Failed to delete record. Please try again.');
+    }
   };
 
-  const confirmDeleteRecord = () => {
+  const confirmDeleteRecord = async () => {
     if (!recordToDelete) return;
-    deleteRecord(recordToDelete.id);
+    await deleteRecord(recordToDelete.id);
     setRecordToDelete(null);
   };
 
@@ -264,29 +314,29 @@ function PreviewPageContent() {
     });
   };
 
-  const confirmBulkEdit = () => {
-    if (!bulkEditFieldId) return;
+  const confirmBulkEdit = async () => {
+    if (!bulkEditFieldId || !currentPage?._id) return;
 
-    setRecords(prev =>
-      prev.map(record =>
-        selectedIds.includes(record.id)
-          ? {
-              ...record,
-              values: {
-                ...record.values,
-                [bulkEditFieldId]: bulkEditValue,
-              },
-            }
-          : record,
-      ),
-    );
-    closeBulkModal();
+    try {
+      await bulkUpdateRecords({ pageId: currentPage._id, ids: selectedIds, fieldId: bulkEditFieldId, value: bulkEditValue }).unwrap();
+      closeBulkModal();
+    } catch (err) {
+      console.error('Failed to bulk update records:', err);
+      window.alert('Failed to update selected records. Please try again.');
+    }
   };
 
-  const confirmBulkDelete = () => {
-    setRecords(prev => prev.filter(record => !selectedIds.includes(record.id)));
-    setSelectedIds([]);
-    closeBulkModal();
+  const confirmBulkDelete = async () => {
+    if (!currentPage?._id) return;
+
+    try {
+      await bulkDeleteRecords({ pageId: currentPage._id, ids: selectedIds }).unwrap();
+      setSelectedIds([]);
+      closeBulkModal();
+    } catch (err) {
+      console.error('Failed to bulk delete records:', err);
+      window.alert('Failed to delete selected records. Please try again.');
+    }
   };
 
   const downloadBlob = (content: string, type: string, extension: string) => {
@@ -443,10 +493,18 @@ function PreviewPageContent() {
             <Button size="sm" variant="outlineWater" onClick={() => setActionDialog('filter')}>
               <Filter className="mr-2 h-4 w-4" /> Filter
             </Button>
-            <Button size="sm" variant="outlineWater" onClick={() => refetch()}>
+            <Button
+              size="sm"
+              variant="outlineWater"
+              onClick={() => {
+                refetch();
+                if (currentPage?._id) refetchRecords();
+              }}
+              disabled={isRecordsFetching}
+            >
               <RefreshCcw className="mr-2 h-4 w-4" /> Reload
             </Button>
-            <Button onClick={openAddDialog} variant="outlineGlassy" size="sm" className="gap-2">
+            <Button onClick={openAddDialog} variant="outlineGlassy" size="sm" className="gap-2" disabled={isMutatingRecords}>
               <Plus className="h-4 w-4" />
               Add
             </Button>
@@ -475,11 +533,17 @@ function PreviewPageContent() {
               <Columns3 className="h-4 w-4" />
               Clumn
             </Button>
-            <Button onClick={openBulkEditDialog} disabled={selectedIds.length === 0 || fields.length === 0} variant="outlineGlassy" size="sm" className="gap-2">
+            <Button
+              onClick={openBulkEditDialog}
+              disabled={selectedIds.length === 0 || fields.length === 0 || isMutatingRecords}
+              variant="outlineGlassy"
+              size="sm"
+              className="gap-2"
+            >
               <Edit className="h-4 w-4" />
               Bulk Edit
             </Button>
-            <Button onClick={() => setBulkModalMode('delete')} disabled={selectedIds.length === 0} variant="outlineFire" size="sm" className="gap-2">
+            <Button onClick={() => setBulkModalMode('delete')} disabled={selectedIds.length === 0 || isMutatingRecords} variant="outlineFire" size="sm" className="gap-2">
               <Trash2 className="h-4 w-4" />
               Bulk Delete
             </Button>
@@ -536,7 +600,21 @@ function PreviewPageContent() {
                     </td>
                   </tr>
                 ))}
-                {paginatedRecords.length === 0 && (
+                {isRecordsLoading && (
+                  <tr>
+                    <td colSpan={displayColumnCount + 3} className="px-4 py-12 text-center text-slate-500">
+                      Loading records...
+                    </td>
+                  </tr>
+                )}
+                {recordsError && !isRecordsLoading && (
+                  <tr>
+                    <td colSpan={displayColumnCount + 3} className="px-4 py-12 text-center text-red-300">
+                      Failed to load records.
+                    </td>
+                  </tr>
+                )}
+                {paginatedRecords.length === 0 && !isRecordsLoading && !recordsError && (
                   <tr>
                     <td colSpan={displayColumnCount + 3} className="px-4 py-12 text-center text-slate-500">
                       No records found.
@@ -582,7 +660,11 @@ function PreviewPageContent() {
               </div>
             </div>
           ))}
-          {paginatedRecords.length === 0 && (
+          {isRecordsLoading && <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-2xl p-10 text-center text-slate-500">Loading records...</div>}
+          {recordsError && !isRecordsLoading && (
+            <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-2xl p-10 text-center text-red-300">Failed to load records.</div>
+          )}
+          {paginatedRecords.length === 0 && !isRecordsLoading && !recordsError && (
             <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-2xl p-10 text-center text-slate-500">No records found.</div>
           )}
         </div>
@@ -785,8 +867,8 @@ function PreviewPageContent() {
               <Button variant="outlineWater" onClick={closeModal} size="sm">
                 Cancel
               </Button>
-              <Button onClick={saveRecord} disabled={fields.length === 0} variant="outlineGarden" size="sm">
-                Save
+              <Button onClick={saveRecord} disabled={fields.length === 0 || isMutatingRecords} variant="outlineGarden" size="sm">
+                {isMutatingRecords ? 'Saving...' : 'Save'}
               </Button>
             </div>
           )}
@@ -831,8 +913,8 @@ function PreviewPageContent() {
               <Button variant="ghost" onClick={closeBulkModal} className="text-slate-400 hover:bg-white/5 hover:text-white">
                 Cancel
               </Button>
-              <Button onClick={confirmBulkEdit} disabled={!bulkEditFieldId} className="bg-blue-600 text-white hover:bg-blue-500">
-                Update Selected
+              <Button onClick={confirmBulkEdit} disabled={!bulkEditFieldId || isBulkUpdatingRecords} className="bg-blue-600 text-white hover:bg-blue-500">
+                {isBulkUpdatingRecords ? 'Updating...' : 'Update Selected'}
               </Button>
             </div>
           </div>
@@ -852,8 +934,8 @@ function PreviewPageContent() {
               <Button variant="ghost" onClick={closeBulkModal} className="text-slate-400 hover:bg-white/5 hover:text-white">
                 Cancel
               </Button>
-              <Button onClick={confirmBulkDelete} className="bg-red-600 text-white hover:bg-red-500">
-                Confirm Delete
+              <Button onClick={confirmBulkDelete} disabled={isBulkDeletingRecords} className="bg-red-600 text-white hover:bg-red-500">
+                {isBulkDeletingRecords ? 'Deleting...' : 'Confirm Delete'}
               </Button>
             </div>
           </div>
@@ -902,8 +984,8 @@ function PreviewPageContent() {
               <Button variant="ghost" onClick={() => setRecordToDelete(null)} className="text-slate-400 hover:bg-white/5 hover:text-white">
                 Cancel
               </Button>
-              <Button onClick={confirmDeleteRecord} className="bg-red-600 text-white hover:bg-red-500">
-                Confirm Delete
+              <Button onClick={confirmDeleteRecord} disabled={isDeletingRecord} className="bg-red-600 text-white hover:bg-red-500">
+                {isDeletingRecord ? 'Deleting...' : 'Confirm Delete'}
               </Button>
             </div>
           </div>

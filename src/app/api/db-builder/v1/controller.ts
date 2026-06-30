@@ -11,7 +11,7 @@ import { FilterQuery } from 'mongoose';
 import { withDB } from '@/app/api/utils/db';
 import { formatResponse, IResponse } from '@/app/api/utils/utils';
 
-import DbBuilder from './model';
+import DbBuilder, { DbBuilderRecord } from './model';
 
 interface MongoError extends Error {
   code?: number;
@@ -123,7 +123,93 @@ export async function deletePage(req: Request): Promise<IResponse> {
 
     const deleted = await DbBuilder.findByIdAndDelete(id);
     if (!deleted) return formatResponse(null, 'Not found', 404);
+    await DbBuilderRecord.deleteMany({ pageId: id });
 
     return formatResponse({ deletedCount: 1 }, 'Deleted successfully', 200);
+  });
+}
+
+export async function getRecords(req: Request): Promise<IResponse> {
+  return withDB(async () => {
+    const url = new URL(req.url);
+    const pageId = url.searchParams.get('pageId');
+    if (!pageId) return formatResponse(null, 'Page ID is required', 400);
+
+    const records = await DbBuilderRecord.find({ pageId }).sort({ createdAt: -1 });
+    const total = await DbBuilderRecord.countDocuments({ pageId });
+
+    return formatResponse({ records, total }, 'Fetched successfully', 200);
+  });
+}
+
+export async function createRecord(req: Request): Promise<IResponse> {
+  return withDB(async () => {
+    const { pageId, values } = await req.json();
+    if (!pageId) return formatResponse(null, 'Page ID is required', 400);
+
+    const page = await DbBuilder.findById(pageId);
+    if (!page) return formatResponse(null, 'Page not found', 404);
+
+    const newRecord = await DbBuilderRecord.create({
+      pageId,
+      values: values || {},
+    });
+
+    return formatResponse(newRecord, 'Record created successfully', 201);
+  });
+}
+
+export async function updateRecord(req: Request): Promise<IResponse> {
+  return withDB(async () => {
+    const { id, values } = await req.json();
+    if (!id) return formatResponse(null, 'Record ID is required', 400);
+
+    const updated = await DbBuilderRecord.findByIdAndUpdate(
+      id,
+      { values: values || {} },
+      {
+        new: true,
+        runValidators: false,
+      },
+    );
+
+    if (!updated) return formatResponse(null, 'Record not found', 404);
+
+    return formatResponse(updated, 'Record updated successfully', 200);
+  });
+}
+
+export async function bulkUpdateRecords(req: Request): Promise<IResponse> {
+  return withDB(async () => {
+    const { ids, fieldId, value } = await req.json();
+    if (!Array.isArray(ids) || ids.length === 0) return formatResponse(null, 'Record IDs are required', 400);
+    if (!fieldId) return formatResponse(null, 'Field ID is required', 400);
+
+    const result = await DbBuilderRecord.updateMany({ _id: { $in: ids } }, { $set: { [`values.${fieldId}`]: value ?? '' } });
+
+    return formatResponse({ modifiedCount: result.modifiedCount }, 'Records updated successfully', 200);
+  });
+}
+
+export async function deleteRecord(req: Request): Promise<IResponse> {
+  return withDB(async () => {
+    const { id } = await req.json();
+    if (!id) return formatResponse(null, 'Record ID is required', 400);
+
+    const deleted = await DbBuilderRecord.findByIdAndDelete(id);
+    if (!deleted) return formatResponse(null, 'Record not found', 404);
+
+    return formatResponse({ deletedCount: 1 }, 'Record deleted successfully', 200);
+  });
+}
+
+export async function bulkDeleteRecords(req: Request): Promise<IResponse> {
+  return withDB(async () => {
+    const { ids } = await req.json();
+    if (!Array.isArray(ids) || ids.length === 0) return formatResponse(null, 'Record IDs are required', 400);
+
+    const result = await DbBuilderRecord.deleteMany({ _id: { $in: ids } });
+
+    return formatResponse({ deletedCount: result.deletedCount }, 'Records deleted successfully', 200);
   });
 }
