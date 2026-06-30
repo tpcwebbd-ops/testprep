@@ -649,7 +649,7 @@ export default function SiteMenuPage() {
   const [deleteItem, setDeleteItem] = useState<SidebarItem | null>(null);
   const [reorderItem, setReorderItem] = useState<SidebarItem | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
-
+  console.log('menuData', menuData);
   const [formData, setFormData] = useState({
     name: '',
     path: '',

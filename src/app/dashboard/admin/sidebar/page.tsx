@@ -272,7 +272,7 @@ export default function SiteMenuPage() {
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
-
+  console.log('sidebarData', sidebarData);
   useEffect(() => {
     if (sidebarData?.data?.sidebars) {
       setMenuItems(sidebarData.data.sidebars);

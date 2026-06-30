@@ -38,7 +38,7 @@ const Page = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [pageToDelete, setPageToDelete] = useState<IPage | null>(null);
   const [formData, setFormData] = useState({ pageName: '', path: '' });
-
+  console.log('pagesData', pagesData);
   useEffect(() => {
     const rawPages = pagesData?.data?.pages || [];
 

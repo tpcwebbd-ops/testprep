@@ -206,7 +206,7 @@ const FooterManager = () => {
   const [importTargetId, setImportTargetId] = useState<string | null>(null);
   const [expandedFooterId, setExpandedFooterId] = useState<string | null>(null);
   const [contentEditingFooter, setContentEditingFooter] = useState<FooterItem | null>(null);
-
+  console.log('footers', footers);
   const [formData, setFormData] = useState<Partial<FooterItem>>({
     name: '',
     disabledPaths: [],
