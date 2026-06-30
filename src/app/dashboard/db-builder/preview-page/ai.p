@@ -41,10 +41,12 @@ Add a conformation model to delete each item inside table.
 Look at the color combination, border, and style from 'src/app/dashboard/admin/sidebar/page.tsx' and implement the style in 'src/app/dashboard/db-bulder/edit-page/page.tsx' and 'src/app/dashboard/db-bulder/page.tsx' and 'src/app/dashboard/db-bulder/preview-page/page.tsx'
 
 
-Now look at the preview-page 'src/app/dashboard/db-builder/preview-page/page.tsx' 
+Now look at the preview-page 
+'src/app/dashboard/db-builder/preview-page/page.tsx' 
 api:
 'src/app/api/db-builder/v1/controller.ts'
 'src/app/api/db-builder/v1/model.ts'
 'src/app/api/db-builder/v1/route.ts'
 
-Now please implement functionality so I can add, edit, and delete data and it will sync with database. 
+here is url ='/dashboard/db-builder/preview-page?pathTitle=/dashboard/db-builder/custom-course' 
+and it will render the data base. Now please create a dynamic route so if the url is ='/dashboard/dynamicdb/custom-course' then it will render same as preview page. and make sure if the path is change then it also work. and If not found then it render database not found sections.

@@ -30,12 +30,14 @@ const Page = () => {
   const { data: pagesData, isLoading, error, refetch } = useGetPagesQuery({ page: 1, limit: 100 });
 
   const [addPage, { isLoading: isAdding }] = useAddPageMutation();
-  const [updatePage] = useUpdatePageMutation();
+  const [updatePage, { isLoading: isUpdating }] = useUpdatePageMutation();
   const [deletePage] = useDeletePageMutation();
 
   const [pages, setPages] = useState<IPage[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [pageToEdit, setPageToEdit] = useState<IPage | null>(null);
   const [pageToDelete, setPageToDelete] = useState<IPage | null>(null);
   const [formData, setFormData] = useState({ pageName: '', path: '' });
 
@@ -66,6 +68,8 @@ const Page = () => {
 
       extractPages(rawPages);
       setPages(normalizedList);
+    } else {
+      setPages([]);
     }
   }, [pagesData]);
 
@@ -82,13 +86,18 @@ const Page = () => {
     }, {});
   }, [pages]);
 
+  const formatPagePath = (path: string) => {
+    const trimmedPath = path.trim();
+    return trimmedPath.startsWith('/') ? trimmedPath : `/${trimmedPath}`;
+  };
+
   const handleSavePage = async () => {
     if (!formData.pageName || !formData.path) {
       toast.error('Please fill in all fields');
       return;
     }
 
-    const formattedPath = formData.path.startsWith('/') ? formData.path : `/${formData.path}`;
+    const formattedPath = formatPagePath(formData.path);
 
     try {
       await addPage({
@@ -109,6 +118,45 @@ const Page = () => {
 
   const handleEdit = (path: string) => {
     window.location.href = `/dashboard/db-builder/edit-page?pathTitle=${path}`;
+  };
+
+  const initiateEditDetails = (page: IPage) => {
+    setPageToEdit(page);
+    setFormData({ pageName: page.pageName, path: page.path });
+    setIsEditDialogOpen(true);
+  };
+
+  const closeEditDialog = () => {
+    setIsEditDialogOpen(false);
+    setPageToEdit(null);
+    setFormData({ pageName: '', path: '' });
+  };
+
+  const handleUpdatePageDetails = async () => {
+    if (!pageToEdit?._id) return;
+
+    if (!formData.pageName.trim() || !formData.path.trim()) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+
+    const formattedPath = formatPagePath(formData.path);
+    const nextPageName = formData.pageName.trim();
+
+    try {
+      await updatePage({
+        id: pageToEdit._id,
+        pageName: nextPageName,
+        path: formattedPath,
+      }).unwrap();
+
+      setPages(prev => prev.map(page => (page._id === pageToEdit._id ? { ...page, pageName: nextPageName, path: formattedPath } : page)));
+      toast.success('Page details updated successfully');
+      closeEditDialog();
+    } catch (err) {
+      toast.error('Failed to update page details');
+      console.error('Error updating page details:', err);
+    }
   };
 
   const initiateDelete = (page: IPage) => {
@@ -294,8 +342,12 @@ const Page = () => {
 
                           <div className="flex items-center justify-between gap-1">
                             <div className="flex gap-1">
-                              <Button size="sm" variant="outlineGlassy" className="min-w-1" onClick={() => handleEdit(page.path)} title="Edit Page">
+                              <Button size="sm" variant="outlineGlassy" className="min-w-1" onClick={() => initiateEditDetails(page)} title="Edit Title & Path">
                                 <Edit className="h-4 w-4" />
+                              </Button>
+
+                              <Button size="sm" variant="outlineGlassy" className="min-w-1" onClick={() => handleEdit(page.path)} title="Edit Fields">
+                                <Layout className="h-4 w-4" />
                               </Button>
 
                               <Button size="sm" variant="outlineGlassy" className="min-w-1" onClick={() => handlePreview(page.path)} title="Preview Page">
@@ -365,6 +417,57 @@ const Page = () => {
               </Button>
               <Button onClick={handleSavePage} disabled={!formData.pageName || !formData.path || isAdding} className="bg-blue-600 hover:bg-blue-500 text-white">
                 {isAdding ? 'Creating...' : 'Create Page'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isEditDialogOpen && pageToEdit && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-transparent backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white/10 rounded-sm bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-30 border border-gray-100 shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between p-6 border-b border-white/5 bg-white/5">
+              <h2 className="text-xl font-semibold text-white">Edit DB Page</h2>
+              <Button variant="ghost" size="icon" onClick={closeEditDialog} className="hover:bg-white/10 text-slate-400 hover:text-white">
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-title" className="text-slate-300">
+                  Page Title
+                </Label>
+                <Input
+                  id="edit-title"
+                  placeholder="e.g. About Us"
+                  className="bg-white/5 border-white/10 h-12 rounded-2xl text-white placeholder:text-white/40 focus:ring-2 focus:ring-blue-500"
+                  value={formData.pageName}
+                  onChange={e => setFormData({ ...formData, pageName: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-path" className="text-slate-300">
+                  Page Path
+                </Label>
+                <Input
+                  id="edit-path"
+                  placeholder="e.g. /about/us"
+                  className="bg-white/5 border-white/10 h-12 rounded-2xl text-white placeholder:text-white/40 focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                  value={formData.path}
+                  onChange={e => setFormData({ ...formData, path: e.target.value })}
+                />
+              </div>
+            </div>
+            <div className="p-6 pt-2 flex justify-end gap-3">
+              <Button variant="ghost" onClick={closeEditDialog} className="text-slate-400 hover:text-white hover:bg-white/5">
+                Cancel
+              </Button>
+              <Button
+                onClick={handleUpdatePageDetails}
+                disabled={!formData.pageName.trim() || !formData.path.trim() || isUpdating}
+                className="bg-blue-600 hover:bg-blue-500 text-white"
+              >
+                {isUpdating ? 'Updating...' : 'Update Page'}
               </Button>
             </div>
           </div>
