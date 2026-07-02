@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { name: 'Images', path: '/tools/images', icon: ImageIcon },
   { name: 'Template Generator', path: '/tools/template-generator', icon: LayoutTemplate },
   { name: 'Dashboard Builder', path: '/tools/dashboard-builder/dashboard-editor', icon: LayoutDashboard },
+  { name: 'Data Builder', path: '/tools/data-builder', icon: LayoutDashboard },
 ];
 
 export default function Layout({ children }: LayoutProps) {

@@ -1,0 +1,21 @@
+
+> testprepcenter@0.1.0 dev
+> next dev --turbopack --port 3001
+
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+   ▲ Next.js 15.5.9 (Turbopack)
+   - Local:        http://localhost:3001
+   - Network:      http://192.168.0.181:3001
+   - Environments: .env.local
+
+ ✓ Starting...
+Creating turbopack project {
+  dir: 'F:\\Work Toufiquer\\Archive\\test prep-copy-form-old-pc-office pc\\TR-test\\.1. software\\TestPrep\\testprep-webapp',
+  testMode: true
+}
+ ✓ Ready in 2.6s
+ ⚠ Webpack is configured while Turbopack is not, which may cause problems.
+ ⚠ See instructions if you need to configure Turbopack:
+  https://nextjs.org/docs/app/api-reference/next-config-js/turbopack
+

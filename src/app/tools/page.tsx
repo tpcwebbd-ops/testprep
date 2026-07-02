@@ -26,6 +26,13 @@ const TOOLS = [
     icon: LayoutDashboard,
     shadow: 'shadow-emerald-500/20',
   },
+  {
+    title: 'Data Builder',
+    description: 'Explore and analyze your database with ease and confidence.',
+    path: '/tools/data-builder',
+    icon: LayoutDashboard,
+    shadow: 'shadow-emerald-500/20',
+  },
 ];
 
 const containerVariants: Variants = {
